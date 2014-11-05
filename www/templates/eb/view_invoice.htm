@@ -1,0 +1,466 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+var licenceCosts = new Object();
+var discount = {$c{invoice}->discount||0};
+
+var exists = false;
+
+{
+	if($c{invoice}->exists)
+	{
+		$OUT.=<<"+++";
+	exists = true;
++++
+	}
+}
+
+function setIdChanged()
+\{	
+	var setId = document.getElementById('thread_set_id').value;
+	var newPrice = licenceCosts[setId];
+	
+	var licenceMode = false;
+	
+	if(setId=="6")
+	\{
+		//setOneYearAhead();
+		licenceMode = true;
+		document.invoiceForm.amount.value = 150;
+	\}
+	else
+	\{
+		licenceChanged();
+		//setForeverAhead();
+	\}
+	
+	document.invoiceForm.licence.disabled = licenceMode;
+\}
+
+function initSetIdChanged()
+\{
+	if(!exists)
+	\{
+		setIdChanged();
+		return;
+	\}
+	
+	var setId = document.getElementById('thread_set_id').value;	
+	
+	var licenceMode = false;
+	
+	if(setId=="6")
+	\{	
+		licenceMode = true;
+	\}
+	
+	document.invoiceForm.licence.disabled = licenceMode;	
+\}
+
+function modeChanged(gui)
+\{
+	var newMode = gui.value;
+	
+	if(newMode=="demo")
+	\{
+		//setOneMonthAhead();
+	\}
+\}
+
+function licenceChanged()
+\{
+	var gui = document.invoiceForm.licence;
+	
+	var licence = gui.value;
+	
+	document.invoiceForm.amount.value = licenceCosts[licence];
+	
+	calculatePrice();
+\}
+
+function discountChanged(gui)
+\{
+	var discount = parseFloat(gui.value);
+	
+	if(discount==-1) \{ discount = 0; \}
+	
+	document.invoiceForm.discount.value = discount;
+
+	calculatePrice();
+\}
+
+function calculatePrice()
+\{
+	var amount = parseFloat(document.invoiceForm.amount.value);
+	var discount = parseFloat(document.invoiceForm.discount.value);
+	
+	var takeAway = round2dp(amount * (discount/100));
+	var total = round2dp(amount - takeAway);
+	
+	document.getElementById('discountAmount').innerText = '£' + takeAway;	
+	document.getElementById('totalPrice').innerText = '£' + total;
+\}
+
+function round2dp(val)
+\{
+	return Math.round(val*100) / 100;
+\}
+
+{
+	my $licences = $c{invoice}->get_licence_hash;
+	
+	foreach my $key (keys %$licences)
+	{
+		my $cost = $licences->{$key}->{cost};
+		
+		$OUT.=<<"+++";
+	licenceCosts['$key'] = $cost;
++++
+	}
+	
+	my $endDate = Webkit::Date->now;
+	$endDate->epoch_days(35);
+	
+	my $st = $endDate->get_calendar_string;
+	
+	my $start_date = $c{invoice}->start_date || Webkit::Date->now;
+	
+	my $purchaseDate = $start_date->clone;
+	my $foreverDate = $start_date->clone;
+	my $sixMonthDate = $start_date->clone;
+	
+	$sixMonthDate->epoch_days(366/2);
+	$purchaseDate->Year($purchaseDate->Year+1);
+	$foreverDate->Year($foreverDate->Year+25);
+	
+	my $normalDateSt = $c{invoice}->end_date_calendar;
+	my $purchaseDateSt = $purchaseDate->get_calendar_string;
+	my $foreverDateSt = $foreverDate->get_calendar_string;
+	my $sixMonthSt = $sixMonthDate->get_calendar_string;
+	
+	$OUT.=<<"+++";
+	var endDateSt = '$st';
+	var normalDateSt = '$normalDateSt';
+	var purchaseDateSt = '$purchaseDateSt';
+	var foreverDateSt = '$foreverDateSt';
+	var sixMonthSt = '$sixMonthSt';
++++
+}
+	function applyDemoEndDate(checkbox, paidCheckbox)
+	\{
+		if(paidCheckbox.checked) \{ return; \}
+		
+		if(checkbox.checked)
+		\{
+			document.getElementById('end_date').value = endDateSt;
+		\}
+		else
+		\{
+			document.getElementById('end_date').value = normalDateSt;
+		\}
+	\}
+	
+	function demoModeClicked(gui)
+	\{
+	
+	\}
+	
+	function setOneMonthAhead()
+	\{
+		document.getElementById('end_date').value = endDateSt;
+	\}
+	
+	function setOneYearAhead()
+	\{
+		document.getElementById('end_date').value = purchaseDateSt;
+	\}
+	
+	function setSixMonthsAhead()
+	\{
+		document.getElementById('end_date').value = sixMonthSt;
+	\}
+	
+	function setForeverAhead()
+	\{
+		document.getElementById('end_date').value = foreverDateSt;	
+	\}
+	
+	function applyPurchaseEndDate(checkbox)
+	\{
+		if(checkbox.checked)
+		\{
+			document.getElementById('end_date').value = purchaseDateSt;
+		\}
+		else
+		\{
+			document.getElementById('end_date').value = normalDateSt;
+		\}
+	\}	
+	
+	function goBack()
+	\{
+		var loc = href + '&method=schools_view_school&school_id={$c{school}->get_id}';
+		
+		document.location = loc;
+	\}
+	
+	function downloadInvoice()
+	\{
+		var loc = href + '&method=invoices_download&invoice_id={$c{invoice}->get_id}';
+		
+		document.location = loc;
+	\}
+	
+	function downloadLicence()
+	\{
+		var loc = href + '&method=invoices_licence_download&invoice_id={$c{invoice}->get_id}';
+		
+		document.location = loc;
+	\}	
+	
+	function sendInvoice()
+	\{
+		var loc = href + '&method=invoices_send_submit&invoice_id={$c{invoice}->get_id}';
+		
+		if(window.confirm('Are you sure you want to set this invoice to sent?'))
+		\{
+			document.location = loc;
+		\}
+	\}
+	
+	function payInvoice()
+	\{
+		var loc = href + '&method=invoices_pay_submit&invoice_id={$c{invoice}->get_id}';
+		
+		if(window.confirm('Are you sure you want to set this invoice to paid?'))
+		\{
+			document.location = loc;
+		\}
+	\}
+	
+	function revokeInvoice(unrevoke)
+	\{
+		var loc = href + '&method=invoices_revoke_submit&invoice_id={$c{invoice}->get_id}';
+		var unrevokeSt;
+		
+		if(unrevoke)
+		\{
+			loc += '&unrevoke=y';
+			unrevokeSt = 'Un';
+		\}
+		
+		if(window.confirm('Are you sure you want to set this invoice to ' + unrevokeSt + 'revoked?'))
+		\{
+			document.location = loc;
+		\}
+	\}
+
+</script>
+<body>
+<form method="GET" action="{$c{href}}" name="invoiceForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="invoices_save_dates">
+<input type="hidden" name="invoice_id" value="{$c{invoice}->get_id}">
+<table height="100%" border="0" align="center" cellpadding="20" cellspacing="0">
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Invoice Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>School Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+{$c{school}->name}    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Set:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+<select style="width:100%;" class="text_field" name="thread_set_id" onChange="setIdChanged(this);">
+{$c{set_options}}
+</select>   </TD>
+  </TR>  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Licence:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+<select style="width:100%;" class="text_field" name="licence" onChange="licenceChanged();">
+{$c{licence_options}}
+</select>   </TD>
+  </TR>    
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Amount:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+	
+      <input name="amount" type="text" class="text_field" id="amount" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{invoice}->amount||0}" onChange="calculatePrice();"></TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Discount:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+	<table border=0 cellpadding=0 cellspacing=0>
+	<tr>
+	<td>
+      <input name="discount" type="text" class="text_field" id="discount" style="width:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{invoice}->discount||0}" onChange="calculatePrice();">
+    </td>
+	 <td><select name="discountOptions" class="text_field" id="discountOptions" style="width:70px;" onChange="discountChanged(this);">
+
+{$c{discount_options}}
+
+
+</select>
+	 
+	 </td>
+	 <td width="50" align="right">
+	 <span id="discountAmount" style="color:blue;">£0</span>
+	 </td>
+    </tr>
+	 </table>
+	  </TD>
+  </TR>  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Total Price:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <span style="color:red;" id="totalPrice"></span></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Notes:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <textarea name="notes" class="text_field" id="notes" style="width:100%;height:60px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{invoice}->notes}</textarea></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Order Number:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <input name="order_number" type="text" class="text_field" id="order_number" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{invoice}->order_number}"></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Mode:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+<select style="width:100%;" class="text_field" name="mode" onChange="modeChanged(this);">
+{$c{mode_options}}
+</select>   </TD>
+  </TR>    
+    <TR style="padding-bottom:5px;"> 
+    <TD colspan="2" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;"><input type="button" value="Set One Month Ahead" class="button" onClick="setOneMonthAhead();"></TD>
+  </TR>  
+    <TR style="padding-bottom:5px;"> 
+    <TD colspan="2" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;"><input type="button" value="Set Six Months Ahead" class="button" onClick="setSixMonthsAhead();"></TD>
+  </TR>    
+    <TR style="padding-bottom:5px;"> 
+    <TD colspan="2" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;"> 
+<input type="button" value="Set One Year Ahead" class="button" onClick="setOneYearAhead();">    </TD>
+  </TR>    
+    <TR style="padding-bottom:5px;"> 
+    <TD colspan="2" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;"> 
+<input type="button" value="Set Forever Ahead" class="button" onClick="setForeverAhead();">    </TD>
+  </TR>  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Access From:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <input name="start_date" type="text" class="text_field" id="start_date" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{invoice}->start_date_calendar}"></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Access To:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <input name="end_date" type="text" class="text_field" id="end_date" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{invoice}->end_date_calendar_forever}"></TD>
+  </TR>    
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Status:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+{$c{invoice}->get_state_icon_img}    </TD>
+  </TR>    
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Revoked:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+{$c{invoice}->get_revoked_status}    </TD>
+  </TR>      
+</TABLE>
+
+</div>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+<td align="center"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" CLASS="button2" style="width:125px;" value="Save Dates"></TD>
+</TR>
+{
+	if($c{invoice}->exists)
+	{
+		$OUT.=<<"+++";
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" value="Download Invoice" CLASS="button2" style="width:125px;" onClick="downloadInvoice();"></TD>
+</TR>
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" value="Download Licence" CLASS="button2" style="width:125px;" onClick="downloadLicence();"></TD>
+</TR>
++++
+	}
+	
+	if($c{invoice}->sent)
+	{
+		if(!$c{invoice}->revoked)
+		{
+			$OUT.=<<"+++";
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" value="Revoke Invoice" CLASS="button2" style="width:125px;" onClick="revokeInvoice();"></TD>
+</TR>		
++++
+		}
+	}
+	
+	if($c{invoice}->revoked)
+	{
+		$OUT.=<<"+++";
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" value="UnRevoke Invoice" CLASS="button2" style="width:125px;" onClick="revokeInvoice(true);"></TD>
+</TR>		
++++
+	}	
+}
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" value="Back" CLASS="button2" style="width:125px;" onClick="history.back();"></TD>
+</TR>		
+</TABLE></td>
+</tr>
+</table>
+<script>
+{
+	if(!$c{invoice}->exists)
+	{
+		$OUT.=<<"+++";
+licenceChanged(document.invoiceForm.licence);
+discountChanged(document.invoiceForm.discount);
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+calculatePrice();		
++++
+	}
+}
+initSetIdChanged();
+</script>
+</form>
+</body>
+</html>
+
+
+

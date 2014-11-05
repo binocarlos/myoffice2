@@ -1,0 +1,552 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#D4D0C8;">
+<script src="/lib/formhelp.js">
+</script>
+<script>
+	var extra_fields = new Object();
+	var calendar_events = new Object();
+	
+	var new_dfield_id = 0;
+	var new_field_id = 0;
+	var edit_field_id = null;
+	
+	var currentSection = 'extra_resource';
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}	
+	
+	function get_keywords_packet()
+	\{
+		var packet = "<keywords>\n";
+		
+		for(var extra_field_id in extra_fields)
+		\{
+			var extra_field = extra_fields[extra_field_id];
+			
+			var is_main_field = extra_field.is_main_field;
+			
+			if(!is_main_field)
+			\{
+				is_main_field = false;
+			\}
+			else
+			\{
+				is_main_field = true;
+			\}
+			
+			packet += "		<extra_field id=\"" + extra_field.id + "\" name=\"" + extra_field.name + "\" type=\"" + extra_field.type + "\" is_main_field=\"" + is_main_field + "\">" + extra_field.list_options + "</extra_field>\n";
+		\}
+		
+		packet += "</keywords>";
+		
+		return packet;
+	\}
+	
+	function get_calendar_events_packet()
+	\{
+		var packet = "<calendar_events>\n";
+		
+		for(var event_id in calendar_events)
+		\{
+			var eventObj = calendar_events[event_id];
+			
+			packet += "		<calendar_event id=\"" + eventObj.id + "\" name=\"" + eventObj.name + "\" color=\"" + eventObj.color + "\"/>\n";
+		\}
+		
+		packet += "</calendar_events>";
+		
+		return packet;
+	\}
+	
+	function add_extra_field()
+	\{
+		var type_gui = document.getElementById('field_type');
+		var field_name_gui = document.getElementById('field_name');
+		var list_options_gui = document.getElementById('field_options');
+		var is_main_field_gui = document.getElementById('main_field');
+		
+		var type = type_gui.value;
+		var field_name = field_name_gui.value;
+		var list_options = list_options_gui.value;
+		var is_main_field = is_main_field_gui.checked;
+		
+		if(field_name=='')
+		\{
+			alert('Please enter a name for the field');
+			return;
+		\}
+		
+		var new_field;
+		
+		if(!edit_field_id)
+		\{
+			new_field_id++;
+		
+			new_field = new Object();
+			new_field.id = 'new' + new_field_id;			
+		\}
+		else
+		\{
+			new_field = extra_fields[edit_field_id];
+		\}
+		
+		new_field.type = type;
+		new_field.name = field_name;
+		new_field.list_options = list_options;
+		new_field.is_main_field = is_main_field;
+		
+		extra_fields[new_field.id] = new_field;
+		
+		apply_extra_field_table();
+		
+		cancel_extra_field();
+	\}
+	
+	function add_calendar_event()
+	\{
+		var event_name = document.getElementById('event_name').value;
+		var color = document.getElementById('color_td').bgColor;
+		
+		if(event_name=='')
+		\{
+			alert('Please enter a name for the event');
+			return;
+		\}
+		
+		var new_event;
+		
+		if(!edit_field_id)
+		\{		
+			var date = new Date();
+			new_event = new Object();
+			new_event.id = date.getTime();
+		\}
+		else
+		\{
+			new_event = calendar_events[edit_field_id];
+		\}
+		
+		new_event.name = event_name;
+		new_event.color = color;
+		
+		calendar_events[new_event.id] = new_event;
+		
+		apply_calendar_event_table();
+		
+		cancel_calendar_event();
+	\}	
+	
+	function cancel_extra_field()
+	\{
+		document.getElementById('field_type').value = 'text';
+		document.getElementById('field_name').value = '';
+		document.getElementById('field_options').value = '';
+		document.getElementById('main_field').checked = false;
+		document.getElementById('add_field_button').value = 'Add Field';
+		
+		field_type_changed();
+		
+		edit_field_id = null;			
+	\}
+	
+	function cancel_calendar_event()
+	\{
+		document.getElementById('event_name').value = '';
+		document.getElementById('color_td').bgColor = '#ffffff';
+		document.getElementById('add_event_button').value = 'Add Event';
+		
+		edit_field_id = null;			
+	\}	
+	
+	function edit_extra_field(field_id)
+	\{
+		var field_obj = extra_fields[field_id];
+		
+		document.getElementById('add_field_button').value = 'Save Field';
+		document.getElementById('field_type').value = field_obj.type;
+		document.getElementById('field_name').value = field_obj.name;
+		document.getElementById('field_options').value = field_obj.list_options;
+		
+		var is_main_field = field_obj.is_main_field;
+		var is_main_field_gui = document.getElementById('main_field');
+		
+		is_main_field_gui.checked = is_main_field;
+		
+		field_type_changed();
+		
+		edit_field_id = field_id;		
+	\}
+	
+	function edit_calendar_event(calendar_event_id)
+	\{
+		var calendar_event = calendar_events[calendar_event_id];
+		
+		document.getElementById('add_event_button').value = 'Save Event';
+		document.getElementById('event_name').value = calendar_event.name;
+		document.getElementById('color_td').bgColor = calendar_event.color;
+		
+		edit_field_id = calendar_event_id;
+	\}	
+	
+	function delete_extra_field(field_id)
+	\{
+		var field_obj = extra_fields[field_id];
+		
+		var should_delete = window.confirm('Are you sure you want to delete the ' + field_obj.name + ' field?');
+		
+		if(should_delete)
+		\{
+			delete(extra_fields[field_id]);
+			
+			apply_extra_field_table();		
+		\}
+	\}
+	
+	function delete_calendar_event(event_id)
+	\{
+		var calendar_event = calendar_events[event_id];
+		
+		var should_delete = window.confirm('Are you sure you want to delete the ' + calendar_event.name + ' event?');
+		
+		if(should_delete)
+		\{
+			delete(calendar_events[event_id]);
+			
+			apply_calendar_event_table();		
+		\}
+	\}	
+	
+	function apply_extra_field_table()
+	\{
+		var text = get_extra_field_table();
+		
+		document.getElementById('extra_field_table').innerHTML = text;
+	\}
+	
+	function apply_calendar_event_table()
+	\{
+		var text = get_calendar_event_table();
+		
+		document.getElementById('calendar_event_table').innerHTML = text;	
+	\}
+
+	function get_extra_field_table()
+	\{
+		var table = '<table width=100% border=0>';
+		
+		for(var extra_field_id in extra_fields)
+		\{
+			var extra_field = extra_fields[extra_field_id];
+			
+			table += 	'<tr><td>' + extra_field.name + '</td>'
+			+			'<td width=60>' + extra_field.type + '</td>'
+			+			'<td width=20><a style="cursor:hand;" onClick="edit_extra_field(\'' + extra_field.id + '\');"><img src="/images/icons/16/folderopen_readwrite.gif" width=16 height=16 border=0 alt="Edit Field"></a></td>'
+			+			'<td width=20><a style="cursor:hand;" onClick="delete_extra_field(\'' + extra_field.id + '\');"><img src="/images/icons/16/recyclebin.gif" width=16 height=16 alt="Delete Field" border=0></td>';
+		\}
+		
+		table += '</table>';
+		
+		return table;
+	\}
+	
+	function get_calendar_event_table()
+	\{
+		var table = '<table width=100% border=0>';
+		
+		for(var calendar_event_id in calendar_events)
+		\{
+			var calendar_event = calendar_events[calendar_event_id];
+			
+			table += 	'<tr><td width=30 bgcolor="' + calendar_event.color + '">&nbsp;</td>'
+			+			'<td>' + calendar_event.name + '</td>'
+			+			'<td width=20><a style="cursor:hand;" onClick="edit_calendar_event(\'' + calendar_event.id + '\');"><img src="/images/icons/16/folderopen_readwrite.gif" width=16 height=16 border=0 alt="Edit Event"></a></td>'
+			+			'<td width=20><a style="cursor:hand;" onClick="delete_calendar_event(\'' + calendar_event.id + '\');"><img src="/images/icons/16/recyclebin.gif" width=16 height=16 alt="Delete Event" border=0></td></tr>';
+		\}
+		
+		table += '</table>';
+		
+		return table;
+	\}
+	
+	
+	function field_type_changed()
+	\{
+		var gui = document.getElementById('field_type');
+		
+		var value = gui.value;
+		
+		var tr = document.getElementById('list_options_tr');
+		
+		if(value=='text')
+		\{
+			tr.style.display = 'none';
+		\}
+		else
+		\{
+			tr.style.display = 'inline';
+		\}
+	\}
+	
+	function do_cancel()
+	\{
+		top.returnValue = null;
+		
+		top.close();
+	\}
+	
+	function validate_optionsform()
+	\{
+		var keywords_packet = get_keywords_packet();
+		var calendar_packet = get_calendar_events_packet();
+		
+		document.optionsform.keywords_packet.value = keywords_packet;
+		document.optionsform.calendar_packet.value = calendar_packet;
+		
+		return true;
+	\}
+
+	function insert_calendar_event(name, id, color)
+	\{
+		var cal_event = new Object();
+		cal_event.id = id;
+		cal_event.name = name;
+		cal_event.color = color;
+		
+		calendar_events[cal_event.id] = cal_event;
+	\}
+	
+	function insert_extra_field(name, type, is_main_field, list_options)
+	\{
+		new_field_id++;
+		
+		var new_field = new Object();
+		new_field.id = 'new' + new_field_id;
+		new_field.name = name;
+		new_field.type = type;
+		new_field.is_main_field = is_main_field;
+		new_field.list_options = list_options;
+		
+		extra_fields[new_field.id] = new_field;
+	\}
+
+	
+{
+	foreach my $event (@{$c{calendar_events}})
+	{
+		my $id = $event->{id};
+		my $name = $event->{name};
+		my $color = $event->{color};
+		
+		$OUT.=<<"+++";
+insert_calendar_event('$name', '$id', '$color');		
++++
+	}
+	
+	foreach my $extra_field (@{$c{extra_fields}})
+	{
+		my $name = $extra_field->name;
+		my $type = $extra_field->type;
+		my $list_options = $extra_field->js_list_options;
+		my $is_main_field = $extra_field->is_main_field;
+		
+		if($is_main_field!~/\w/)
+		{
+			$is_main_field = 'false';
+		}
+		
+		$OUT.=<<"+++";
+insert_extra_field('$name', '$type', $is_main_field, '$list_options');		
++++
+	}
+}		
+
+</script>
+<style>
+.tab-page \{height:352px;width:474px;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="optionsform" onSubmit="return validate_optionsform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_options_submit">
+<input type="hidden" name="keywords_packet" value="">
+<input type="hidden" name="calendar_packet" value="">
+<input type="hidden" name="website_id" value="{$c{website}->get_id}">
+
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td colspan="2">{$c{website}->name} Options</td>
+</tr>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="extra_resource" selected>Extra Resource Fields</option>
+<option value="calendar">Calendar Options</option>
+<option value="moderators">Moderators</option>
+</select>
+</td>
+<td align="left" width="100%" valign=top>
+<!--
+
+
+	Extra Resource
+	
+	
+	-->
+	
+<span id="extra_resource_section" style="display:inline;">	
+<b>Extra Resource Fields</b><br><br>
+{
+	my $display = 'inline';
+	
+	if(!$c{user}->admin)
+	{
+		$display = 'none';
+		$OUT.=<<"+++";
+<font color="red">This is an 'Admin Only' feature. Please contact your system administrator if you wish to add any additional fields.</font>
++++
+	}
+	
+	$OUT.=<<"+++";
+<table border="0" cellpadding="0" cellspacing="0" width="96%" align="center" style="display:$display;">	
++++
+}
+    <tr> 
+      <td valign="top"> 
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+          <tr style="padding-bottom:5px;"> 
+            <td width="70" align="right" nowrap>Field&nbsp;Name:&nbsp;</td>
+            <td align="left"> 
+              <input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="field_name" id="field_name" value="" style="width:100%;">
+            </td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td width="70" align="right" nowrap>Field Type:</td>
+            <td align="left"> 
+              <select onChange="field_type_changed(this);" size="1" style="width:100%;" class="text_field" name="field_type" id="field_type">
+                <option value="text" selected>Simple Text Entry</option>
+                <option value="choice">Select From List</option>
+                <option value="textorchoice">Select From List or Text</option>
+                <option value="multichoice">Multiple Choice</option>				
+              </select>
+            </td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td width="70" align="right" nowrap>Main Field?:</td>
+            <td align="left"> 
+             <input type="checkbox" id="main_field" name="main_field" value="y">
+            </td>
+          </tr>		  
+          <tr style="padding-bottom:5px;display:none;" id="list_options_tr"> 
+            <td width="70" align="right" valign="top">List Options:<br>
+              (seperate with <br>
+              comma)</td>
+            <td align="right" valign="top"> 
+              <textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="field_options" id="field_options" style="width:300px; height:200px;"></textarea>
+            </td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td align="right" valign="top">&nbsp;</td>
+            <td align="right" valign="top">
+              <input type="button" value="Cancel" class="button" onClick="cancel_extra_field();" style="width:100px;">
+              &nbsp;&nbsp;
+              <input id="add_field_button" type="button" value="Add Field" class="button" onClick="add_extra_field();" style="width:100px;">
+            </td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td colspan="2" align="right" valign="top" height=10><hr></td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td colspan="2" align="left" valign="top" id="extra_field_table">&nbsp;</td>
+          </tr>
+        </table>
+      </td>
+      <td width="10"><img src="/images/clear.gif" width="10" height="1"></td>
+    </tr>
+  </table>
+</span>
+<span id="calendar_section" style="display:none;">	
+<b>Calendar Events </b><br>
+<br>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+          <tr style="padding-bottom:5px;"> 
+            <td width="70" align="right" nowrap>Event&nbsp;Name:&nbsp;</td>
+            <td align="left"> 
+              <input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="event_name" id="event_name" value="" style="width:100%;">
+            </td>
+          </tr>		  
+          <tr style="padding-bottom:5px;"> 
+            <td width="70" align="right" valign="top">Color: </td>
+            <td align="right" valign="top">{$c{color_picker}} 
+            </td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td align="right" valign="top">&nbsp;</td>
+            <td align="right" valign="top">
+              <input type="button" value="Cancel" class="button" onClick="cancel_calendar_event();" style="width:100px;">
+              &nbsp;&nbsp;
+              <input id="add_event_button" type="button" value="Add Event" class="button" onClick="add_calendar_event();" style="width:100px;">
+            </td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td colspan="2" align="right" valign="top" height=10><hr></td>
+          </tr>
+          <tr style="padding-bottom:5px;"> 
+            <td colspan="2" align="left" valign="top" id="calendar_event_table">&nbsp;</td>
+          </tr>
+        </table>
+</span>
+
+<span id="moderators_section" style="display:none;">	
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+          <tr style="padding-bottom:5px;" id="list_options_tr"> 
+            <td width="70" align="right" valign="top">Moderators email addresses (one per line): </td>
+            <td align="left" valign="top"> 
+              <textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="moderators" id="moderators" style="width:300px; height:200px;">{$c{moderators}}</textarea>
+          </td>
+          </tr>
+</table>		  
+</span>
+</td>
+</tr>
+<tr>
+<td colspan=2>
+
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="474">
+<tr>
+<td align="LEFT" valign="TOP" style="padding-top:12px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{error_text}}</span></font></td>
+<td align="RIGHT" valign="TOP">
+<input type="submit" value="Save" class="button" name="submit" style="width:75px;" id="save_button"><input type="button" value="Cancel" class="button2" name="Button" onClick="do_cancel();" style="width:75px;">
+</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</form>
+
+<script>
+		//setupAllTabs();
+		apply_extra_field_table();
+		apply_calendar_event_table();
+		//apply_dynamic_field_table();
+</script>
+</body>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Clients/Users" width="150">
+{
+	if(!$c{org}->is_client)
+	{
+		$OUT.=<<"+++";
+
+		<menublock title="Clients" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=clients_tree&amp;frame_method=clients_add_client&amp;appname=clientms');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=clients_tree&amp;appname=clientms');"/>
+		</menublock>
++++
+	}
+}
+		<menublock title="{$c{org}->get_value('name')} Users" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user&amp;appname=queryhandler');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home&amp;appname=queryhandler');"/>
+		</menublock>
+	</menublock>
+	<menublock title="Queries" width="140">
+{
+	if(!$c{org}->is_client)
+	{
+		$OUT.=<<"+++";
+		<menuitem title="View/Edit All Queries" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Search Queries&amp;frame_method=queries_org_home&amp;appname=queryhandler');"/>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		<menuitem title="Submit Query" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Create Query&amp;frame_method=queries_client_add_query&amp;appname=queryhandler');"/>
+		<menuitem title="View Queries" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Queries&amp;frame_method=queries_client_home&amp;appname=queryhandler');"/>
++++
+	}
+}
+	</menublock>
+</menu_config>

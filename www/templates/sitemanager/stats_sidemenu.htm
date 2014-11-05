@@ -1,0 +1,89 @@
+<!--#include virtual="temp_include.htm" -->
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	
+	function get_xTree_log(id)
+	\{
+		parent.view_log(id);		
+	\}
+
+var tree = new WebFXTree('Website Statistics');
+tree.setBehavior('explorer');
+{
+	my $warr = $c{org}->get_child_array('website');
+	foreach my $website (@$warr)
+	{
+		my $website_id = $website->get_id;
+		my $website_title = $website->get_value('title');
+
+		$OUT.=<<"+++";
+var website$website_id = new WebFXTreeItem('$website_title');
+
+tree.add(website$website_id);
++++
+
+		$OUT.=<<"+++";
+var website$website_idmonthfolder;
++++
+
+		my $current_month = 10000;
+		my $current_year = 10000;
+		
+		my $larr = $website->get_child_array('log');
+
+		foreach my $log (@$larr)
+		{
+			my $id = $log->get_id;
+			my $date_st = $log->get_date_st;
+			
+			my $log_month = $log->get_value('generated')->Month;
+			my $log_year = $log->get_value('generated')->Year;
+			
+			my $new_folder = undef;
+			
+			if($log_month<$current_month)
+			{
+				$current_month = $log_month;
+				$new_folder = 1;
+			}
+			
+			if($log_year<$current_year)
+			{
+				$current_month = $log_month;
+				$current_year = $log_year;
+				$new_folder = 1;
+			}
+			
+			if($new_folder)
+			{
+				my $month_name = Webkit::BaseDate->get_monthname($current_month);
+			
+				$OUT.=<<"+++";
+website$website_idmonthfolder = new WebFXTreeItem('$month_name - $current_year');
+website$website_id.add(website$website_idmonthfolder);
++++
+			}
+	
+			
+
+			$OUT.=<<"+++";
+var log$id = new WebFXTreeItem('$date_st');
+log$id.action = "javascript: get_xTree_log($id);";
+
+website$website_idmonthfolder.add(log$id);
++++
+		}
+	}
+}
+document.write(tree.toString());
+
+tree.collapseAll();
+
+tree.expand();
+
+</script>
+
+
+

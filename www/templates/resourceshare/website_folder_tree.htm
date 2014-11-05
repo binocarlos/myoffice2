@@ -1,0 +1,177 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<style>
+body \{margin:5px\}
+</style>
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+
+	var folderInfo = new Object();
+
+	function nF(folder_id, id, title, icon, open_icon)
+	\{
+		var folderItem = new WebFXTreeItem(title);
+		folderItem.action = "javascript: select_folder('" + id + "');";
+		folderItem.icon = icon;
+		folderItem.openIcon = open_icon;
+		folder_tree_nodes[folder_id] = folderItem;
+		
+		var info = new Object();
+		info.title = title;
+		info.id = id;
+		
+		folderInfo[id] = info;
+		
+		return folderItem;
+	\}
+
+	function viewSchool(id)
+	\{
+		top.set_current_folder_from_tree('rootfolder&subdomain_org_id=' + id);
+	\}
+	
+	function viewRoot()
+	\{
+		top.set_current_folder_from_tree('rootfolder');
+	\}
+
+	function select_folder(id, org_id)
+	\{
+		var info = folderInfo[id];
+		
+		top.returnValue = info;
+		top.close();
+	\}
+	
+	function view_recycle_bin(view_org_id)
+	\{
+		var new_loc = href + '&method=resources_recycle_bin';
+		
+		if(view_org_id)
+		\{
+			new_loc += '&view_org_id=' + view_org_id;
+		\}
+		
+		top.content.page.content.location = new_loc;
+	\}
+
+	function click_folder(id, org_id)
+	\{
+		var node_id = id;
+
+		if(node_id!='rootfolder')
+		\{
+			node_id = 'folder' + node_id;
+		\}
+
+		var node = folder_tree_nodes[node_id];
+		var current_node = node;
+		
+		var to_expand_array = new Array();
+		
+		while(current_node)
+		\{
+			if(current_node.parentNode)
+			\{
+				to_expand_array[to_expand_array.length] = current_node;
+			\}
+			
+			current_node = current_node.parentNode;
+		\}
+		
+		for(var i=to_expand_array.length-1; i>=0; i--)
+		\{
+			var pnode = to_expand_array[i];
+			
+			pnode.expand();
+		\}
+		
+		if(node)
+		\{
+			node.focus();
+		\}
+				
+		select_folder(id, org_id);		
+	\}
+
+	function expand_folder(id)
+	\{
+		var node = folder_tree_nodes['folder' + id];
+
+		if(node)
+		\{
+			if(node.childNodes.length>0)
+			\{
+				node.expand();
+			\}
+		\}
+	\}
+	
+var folder_tree_nodes = new Object();	
+
+{
+	sub get_folder_tree
+	{
+		my ($folder, $parent) = @_;
+
+		my $id = $folder->get_id;
+		my $folderid = $folder->js_folder_id;
+		my $title = $folder->get_js_value('title');
+		my $parent_id = $parent->js_folder_id;
+
+		my $icon = $folder->get_tree_icon;
+		my $open_icon = $folder->get_tree_open_icon;
+
+		my $txt=<<"+++";
+var $folderid = nF('$folderid', $id, '$title', '$icon', '$open_icon');
++++
+
+		foreach my $child (@{$folder->ensure_child_array('folder')})
+		{
+			$txt.=&get_folder_tree($child, $folder);
+		}
+
+		$txt.=<<"+++";
+$parent_id.add($folderid);
++++
+
+		return $txt;		
+	}
+	
+	my $root_folder = $c{website}->root_folder;
+	my $root_folder_id = $root_folder->js_folder_id;
+
+	my $title = $root_folder->title;
+
+	$OUT.=<<"+++";
+
+var $root_folder_id = new WebFXTree('$title');
+$root_folder_id.setBehavior('explorer');
+$root_folder_id.action = "javascript: viewRoot();";
+$root_folder_id.icon = '/images/icons/16/networkdrive.gif';
+$root_folder_id.openIcon = '/images/icons/16/networkdrive.gif';
+
+
+folder_tree_nodes.rootfolder = $root_folder_id;
++++
+
+	my $folder_arr = $root_folder->get_child_array('folder');
+
+	foreach my $folder (@$folder_arr)
+	{
+		$OUT.=&get_folder_tree($folder, $root_folder);
+	}
+
+	$OUT.=<<"+++";
+
+var tree_string = $root_folder_id.toString();
+
+document.write(tree_string);
+
++++
+}
+
+</script>
+
+
+

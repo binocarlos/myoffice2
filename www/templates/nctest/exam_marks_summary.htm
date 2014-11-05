@@ -1,0 +1,41 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+</script>
+
+<table border="0" align="left" cellpadding="5" cellspacing="1" bgcolor="#999999">
+  <tr bgcolor="#FFFFFF">
+    <td colspan="3">
+      <p>{$c{test}->name} Quiz Marks Summary</p>
+	<p><b style="color:red;">{$c{test}->get_auto_marks}</b> Marks Automatically Marked from <b style="color:red;">{$c{test}->get_total_marks}</b> Total</p>
+	<p><input type="button" class="button" value="Back to Quizzes" onClick="document.location = href + '&method=exams_home';"></p>
+	</td>
+  </tr>
+{
+	foreach my $class (@{$c{exam}->ensure_child_array('class')})
+	{
+		my $title = $class->get_title;
+		
+		$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF">
+    <td colspan="3">$title</td>
+  </tr>
++++
+		foreach my $exam_login (@{$class->ensure_child_array('exam_login')})
+		{
+			my $pupil_name = $exam_login->get_pupil_name;
+			my $login_code = $exam_login->login_code;
+			my $marks = $exam_login->get_total_marks;
+			my $percent = sprintf("%.0f", ($marks / $c{test}->get_total_marks)*100);
+			
+			$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF">
+    <td width="250" align="right">$pupil_name - $login_code</td>
+    <td align="right"><b style="color:red;">$marks</b> Marks</td>
+	<td align="right">$percent %</td>
+  </tr>
++++
+		}
+	}
+}
+</table>

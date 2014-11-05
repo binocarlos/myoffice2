@@ -1,0 +1,98 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%"> 
+<TR> 
+  <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="TOP"> 
+	 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%"> 
+		<TR> 
+		  <TD HEIGHT="100%"> 
+			 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner" HEIGHT="100%"> 
+				<TR> 
+				  <TD CLASS="panelbody" HEIGHT="100%"> 
+					 <TABLE BORDER="0" CELLPADDING="2" CELLSPACING="0" WIDTH="100%"> 
+{
+	my $count = 0;
+	my $total = @{$c{day_array}};	
+	
+	foreach my $day (@{$c{day_array}})
+	{
+		my $title = $day->{date}->get_full_string;
+		
+		my $year = $day->{date}->Year;
+		
+		if(($count>0)&&($count<$total))
+		{
+			$OUT.=<<"+++";
+						<TR> 
+						  <TD COLSPAN="9" HEIGHT="8"></TD> 
+						</TR> 
++++
+		}		
+		
+		$count++;		
+		
+		$OUT.=<<"+++";
+						<TR> 
+						  <TD COLSPAN="9" HEIGHT="3"><B>$title</B><BR><IMG src="/images/holiday/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD> 
+						</TR> 
++++
+
+		foreach my $entry (@{$day->{time_entry_array}})
+		{
+			my $user = $c{org}->ensure_child_hash('users')->{$entry->get_value('users_id')};
+			my $whtitle = $entry->get_half_day_title;			
+			my $color = $entry->get_color;
+			
+			my $name = $user->get_fullname;
+			my $user_id = $user->get_id;
+			my $reason_title = $entry->get_reason_title;
+			
+			my $notes = $entry->get_value('notes');
+			$notes =~ s/\n//g;			
+			
+			my $edit_link;
+			my $delete_link;			
+			
+			$OUT.=<<"+++";
+						<TR> 
+						  <TD CLASS="keycolorsltb" BGCOLOR="$color" title="$notes" NOWRAP>&nbsp;$name</TD> <TD BGCOLOR="$color" CLASS="keycolorsrtb" WIDTH="100%" COLSPAN="2" title="$notes">&nbsp;$reason_title  $whtitle</TD> 
+						  <TD></TD> 
+						  <TD onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" NOWRAP="NOWRAP" onClick="document.location='$c{href}&method=view_year&year=$year&users_id=$user_id';">&nbsp;View Year&nbsp;</TD> 
+						  <TD></TD> 
++++
+
+			if(($c{user}->admin)||($c{user}->get_id==$user->get_id))
+			{
+				my $entry_id = $entry->get_id;
+			
+				$OUT.=<<"+++";
+						  <TD onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" ONCLICK="document.location='$c{href}&method=edit_holiday&holiday_id=$entry_id';">&nbsp;Edit&nbsp;</TD>
+						  <TD></TD>
+						  <TD onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" ONCLICK="document.location='$c{href}&method=delete_holiday&holiday_id=$entry_id';">&nbsp;Delete&nbsp;</TD> 
++++
+			}			
+			
+			$OUT.=<<"+++";
+						</TR>
+						<TR> 
+						  <TD COLSPAN="9" HEIGHT="3"></TD> 
+						</TR> 
++++
+		}
+	}
+}
+					 </TABLE></TD> 
+				</TR> 
+			 </TABLE></TD> 
+		</TR> 
+	 </TABLE></TD> 
+</TR> 
+</TABLE>
+
+<script>
+{$c{top_js}}
+</script>
+
+
+

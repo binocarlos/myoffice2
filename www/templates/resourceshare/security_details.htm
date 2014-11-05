@@ -1,0 +1,208 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+	var item_id = '{$c{item}->get_id}';
+	var security_type = '{$c{item}->get_security_type}';	
+	var security_context;
+	var security_setting;
+	var security_details;
+	var security_apply;
+	var security_cancel;
+
+	function init_elements()
+	\{
+		security_context = document.getElementById('security_context');
+		security_setting = document.getElementById('security_setting');
+		security_details = document.getElementById('security_details');
+		security_apply = document.getElementById('security_apply');
+		security_cancel = document.getElementById('security_cancel');
+	\}
+
+	function apply_security_details(text)
+	\{
+		security_details.innerHTML = text;
+	\}
+
+	function apply_security_setting()
+	\{
+		var code = security_setting.value;
+
+		document.security_iframe.applyCode(code);
+
+		cancel_security_setting();
+	\}
+
+	function cancel_security_setting()
+	\{
+		security_context.innerText = '';
+		security_setting.disabled = true;
+		security_apply.disabled = true;
+		security_cancel.disabled = true;
+
+		document.security_iframe.cancel_selection();
+	\}
+
+	function show_security_table(string, mode)
+	\{
+		security_context.innerText = string;
+		security_setting.value = mode;
+
+		security_setting.disabled = false;
+		security_apply.disabled = false;
+		security_cancel.disabled = false;
+	\}
+
+	function submit_security_form()
+	\{
+		if(!document.security_iframe.get_privilage_packet) \{ return; \}
+		
+		var privilage_packet = document.security_iframe.get_privilage_packet();
+		var access_code = document.security_iframe.get_item_access_code();
+		
+		if(privilage_packet=='')
+		\{
+			privilage_packet = 'clear';
+		\}
+
+		document.getElementById('privilage_packet').value = privilage_packet;
+		document.getElementById('access_code').value = access_code;
+		
+		return true;
+	\}
+
+	function reset_security()
+	\{
+		var new_loc = href + '&method=resources_privilages_reset_submit&security_type=' + security_type + '&item_id=' + item_id;
+
+		var item_warning = 'resource';
+
+		if(security_type=='folder')
+		\{
+			item_warning = 'folder and all its contents';
+		\}
+
+		var status = window.confirm('This will reset the security settings for this ' + item_warning + ' - are you sure?');
+
+		if(status)
+		\{
+			document.location = new_loc;
+		\}
+	\}
+	
+	function inherit_security_clicked()
+	\{
+		var gui = document.getElementById('inherit_security');
+		var table = document.getElementById('main_security_span');
+		
+		if(gui.checked)
+		\{
+			table.style.display = 'none';
+		\}
+		else
+		\{
+			table.style.display = 'inline';		
+		\}
+	\}
+</script>
+{
+	my $checked = '';
+	
+	if($c{item}->is_inherit_access)
+	{
+		$checked = ' CHECKED';
+	}
+
+	$OUT.=<<"+++";
+<fieldset>
+        <legend>Custom Security Settings</legend>
+        <div class="seccontent">
+		<input type="checkbox" name="inherit_security" id="inherit_security" value="y" onClick="inherit_security_clicked();" $checked> <label for="inherit_security">Inherit Security Settings? (uncheck this box to apply specific security settings for this item...)</label>
+		</div>
+</fieldset>
++++
+}
+
+<span id="main_security_span" style="display:nonde;">
+<fieldset>
+        <legend>Security Settings</legend>
+        <div class="seccontent">
+            <table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+              <tr>
+                <td colspan=2> <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr valign="top">
+                      <td align="left" width="300"><iframe name="security_iframe" id="security_iframe" frameborder="no" width="300" height="300" scrolling="auto" src="{$c{href}}&method=resources_privilage_tree&item_id={$c{item}->get_id}&security_type={$c{item}->get_security_type}"></iframe>
+                    </td>
+                      <td width="20"></td>
+                      <td> <table width="100%" height="300" border="0" cellpadding="3" cellspacing="0" id="security_table">
+                          <tr style="padding-bottom:5px;">
+                            <td height="30" align="right">Apply&nbsp;to:&nbsp;</td>
+                            <td width="100%"><span id="security_context"></span></td>
+                          </tr>
+                          <tr style="padding-bottom:5px;">
+                            <td height="30" align="right">Access:&nbsp;</td>
+                            <td><select DISABLED name="security_setting" id="security_setting" size="1" style="width:100%;" class="text_field">
+                                <option value="hidden">Hidden</option>
+                                <option value="noaccess">No Access</option>
+                                <option value="readonly">Read Only</option>
+                                <option value="readwrite" selected>Read/Write</option>
+                              </select></td>
+                          </tr>
+                          <tr align="right">
+                            <td height="30" colspan="2">				
+                              <input id="security_apply" type="button" DISABLED value="Apply" class="button" style="width:75px" name="Button2" onClick="apply_security_setting();">
+                              <img src="/wk/images/clear.gif" width="8" height="1" border="0">
+                              <input id="security_cancel" DISABLED name="button" type="button" class="button" style="width:75px" onClick="cancel_security_setting();" value="Cancel">
+                          </td>
+                          </tr>
+						  <tr valign="top">
+                            <td height=100% colspan="2" style="font-size:11px; padding-top:8px;"><fieldset><legend>Current Security Settings</legend>
+<div class="seccontent" style="color:#404040;">
+                              <div style="width:96%;height:90px;" id="security_details"></div></div></fieldset>
+						  </td>
+					  </tr>
+                        </table></td>
+                    </tr>
+                  </table></td>
+              </tr>
+            </table>
+</div>
+</fieldset>
+          <br>
+          <fieldset>
+          <legend>Security Key</legend>
+          <div class="seccontent">
+            <table border="0" cellpadding="4" cellspacing="0" width="95%" align="center">
+              <tr>
+                <td colspan=2> <table width="100%" border="0" cellspacing="0" cellpadding="2">
+                    <tr align="center" valign="middle">
+                      <td width="25%"><img src="/wk/images/icons/16/user_hidden.gif" width="16" height="16" align="absmiddle"><img src="/wk/images/icons/16/folder_hidden.gif" width="16" height="16" align="absmiddle">
+                        - Hidden</td>
+                      <td width="25%"><img src="/wk/images/icons/16/user_noaccess.gif" width="16" height="16" align="absmiddle"><img src="/wk/images/icons/16/folder_noaccess.gif" width="16" height="16" align="absmiddle">
+                        - No Access</td>
+                      <td width="25%"><img src="/wk/images/icons/16/user_readonly.gif" width="16" height="16" align="absmiddle"><img src="/wk/images/icons/16/folder_readonly.gif" width="16" height="16" align="absmiddle">
+                        - Read Only</td>
+                      <td width="25%"><img src="/wk/images/icons/16/user_readwrite.gif" width="16" height="16" align="absmiddle"><img src="/wk/images/icons/16/folder_readwrite.gif" width="16" height="16" align="absmiddle">
+                        - Read/Write</td>
+                    </tr>
+                    <tr align="center" valign="middle">
+                      <td style="font-size:11px; color:#404040;">{$c{item_title}}
+                        is completely<br>hidden from view</td>
+                      <td style="font-size:11px; color:#404040;">{$c{item_title}}
+                        can be see but not viewed </td>
+                    <td style="font-size:11px; color:#404040;">{$c{item_title}}
+                        is readable<br>
+                      but cannot be edited/uploaded into</td>
+                      <td style="font-size:11px; color:#404040;">{$c{item_title}}
+                        is readable and<br>
+can be edited/uploaded into </td>
+                    </tr>
+                  </table></td>
+              </tr>
+            </table>
+          </div>
+          </fieldset>
+</span>
+<script>
+	init_elements();
+	inherit_security_clicked();
+</script>

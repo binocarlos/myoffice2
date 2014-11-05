@@ -1,0 +1,132 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function validate_alias_form()
+	\{
+		var form = document.pop_account_form;
+
+		if(form.domain_id.value=="-1")
+		\{
+			document.getElementById('error_span').innerText = 'You must choose a domain for the email address';
+
+			return false;
+		\}
+
+		if((form.alias)&&(!form.assign_pop_account_id)&&(form.alias.value==''))
+		\{
+			document.getElementById('error_span').innerHTML = 'You must enter an external email address';
+
+			return false;
+		\}
+
+		if((form.alias)&&(form.assign_pop_account_id))
+		\{
+			if((form.alias.value=='')&&(form.assign_pop_account_id.value=='-1'))
+			\{
+				document.getElementById('error_span').innerHTML = 'You must either enter another email address or choose a mailbox.';
+
+				return false;
+			\}
+
+			if((form.alias.value!='')&&(form.assign_pop_account_id.value!='-1'))
+			\{
+				document.getElementById('error_span').innerHTML = 'You cannot enter both an email address and a mailbox.';
+
+				return false;
+			\}
+		\}
+
+		return true;
+	\}
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="project_form" method="GET" action="{$c{script}}" onSubmit="return validate_project_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="project_id" value="{$c{project}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Project Details&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+<TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR>
+  
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Name:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+	 
+<input type="text" name="email" value="{$c{email}}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:150px; text-align:right;">
+</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Client</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+<select name="assign_pop_account_id" class="text_field" style="width:150px;">{$c{client_options}}
+</select>
+</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Start Date:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+<input class="text_field"
+										 type="TEXT" name="enddate" style="width:149px;" readonly="READONLY"
+										 value="{$c{project}->get_calendar_value('start_datetime')}">
+<img src="/images/holiday/clear.gif" width="8" height="8"
+										 border="0" align="ABSMIDDLE"></TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><a onClick="calendar_click(document.holidayform.enddate);"><img
+										 src="/images/holiday/but_date.gif" width="26" height="20" border="0"
+										 align="ABSMIDDLE"></a></TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">End Date:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+<input class="text_field"
+										 type="TEXT" name="enddate" style="width:149px;" readonly="READONLY"
+										 value="{$c{project}->get_calendar_value('start_datetime')}">
+<img src="/images/holiday/clear.gif" width="8" height="8"
+										 border="0" align="ABSMIDDLE"></TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><a onClick="calendar_click(document.holidayform.enddate);"><img
+										 src="/images/holiday/but_date.gif" width="26" height="20" border="0"
+										 align="ABSMIDDLE"></a></TD>
+</TR>
+</TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{email_address}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="{$c{submit_title}}" CLASS="button" style="width:75px;"></TD>
+</TR></TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+<script>
+{$c{title_script}}
+</script>
+</body>
+</html>
+
+
+

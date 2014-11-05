@@ -1,0 +1,463 @@
+<HTML> 
+ <HEAD> 
+	<TITLE></TITLE>
+<link href="/lib/nctest/assessment_group_editor.css" rel="stylesheet" type="text/css">	
+<script>
+var inputTableStates = new Object();
+var assessmentGroups = new Object();
+var inputs = new Object();
+
+function newAssessmentGroup(id, totalMarks, percentage)
+\{
+	var obj = new Object();
+	obj.id = id;
+	obj.totalMarks = totalMarks;
+	obj.percentage = percentage;
+	
+	assessmentGroups[obj.id] = obj;
+\}
+
+function newInput(id, level_id, marks)
+\{
+	var obj = new Object();
+	obj.id = id;
+	obj.level_id = level_id;
+	obj.marks = marks;
+	
+	inputs[id] = obj;
+\}
+
+function marksChanged(assessmentGroupId, input_id)
+\{
+	var obj = inputs[input_id];
+	
+	var input = document.getElementById('marks_' + input_id);
+	
+	var newMarks = parseFloat(input.value);
+	
+	if(isNaN(newMarks))
+	\{
+		alert('Please enter a number for the new marks');
+		input.value = obj.marks;
+		return false;
+	\}
+	
+	newMarks = Math.round(newMarks * 10);
+	newMarks /= 10;
+	
+	var assessmentGroup = assessmentGroups[obj.level_id];
+	
+	assessmentGroup.totalMarks -= obj.marks;
+	assessmentGroup.totalMarks += newMarks;
+	
+	obj.marks = newMarks;
+	
+	applyRatioMarks(assessmentGroup.id);
+	applyLevelMarksTotal(assessmentGroup.id);
+\}
+
+function previewInput(sub_question_id, input_id)
+\{
+	var query = '&method=tests_sub_question_preview&force_sub_question_id=' + sub_question_id + '&highlight_input_id=' + input_id;
+	
+	var returnData = top.get_modal_window_return(query, 750, 550);	
+\}
+
+function applyAllRatioMarks()
+\{
+	for(var groupId in assessmentGroups)
+	\{
+		applyRatioMarks(groupId);
+	\}
+\}
+
+function applyLevelMarksTotal(id)
+\{
+	var group = assessmentGroups[id];
+	var span = document.getElementById('total_marks_' + id);
+	span.innerText = group.totalMarks;
+\}
+
+function applyRatioMarks(id)
+\{
+	var oldGroup = assessmentGroups[id];
+	var ratioLabel = document.getElementById('ratio_' + id);
+	
+	var marks = (oldGroup.percentage/100) * oldGroup.totalMarks;
+	marks = Math.round(marks*10);
+	marks /= 10;
+
+	ratioLabel.innerText = marks;	
+\}
+
+function percentageChanged(id)
+\{
+	var oldGroup = assessmentGroups[id];
+	
+	var input = document.getElementById('percentage_' + id);
+	
+	var newValue = parseInt(input.value);
+	
+	if(isNaN(newValue))
+	\{
+		input.value = oldGroup.percentage;
+		alert('Please Enter an Integer For the Percentage');
+		return false;
+	\}
+	
+	input.value = newValue;
+
+	oldGroup.percentage = newValue;
+		
+	applyRatioMarks(id);
+\}
+
+function saveForm()
+\{
+	document.level_form.submit();
+\}
+
+function toggleInputTable(id)
+\{
+	if(inputTableStates[id]==null) \{ inputTableStates[id] = false; \}
+	
+	inputTableStates[id] = !inputTableStates[id];
+	
+	var dis = 'none';
+	var title = 'Show Inputs';
+	
+	if(inputTableStates[id])
+	\{
+		dis = 'inline';
+		title =  'Hide Inputs';
+	\}
+	
+	var itable = document.getElementById('input_table_' + id);
+	var ibutton = document.getElementById('input_button_' + id);
+
+	itable.style.display = dis;
+	ibutton.value = title;	
+\}
+
+</script>
+
+ </HEAD>
+<body>
+<form name="level_form" method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tests_assessment_groups_form_submit">
+
+<table border=0>
+{
+	if($c{params}->{read_only})
+	{
+		$OUT.=<<"+++";
+<tr><td><b style="color:red;">Read Only Mode</b></td>
++++
+	}
+	elsif($c{params}->{include_save_button})
+	{
+		$OUT.=<<"+++";
+<input type="hidden" name="mode" value="control_panel">
+<tr><td><input type="submit" class="button" value="Save Assessment Groups"></td>
++++
+	}
+}
+</table>
+<table width="100%" border="0" cellspacing="1" cellpadding="0" bgcolor=#888888>
+{
+	#### A Subject Row is A Main Header	
+	sub get_subject_row
+	{
+		my ($subject) = @_;
+		
+		my $total_marks = $c{tree}->get_subject_marks($subject);
+
+		my $row=<<"+++";
+<!--Subject-->
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+	 <TR> 
+		<TD WIDTH="25" HEIGHT="22"><IMG SRC="/images/nctest/editor/assessment_group_editor/subject_icon.gif" WIDTH="25" HEIGHT="22" BORDER="0"></TD> 
+		<TD CLASS="subject">$subject</TD> 
+	 </TR> 
+	 <TR> 
+		<TD HEIGHT="11" COLSPAN="2"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="13" HEIGHT="11" BORDER="0"></TD> 
+	 </TR> 
+	</TABLE>
+<!--Subject-->
++++
+
+		return $row;
+	}
+	
+	#### A Topic Row is a Second-level header
+	sub get_topic_row
+	{
+		my ($topic) = @_;
+	
+		my $row=<<"+++";
+<!--Group--> 
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+	 <TR> 
+		<TD HEIGHT="18" WIDTH="25"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="25" HEIGHT="18" BORDER="0"></TD> 
+		<TD HEIGHT="18" WIDTH="18" CLASS="group_arrow"><IMG SRC="/images/nctest/editor/assessment_group_editor/arrow.gif" WIDTH="18" HEIGHT="18" BORDER="0"></TD> 
+		<TD HEIGHT="18" WIDTH="100%" CLASS="group_td">$topic</TD> 
+	 </TR> 
+	</TABLE>
+<!--Group--> 
++++
+
+		return $row;
+	}
+	
+	sub get_assessment_group_row
+	{
+		my ($assessment_group, $title, $indent) = @_;
+		
+		my $total_marks = $assessment_group->get_total_marks;
+		my $percentage = $assessment_group->get_percentage;
+		my $id = $assessment_group->get_id;
+		
+		my $content = &get_small_spacer();
+		
+		$content.=<<"+++";
+<!--Level--> 
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+	  <TR> 
+		 <TD HEIGHT="18" WIDTH="25"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="25" HEIGHT="18" BORDER="0"></TD> 
++++
+
+		if($indent)
+		{
+			$content.=<<"+++";
+		 <TD HEIGHT="18" WIDTH="22"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="22" HEIGHT="18" BORDER="0"></TD>
++++
+		}
+		
+		$content.=<<"+++";
+<script>
+newAssessmentGroup('$id', $total_marks, $percentage);
+</script>		
+		 <TD HEIGHT="18" WIDTH="22" CLASS="level_arrow"><IMG SRC="/images/nctest/editor/assessment_group_editor/arrow.gif" WIDTH="18" HEIGHT="18" BORDER="0"></TD> 
+		 <TD HEIGHT="18" CLASS="level_td" WIDTH="100%">$title</TD> 
+		 <TD HEIGHT="18" CLASS="level_required">Required:</TD>
+		 <TD HEIGHT="18" CLASS="level_fieldtd"><INPUT TYPE="TEXT" value="$percentage" name="percentage_$id" id="percentage_$id" CLASS="level_field" onChange="percentageChanged('$id');"></TD> 
+		 <TD HEIGHT="18" CLASS="level_percentage" NOWRAP>% (<span id="ratio_$id"></span> Marks)</TD> 
+		 <TD HEIGHT="18" CLASS="level_total" NOWRAP>Total: <B id="total_marks_$id">$total_marks</B></TD> 
+		 <TD HEIGHT="18" CLASS="level_marks">Marks</TD> 
+	  </TR> 
+	</TABLE>
+<!--Level-->
++++
+
+		my $inputs = $assessment_group->ensure_child_array('question_input');
+		
+		foreach my $input (@$inputs)
+		{
+			my $question = $c{test}->get_child('question', $input->get_value('question_id'));
+			my $sub_question = $c{test}->get_child('sub_question', $input->get_value('sub_question_id'));
+			
+			my $qtitle = $question->get_value('title');
+			my $qorder = $question->get_value('numberorder');
+			my $sqorder = $sub_question->get_order_title;
+			my $marks = $input->get_value('marks');
+			
+			my $sub_question_id = $sub_question->get_id;
+			my $input_id = $input->get_id;
+			
+			$content.=&get_small_spacer();
+			
+			$content.=<<"+++";
+<script>
+newInput($input_id, '$id', $marks);
+</script>			
+<!--Input--> 
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+	  <TR> 
+		 <TD HEIGHT="18" WIDTH="25"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="25" HEIGHT="18" BORDER="0"></TD> 
+		 <TD HEIGHT="18" WIDTH="22"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="22" HEIGHT="18" BORDER="0"></TD> 
+		 <TD HEIGHT="18" WIDTH="22"><IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="22" HEIGHT="18" BORDER="0"></TD> 
+		 <TD HEIGHT="18" WIDTH="22" CLASS="input_arrow"><IMG SRC="/images/nctest/editor/assessment_group_editor/arrow.gif" WIDTH="18" HEIGHT="18" BORDER="0"></TD> 
+		 <TD HEIGHT="18" CLASS="input_td" WIDTH="100%">Q$qorder - $qtitle ($sqorder)</TD> 
+		 <TD HEIGHT="18" CLASS="input_fieldtd"><INPUT TYPE="TEXT" name="marks_$input_id" id="marks_$input_id" value="$marks" onChange="marksChanged('$id', $input_id);" CLASS="input_field"></TD> 
+		 <TD HEIGHT="18" CLASS="input_marks">Marks</TD> 
+		 <TD HEIGHT="18" CLASS="input_view"><A HREF="#" onClick="previewInput($sub_question_id, $input_id);"><IMG SRC="/images/nctest/editor/assessment_group_editor/view_input.gif" WIDTH="59" HEIGHT="16" BORDER="0"></A></TD> 
+	  </TR> 
+	</TABLE>
+<!--Input-->
++++
+		
+		}
+		
+		return $content;	
+	}
+	
+	sub get_small_spacer
+	{
+		my $html=<<"+++";
+<!--Large Spacer--> 
+<IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><br>
+<!--Large Spacer-->
++++
+
+		return $html;
+	}	
+	
+	sub get_large_spacer
+	{
+		my $html=<<"+++";
+<!--Large Spacer--> 
+<IMG SRC="/images/nctest/editor/assessment_group_editor/clear.gif" WIDTH="1" HEIGHT="18" BORDER="0"><br>
+<!--Large Spacer-->
++++
+
+		return $html;
+	}
+	
+	my $tree = $c{tree};
+	
+### Frist we will show the levelled groups
+
+	$OUT.=<<"+++";
+<hr>
+<b>Level Groups</b>
+<hr>
++++
+
+	my $subject_count = 0;
+	my $level_groups = $tree->{groups}->{level};
+	
+	foreach my $subject (sort keys %$level_groups)
+	{
+		$subject_count++;
+		
+		if($subject_count>1)
+		{
+			$OUT.="	<BR>";
+		}		
+	
+		my $subject_title = &Webkit::NcTest::NCHub::get_subject_field($subject, 'title');
+		
+		$OUT.=&get_subject_row($subject_title);
+		
+		my $topic_count = 0;
+		
+		foreach my $topic (sort keys %{$level_groups->{$subject}})
+		{
+			$topic_count++;
+			
+			if($topic_count>1)
+			{
+				$OUT.=&get_large_spacer();
+			}
+			
+			my $topic_title = &Webkit::NcTest::NCHub::get_topic_field($topic, 'title');
+				
+			$OUT.=&get_topic_row($topic_title);
+				
+			foreach my $level (sort keys %{$level_groups->{$subject}->{$topic}})
+			{					
+				my $assessment_group = $level_groups->{$subject}->{$topic}->{$level};
+					
+				$OUT.=&get_assessment_group_row($assessment_group, $level, 1);
+			}					
+		}	
+	}
+	
+### Then we will show the statement groups
+
+	$OUT.=<<"+++";
+<hr>
+<b>Statement Groups</b>
+<hr>
++++
+
+	my $subject_count = 0;
+	my $statement_groups = $tree->{groups}->{statement};
+	
+	foreach my $subject (sort keys %$statement_groups)
+	{
+		$subject_count++;
+		
+		if($subject_count>1)
+		{
+			$OUT.="	<BR>";
+		}		
+	
+		my $subject_title = &Webkit::NcTest::NCHub::get_subject_field($subject, 'title');
+		
+		$OUT.=&get_subject_row($subject_title);
+		
+		my $statement_count = 0;
+		
+		foreach my $statement_code (sort keys %{$statement_groups->{$subject}})
+		{
+			$statement_count++;
+			
+			if($statement_count>1)
+			{
+				$OUT.=&get_large_spacer();
+			}
+							
+			my $assessment_group = $statement_groups->{$subject}->{$statement_code};
+					
+			$OUT.=&get_assessment_group_row($assessment_group, $statement_code);
+		}	
+	}
+
+### Then we will show the reception groups
+
+	$OUT.=<<"+++";
+<hr>
+<b>Reception Groups</b>
+<hr>
++++
+
+	my $subject_count = 0;
+	my $statement_groups = $tree->{groups}->{reception};
+	
+	foreach my $subject (sort keys %$statement_groups)
+	{
+		$subject_count++;
+		
+		if($subject_count>1)
+		{
+			$OUT.="	<BR>";
+		}		
+	
+		my $subject_title = Webkit::NcTest::ReceptionStatement->get_topic_title($subject);
+		
+		$OUT.=&get_subject_row($subject_title);
+		
+		my $statement_count = 0;
+		
+		foreach my $statement_id (sort keys %{$statement_groups->{$subject}})
+		{
+			$statement_count++;
+			
+			if($statement_count>1)
+			{
+				$OUT.=&get_large_spacer();
+			}
+							
+			my $assessment_group = $statement_groups->{$subject}->{$statement_id};
+					
+			$OUT.=&get_assessment_group_row($assessment_group, $statement_id);
+		}	
+	}
+}
+
+</table>
+</form>
+<script>
+	applyAllRatioMarks();
+{
+	if(!$c{params}->{include_save_button})
+	{
+		$OUT.=<<"+++";
+	parent.loadLevelToolbar();
++++
+	}
+}
+</script>
+</body></html>

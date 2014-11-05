@@ -1,0 +1,17 @@
+<html>
+<head>
+<link href="/templates/diary/lib.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+body \{background:menu; border:0px; margin:0px;\}
+</style>
+<body>
+<form method="POST" name="object_form" action="{$c{script}}" style="margin:0px;">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="save_diaryApp_wddx_objects">
+<input type="hidden" name="object_packet" value="">
+</form>
+<script>
+{$c{js}}
+</script>
+</body>
+</html>

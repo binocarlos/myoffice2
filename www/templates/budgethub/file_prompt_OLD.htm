@@ -1,0 +1,161 @@
+<head>
+<title>{$c{window_title}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</title>
+</head>
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var selected_id = null;
+	
+	var save_mode = false;
+	
+	var selected_mode = false;
+	
+	{$c{save_mode}}
+	
+	function filename_change()
+	\{
+		if(!save_mode)
+		\{
+			return;
+		\}
+		
+		if(selected_mode)
+		\{
+			selected_mode = false;
+			
+			return;
+		\}
+		
+		selected_id = null;
+	\}
+	
+	function select_budget(title, budget_id)
+	\{
+		if(budget_id==selected_id)
+		\{
+			do_confirm();
+		\}
+		else
+		\{
+			selected_mode = true;
+			selected_id = budget_id;
+			document.getElementById('filename').value = title;
+		\}
+	\}
+	
+	function do_confirm()
+	\{
+		if(save_mode)
+		\{
+			if(selected_id)
+			\{
+					var budgetName = document.all('budgetname' + selected_id).innerText;
+					
+					var conf = window.confirm("Overwrite " + budgetName);
+					
+					if(conf)
+					\{
+						var ret = new Array(selected_id, '', document.all('file_type').value);
+						
+						window.returnValue = ret;
+						window.close();
+					\}
+			\}
+			else
+			\{
+				var newName = document.all('filename').value;
+				
+				if(newName=="")
+				\{
+					alert('Please Enter a Name');
+					
+					return;
+				\}
+				
+				var ret = new Array('', newName, document.all('file_type').value);
+				
+				window.returnValue = ret;
+				window.close();
+			\}								
+		\}
+		else
+		\{
+			if(selected_id)
+			\{
+				if(document.all('file_type'))
+				\{
+					var type = document.all('file_type').value;
+					var id = selected_id;
+					
+					var arr = new Array(id, type);
+
+					window.returnValue=arr;
+					window.close();
+				\}
+			\}
+		\}
+	\}
+</script>
+<body bgcolor="#FFFFFF" text="#000000">
+<table border="1" cellspacing="0" cellpadding="1" width="100%" height="100%">
+<tr align="left" valign="top">
+<td colspan="3" style="overflow:scroll;">
+<table border="0" cellspacing="5" cellpadding="0" style="overflow:scroll;">
+<tr>
+{
+	my $count = 0;
+
+	foreach my $budget (@{$c{budgets}})
+	{
+		$count++;
+		
+		$OUT.=<<"+++";
+<td align="left" valign=top class="foldertext" width=250>
+<a onClick="select_budget('$budget->{name}', $budget->{id});" style="cursor:hand;">
+<img src="/images/nav/folderclosed.gif" width="18" height="16" align="absmiddle"><span id="budgetname$budget->{id}">$budget->{name}</span></a>
+</td>
+<td width=10></td>
++++
+
+		if($count>=4)
+		{
+			$OUT.=<<"+++";
+</tr>
+<tr>
++++
+		
+			$count = 0;
+		}
+	}
+}
+
+</tr>
+</table>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td colspan="3" height=1 style="overflow: auto;">
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+<tr>
+<td width="60">File name:
+</td>
+<td align="right">
+<input type="text" onChange="filename_change" id="filename" style="width:100%;"{$c{readonly}}>
+</td>
+<td align="right" width="70">
+<input type="button" style="width:100%;" value="{$c{confirm_title}}" name="button" onClick="do_confirm();">
+</td>
+</tr>
+<tr>
+<td width="60">{$c{other_title}}</td>
+<td align="right">{$c{other_option}}
+</td>
+<td align="right" width="70">
+<input type="button" value="Cancel" style="width:100%;" onClick="window.close();">
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+</table>
+</body>

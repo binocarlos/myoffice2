@@ -1,0 +1,152 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script>
+var graphMode = false;
+var namesMode = false;
+
+	function printPage()
+	\{
+		parent.content.focus();
+		parent.content.print();
+	\}
+	
+	function resetGraphButton()
+	\{
+		graphMode = false;
+		namesMode = false;
+		document.getElementById('graphButton').value = 'Show Graph';
+		document.getElementById('namesButton').value = 'Show Names';		
+	\}
+	
+	function toggleGraph()
+	\{
+		graphMode = !graphMode;
+	
+		var buttonTitle = 'Hide Graph';
+		var display = 'inline';
+	
+		if(!graphMode)
+		\{
+			buttonTitle = 'Show Graph';
+			display = 'none';
+		\}
+	
+		parent.content.document.getElementById('graphP').style.display = display;
+		document.getElementById('graphButton').value = buttonTitle;
+	\}	
+	
+	function toggleNames()
+	\{
+		namesMode = !namesMode;
+	
+		var buttonTitle = 'Hide Names';
+		var display = 'inline';
+	
+		if(!namesMode)
+		\{
+			buttonTitle = 'Show Names';
+			display = 'none';
+		\}
+	
+		parent.content.setPupilNames(display);
+		document.getElementById('namesButton').value = buttonTitle;
+	\}		
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" cellspacing="0" cellpadding="0" align="center">
+				<tr>
+					<td align="center" valign="middle">
+	<form method="GET" action="{$c{script}}" target="content">
+	<input type="hidden" name="session_id" value="{$c{session_id}}">
+	<input type="hidden" name="method" value="analysis_question_report">
+	<input type="hidden" name="exam_id" value="{$c{exam}->get_id}">
+	<table border="0" cellpadding="5" cellspacing="0">
+	<tr><td height=5></td></tr>
+      <tr>
+        <td align="right"><b>View AT's </b></td>
+        <td colspan=2 width=120><select name="topic_id" class="text_field" style="width:100%;">         
+	{$c{exam}->get_topic_options($c{params}->{topic_id})}
+        </select> </td>
+    <td align="right"><strong>Order By</strong></td>
+  <td width=120><select name="orderby" class="text_field" style="width:100%;">	
+{
+	my $options = [
+		{	key => 'name',
+			title => 'Pupil Name' },
+		{	key => 'score',
+			title => 'Score' } ];
+			
+	my $options = Webkit::AppTools->get_select_options($options, {
+		key_field => 'key',
+		value_field => 'title' });
+
+	$OUT.=<<"+++";
+	$options
++++
+}		
+</select></td>
+    <td width="150">
+<input name="printButton" id="printButton" type="button" class="button" onClick="printPage();" value="Print">&nbsp;
+<input name="graphButton" id="graphButton" type="button" class="button" onClick="toggleGraph();" value="Show Graph"></td>
+      </tr>
+      <tr>
+        <td align="right"><b>View Pupils </b></td>
+        <td align="right" valign="middle" width=60><select name="operator" class="text_field" style="width:100%;">         
+{
+	my $options = [
+		{	key => '>=',
+			title => '>=' },
+		{	key => '<=',
+			title => '<=' } ];
+			
+	$OUT.=Webkit::AppTools->get_select_options($options, {
+		key_field => 'key',
+		value_field => 'title',
+		selected => $c{report}->{operator} });
+}
+        </select> </td>
+		<td valign="middle"><input type="text" name="percent" class="text_field" value="" style="width:50px;">
+		%</td>
+    <td align="right"><strong>Order</strong></td>
+	    <td><select name="order" class="text_field" style="width:100%;">
+{
+	my $options = [
+		{	key => 'asc',
+			title => 'Ascending' },
+		{	key => 'desc',
+			title => 'Descending' } ];
+			
+	my $options = Webkit::AppTools->get_select_options($options, {
+		key_field => 'key',
+		value_field => 'title' });
+
+	$OUT.=<<"+++";
+	$options
++++
+}		
+	</select></td>
+	  <td><input type="submit" value="View" class="button" onClick="resetGraphButton();">&nbsp;
+<input name="namesButton" id="namesButton" type="button" class="button" onClick="toggleNames();" value="Show Names"></td>
+
+      </tr>
+    </table>
+	</form>					
+					</td>
+				</tr>
+      </table>
+    </TD>
+		</TR>
+</TABLE></BODY>
+</HTML>

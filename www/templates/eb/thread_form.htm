@@ -1,0 +1,385 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function dateUpdated()
+	\{
+
+	\}
+	
+	function deleteThread()
+	\{
+		if(window.confirm('Are you sure you want to delete this thread and activities?'))
+		\{
+			document.location = href + '&method=thread_delete_submit&thread_id={$c{thread}->get_id}';
+		\}
+	\}	
+	
+	function validateThreadForm()
+	\{
+		var form = document.thread_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the thread');
+			return false;
+		\}
+
+		return true;
+	\}
+</script>
+<body>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td height="100%" align="center" valign="top">
+
+<form action="{$c{script}}" method="POST" enctype="multipart/form-data" name="thread_form" onSubmit="return validateThreadForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="thread_form_submit">
+<input type="hidden" name="thread_id" value="{$c{thread}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Thread Details<br>
+<br>
+</legend>
+<div class="seccontent" align="left">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{thread}->{error_text}}</span></TD></tr>
+<tr>
+<TD ALIGN="left" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"><input type="button" value="Delete" CLASS="button2" onClick="deleteThread();" style="width:75px;"></TD>
+</TR>
+</TABLE>
+<br>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+{
+	my $website = $c{thread}->load_website;
+	$disabled = '';
+	
+	if($website)
+	{
+		$website_name = $website->name;
+		$disabled = ' DISABLED';
+	
+		$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Website Variation:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%" style="color:#990000;"> 
+$website_name    </TD>
+  </TR>
++++
+	}
+}
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input {$disabled} name="name" type="text" class="text_field" id="name" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->name}">
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;color:#CC0000;" nowrap><strong>Live On Website: </strong></TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">      {$c{thread}->live_on_site_checkbox}</TD>
+  </TR>    
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Order:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input {$disabled} name="ordernumber" type="text" class="text_field" id="ordernumber" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->ordernumber || 0}">
+    </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Web Version Comment :</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input {$disabled} name="version_comment" type="text" class="text_field" id="version_comment" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->version_comment_default}">
+    </TD>
+  </TR>       
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Rating:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input {$disabled} name="rating" type="text" class="text_field" id="rating" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->rating || 0}">
+    </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Free Collections <br>
+(comma seperate):</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input {$disabled} name="free_collections" type="text" class="text_field" id="free_collections" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->free_collections}">
+    </TD>
+  </TR>  
+{
+	if(!$c{thread}->exists)
+	{
+		$OUT.=<<"+++";      
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Set:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select $disabled name="thread_set_id" size="1" class="text_field" id="thread_set_id" style="width:100%;">
+      $c{set_options}
+    
+    
+    </select></TD>
+  </TR>  
++++
+	}
+}
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Alternative Set:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+	<select {$disabled} name="alternative_thread_set_id" size="1" class="text_field" id="alternative_thread_set_id" style="width:100%;">
+      {$c{alternative_set_options}}
+</select>
+</TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Subject:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select {$disabled} name="subject" size="1" class="text_field" id="subject" style="width:100%;">
+      {$c{thread}->get_subject_options}
+</select> 
+      
+    </TD>
+  </TR>  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>ICT Strand:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select {$disabled} name="ict_strand" size="1" class="text_field" id="ict_strand" style="width:100%;">
+      {$c{thread}->get_ict_strand_options}
+
+</select> 
+      
+    </TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Badges:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><table border="0" cellspacing="0" cellpadding="5">
+      <tr>
+{
+	foreach my $badge (@{$c{thread}->get_badge_array})
+	{
+		my $title = $c{thread}->get_badge_title($badge);
+		my $checked = '';
+		
+		if($c{thread}->has_badge($badge))
+		{
+			$checked = ' CHECKED';
+		}
+		
+		$OUT.=<<"+++";
+        <td valign="middle"><input $disabled type="checkbox" name="badge_$badge" value="y" $checked> $title</td>
++++
+	}
+}
+      </tr>
+    </table></TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Thumbnail:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td>
+            <input name="thumbnail" type="file" class="text_field" id="thumbnail" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">
+          </td>
+          <td width="20">{$c{thread}->file_check_img('thumbnail')}</td>
+        </tr>
+      </table>
+    </TD>
+  </TR> 
+  <tr><td colspan=2>Width:124 - Height:100<br>
+    <br></td>
+  </tr>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>CD Thumbnail:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td>
+            <input name="cd_thumbnail" type="file" class="text_field" id="cd_thumbnail" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">
+          </td>
+          <td width="20">{$c{thread}->file_check_img('cd_thumbnail')}</td>
+        </tr>
+      </table>
+    </TD>
+  </TR>   
+  <tr><td colspan=2>Width:248 - Height:200<br>
+    <br></td>
+  </tr>  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Resource
+      Pack:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td>
+            <input name="resourcepack" type="file" class="text_field" id="resourcepack" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">
+          </td>
+          <td width="20">{$c{thread}->file_check_img('resourcepack')}</td>
+        </tr>
+      </table>
+</TD>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Help SWF :</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td>
+            <input name="help_swf" type="file" class="text_field" id="help_swf" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">
+          </td>
+          <td width="20">{$c{thread}->file_check_img('help_swf')}</td>
+        </tr>
+      </table>
+</TD>
+  </TR>      
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Help SWF Size:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <table border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td width="25%" align="right">Width:
+          </td>
+          <td width="25%"><input name="help_width" type="text" class="text_field" id="help_width" style="width:60px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->help_width}"></td>
+          <td width="25%" align="right">Height:</td>
+          <td width="25%"><input name="help_height" type="text" class="text_field" id="help_height" style="width:60px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{thread}->help_height}"></td>
+        </tr>
+      </table>
+</TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>This Month Free: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">      {$c{thread}->this_month_free_checkbox}</TD>
+  </TR>       
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>On Web : </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">      {$c{thread}->on_web_checkbox}</TD>
+  </TR>       
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>On CD : </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">      {$c{thread}->on_cd_checkbox}</TD>
+  </TR>     
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Comments:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <textarea {$disabled} name="comments" class="text_field" id="comments" style="width:100%; height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{thread}->comments}</textarea>
+</TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+{
+	if(($c{thread}->exists)&&(!$c{thread}->linked_thread_id>0))
+	{
+		my $thread_id = $c{thread}->get_id;
+		my $website_options = $c{org}->get_website_options;
+				
+		$OUT.=<<"+++";
+<form action="$c{script}" method="GET" enctype="multipart/form-data" name="thread_move_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="thread_move_set_submit">
+<input type="hidden" name="thread_id" value="$thread_id">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Move To Another Set </legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Set: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"><select name="thread_set_id" size="1" class="text_field" id="thread_set_id" style="width:100%;">
+
+      $c{set_options}
+
+
+</select> 
+    </TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>	
+
+<form action="$c{script}" method="POST" enctype="multipart/form-data" name="thread_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="thread_create_variation_submit">
+<input type="hidden" name="thread_id" value="$thread_id">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Create Thread Variation </legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>For Website: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"><select name="website_id" size="1" class="text_field" id="website_id" style="width:100%;">
+
+      $website_options
+
+</select> 
+    </TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{thread}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
++++
+	}
+}
+</td>
+<td width="300" align="center" valign="top"><img src="{$c{thread}->img_tag('thumbnail', 1)}" border=0><br>
+  {$c{thread}->img_tag('thumbnail', 1)}<br>
+  <br>
+  <img src="{$c{thread}->img_tag('cd_thumbnail', 1)}" border=0><br>
+{$c{thread}->img_tag('cd_thumbnail', 1)}</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

@@ -1,0 +1,341 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.tab-page \{height:390px;width:345px;\}
+.label \{padding-right:10px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+
+<script>
+
+	var query_fields = new Array("ticket_no", "client", "user", "submitted", "answered", "title", "keywords", "question", "answer");
+	var search_results_rows = new Array();
+	
+	var search_mode = false;
+	var query_mode = false;
+	
+	var selected_query_id = null;
+	
+	var results_tr = document.createElement('TR');
+	
+	for(var i=0; i<4; i++)
+	\{
+		var td = document.createElement('TD');
+		
+		td.id = i;
+		
+		results_tr.appendChild(td);
+	\}			
+	
+	function clear_search_form()
+	\{
+		document.getElementById('search_client_id').value = -1;
+		document.getElementById('search_term').value = '';
+	\}
+	
+	function search_queries()
+	\{
+		var client_select = document.getElementById('search_client_id');
+		var client_id = client_select.value;
+		var term = document.getElementById('search_term').value;
+		
+		if((client_id>0)||(term!=''))
+		\{
+			set_search_status('Searching...');
+		
+			document.searchframe.submit_searchform(client_id, term);
+			
+			var criteria = term;
+			
+			if(client_id>0)
+			\{				
+				criteria += ' - ' + client_select.options[client_select.selectedIndex].text;
+			\}
+			
+			document.getElementById('search_criteria').innerText = criteria;
+			
+			clear_search_form();
+			clear_search_results();
+			
+			set_search_active('Searching...');
+		\}
+	\}
+	
+	function hide_search_results()
+	\{
+		clear_search_results();
+		
+		tabClick(1);
+	\}
+	
+	function clear_search_results()
+	\{
+		if(!search_mode)
+		\{
+			return;
+		\}
+		
+		clear_query();
+		
+		var tbody = document.getElementById('search_results_body');
+		
+		if(search_results_rows)
+		\{
+			for(var i=0; i<search_results_rows.length; i++)
+			\{
+				var row = search_results_rows[i];
+				
+				tbody.removeChild(row);
+			\}
+		\}
+		
+		search_results_rows = new Array();		
+		
+		search_mode = false;
+	\}
+	
+	function assign_search_results(results)
+	\{
+		clear_search_results();
+		
+		var tbody = document.getElementById('search_results_body');
+			
+		for(var i=0; i<results.length; i++)
+		\{
+			var tr = results_tr.cloneNode(true);
+			var result = results[i];
+			
+			tr.id = 'search_results_tr_' + result.id;
+			
+			tr.all('0').innerHTML = '<font style="padding-right:4px;">' + result.title + '</font><img src="/images/clear.gif" width="1" height="17" align="absmiddle">';
+			tr.all('1').innerText = result.client;
+			tr.all('2').innerHTML = '<a style="cursor:hand;width:40px; height:15px; text-align:center;" onClick="select_query(' + result.id + ');" onMouseOver="this.className=\'buttoninset\';" onMouseOut="this.className=\'buttonouter\';" CLASS="buttonouter">View</a>';
+			
+			tbody.appendChild(tr);
+			
+			search_results_rows[search_results_rows.length] = tr;
+		\}
+
+		
+		search_mode = true;
+		
+		set_search_status(results.length + ' results found');
+		
+		clickTab(2);
+	\}
+	
+	function clear_query()
+	\{
+		if(!query_mode)
+		\{
+			return;
+		\}
+		
+		for(var i=0; i<query_fields.length; i++)
+		\{
+			var field = query_fields[i];
+			
+			document.getElementById('search_query_' + field).innerText = '';
+		\}
+
+		
+		if(selected_query_id>0)
+		\{
+			document.getElementById('search_results_tr_' + selected_query_id).bgColor = '';
+			
+			selected_query_id = null;
+		\}
+		
+		query_mode = false;
+		
+		clickTab(2);
+		
+	\}
+	
+	function tabClick(page)
+	\{
+		clickTab(page);
+	\}
+	
+	function clickTab(page)
+	\{
+		var tab = document.getElementById('tabShow' + page);
+		
+		tab.click();
+	\}
+		
+	function select_query(id)
+	\{
+		if(selected_query_id>0)
+		\{
+			document.getElementById('search_results_tr_' + selected_query_id).bgColor = '';
+		\}
+		
+		document.getElementById('search_results_tr_' + id).bgColor = '#ffffff';
+		
+		selected_query_id = id;
+		
+		var query_obj = document.searchframe.get_query_obj(id);
+		
+		for(var i=0; i<query_fields.length; i++)
+		\{
+			var field = query_fields[i];
+			
+			var value = query_obj[field];
+			
+			document.getElementById('search_query_' + field).innerHTML = value;
+		\}
+		
+		query_mode = true;
+		
+		tabClick(3);
+	\}
+	
+	function clear_search_active()
+	\{
+		document.getElementById('search_active').innerText = '';
+	\}
+	
+	function set_search_active(text)
+	\{
+		document.getElementById('search_active').innerText = text;
+		
+		setTimeout("clear_search_active();", 5000);
+	\}
+	
+	function clear_search_status()
+	\{
+		document.getElementById('search_status').innerText = '';
+	\}
+	
+	function set_search_status(text)
+	\{
+		document.getElementById('search_status').innerText = text;
+		
+//		setTimeout("clear_search_status();", 5000);
+	\}
+
+</script>
+
+	 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+		<TR id="form_tr" style="display: inline;">
+		 
+<TD HEIGHT="100%" ALIGN="CENTER" VALIGN="top">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+			 <TR>
+				<TD>
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"
+					CLASS="panelinner">
+					<TR>
+<TD CLASS="panelbody" WIDTH="100%">
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+
+<!--#### Search Form ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Search Query Database</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+
+<table width="100%" border="0" cellpadding="0">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Client:&nbsp;</td>
+<td align="LEFT" WIDTH="100%"><select id="search_client_id" size="1" style="width:100%;" class="text_field" name="select">{$c{client_options}}</select></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Search&nbsp;Term:&nbsp;</td>
+<td align="LEFT" WIDTH="100%"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" id="search_term" value="{$c{params}->{search_term}}" style="width:100%;" name="TEXT"></td>
+</tr>
+<tr valign="top">
+<td align="left"><font color="red"><span id="search_active"></span></font></td>
+<td align="RIGHT"><input type="button" value="Search" class="button" style="width:75px;" onClick="search_queries();" name="button2">
+<iframe src="{$c{href}}&method=query_search_js" width="100" height="100" name="searchframe" scrolling="no" border=1 frameborder="no" style="display:none;"></iframe>
+</td>
+</tr>
+</table>
+</div>
+
+<!--#### Search Results ####-->
+<div class="tab-page" id="tabPage2">
+<h2 class="tab"  id="tabShow2">Search Results</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage2" ) );</script>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="3">Results for <font id="search_criteria"></font>...<BR><img src="/images/clear.gif" width="1" height="5"></td>
+</tr>
+<tr>
+<td width="100%" nowrap><b>Subject</b><br><img src="/images/clear.gif" width="1" height="5"></td>
+<td width="90" nowrap><b>Client</b><br><img src="/images/clear.gif" width="90" height="5"></td>
+<!--<td width="90" nowrap><b>Submitted</b><br><img src="/images/clear.gif" width="90" height="5"></td>-->
+<td width="40"></td>
+</tr>
+<tbody id="search_results_body">
+
+</tbody>
+<tfoot>
+<tr>
+<td colspan="3" align="left"><img src="/images/clear.gif" width="1" height="5"><br><font color="red"><span id="search_status"></span></font></td>
+</tr>
+</tfoot>
+</table>
+</div>
+
+
+<!--#### Individual Result ####-->
+<div class="tab-page" id="tabPage3">
+<h2 class="tab"  id="tabShow3">Query Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage3" ) );</script>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Ticket No:&nbsp;</td>
+<td align="LEFT" width="100%"><span id="search_query_ticket_no"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Client:&nbsp;</td>
+<td align="LEFT"><span id="search_query_client"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Submitted&nbsp;By:&nbsp;</td>
+<td align="LEFT"><span id="search_query_user"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Submitted:&nbsp;</td>
+<td align="LEFT"><span id="search_query_submitted"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Answered:&nbsp;</td>
+<td align="LEFT"><span id="search_query_answered"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Subject:&nbsp;</td>
+<td align="LEFT"><span id="search_query_title"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Keywords:&nbsp;</td>
+<td align="LEFT"><span id="search_query_keywords"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Question:&nbsp;</td>
+<td align="LEFT" colspan="3"><span style="cursor:text;" id="search_query_question"></span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Answer:&nbsp;</td>
+<td align="LEFT" colspan="3"><span style="cursor:text;" id="search_query_answer"></span></td>
+</table>
+</div>
+</div>
+</TD>
+					</TR>
+				 </TABLE></TD>
+			 </TR>
+			</TABLE>
+</TD>
+		</TR>
+	 </TABLE>
+<script>
+setupAllTabs();
+</script>
+
+

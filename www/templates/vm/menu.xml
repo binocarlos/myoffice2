@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<menu_config>
+{
+	if($c{user}->admin)
+	{
+		my $org_title = $c{org}->get_value('name');
+
+		$OUT.=<<"+++";		
+		<menublock title="Employees" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user&amp;appname=vm');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home&amp;appname=vm');"/>
+		</menublock>
++++
+	}
+	
+	if((!$c{org}->is_client)&&($c{session}->is_privilaged('vm', 'clientms')))
+	{
+		$OUT.=<<"+++";
+		<menublock title="Clients" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=clients_tree&amp;frame_method=clients_add_client&amp;appname=clientms');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=clients_tree&amp;appname=clientms');"/>
+		</menublock>
++++
+	}
+
+
+}
+	<menublock title="Projects" width="90">
+		<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Project&amp;frame_method=projects_add_project&amp;appname=vm');"/>
+		<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Projects&amp;frame_method=projects_home&amp;appname=vm');"/>
+	</menublock>
+	<menublock title="Tasks" width="90">
+		<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Task&amp;frame_method=tasks_add_task&amp;appname=vm');"/>
+		<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Tasks&amp;frame_method=tasks_home&amp;appname=vm');"/>
+	</menublock>
+</menu_config>
+

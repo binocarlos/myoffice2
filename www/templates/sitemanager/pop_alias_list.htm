@@ -1,0 +1,131 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function add_pop_alias()
+	\{
+		var mode = true;
+		
+		if(hasChanged)
+		\{
+			mode = confirm("You have changed details, continue anyway?");
+		\}
+		
+		if(mode)
+		\{
+			var loc = href + '&method=email_add_alias&pop_account_id={$c{pop_id}}';
+		
+			document.location = loc;
+		\}
+	\}
+	
+	function edit_pop_alias()
+	\{
+		var alias_id = document.getElementById('otheraddresses').value;
+		
+		if(alias_id>0)
+		\{
+			var mode = true;
+			
+			if(hasChanged)
+			\{
+				mode = confirm("You have changed details, continue anyway?");
+			\}
+			
+			if(mode)
+			\{
+				var loc = href + '&method=email_edit_alias&email_address_id=' + alias_id;
+			
+				document.location = loc;
+			\}
+		\}
+	\}
+	
+	function delete_pop_alias()
+	\{
+		var alias_id = document.getElementById('otheraddresses').value;
+		
+		if(alias_id>0)
+		\{
+			var mode = true;
+			
+			if(hasChanged)
+			\{
+				mode = confirm("You have changed details, continue anyway?");
+			\}
+			
+			if(mode)
+			\{		
+				var loc = href + '&method=email_delete_alias&email_address_id=' + alias_id;
+			
+				document.location = loc;
+			\}
+		\}
+	\}	
+
+</script>
+<BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="520">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="2" align="LEFT" background="/images/layout/panelt.gif" height="13"><img src="/images/layout/paneltl.gif" border="0" width="7" height="13" align="ABSMIDDLE"><font class="section_title"
+>&nbsp;Mailbox Other Addresses&nbsp;</font></td>
+<td width="2" height="13" valign="TOP"><img src="/images/layout/paneltr.gif" border="0" width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/layout/panell.gif"><img src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td>
+<table border="0" cellpadding="4" cellspacing="0" width="100%">
+<tr>
+<td align="LEFT" valign="TOP">
+<select name="otheraddresses" id="otheraddresses" size="6" style="width:100%; font-family:tahoma,verdana; font-size:11px; color:#000000;">
+{
+	my $arr = $c{pop_alias_array};
+	
+	foreach my $email_address (@$arr)
+	{
+		my $id = $email_address->get_id;
+		
+		my $address = $email_address->get_value('email_address');
+		
+		$OUT.=<<"+++";
+<option value="$id">$address</option>
++++
+	}
+}
+</select>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2" background="/images/layout/panelr.gif"><img src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3" background="/images/layout/panelb.gif" align="RIGHT"><img src="/images/layout/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
+</table>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR>
+  <TD ALIGN="LEFT" VALIGN="MIDDLE"></TD>
+  <TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" name="add" value="Add" class="button" style="width:75px;" onClick="add_pop_alias();"><img src="/images/holiday/clear.gif" width="8" height="1" 
+border="0"><input type="button" name="edit" value="Edit" class="button" style="width:75px;" onClick="edit_pop_alias();"><img src="/images/holiday/clear.gif" width="8" height="1" 
+border="0"><input type="button" name="delete" value="Delete" class="button" style="width:75px;" onClick="delete_pop_alias();">
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>

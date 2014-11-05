@@ -1,0 +1,86 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	var exam_type = '{$c{exam}->type}';
+	
+	function previewExam()
+	\{
+		var test_id = {$c{test}->get_id};
+		
+		var query = '&method=tests_preview_test_frameset&test_id=' + test_id;
+			
+		var ret = top.get_modal_window_return(query, 780, 580);
+	\}
+	
+	function editExam()
+	\{
+		if(exam_type=='manual')
+		\{
+			var method = 'exams_edit_manual_assessment_groups';
+			var title = 'Edit Assessment Groups';
+			
+			var new_loc = href + '&method=exams_edit_manual_assessment_groups&exam_id={$c{exam}->get_id}';
+			
+			top.content.page.content.location = new_loc;
+		\}
+		else
+		\{
+			var loc = href + '&method=tests_redirect_to_test_editor&test_id={$c{test}->get_id}';
+		
+			top.content.location = loc;
+		\}
+	\}
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+  <tr>
+    <td bgcolor="#666666"><strong style="color:#FFFFFF;">Edit {$c{org}->test_title} Paper </strong></td>
+  </tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	my $title = $c{org}->test_title;
+	if((!$c{test}->locked)||($c{user}->is_webkit))
+	{
+		$OUT.=<<"+++";
+<tr><td><input type="button" class="button" value="Edit $title Paper" onClick="editExam();"></td></tr>
++++
+	}
+
+	if(!$c{exam}->is_manual)
+	{
+		$OUT.=<<"+++";
+<tr><td><input name="button" type="button" class="button" value="Preview $title Paper" onClick="previewExam();"></td></tr>
++++
+	}
+}
+</table>
+<br> 
+Click above to edit the quiz paper or to preview its contents.<br>
+</body>
+

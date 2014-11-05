@@ -1,0 +1,72 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+	function selectShowing(id, tour_id)
+	\{
+		var ret = new Object();
+		ret.showing_id = id;
+		ret.venue_id = {$c{venue}->get_id};
+		ret.tour_id = tour_id;
+		
+		top.returnValue = ret;
+		top.close();
+	\}
+	
+	function selectAllDates()
+	\{
+		var ret = new Object();
+		ret.venue_id = {$c{venue}->get_id};
+		ret.showing_id = 0;
+		
+		top.returnValue = ret;
+		top.close();
+	\}
+</script>
+<body>
+<span class="welcome">Find Visit For {$c{venue}->get_city_title} </span><br>
+<br>
+<table border=0>
+<tr>
+<td>
+<input type="submit" class="button" value="Cancel" onClick="top.close();">
+</td>
+{
+	if($c{show_all_button}=~/\w/)
+	{		
+		$OUT.=<<"+++";
+<td width=30></td>
+<td>
+<input type="submit" class="button" value="Select All Dates" onClick="selectAllDates();">
+</td>
++++
+	}
+}
+</tr>
+</table>
+<br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#e5e5e5">
+{
+	foreach my $showing (@{$c{venue}->ensure_child_array('showing')})
+	{
+		my $tour = $c{org}->get_child('tour', $showing->tour_id);
+		my $tour_title = $tour->name;
+		my $dates_title = $showing->get_datetime_title;
+		my $id = $showing->get_id;
+		my $tour_id = $tour->get_id;
+		
+		$OUT.=<<"+++";
+	  <tr>
+    <td width="140" align="right" bgcolor="#FFFFFF" style="color:blue;">$tour_title</td>	  
+    <td width="180" bgcolor="#FFFFFF">$dates_title</td>
+    <td bgcolor="#FFFFFF"><input type="submit" class="button" value="Select" onClick="selectShowing($id, $tour_id);"></td>
+  </tr>	
++++
+	}
+}
+</table>
+
+</body>
+</html>
+
+
+

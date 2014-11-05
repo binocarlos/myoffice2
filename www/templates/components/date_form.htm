@@ -1,0 +1,183 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+<script>
+	{$c{event_js}}
+	
+	function apply_event_color()
+	\{
+		var event_id = document.entryform.calendar_event_id.value;
+		var event_obj = calendar_events[event_id];
+		
+		var col = '#' + event_obj.color;
+		
+		document.getElementById('color_td').bgColor = col;
+	\}
+	
+	function create_event_select(selected)
+	\{
+		var i_id = document.entryform.calendar_installation_id.value;
+		
+		var event_array = installation_events[i_id];
+		
+		var txt = '<select name="calendar_event_id" size="1" style="width:280px;" class="text_field" onChange="apply_event_color();">';
+		
+		for(var i=0; i<event_array.length; i++)
+		\{
+			var ev = event_array[i];
+			
+			var sel = '';
+			
+			if(ev.id==selected)
+			\{
+				sel = ' SELECTED';
+			\}
+			
+			txt += '<option value="' + ev.id + '"' + sel + '>' + ev.title + '</option>';
+		\}
+		
+		txt += '</select>';
+		
+		document.getElementById('event_select_td').innerHTML = txt;
+		
+		apply_event_color();
+	\}
+
+	var giMinYear = {$c{calendar_entry}->get_start_date->Year};
+
+	var giMaxYear = {$c{calendar_entry}->get_start_date->Year + 2};
+	
+	function validate_entry_form()
+	\{
+		var form = document.entryform;
+		
+		if(form.add_event_proxy.value=='y')
+		\{
+			return true;
+		\}
+		
+		if(form.title.value=='')
+		\{
+			set_error('Please enter a title');
+			return false;
+		\}
+		
+		return true;
+	\}
+	
+	function dateUpdated(gui)
+	\{
+		if(gui.name=='start_date')
+		\{
+			document.entryform.end_date.value = gui.value;
+		\}
+		
+		return true;
+	\}
+	
+	function clear_error_span()
+	\{
+		document.getElementById('error_span').innerText = '';
+	\}
+
+	function set_error(st)
+	\{
+		document.getElementById('error_span').innerText = st;
+		
+		setTimeout("clear_error_span();", 5000);
+	\}
+	
+	function add_new_event()
+	\{
+		document.entryform.add_event_proxy.value = 'y';
+		
+		document.entryform.submit();
+	\}
+
+</script>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="entryform" onSubmit="return validate_entry_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="add_event_proxy" value="n">
+<input type="hidden" name="method" value="calendar_entry_form_submit">
+<input type="hidden" name="entry_id" value="{$c{calendar_entry}->get_id}">
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR id="form_tr" style="display: inline;">
+		 <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+
+<div class="panelouter" style="width:470px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+
+
+<fieldset>
+<legend>Event Information</legend>
+<div class="seccontent" align="left">
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+	<TD ALIGN="RIGHT" width="70">Calendar:&nbsp;</TD>
+	<TD><select name="calendar_installation_id" size="1" style="width:390px;" class="text_field" onChange="create_event_select();">{$c{installation_options}}</select></TD>
+</TR>
+</TABLE>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" style="margin-top:5px;">
+<TR>
+	<TD ALIGN="RIGHT" width="70">Event&nbsp;Type:&nbsp;</TD>
+	<TD id="event_select_td"></TD>
+	<TD ALIGN="LEFT" width="100"><span id="color_td" align="center" width="50" style="display:none;"></span><input type="button" value="New Event Type" class="button" style="height:19px; width:100px;" onClick="add_new_event();"></td>
+</TR>
+</TABLE>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" style="margin-top:5px;">
+<TR>
+	<TD ALIGN="RIGHT" width="70">Title:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><input type="text" name="title" value="{$c{calendar_entry}->get_value('title')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:390px;"></TD>
+</tr>
+</TABLE>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" style="margin-top:5px;">
+<TR>
+	<TD ALIGN="RIGHT" width="70">Start Date:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><INPUT CLASS="text_field" TYPE="TEXT" NAME="start_date" STYLE="width:129px;" READONLY="READONLY" VALUE="{$c{calendar_entry}->get_calendar_value('start_date')}"><IMG src="/images/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A style="cursor:hand;" ONCLICK="calendar_click(document.entryform.start_date);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></TD>
+	<td align="RIGHT" width="65">End Date:&nbsp;</td>
+	<td align="LEFT" valign="TOP"><input class="text_field" type="TEXT" name="end_date" style="width:129px;" readonly="READONLY" value="{$c{calendar_entry}->get_calendar_value('end_date')}"><img src="/images/clear.gif" width="5" height="1" border="0" align="ABSMIDDLE"><a style="cursor:hand;"  onClick="calendar_click(document.entryform.end_date);"><img src="/images/holiday/but_date.gif" width="26" height="20" border="0" align="ABSMIDDLE"></a></td>
+</TR>
+</TABLE>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" style="margin-top:5px;">
+<TR>
+	<TD ALIGN="RIGHT" VALIGN="top" width="70">Details:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="top"><textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="comment" style="width:390px; height:120px;">{$c{calendar_entry}->get_value('comment')}</textarea></TD>
+</TR>
+</TABLE>
+
+</div></fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="middle"><font color="red" id="error_span">{$c{calendar_entry}->{error_text}}</font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><INPUT TYPE="submit" VALUE="Save" CLASS="button2" STYLE="width:75px;">
+{
+	if($c{calendar_entry}->exists)
+	{
+		my $id = $c{calendar_entry}->get_id;
+		
+		$OUT.=<<"+++";
+<INPUT TYPE="button" VALUE="Delete" CLASS="button2" STYLE="width:75px;" onClick="document.location=href+'&method=calendar_delete_calendar_entry&object_id=$id';">
++++
+	}
+}
+<input type="button" value="Cancel" class="button2" name="Button" onClick="document.location='{$c{href}}&method=calendar_entry_home';" STYLE="width:75px;"></TD>
+</TR>
+</TABLE>
+
+
+
+</div></div></div>
+
+</TD>
+		</TR>
+
+	 </TABLE>
+</form>
+{$c{calendar_table}}
+
+<script>
+calendar_callback_obj.onUpdate = dateUpdated;
+create_event_select({$c{calendar_entry}->get_value('calendar_event_id')});
+</script>

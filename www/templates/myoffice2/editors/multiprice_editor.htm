@@ -1,0 +1,260 @@
+<!--#include virtual="temp_include.htm" -->
+<script>	
+var priceArray = new Array();
+var price;
+
+{
+	my @parts = split(/:/, $c{value});
+	
+	foreach my $part (@parts)
+	{		
+		my ($price, $note, $percent) = split(/=/, $part);
+		
+		if($percent!~/\d/)
+		{
+			$percent = 100;
+		}
+		
+		if($price<=0) { next; }
+		
+		$OUT.=<<"+++";
+	price = new Object();
+	price.price = $price;
+	price.note = '$note';
+	price.percent = $percent;
+	
+	priceArray[priceArray.length] = price;
++++
+	}
+}
+
+	function getRemainingPercent()
+	\{
+		var total = 0;
+		
+		for(var i=0; i<priceArray.length; i++)
+		\{
+			var ref = priceArray[i];
+			var percent = parseFloat(ref.percent);
+			
+			if(!isNaN(percent))
+			\{
+				total += percent;
+			\}
+		\}
+		
+		return 100 - total;
+	\}
+
+	function addPrice()
+	\{
+		var value = document.getElementById('price').value;
+		var note = document.getElementById('note').value;
+		var percent = document.getElementById('percent').value;
+		
+		value = value.replace(/=/g, '');
+		value = value.replace(/:/g, '');
+		value = value.replace(/£/g, '');
+		note = note.replace(/=/g, '');
+		note = note.replace(/:/g, '');
+		percent = percent.replace(/=/g, '');
+		percent = percent.replace(/:/g, '');
+		
+		if(value=='') \{ return; \}
+		
+		var newPrice = new Object();
+		newPrice.price = value;
+		newPrice.note = note;
+		newPrice.percent = percent;
+		
+		if(!newPrice.percent)
+		\{
+			newPrice.percent = getRemainingPercent();
+		\}
+		
+		priceArray[priceArray.length] = newPrice;
+		
+		document.getElementById('price').value = '';
+		document.getElementById('note').value = '';	
+		document.getElementById('percent').value = '';				
+		writePriceTable();
+	\}
+	
+	function deletePrice(index)
+	\{
+		var newArr = new Array();
+		
+		for(var i=0; i<priceArray.length; i++)
+		\{
+			if(i!=index)
+			\{
+				newArr[newArr.length] = priceArray[i];
+			\}		
+		\}
+
+		priceArray = newArr;
+		writePriceTable();		
+	\}
+
+	function writePriceTable()
+	\{
+		var html = '<table border=0 cellpadding=3 cellspacing=0 width=96%>';
+		
+		for(var i=0; i<priceArray.length; i++)
+		\{
+			var ref = priceArray[i];
+			
+			html += '<tr><td width=60>' + ref.price + '</td><td width=60>' + ref.percent + '%</td><td width=60><a href="javascript:deletePrice(' + i + ');"><img src="/images/icons/16/recyclebin.gif" width="16" height="16" border=0></a></td><td>' + ref.note + '</td></tr>';
+		\}
+		
+		html += '</table>';
+		
+		document.getElementById('priceSpan').innerHTML = html;
+	\}
+	
+	function submitForm()
+	\{
+		var ret = new Object();
+		
+		var dataParts = new Array();
+		var titleParts = new Array();
+		
+		for(var i=0; i<priceArray.length; i++)
+		\{
+			var ref = priceArray[i];
+			
+			dataParts[dataParts.length] = ref.price + '=' + ref.note + '=' + ref.percent;
+			
+			var title = ref.price;
+			
+			if(ref.percent!='') \{ title += ' @ ' + ref.percent + '%' \}
+			
+			if(ref.note!='') \{ title += ' (' + ref.note + ')'; \}
+			
+			titleParts[titleParts.length] = title;
+		\}
+		
+		var value = dataParts.join(':');
+		var title = titleParts.join(',<br>');
+		
+		ret.value = value;
+		ret.title = title;
+		
+		top.returnValue = ret;
+		top.close();
+	\}
+</script>
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}>
+<tr>
+<td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} align="center" valign="top">
+<style>
+.tab-page \{height:100%;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+{Webkit::Browser->if_not_mac('<script type="text/javascript" src="/lib/tabpane.js"></script>')}
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}><tr><td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Edit Prices</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Current Price</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Current Price</u><br>
+	<br>
++++
+}
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Add Price:&nbsp;</td>
+<td align="LEFT"><input name="price" type="TEXT" class="text_field" id="price" style="width:100px;" value=""></td>
+<td align="LEFT" colspan=2></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Percent:&nbsp;</td>
+<td align="LEFT"><input name="percent" type="TEXT" class="text_field" id="percent" style="width:100px;" value=""></td>
+<td align="LEFT" colspan=2></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Note:&nbsp;</td>
+<td align="LEFT"><input name="note" type="TEXT" class="text_field" id="note" style="width:100px;" value=""></td>
+<td align="LEFT" width=30></td>
+<td align="LEFT"><input type="button" name="Button" value="Add" class="button" onClick="addPrice();"></td>
+</tr>
+</table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
++++
+}
+
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Current Prices</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Current Prices</u> <br>
+	<br>
++++
+}
+
+<span id="priceSpan"></span>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+</div>
+</div>
++++
+}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="button" value="OK" CLASS="button2" style="width:75px;" onClick="submitForm();">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</table>
+
+</td>
+</tr>
+</table>
+<script>	
+		{Webkit::Browser->if_not_mac('setupAllTabs();')}
+		writePriceTable();
+</script>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

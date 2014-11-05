@@ -1,0 +1,77 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function dateUpdated()
+	\{
+
+	\}
+	
+	function validateTemplateForm()
+	\{
+		var form = document.template_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the template');
+			return false;
+		\}
+		
+		return true;
+	\}
+</script>
+<body>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td height="100%" align="center" valign="middle">
+
+<form action="{$c{script}}" method="POST" name="template_form" onSubmit="return validateTemplateForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="audit_template_form_submit">
+<input type="hidden" name="audit_template_id" value="{$c{template}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Audit Template  Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="name" type="text" class="text_field" id="name" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{template}->name}">
+    </TD>
+  </TR>      
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>XML:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <textarea name="xml" class="text_field" id="xml" style="width:600px; height:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{template}->xml}</textarea>
+</TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{template}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>

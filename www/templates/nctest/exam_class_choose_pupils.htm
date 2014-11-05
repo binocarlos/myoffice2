@@ -1,0 +1,215 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#D4D0C8; margin:8px;">
+<script>
+	var selectedBg = '#B2B8CD';
+	var loggedInBg = '#FEB8B2';
+		
+	var pupils = new Object();
+
+	function newPupil(id, selected, loggedIn, sex)
+	\{
+		var pupil = new Object();
+		pupil.id = id;
+		pupil.selected = selected;
+		pupil.sex = sex;
+		pupil.loggedIn = loggedIn;
+
+		pupils[pupil.id] = pupil;
+	\}
+
+	function selectNone(sex)
+	\{
+		bulkSelect(sex, false);
+	\}
+
+	function selectAll(sex)
+	\{
+		bulkSelect(sex, true);
+	\}
+
+	function bulkSelect(sex, value)
+	\{
+		var should = true;
+		
+		if(!value)
+		\{
+			for(var pupil_id in pupils)
+			\{
+				var pupil = pupils[pupil_id];
+				
+				if((pupil.selected)&&(pupil.loggedIn))
+				\{
+					should = false;
+				\}
+			\}
+		\}
+		
+		if(!should)
+		\{
+			should = window.confirm('Warning - some of the pupils have already logged in - if you deselect them, all answers will be deleted - are you sure?');
+		\}
+		
+		if(should)
+		\{
+			for(var pupil_id in pupils)
+			\{
+				var pupil = pupils[pupil_id];
+
+				if(pupil.sex==sex)
+				\{
+					setPupil(pupil_id, value);
+				\}
+			\}
+		\}
+	\}
+
+	function setPupil(id, value)
+	\{
+		var pupil = pupils[id];
+
+		pupil.selected = value;
+
+		var tr = document.getElementById('pupilTr' + id);
+		var hiddenElem = document.exam_class_pupils_form['pupil_' + id];
+
+		if(pupil.selected)
+		\{
+			if(pupil.loggedIn)
+			\{
+				tr.bgColor = loggedInBg;
+			\}
+			else
+			\{
+				tr.bgColor = selectedBg;
+			\}
+			
+			hiddenElem.value = 'y';
+		\}
+		else
+		\{
+			tr.bgColor = '#ffffff';
+			hiddenElem.value = 'n';
+		\}
+	\}
+
+	function togglePupil(id)
+	\{
+		var pupil = pupils[id];
+		
+		var should = true;
+		
+		if((pupil.loggedIn)&&(pupil.selected))
+		\{
+			should = window.confirm('Warning - this pupil has already logged in, deselecting them will delete all answers - are you sure?');
+		\}
+
+		if(should)
+		\{
+			setPupil(id, !pupil.selected);
+		\}
+	\}
+
+</script>
+<form method="POST" action="{$c{script}}" name="exam_class_pupils_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="exams_class_choose_pupils_submit">
+<input type="hidden" name="class_id" value="{$c{class}->get_id}">
+
+
+
+
+
+
+{
+	sub get_pupil_row
+	{
+		my ($pupil) = @_;
+
+		my $id = $pupil->get_id;
+		my $name = $pupil->get_fullname(1);
+		my $selected = $c{exam}->contains_pupil($pupil);
+		my $logged_in = $c{exam}->pupil_logged_in($pupil);
+
+		my $js_sel = 'false';
+		my $js_logged_in = 'false';
+		my $hidden_sel = 'n';
+		my $bg = '#ffffff';
+		my $sex = $pupil->sex;
+
+		if($selected)
+		{
+			$hidden_sel = 'y';
+			$js_sel = 'true';
+			$bg = '#B2B8CD';
+		}
+
+		if($logged_in)
+		{
+			$js_logged_in = 'true';
+			$bg = '#FEB8B2';
+		}
+		
+		my $row=<<"+++";
+<script>
+	newPupil($id, $js_sel, $js_logged_in, '$sex');
+</script>
+<input type="hidden" name="pupil_$id" value="$hidden_sel">
+<tr id="pupilTr$id" bgcolor=$bg style="cursor:hand;" onClick="togglePupil($id);">
+  <td>$name</td>
+</tr>
++++
+
+		return $row;
+	}
+}
+
+<table cellpadding="0" cellspacing="0" border="0" width="495">
+	<tr>
+		<td colspan="2" CLASS="panel" align="center" style="padding:5px 5px 5px 5px;" width="50%"><b>Boys</b></td>
+		<td rowspan="3" width="20"><img src="/images/clear.gif" width="20" height="1"></td>
+		<td colspan="2" CLASS="panel" align="center" style="padding:5px 5px 5px 5px;" width="50%"><b>Girls</b></td>
+	</tr>
+	<tr>
+		<td colspan="2" bgcolor="#FFFFFF" style="height:370px;">
+		<div CLASS="insetouter"><DIV STYLE="overflow-y:scroll; width:100%; height:370px;" CLASS="insetinner">
+				<table width="100%" border="0" cellspacing="1" cellpadding="3" bgcolor=#999999>
+				{
+					foreach my $male_pupil (@{$c{class}->get_pupils_by_sex('m')})
+					{
+
+						$OUT.=&get_pupil_row($male_pupil);
+					}
+				}
+				</table>
+		</DIV></div>
+		</td>
+		<td colspan="2" bgcolor="#FFFFFF">
+		<div CLASS="insetouter"><DIV STYLE="overflow-y:scroll; width:100%; height:370px;" CLASS="insetinner">
+		    <table width="100%" border="0" cellspacing="1" cellpadding="3" bgcolor=#999999>
+				{
+					foreach my $female_pupil (@{$c{class}->get_pupils_by_sex('f')})
+					{
+						if($female_pupil->has_left_school) { next; }					
+						$OUT.=&get_pupil_row($female_pupil);
+					}
+				}
+      	</table>
+		</DIV></div>
+		</td>
+	</tr>
+	<tr>
+		<td align="left"><input type="button" class="button" style="width:75px; height:19px; margin-top:5px;" value="Select All" onClick="selectAll('m');"></td>
+		<td align="right"><input type="button" class="button" style="width:75px; height:19px; margin-top:5px;" value="Select None" onClick="selectNone('m');"></td>
+		<td align="left"><input type="button" class="button" style="width:75px; height:19px; margin-top:5px;" value="Select All" onClick="selectAll('f');"></td>
+		<td align="right"><input type="button" class="button" style="width:75px; height:19px; margin-top:5px;" value="Select None" onClick="selectNone('f');"></td>
+	</tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" width="495">
+  <tr>
+    <td align="right" style="padding-top:20px;">
+    	<input type="submit" class="button2" style="width:75px;" value="Save">
+      <input type="button" class="button2" style="width:75px;" value="Cancel" onClick="top.close();">
+    </td>
+  </tr>
+</table>
+</form>

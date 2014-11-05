@@ -1,0 +1,101 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function viewAll()
+	\{
+		var loc = href + '&method=venue_status_sheet&venue_id={$c{venue}->get_id}';
+		
+		parent.parent.page.content.document.location = loc;		
+	\}
+	
+	function viewShowing(booking_id, showing_id, part)
+	\{
+		var loc = href + '&method=venue_status_sheet&venue_id={$c{venue}->get_id}&showing_id=' + showing_id + '&booking_id=' + booking_id + '&modal={$c{params}->{modal}}';
+		
+		if(part)
+		\{
+			var part_id = part;
+			
+			if(showing_id>0)
+			\{
+				part_id += 'showing' + showing_id;
+			\}
+			else
+			\{
+				part_id += 'booking' + booking_id;
+			\}
+			
+			loc += '#' + part_id;
+		\}
+		
+		parent.parent.page.content.document.location = loc;
+	\}
+</script>
+<body>
+<span class="welcome">Venue History  for {$c{venue}->name}</span><br>
+<br>
+<input type="button" class="button" value="View All" onClick="viewAll();">
+<br>
+<br>
+<table  border="0" cellspacing="0" cellpadding="0">
+{	
+	my $venue_id = $c{venue}->get_id;
+	
+	foreach my $booking (@{$c{venue}->ensure_child_array('booking')})
+	{
+		my $booking_id = $booking->get_id;
+		my $tourdate = $booking->get_first_tourdate;
+		my $showing_id = $tourdate->showing_id;
+		
+		my $date_title = $booking->get_datetime_title;
+		my $tour = $c{org}->get_child('tour', $booking->tour_id);
+		
+		my $tour_name = $tour->name;
+		
+		my $pencil_display = '';
+		
+		if($showing_id>0)
+		{
+			$pencil_display = 'display:none;';
+		}
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td><img src="/images/xtree/T.gif" width="19" height="16" align="absmiddle"></td>
+	<td width=19><img src="/images/xtree/default.16.png" width="16" height="16"></td>	
+    <td style="color:blue;">$tour_name</td>
+  </tr>	
+<tr>
+<td width=19 background="/images/xtree/I.gif"></td>
+<td valign="middle" colspan=2>
+  <table border=0 cellpadding=3 cellspacing=1 bgcolor="#e5e5e5">
+<tr valign="top" bgcolor="#FFFFFF"><td width="160" style="color:green;">$date_title<br>
+	<span style="color:red;font-weight:bold;font-size:7pt;$pencil_display">PENCIL DATE</span></td>
+<td width="16" style="color:blue;cursor:hand;"><a href="javascript:viewShowing($booking_id, $showing_id);"><img src="/images/icons/16/group.gif" width="16" height="16" border=0></a></td></tr>
+<tr valign="top" bgcolor="#FFFFFF">
+  <td>Profit Loss</td>
+  <td style="cursor:hand;"><a href="javascript:viewShowing($booking_id, $showing_id, 'profit_loss');"><img src="/images/icons/16/help.gif" width="16" height="16" border=0></a></td>
+</tr>
+<tr valign="top" bgcolor="#FFFFFF">
+  <td>Marketing</td>
+  <td style="cursor:hand;"><a href="javascript:viewShowing($booking_id, $showing_id, 'marketing');"><img src="/images/icons/16/help.gif" width="16" height="16" border=0></a></td>
+</tr>
+<tr valign="top" bgcolor="#FFFFFF">
+  <td>Production</td>
+  <td style="cursor:hand;"><a href="javascript:viewShowing($booking_id, $showing_id, 'production');"><img src="/images/icons/16/help.gif" width="16" height="16" border=0></a></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td width=19><img src="/images/xtree/I.gif" width="19" height="16"></td>
+</tr>
++++
+	}
+}
+</table>
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,102 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	
+	function finishExam()
+	\{
+		var new_loc = href + '&method=exams_force_exam_close&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+  <tr>
+    <td bgcolor="#666666"><strong style="color:#FFFFFF;">Finish A {$c{org}->test_title} </strong></td>
+  </tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	if(((!$c{exam}->closed)&&($c{exam}->has_completed_phase('pupils')))||($c{exam}->is_manual))
+	{
+		my $title = $c{org}->test_title;
+		
+		$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Finish $title" onClick="finishExam();"></td>
+</tr>
++++
+	}
+}
+</table>
+<br>
+<table border="0" cellpadding="2" cellspacing="1" bgcolor="#d5d5d5">
+<tr bgcolor="#FFFFFF">
+  <td colspan=2><b>Finish Quiz</b></td>
+</tr>
+{
+	my $total = $c{exam}->get_sql_pupil_count;
+	my $finished = $c{exam}->get_sql_finished_pupil_count;
+	my $togo = $total-$finished;
+	
+	$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">
+  <td>Total Pupils:</td><td align=right>$total</td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td>Finished Pupils:</td><td align="right">$finished</td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td>Remaining Pupils:</td><td align="right"><b style="color:red;">$togo</b></td>
+</tr>
++++
+}
+</table>
+<br> 
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+In order for the marking and processing to take place, you must finish each quiz.<br>
+<br>
+By finishing a quiz, you will close all sittings and automatically finish all pupils.<br>
+<br>
+You should only click this button if you are absolutely sure that there are no more pupils to still sit this quiz.<br>
+<br>
+Below is an overview of the number of assigned and finished pupils. 
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+Click on 'Finish Test' to complete this test and close it to any students who have been assigned...
++++
+	}
+}
+</body>
+

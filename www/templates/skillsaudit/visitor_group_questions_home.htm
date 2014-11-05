@@ -1,0 +1,177 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script src="/templates/skillsaudit/audit_analysis.js"></script>
+<script>
+	function goBack()
+	\{
+
+	\}
+
+	var giMinYear = 2004;
+
+	var giMaxYear = 2010;
+
+
+</script>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+<td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;"><table width=100% border=0 cellpadding=0 cellspacing=0>
+    <tr>
+      <td> <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/adminmenu/questionanalysis.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> LA - FEEDBACK analysis </b> </td>
+      <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;"><img id="imghelp" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Help</td>
+    </tr>
+  </table></td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">Below is a summary of the Resources &amp; Improvements sections of the audits taken within the school. <br>
+      <br>
+      There are <b style="color:red;">{$c{org}->{_visitor_count}}</b> visitors  present in the result set.      <br>
+      <br>
+      The filter is set as follows: <br>
+	  <table border=0 cellpadding=5 cellspacing=0>
+	<tr>
+	  <td align=right>Audit between </td>
+	  <td style="color:blue;">{$c{org}->{from_date}} and {$c{org}->{to_date}}</td>
+	</tr>	  
+{
+	my @props = qw(subject keystage school_type postcode);
+	
+	foreach my $prop (@props)
+	{
+		my $value = $c{params}->{$prop};
+		
+		if(($value=~/\w/)&&($value!=-1))
+		{
+			$OUT.=<<"+++";
+	<tr><td align=right>$prop =</td><td style="color:red;">$value</td></tr>
++++
+		}
+	}
+}
+</table><br>
+      Please note these are  average results across teachers from the whole LA. <br>
+To look at specific individuals outside  the average, please choose a school from the tree on the left where you will find a list of teachers. </td>
+<tr><td height=20></td></tr>
+  <tr>
+    <td width="100%" bgcolor="#e5e5ff" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#000099;"><b style="color:#000099; font-size:13px; font-variant:small-caps;">Resources</b></td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#000099; background-color:#F2F2FF;">
+  <table  border="0" cellpadding="4" cellspacing="1" bgcolor="#e5e5ff">
+    <tr bgcolor="#F2F2FF">
+      <td align="right" bgcolor="#F2F2FF"><strong>Resource</strong></td>
+      <td width="70" align="center" bgcolor="#F2F2FF"><strong>No Access</strong></td>
+      <td width="70" align="center" bgcolor="#F2F2FF"><strong>Dont Use</strong></td>
+      <td width="70" align="center" bgcolor="#F2F2FF"><strong>Daily</strong></td>
+      <td width="70" align="center" bgcolor="#F2F2FF"><strong>Weekly</strong></td>
+      <td width="70" align="center" bgcolor="#F2F2FF"><strong>Termly</strong></td>
+      <td width="70" align="center" bgcolor="#F2F2FF"><strong>Anually</strong></td>
+    </tr>
+{
+	my $refs = $c{org}->{question_refs}->{resources};
+	
+	$c{st} = '';
+	
+	foreach my $question_id (keys %$refs)
+	{
+		my $question_title = $c{org}->{question_titles}->{$question_id};
+		
+		my $answer_refs = $refs->{$question_id};
+		
+		my $u;
+		
+		foreach my $answer_ref (@$answer_refs)
+		{
+			if($answer_ref->{answer}=~/usage=(\w+).*?frequency=(\w+)?/s)
+			{
+				if($1 eq 'yes')
+				{
+					$u->{$2}+=$answer_ref->{count};
+				}
+				else
+				{					
+					$u->{$1}+=$answer_ref->{count};
+				}
+			}
+		}
+		
+		$OUT.=<<"+++";
+    <tr bgcolor="#F2F2FF">
+      <td align="right" bgcolor="#F2F2FF">$question_title</td>
++++
+
+		my @keys = qw(na no daily weekly termly anually);
+		
+		foreach my $key (@keys)
+		{
+			my $bg = ' bgcolor=#F2F2FF';
+			
+			my $value = $u->{$key};
+			
+			if($value>0)
+			{
+				$bg = ' bgcolor=#ffffff';
+			}
+			
+			$OUT.=<<"+++";
+      <td align="right"$bg>$value</td>
++++
+		}
+
+		$OUT.=<<"+++";	    </tr>
++++
+	}
+}
+  </table>
+</td>
+</tr>
+<tr><td height=20></td></tr>
+  <tr>
+    <td width="100%" bgcolor="#ffe5e5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#990000;"><b style="color:#990000; font-size:13px; font-variant:small-caps;">Improvements</b></td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#990000; background-color:#FFF2F2;">
+      <table  border="0" cellpadding="4" cellspacing="1" bgcolor="#ffe5e5">
+        <tr bgcolor="#F2F2FF">
+          <td width="70" align="right" bgcolor="#FFF2F2"><strong>Count</strong></td>		
+          <td align="left" bgcolor="#FFF2F2"><strong>Issue</strong></td>
+        </tr>
+{
+	my $refs = $c{org}->{question_refs}->{improvements};
+	
+	foreach my $question_id (keys %$refs)
+	{
+		my $question_title = $c{org}->{question_titles}->{$question_id};
+		
+		my $count;
+		
+		foreach my $ref (@{$refs->{$question_id}})
+		{
+			$count += $ref->{count};
+		}
+		
+		$OUT.=<<"+++";
+		        <tr bgcolor="#F2F2FF">
+          <td align="right" bgcolor="#FFF2F2">$count</td>				
+          <td align="left" bgcolor="#FFF2F2">$question_title</td>
+        </tr>
++++
+	}
+}
+    </table></td>
+  </tr>
+</table>
+<br>
+{$c{calendar_table}}
+</body>
+</html>
+
+
+

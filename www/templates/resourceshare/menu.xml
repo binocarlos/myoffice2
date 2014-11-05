@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<menu_config>
+		<menublock title="File" width="90">
+				<menuitem title="View Resources" action="resources_frameset();"/>
+				<menublock title="New" width="90">
+					<menuitem title="Folder" action="create_folder();"/>
+					<menuitem title="File" action="create_file();"/>
+					<menuitem title="Web Link" action="create_link();"/>
+					<menuitem title="Note" action="create_text();"/>
+				</menublock>
+				<menuitem title="Delete" action="delete_item();"/>
+				<menuitem title="Edit" action="edit_item();"/>
+				<menuitem title="Download" action="download();"/>
+				<menuitem title="Versions" action="versions();"/>
+				<menuitem title="Security" action="edit_security();"/>
+				<menuitem title="Log Out" action="application_logout();"/>
+		</menublock>
+		
+		<menublock title="Edit" width="90">
+				<menuitem title="Cut" action="cut();"/>
+				<menuitem title="Copy" action="copy();"/>
+				<menuitem title="Paste" action="paste();"/>
+		</menublock>
+		<menublock title="Tools" width="90">
+				<menuitem title="Options" action="view_options();"/>
+				<menuitem title="Search" action="search_resources();"/>
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+				<menuitem title="Moderation" action="view_moderation();"/>
+				<menuitem title="Password Reminders" action="password_reminders();"/>
+				<menublock title="Users" width="90">
+					<menuitem title="Add User" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user&amp;appname=resourceshare');"/>
+					<menuitem title="View/Edit Users" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home&amp;appname=resourceshare');"/>
+				</menublock>
+
++++
+
+        if($c{session}->is_privilaged('resourceshare', 'resourceshare_clientms'))
+        {
+                $OUT.=<<"+++";
+                <menublock title="Clients &amp; Their Users" width="150">
+                        <menuitem title="View/Edit Clients" action="get_menu_query('&amp;method=clients_tree&amp;appname=resourceshare_clientms');"/>
+                </menublock>
++++
+        }
+	}
+}
+		</menublock>
+</menu_config>

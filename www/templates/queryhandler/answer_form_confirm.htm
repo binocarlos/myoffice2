@@ -1,0 +1,142 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+	function do_cancel()
+	\{
+		var cancel_method = '{$c{cancel_method}}';
+		
+		if(cancel_method!='')
+		\{
+			var new_loc = href + '&method=' + cancel_method;
+			
+			document.location = new_loc;
+		\}
+	\}
+
+
+</script>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="confirmform">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="query_id" value="{$c{query}->get_id}">
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR id="form_tr" style="display: inline;">
+		 <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+			 <TR>
+				<TD>
+				 
+<TABLE WIDTH="480" BORDER="0" CELLPADDING="8" CELLSPACING="0"
+					CLASS="panelinner">
+					<TR>
+<TD CLASS="panelbody">
+<fieldset>
+<legend>{$c{form_title}}</legend>
+<div class="seccontent">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Ticket&nbsp;No:&nbsp;</td>
+<td align="LEFT" width="100%">{$c{query}->get_value('ticket_no')}</td>
+</tr>
+{
+	if(!$c{org}->is_client)
+	{
+		my $name = $c{query}->get_client_name;
+		$OUT.=<<"+++";
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Client:&nbsp;</td>
+<td align="LEFT">$name</td>
+</tr>
++++
+	}
+}
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Submitted&nbsp;By:&nbsp;</td>
+<td align="LEFT"><span id="search_query_users_name">{$c{query}->get_user_fullname}</span></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Submitted:&nbsp;</td>
+<td align="LEFT"><span id="search_query_submitted">{$c{query}->get_submitted_title}</span></td>
+</tr>
+{
+	if($c{query}->get_value('answered'))
+	{
+		my $title = $c{query}->get_answered_title;
+		
+		$OUT.=<<"+++";
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Answered:&nbsp;</td>
+<td align="LEFT"><span id="search_query_answered"></span><span id="search_query_submitted">$title</span></td>
+</tr>
++++
+	}
+}
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Subject:&nbsp;</td>
+<td align="LEFT"><span id="search_query_title">{$c{query}->get_value('title')}</span></td>
+</tr>
+{
+	if(!$c{org}->is_client)
+	{
+		my $string = $c{query}->get_keywords_string;
+		
+		$OUT.=<<"+++";
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Keywords:&nbsp;</td>
+<td align="LEFT"><span id="search_query_keywords">$string</span></td>
+</tr>
++++
+	}
+}
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Question:&nbsp;</td>
+<td align="LEFT" colspan="3"><span id="search_query_question">{$c{query}->get_question_title}</span></td>
+</tr>
+{
+	if($c{query}->is_answered)
+	{
+		my $answer = $c{query}->get_answer_title;
+		
+		$OUT.=<<"+++";
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Answer:&nbsp;</td>
+<td align="LEFT" colspan="3"><span id="search_query_answer">$answer</span></td>
+</tr>
++++
+	}
+}
+
+</table>
+</div>
+</fieldset>
+<IMG src="/images/holiday/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP"><font color="red"><b id="error_span">{$c{query}->{error_text}}</b></font></TD>
+{
+	if($c{submit_title}=~/\w/)
+	{
+		$c{submit_button}=<<"+++";
+<INPUT TYPE="submit" VALUE="$c{submit_title}" CLASS="button">
++++
+
+		$OUT.="";
+	}
+}
+<TD ALIGN="RIGHT" VALIGN="TOP">
+{$c{submit_button}}<IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><input type="button" value="Cancel" class="button" name="Button" onClick="do_cancel();" STYLE="width:75px;"></TD>
+</TR>
+</TABLE>
+</TD>
+					</TR>
+				 </TABLE></TD>
+			 </TR>
+			</TABLE>
+</TD>
+		</TR>
+	 </TABLE>
+</form>
+

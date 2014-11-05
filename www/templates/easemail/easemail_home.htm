@@ -1,0 +1,93 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+	function show_email_status(id)
+	\{
+		if(!id)
+		\{
+			id = object_list_get_selected_id();
+		\}
+		
+		if(id>0)
+		\{
+			var modal_loc = "/wkhtml/modal_frameset/?session_id={$c{session_id}}&appname=easemail&method=easemail_email_summary&title=Email Summary";		
+			modal_loc += '&email_id=' + id;
+			
+			var res = top.show_modal_window(modal_loc, 450, 300);
+		\}
+	\}
+
+	function do_cancel()
+	\{
+		var cancel_method = '{$c{cancel_method}}';
+		
+		if(cancel_method!='')
+		\{
+			var new_loc = href + '&method=' + cancel_method;
+			
+			document.location = new_loc;
+		\}
+	\}
+
+</script>
+
+
+	 
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" HEIGHT="100%">
+<TR>
+<TD>
+<form method="GET" action="{$c{script}}" style="margin:0;" name="searchform">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="easemail_home">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%">
+<TR>
+<TD WIDTH="100%">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset>
+                    <legend>Filter Emails</legend>
+<div class="seccontent">
+                      <table  border="0" cellpadding="0" cellspacing="0">
+                        <tr> 
+                          <td align="RIGHT">&nbsp;&nbsp;Status:&nbsp;</td>
+                          <td align="LEFT"> 
+                            <select id="email_status" name="email_status" size="1" style="width:100px;" class="text_field">{$c{status_options}} 
+                            </select>
+                          </td>
+                          <td align="LEFT">&nbsp; 
+                            <input type="submit" value="Filter" class="button" style="width:75px;height:19px;">
+                          </td>
+                        </tr>
+                      </table>
+</div>
+</fieldset>
+</td>
+</tr>
+</table>
+</TD>
+</TR>
+</TABLE>
+</form>
+<img src="/images/clear.gif" height="8" width="1"><BR>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top" WIDTH="100%" HEIGHT="100%">{$c{object_table}}</TD>
+</TR>
+</TABLE>
+{
+	if($c{params}->{status_id}>0)
+	{
+		my $id = $c{params}->{status_id};
+		
+		$OUT.=<<"+++";
+<script>
+	show_email_status($id);
+</script>		
++++
+	}
+}
+

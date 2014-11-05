@@ -1,0 +1,276 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+	var calmode = false;
+	var current_day;
+	var current_month;
+	var current_year;
+
+	{$c{start_date_js}}
+	var now = new Date();
+
+  var giMinYear = now.getYear() - 50;
+  var giMaxYear = now.getYear();
+
+  	function check_starting_block()
+	\{
+		if(current_year==now.getYear())
+		\{
+			document.all('starting_block').style.display = 'inline';
+		\}
+		else
+		\{
+			document.all('starting_block').style.display = 'none';
+		\}
+	\}
+
+	function reset_calendar()
+	\{
+		set_calendar_date();
+		
+		set_calendar_display(false);		
+	\}
+
+	function show_calendar()
+	\{
+		set_calendar_date();
+		
+		set_calendar_display(true);
+	\}
+
+	function accept_calendar()
+	\{
+		set_calendar_display(false);
+		
+		var calendar = document.all('calendar');
+
+		current_day = calendar.day;
+		current_month = calendar.month;
+		current_year = calendar.year;
+
+		apply_startdate_value();
+		apply_starting_year();
+		allowance_changed();
+		check_starting_block();
+	\}
+
+	function set_calendar_date()
+	\{
+		var calendar = document.all('calendar');
+
+		calendar.day = current_day;
+		calendar.month = current_month;
+		calendar.year = current_year;
+	\}
+
+	function apply_starting_year()
+	\{
+		document.all('starting_year').innerText = current_year;
+	\}
+
+	function apply_startdate_value()
+	\{
+		var value = current_day + ' / ' + current_month + ' / ' + current_year;
+
+		document.userform.startdate.value = value;
+	\}
+
+	function allowance_changed()
+	\{
+		var allowance = parseFloat(document.userform.allowance.value);
+		var start_date = new Date(current_year, current_month, current_day);
+		var next_year_date = new Date(current_year + 1, 1, 1);
+
+		var difference = next_year_date.getTime() - start_date.getTime();
+		var days = Math.round(difference / (60*60*24*1000));
+		var prorata = Math.round((days / 365)*allowance);
+
+		document.userform.starting_allowance.value = prorata;
+		document.all('starting_allowance_span').innerText = prorata;
+	\}
+
+	function validate_userform()
+	\{
+		var ret = true;
+		var form = document.userform;
+		var required_texts = new Array('firstname', 'surname', 'number', 'username', 'password');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			\{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			\}
+		\}
+
+		if((form.department_id.value<0)&&(form.otherdepartment.value==''))
+		\{
+			form_error('You must choose a department or enter a new one.');
+			ret = false;
+		\}
+
+		if((form.department_id.value>0)&&(form.otherdepartment.value!=''))
+		\{
+			form_error('You must choose either a department OR enter a new one');
+			ret = false;
+		\}
+
+		return ret;
+	\}
+	
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+	\}
+
+</script>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="userform" onSubmit="return validate_userform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="user_id" value="{$c{formuser}->get_id}">
+<input type="hidden" name="starting_allowance" value="{$c{formuser}->get_value('starting_allowance')}">
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR id="form_tr" style="display: inline;">
+		 <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+			 <TR>
+				<TD>
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"
+					CLASS="panelinner">
+					<TR>
+<TD CLASS="panelbody">
+{$c{user_form}}
+<IMG src="/images/holiday/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" style="display:{$c{users_dis}};">
+						 <TR>
+							<TD COLSPAN="2" ALIGN="LEFT"
+							 BACKGROUND="/images/holiday/panelt.gif" HEIGHT="13"><IMG
+							 src="/images/holiday/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13"
+							 ALIGN="ABSMIDDLE"><FONT CLASS="section_title">&nbsp;Employment
+							 Information&nbsp;</FONT></TD>
+							<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG
+							 src="/images/holiday/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+						 </TR>
+						 <TR>
+							<TD WIDTH="2" BACKGROUND="/images/holiday/panell.gif"><IMG
+							 src="/images/holiday/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+							<TD WIDTH="100%">
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+								<TR>
+								 <TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="4"
+									 CELLSPACING="0">
+									 <TR>
+										<TD ALIGN="RIGHT" VALIGN="MIDDLE"
+										 WIDTH="95">Employee&nbsp;Number:</TD>
+										<TD ALIGN="LEFT" VALIGN="TOP"><INPUT
+										 ONFOCUS="this.className='text_field2';" ONBLUR="this.className='text_field';"
+										 CLASS="text_field" TYPE="text" NAME="number" VALUE="{$c{formuser}->get_value('number')}"
+										 STYLE="width:160px;"></TD>
+										<TD ALIGN="RIGHT" VALIGN="MIDDLE"
+										 WIDTH="95">Start&nbsp;Date:</TD>
+										<TD ALIGN="LEFT" VALIGN="MIDDLE"><INPUT CLASS="text_field"
+										 TYPE="TEXT" NAME="startdate" STYLE="width:129px;" READONLY="READONLY"
+										 VALUE=""><IMG src="/images/holiday/clear.gif" WIDTH="5" HEIGHT="1"
+										 BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="calendar_click(document.userform.startdate);"><IMG
+										 src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0"
+										 ALIGN="ABSMIDDLE"></A></TD>
+									 </TR>
+									 <TR>
+										<TD ALIGN="RIGHT" VALIGN="MIDDLE">Type:</TD>
+										<TD ALIGN="LEFT" VALIGN="MIDDLE">
+										 <SELECT NAME="employment_type" SIZE="1" STYLE="width:160px;"
+											CLASS="text_field">
+											{$c{employement_type_options}}
+										 </SELECT></TD>
+										<TD ALIGN="RIGHT" VALIGN="MIDDLE">Work&nbsp;Weekends:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+<input type="checkbox" name="saturdays" value="y"{$c{sat_check}}>
+Sat
+<input type="checkbox" name="sundays" value="y"{$c{sun_check}}>
+ Sun
+</TD>
+</TR>
+<TR>
+<TD ALIGN="RIGHT">Holiday&nbsp;Allowance:</TD>
+<TD ALIGN="LEFT">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+ <TD WIDTH="25" VALIGN="middle">
+	<INPUT ONCHANGE="allowance_changed();" ONFOCUS="this.className='text_field2';"
+	 ONBLUR="this.className='text_field';" CLASS="text_field" TYPE="TEXT"
+	 NAME="allowance" SIZE="5" VALUE="{$c{formuser}->get_value('allowance')}"
+	 STYLE="width:25px; text-align:right;"> </TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;Days <span id="starting_block">(<SPAN
+	ID="starting_allowance_span">{$c{formuser}->get_value('starting_allowance')}</SPAN>
+	Days in <SPAN ID="starting_year">2002</SPAN>)</span></TD>
+</TR>
+</TABLE>
+</TD>
+<TD ALIGN="RIGHT">Owed&nbsp;Days:</TD>
+<TD ALIGN="LEFT">
+										 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+											<TR>
+											 <TD><INPUT ONFOCUS="this.className='text_field2';"
+												ONBLUR="this.className='text_field';" CLASS="text_field" TYPE="TEXT"
+												NAME="owed_days" SIZE="5" VALUE="{$c{formuser}->get_value('owed_days')}"
+												STYLE="width:25px; text-align:right;"></TD>
+											 <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;Days</TD>
+											</TR>
+										 </TABLE>
+</TD>
+									 </TR>
+									</TABLE></TD>
+								</TR>
+							 </TABLE></TD>
+							<TD WIDTH="2" BACKGROUND="/images/holiday/panelr.gif"><IMG
+							 src="/images/holiday/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+						 </TR>
+						 <TR>
+							<TD HEIGHT="2" COLSPAN="3"
+							 BACKGROUND="/images/holiday/panelb.gif" ALIGN="RIGHT"><IMG
+							 src="/images/holiday/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+						 </TR>
+						</TABLE><IMG src="/images/holiday/clear.gif" BORDER="0" WIDTH="1" HEIGHT="8"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP"><font color="red"><b id="error_span">{$c{formuser}->{error_text}}</b></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><INPUT TYPE="submit" VALUE="{$c{submit_title}}" CLASS="button"><IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><input type="button" value="Cancel" class="button" name="Button" onClick="document.location='{$c{href}}&method={$c{session}->{view_method}}';" STYLE="width:75px;"></TD>
+</TR>
+</TABLE>
+</TD>
+					</TR>
+				 </TABLE></TD>
+			 </TR>
+			</TABLE>
+</TD>
+		</TR>
+	 </TABLE>
+</form>
+{$c{calendar_table}}
+<SCRIPT LANGUAGE="JavaScript">
+parent.pagetop.location = '/templates/holiday/usertop.htm';
+
+apply_startdate_value();
+apply_starting_year();
+set_calendar_date();
+check_starting_block();
+
+{
+	if($c{params}->{owed_focus})
+	{
+		$OUT.=<<"+++";
+document.userform.owed_days.focus();
+document.userform.owed_days.select();
++++
+	}
+}
+</SCRIPT>
+

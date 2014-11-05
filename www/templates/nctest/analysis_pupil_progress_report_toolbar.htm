@@ -1,0 +1,126 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script>
+var graphMode = false;
+var namesMode = false;
+
+	function printPage()
+	\{
+		parent.content.focus();
+		parent.content.print();
+	\}
+	
+	function downloadReport()
+	\{
+		var loc = href + '&method=analysis_download_pupil_progress_report&pupil_id={$c{params}->{pupil_id}}';
+		
+		window.open(loc);
+	\}
+	
+	function downloadParentReport()
+	\{
+		var loc = href + '&method=analysis_download_parent_progress_report&pupil_id={$c{params}->{pupil_id}}';
+		
+		window.open(loc);
+	\}
+	
+	function resetGraphButton(isWithPupils)
+	\{
+		graphMode = false;
+
+		document.getElementById('graphButton').value = 'Show Graph';
+		
+		if(isWithPupils)
+		\{
+			document.filter_form.show_pupils.value = 1;
+		\}
+		else
+		\{
+			document.filter_form.show_pupils.value = '';		
+		\}
+	\}
+	
+	function toggleGraph()
+	\{
+		graphMode = !graphMode;
+	
+		var buttonTitle = 'Hide Graph';
+		var display = 'inline';
+	
+		if(!graphMode)
+		\{
+			buttonTitle = 'Show Graph';
+			display = 'none';
+		\}
+	
+		parent.content.document.getElementById('graphP').style.display = display;
+		document.getElementById('graphButton').value = buttonTitle;
+	\}	
+	
+	function viewTargets()
+	\{
+		document.getElementById('graphButton').style.display = 'none';
+		
+		document.filter_form.method.value = 'analysis_target_report';
+		document.filter_form.submit();
+	\}
+	
+	function viewProgress()
+	\{
+		document.getElementById('graphButton').style.display = 'inline';
+		
+		document.filter_form.method.value = 'analysis_progress_report';
+		document.filter_form.submit();
+	\}	
+		
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" cellspacing="0" cellpadding="0" align="center">
+				<tr>
+					<td align="center" valign="middle">
+	<form method="GET" action="{$c{script}}" target="content" name="filter_form" style="margin:0px;padding:0px;">
+	<input type="hidden" name="session_id" value="{$c{session_id}}">
+	<input type="hidden" name="method" value="analysis_progress_report">
+	<input type="hidden" name="show_pupils" value="">
+	<input type="hidden" name="year" value="{$c{params}->{year}}">
+	<input type="hidden" name="class_id" value="{$c{params}->{class_id}}">
+	<input type="hidden" name="pupil_id" value="{$c{params}->{pupil_id}}">		
+	<table border="0" cellpadding="5" cellspacing="0">
+
+      <tr>
+        <td align="center"> <a href="javascript:printPage();"><img src="/images/skillsaudit/adminmenu/print.gif" width="23" height="22" border="0"> Print Page</a>&nbsp;  <span id="graphButton" style="display:inline;"><a href="javascript:toggleGraph();"><img src="/images/skillsaudit/adminmenu/show_graph.gif" width="24" height="19" border="0"> Toggle Graph</a></span>&nbsp;
+  <a href="javascript:viewProgress();"><img src="/images/skillsaudit/adminmenu/timeline.gif" width="24" height="24" border=0 align="absmiddle"> View Progress</a>&nbsp;
+  <a href="javascript:viewTargets();"><img src="/images/skillsaudit/adminmenu/targets.gif" width="24" height="24" border=0 align="absmiddle"> View targets</a></td>
+	<td align="right"><b>View Mode </b></td>
+        <td align="right" valign="middle"><select name="carry_level_mode" size="1" class="text_field" id="carry_level_mode" style="width:180px;">
+          
+<option value="no_carry" selected>Don't Carry Levels Forward</option>
+<option value="carry">Carry Levels Forward</option>
+		
+        </select></td>  
+  </tr>
+<tr><td align="center" colspan=3>
+<input name="reportButton" id="reportButton" type="button" class="button" onClick="downloadReport();" value="Download Teacher Report">&nbsp;
+<input name="reportButton" id="reportButton" type="button" class="button" onClick="downloadParentReport();" value="Download Parent Report"></td>
+      </tr>
+    </table>
+	</form>					
+					</td>
+				</tr>
+      </table>
+    </TD>
+		</TR>
+</TABLE></BODY>
+</HTML>

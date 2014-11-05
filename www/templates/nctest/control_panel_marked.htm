@@ -1,0 +1,123 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	
+	function markExam()
+	\{
+{
+	if($c{exam}->is_manual)
+	{
+		$OUT.=<<"+++";
+		markManualExam();
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		markNormalExam();
++++
+	}
+}
+	\}
+	
+	function markManualExam()
+	\{
+		var new_loc = href + '&method=marking_manual_form&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;		
+	\}
+	
+	function markNormalExam()
+	\{
+		var new_loc = href + '&method=marking_redirect_to_marking_editor&exam_id={$c{exam}->get_id}';
+		
+		top.content.location = new_loc;	
+	\}
+	
+	function closeExam()
+	\{
+		var new_loc = href + '&method=marking_force_complete_exam&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+  <tr>
+    <td bgcolor="#666666"><strong style="color:#FFFFFF;">Mark Answers </strong></td>
+  </tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	if(($c{exam}->is_manual)||(!$c{exam}->marked)||($c{user}->is_webkit))
+	{
+		my $title = $c{org}->test_title;
+		
+		$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Mark $title" onClick="markExam();"></td>
+</tr>
++++
+	}
+	
+	if(($c{exam}->phase eq 'finished')&&(!$c{exam}->is_manual))
+	{
+		$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Close Marking" onClick="closeExam();"></td>
+</tr>
++++
+	}
+}
+</table>
+<br>
+<table border="0" cellpadding="2" cellspacing="1" bgcolor="#d5d5d5">
+<tr bgcolor="#FFFFFF">
+  <td colspan=2><b>Mark Quiz </b></td>
+</tr>
+{
+	$c{exam}->load_unmarked_manual_answers;
+	my $total_pupils = $c{exam}->get_sql_pupil_count;
+	my $to_mark = $c{exam}->unmarked_manual_answers;
+	
+	$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">
+  <td>Total Pupils:</td><td align=right>$total_pupils</td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td>Answers to Mark:</td><td align=right><b style="color:red;">$to_mark</b></td>
+</tr>
++++
+}
+</table>
+<br>
+Although the computer marks the majority of questions automatically, manually marked questions required human intervention.<br>
+<br>
+Also - the marking section gives you the opportunity to check the automatic marking and its accuracy.
+</body>
+

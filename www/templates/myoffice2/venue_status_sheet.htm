@@ -1,0 +1,1975 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var newVenueStatusId = 0;
+
+	var bookings = new Object();
+	var showings = new Object();
+	var deals = new Object();
+	var venueStatusEntries = new Object();
+	var printReqs = new Object();
+	var showingsByBooking = new Object();
+	var dealIdByBooking = new Object();
+
+	
+	function checkTicketsUrl(inputId)
+	\{
+		var input = document.getElementById(inputId);
+		
+		window.open(input.value);
+		
+		
+	\}
+	
+	function newDeal(id, booking_id, print_required, print_deadline)
+	\{
+		var deal = new Object();
+		deal.id = id;
+		deal.print_required = print_required;
+		deal.print_deadline = print_deadline;
+		
+		dealIdByBooking[booking_id] = id;
+		
+		deals[deal.id] = deal;
+	\}
+	
+	function newPrintReq(id, print_run_id)
+	\{
+		var print_req = new Object();
+		print_req.id = id;
+		print_req.print_run_id = print_run_id;
+		
+		printReqs[print_req.id] = print_req;
+	\}
+	
+	function newBooking(id, notes, venue_target, brochure_copy_deadline, brochure_mailing_dates)
+	\{
+		var booking = new Object();
+		booking.id = id;
+		booking.notes = notes;
+		booking.venue_target = venue_target;
+		booking.brochure_copy_deadline = brochure_copy_deadline;
+		booking.brochure_mailing_dates = brochure_mailing_dates;
+		
+		booking.venueStatusEntries = new Object();		
+		
+		bookings[booking.id] = booking;
+	\}
+	
+	function newShowing(id, booking_id, current_attendance, technical_rider_date, technical_rider_date_rcvd, onsale_date)
+	\{
+		var showing = new Object();
+		showing.id = id;
+		showing.booking_id = booking_id;
+		showing.current_attendance = current_attendance;
+		showing.technical_rider_date_rcvd = technical_rider_date_rcvd;
+		showing.technical_rider_date = technical_rider_date;
+		showing.onsale_date = onsale_date;
+		
+		showing.venueStatusEntries = new Object();
+		
+		showings[showing.id] = showing;
+		showingsByBooking[showing.booking_id] = showing;
+	\}
+	
+	function newVenueStatusEntry(id, showing_id, booking_id, field, value)
+	\{
+		var entry = new Object();
+		entry.id = id;
+		entry.showing_id = showing_id;
+		entry.booking_id = booking_id;
+		entry.field = field;
+		entry.value = value;
+		
+		venueStatusEntries[entry.id] = entry;
+		
+		if(showing_id>0)
+		\{
+			var showing = showings[showing_id];
+		
+			showing.venueStatusEntries[entry.field] = entry;
+		\}
+		else
+		\{
+			var booking = bookings[booking_id];
+			
+			booking.venueStatusEntries[entry.field] = entry;
+		\}
+	\}
+	
+	function getBookingVenueStatus(booking, field)
+	\{
+		if(booking==null) \{ return; \}
+		
+		var entry = booking.venueStatusEntries[field];
+		
+		if(!entry)
+		\{
+			newVenueStatusId++;
+			entry = new Object();
+			entry.id = 'new_booking_' + booking.id + '_' + newVenueStatusId;
+			entry.showing_id = 0;
+			entry.booking_id = booking.id;
+			entry.field = field;
+			entry.value = '';
+			
+			booking.venueStatusEntries[field] = entry;
+		\}
+		
+		return entry;
+	\}
+	
+	function getShowingVenueStatus(showing, field)
+	\{
+		if(showing==null) \{ return; \}
+		
+		var booking = bookings[showing.booking_id];
+		
+		var entry = showing.venueStatusEntries[field];
+		
+		if(!entry)
+		\{
+			newVenueStatusId++;
+			entry = new Object();
+			entry.id = 'new_' + showing.id + '_' + newVenueStatusId;
+			entry.showing_id = showing.id;
+			entry.booking_id = booking.id;
+			entry.field = field;
+			entry.value = '';
+			
+			showing.venueStatusEntries[field] = entry;
+		\}
+		
+		return entry;
+	\}
+	
+	function editVenueStatusCheckbox(booking_id, field, gui)
+	\{
+		var booking = bookings[booking_id];
+		
+		var showing = showingsByBooking[booking_id];
+		
+		var entry;
+		
+		if(showing)
+		\{
+			entry = getShowingVenueStatus(showing, field);
+		\}
+		else
+		\{
+			entry = getBookingVenueStatus(booking, field);
+		\}
+		
+		if(gui.checked)
+		\{
+			entry.value = 'yes';
+		\}
+		else
+		\{
+			entry.value = 'no';
+		\}	
+		
+		parent.title.addVenueStatusField(entry.id, field, entry.value);
+	\}
+	
+	function editVisit(showing_id)
+	\{
+		top.get_menu_iframe_query('showing_form&showing_id=' + showing_id, 'Edit Visit');
+	\}
+		
+	function editShowingDate(showing_id, field, td)
+	\{
+		var showing = showings[showing_id];
+		
+		var ret = get_modal_window_return('&method=editors_date&date=' + showing[field], 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addShowingField(showing_id, field, ret);
+		td.innerHTML = ret;
+		showing[field] = ret;
+	\}
+	
+	function editShowingCheckbox(showing_id, field, checkbox)
+	\{
+		var showing = showings[showing_id];
+		
+		var value = checkbox.checked ? 'y' : 'n';
+		
+		parent.title.addShowingField(showing_id, field, value);
+	\}
+	
+	function showingTextFieldChanged(showing_id, field, textfield)
+	\{
+		var showing = showings[showing_id];
+		
+		showing[field] = textfield.value;
+		
+		parent.title.addShowingField(showing_id, field, textfield.value);
+	\}
+	
+	function dealTextFieldChanged(deal_id, field, textfield)
+	\{
+		var deal = deals[deal_id];
+		
+		deal[field] = textfield.value;
+		
+		parent.title.addDealField(deal_id, field, textfield.value);
+	\}	
+	
+	function getShowingMultiDateText(showing_id, field)
+	\{		
+		var showing = showings[showing_id];
+		
+		if(!showing) \{ return ''; \}
+		
+		return getMultiDateNoteText(showing[field]);
+	\}	
+	
+	function editShowingMultiDateNote(showing_id, field, td)
+	\{
+		var showing = showings[showing_id];
+				
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, showing[field]);
+		
+		if(!ret) \{ return; \}
+		
+		showing[field] = ret;
+		
+		parent.title.addShowingField(showing.id, field, getMultiDateNoteReturn(ret));
+		td.innerHTML = getMultiDateNoteText(showing[field]);
+	\}	
+	
+	function getVenueStatusMultiDateText(booking_id, field)
+	\{
+		var booking = bookings[booking_id];
+		
+		var showing = showingsByBooking[booking_id];
+		
+		var entry;
+		
+		if(showing)
+		\{
+			entry = getShowingVenueStatus(showing, field);
+		\}
+		else
+		\{
+			entry = getBookingVenueStatus(booking, field);
+		\}
+		
+		return getMultiDateNoteText(entry.value);
+	\}	
+	
+	function editVenueStatusMultiDateNote(booking_id, field, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var showing = showingsByBooking[booking_id];
+		
+		var entry;
+		
+		if(showing)
+		\{
+			entry = getShowingVenueStatus(showing, field);
+		\}
+		else
+		\{
+			entry = getBookingVenueStatus(booking, field);
+		\}
+		
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, entry.value);
+		
+		if(!ret) \{ return; \}
+		
+		entry.value = ret;
+		
+		parent.title.addVenueStatusField(entry.id, field, getMultiDateNoteReturn(ret));
+		td.innerHTML = getMultiDateNoteText(entry.value);	
+	\}
+	
+	function editVenueStatusDate(booking_id, field, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var showing = showingsByBooking[booking_id];
+		
+		var entry;
+		
+		if(showing)
+		\{
+			entry = getShowingVenueStatus(showing, field);
+		\}
+		else
+		\{
+			entry = getBookingVenueStatus(booking, field);
+		\}
+		
+		var ret = get_modal_window_return('&method=editors_date&date=' + entry.value, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addVenueStatusField(entry.id, field, ret);
+		td.innerHTML = ret;
+		entry.value = ret;		
+	\}
+	
+	function editVenueStatusNote(booking_id, field, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var showing = showingsByBooking[booking_id];
+		
+		var entry;
+		
+		if(showing)
+		\{
+			entry = getShowingVenueStatus(showing, field);
+		\}
+		else
+		\{
+			entry = getBookingVenueStatus(booking, field);
+		\}
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, entry.value);			
+		
+		if(!ret) \{ return; \}		
+
+		td.innerHTML = ret.title;
+		entry.value = ret.value;		
+		
+		parent.title.addVenueStatusField(entry.id, field, entry.value);		
+	\}	
+	
+	function venueStatusEntryChanged(booking_id, field, gui, value)
+	\{
+		var booking = bookings[booking_id];
+		
+		var showing = showingsByBooking[booking_id];
+		
+		var entry;
+		
+		if(showing)
+		\{
+			entry = getShowingVenueStatus(showing, field);
+		\}
+		else
+		\{
+			entry = getBookingVenueStatus(booking, field);
+		\}
+		
+		if(value!=null)
+		\{
+			entry.value = value;
+		\}
+		else
+		\{
+			entry.value = gui.value;		
+		\}
+		
+		parent.title.addVenueStatusField(entry.id, field, gui.value);
+		
+		if((field=='som_target')&&(showing))
+		\{
+			var num = parseFloat(gui.value);
+			
+			if(!isNaN(num))
+			\{
+				var left = num - showing.current_attendance;
+				
+				if(left<0) \{ left = 0; \}
+				
+				document.getElementById('left_to_hit_target_' + showing.id).innerText = left;
+			\}
+		\}
+	\}
+	
+	function getBrochureCopyDeadlineText(booking_id)
+	\{
+		var booking = bookings[booking_id];
+		
+		if(!booking) \{ return ''; \}
+		
+		return getMultiDateNoteText(booking.brochure_copy_deadline);
+	\}	
+	
+	function getBrochureCopyDeadlineText(booking_id)
+	\{
+		var booking = bookings[booking_id];
+		
+		if(!booking) \{ return ''; \}
+		
+		return getMultiDateNoteText(booking.brochure_copy_deadline);
+	\}
+		
+	function getBrochureMailingText(booking_id)
+	\{
+		var booking = bookings[booking_id];
+		
+		if(!booking) \{ return ''; \}
+		
+		return getMultiDateNoteText(booking.brochure_mailing_dates);
+	\}
+	
+	function editBrochureCopyDeadline(booking_id, td)
+	\{			
+		var booking = bookings[booking_id];
+		var deal_id = dealIdByBooking[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, booking.brochure_copy_deadline);
+		
+		if(!ret) \{ return; \}
+		
+		booking.brochure_copy_deadline = ret;
+		
+		parent.title.addBookingField(booking_id, 'brochure_copy_deadline', getMultiDateNoteReturn(ret));
+		
+		if(deal_id>0)
+		\{
+			parent.title.addDealField(deal_id, 'brochure_copy_deadline', getMultiDateNoteReturn(ret));
+		\}
+		
+		td.innerHTML = getMultiDateNoteText(booking.brochure_copy_deadline);
+	\}	
+	
+	function editBrochureMailingDates(booking_id, td)
+	\{			
+		var booking = bookings[booking_id];
+		var deal_id = dealIdByBooking[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, booking.brochure_mailing_dates);
+		
+		if(!ret) \{ return; \}
+		
+		booking.brochure_mailing_dates = ret;
+		
+		parent.title.addBookingField(booking_id, 'brochure_mailing_dates', getMultiDateNoteReturn(ret));
+		
+		if(deal_id>0)
+		\{
+			parent.title.addDealField(deal_id, 'brochure_mailing_dates', getMultiDateNoteReturn(ret));
+		\}
+		
+		td.innerHTML = getMultiDateNoteText(booking.brochure_mailing_dates);
+	\}	
+
+	function editVenueTarget(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.venue_target);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addBookingField(booking.id, 'venue_target', ret.value);
+		td.innerHTML = ret.title;
+		booking.venue_target = ret.value;		
+	\}
+	
+	function editStaff(id, td)
+	\{
+		var ret = get_modal_window_return('&method=tourlist_assign_staff&tourdate_id=' + id, 650, 480);	
+		
+		if(ret)
+		\{
+			td.innerHTML = ret;
+		\}
+	\}	
+	
+	function viewPrintSheet(id)
+	\{
+		var ret = get_modal_window_return('&method=print_assign_print_run&showing_id=' + id, 700, 530);	
+		
+		if(ret)
+		\{
+			if(ret.mode=='view')
+			\{
+				top.get_double_frameset('myoffice2_print&page_method=print_sheet&print_run_id=' + ret.id);
+			\}
+			else
+			\{
+				var td = document.getElementById('printTd_' + id);
+				var bg = '#ffe5e5';
+				
+				if(ret.count>0)
+				\{
+					bg = '#e5ffe5';
+				\}
+
+				td.style.backgroundColor = bg;
+			\}
+		\}	
+	\}
+	
+	function viewDealSheet(showing_id)
+	\{
+		var ret = get_modal_window_return('&method=booking_deal_summary&modal=1&showing_id=' + showing_id, 800, 600);
+	\}
+	
+	function editBookingDate(booking_id, field, td)
+	\{
+		var booking = bookings[booking_id];
+			
+		var ret = get_modal_window_return('&method=editors_date&date=' + booking[field], 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, field, ret);
+		td.innerHTML = ret;
+		booking[field] = ret;
+	\}			
+	
+	function editDealDate(deal_id, field, td)
+	\{
+		var deal = deals[deal_id];
+			
+		var ret = get_modal_window_return('&method=editors_date&date=' + deal[field], 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addDealField(deal_id, field, ret);
+		td.innerHTML = ret;
+		deal[field] = ret;
+	\}			
+	
+	
+	function dealChanged(deal_id, field, gui)
+	\{
+		var deal = deals[deal_id];
+		
+		deal[field] = gui.value;
+		
+		parent.title.addDealField(deal_id, field, gui.value);		
+	\}	
+
+	function editProgressNotes(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.notes);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addBookingField(booking_id, 'notes', ret.value);
+		td.innerHTML = ret.title;
+		booking.notes = ret.value;
+	\}	
+	
+{
+	foreach my $booking (@{$c{tour}->ensure_child_array('booking')})
+	{
+		my $id = $booking->get_id;
+		my $notes = $booking->get_js_value('notes');
+		my $venue_target = $booking->get_js_value('venue_target');
+		my $brochure_copy_deadline = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->brochure_copy_deadline);
+		my $brochure_mailing_dates =  Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->brochure_mailing_dates);		
+		
+		$OUT.=<<"+++";
+	newBooking($id, '$notes', '$venue_target', $brochure_copy_deadline, $brochure_mailing_dates);
++++
+	}
+	
+	foreach my $print_req (@{$c{tour}->ensure_child_array('print_req')})
+	{
+		my $id = $print_req->get_id;
+		my $print_run_id = $print_req->print_run_id || 0;
+		
+		$OUT.=<<"+++";
+	newPrintReq($id, $print_run_id);
++++
+	}
+	
+	foreach my $showing (@{$c{tour}->ensure_child_array('showing')})
+	{
+		my $id = $showing->get_id;
+		my $booking_id = $showing->booking_id;
+		my $current_attendance = $showing->get_current_attendance;
+		
+		my $technical_rider_date = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($showing->technical_rider_date);
+		my $technical_rider_date_rcvd =  Webkit::MyOffice2::Admin->editors_multidatenote_js_value($showing->technical_rider_date_rcvd);		
+		
+		my $deal = $c{tour}->get_child('deal', $showing->deal_id);
+		my $deal_id = $deal->get_id;
+		
+		my $onsaledate = $showing->ensure_onsale_date_string;
+		
+		my $deal_print_required = $deal->get_js_value('print_required');
+		my $print_deadline = $deal->date_title('print_deadline');
+		
+		$OUT.=<<"+++";
+	newDeal($deal_id, $booking_id, '$deal_print_required', '$print_deadline');		
+	newShowing($id, $booking_id, $current_attendance, $technical_rider_date, $technical_rider_date_rcvd, '$onsaledate');
++++
+	}
+	
+	foreach my $entry (@{$c{tour}->ensure_child_array('venue_status_entry')})
+	{
+		my $id = $entry->get_id;
+		my $showing_id = $entry->showing_id || 0;
+		my $booking_id = $entry->booking_id || 0;
+		my $field = $entry->field;
+		my $value = $entry->get_js_value('value');
+		
+		my $multidate_fields = {
+			proof_requested => 1,
+			proof_seen => 1,
+			brochure_proof_date => 1,
+			progress_report => 1,
+			action => 1 };
+		
+		if($multidate_fields->{$field})
+		{
+			$value = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($value);
+		}
+		else
+		{
+			$value = "'$value'";
+		}
+		
+		$OUT.=<<"+++";
+	newVenueStatusEntry($id, $showing_id, $booking_id, '$field', $value);
++++
+	}
+}
+</script>
+{
+	if($c{params}->{modal}!~/\w/)
+	{
+		$c{onUnload} = ' onunload="if(parent.title){parent.title.resetForm();}"';
+	}
+	
+	$OUT.="";
+}
+<body {$c{onUnload}}>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td><table  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><img src="/images/tools/16px/paste.gif" width="16" height="16" align="absmiddle"> = <u>View Dealsheet</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/xtree/cascade.16.gif" width="16" height="16" align="absmiddle"> = <u>View Print Run </u> </td>
+        <td width="30">&nbsp;</td>		
+        <td><img src="/images/icons/16/user_readwrite.gif" width="16" height="16" align="absmiddle"> = <u>Edit Staff </u> </td>
+        <td width="30">&nbsp;</td>			
+        </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td class="welcome"><table border="0" cellpadding="3" cellspacing="1" bgcolor="#CCCCCC" id="mainTable">
+{
+	sub add_cell
+	{
+		my ($row, $col, $content) = @_;
+		
+		if(!$c{cells}->[$row]->[$col])
+		{
+			$c{cells}->[$row]->[$col] = $content;
+		}
+	}
+	
+	sub write_table
+	{
+		my $st;
+		
+		foreach my $row (@{$c{cells}})
+		{			
+			$st .= '
+			<tr bgcolor="#ffffff">';
+			
+			my $col_count = 0;
+			foreach my $col (@$row)
+			{
+				$st .= $col;
+
+				if($col_count==2)
+				{
+					$col_count = 0;
+					
+					$st .= $row->[0];
+				}
+				
+				$col_count++;				
+			}
+			$st .= '</tr>';
+		}
+		
+		$OUT.=$st;
+	}
+
+	my $pad;
+	my $col = 0;
+	my $row = 0;
+	
+	$c{table_width} = 160;
+	my $width_col = 0;
+
+	foreach my $booking (@{$c{tour}->ensure_child_array('booking')})
+	{
+		$col++;
+		$width_col++;
+		$row = 0;
+		$c{table_width} += 440;
+		
+		if($width_col==2)
+		{
+			$width_col=0;
+			$c{table_width} += 160;
+		}
+		
+		
+		my $venue = $c{tour}->{venue};
+		my $tour = $c{org}->get_child('tour', $booking->tour_id);
+		my $showing = $booking->{_showing_obj};
+		
+		my $tour_id = $tour->get_id;		
+		my $deal;
+		my $print_reqs;
+		my $showing_id = 0;
+		my $booking_id = $booking->get_id;
+		my $deal_id = 0;
+		my $tour_title = $tour->name;	
+		my $venue_title = $venue->get_city_title;			
+		my $show_count = $booking->get_child_count('tourdate');		
+		my $perf_times = $booking->get_datetime_title;		
+		my $no_weeks_left = $booking->no_weeks_left;	
+		my $venue_capacity = $venue->capacity;			
+		my $seats_on_sale = $booking->tickets_on_sale;
+		my $seats_on_sale_reason = $booking->tickets_on_sale_reason;		
+		my $ticket_prices = $booking->get_ticket_price_title;		
+		my $average_ticket_price = $booking->calculate_average_ticket_price;		
+		my $deal_title = $booking->deal_title;	
+		my $guarantee = $booking->guarantee || 0;		
+		my $progress_notes = $booking->get_html_value('notes');
+		my $venue_target = $booking->get_html_value('venue_target');		
+		
+		my $current_attendance;
+		my $current_sold_in_week;
+		my $current_sold_gross;
+		my $attendance_capacity;
+		my $average_gross_ticket_price;
+		my $average_net_ticket_price;
+		my $percent_reserved;
+		my $percent_to_sell;
+		my $per_show_gross;
+		my $rider_sent;
+		my $rider_rcvd;
+		my $projector;
+		my $projectionist;
+		my $screen;
+
+		my $booking_disabled = ' DISABLED';
+		my $booking_return_false = 'return false;';
+		
+		my $part_id = 'booking'.$booking->get_id;
+		
+		if($showing)
+		{		
+			$part_id = 'showing'.$showing->get_id;
+			$booking_disabled = '';
+			$booking_return_false = '';
+			
+			$deal = $c{tour}->get_child('deal', $showing->deal_id);
+			
+			$print_reqs = $showing->get_child_array('print_req');
+			$showing_id = $showing->get_id;
+
+			$deal_id = $deal->get_id;
+			
+			$current_attendance = $showing->get_current_attendance;
+			$current_sold_in_week = $showing->get_current_sold_in_week;
+			$current_sold_gross = $showing->get_current_sold_gross;
+			$attendance_capacity = sprintf("%.2f", $showing->get_attendance_capacity);
+			$average_gross_ticket_price = sprintf("%.2f", $showing->get_average_gross_ticket_price);
+			$average_net_ticket_price = sprintf("%.2f", $showing->get_average_net_ticket_price);	
+			$percent_reserved = sprintf("%.2f", $showing->get_percent_reserved);
+			$percent_to_sell = sprintf("%.2f", $showing->get_percent_to_sell);
+			$per_show_gross = $deal->{_per_show_gross};		
+			$projector = $deal->projector;			
+			$projectionist = $deal->projectionist;		
+			$screen = $deal->screen;	
+									
+		}
+		
+
+
+		my $vs_entry;
+		my $vs_value;
+		my $vs_id;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+		<td width=1 bgcolor=#99ccff rowspan=57></td>				
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Venue Name:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td width=1 bgcolor=#99ccff rowspan=57></td>		
+        <td align="right" valign="top" colspan=3>$venue_title</td>
++++
+
+		$pad.="</tr>";
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Tour:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" style="color:blue;" colspan=3>$tour_title</td>
++++
+
+		$pad.="</tr>";
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Perf Times:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" style="color:green;" colspan=3>$perf_times</td>
++++
+
+		$pad.="</tr>";	
+		
+		$row++;							
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">No. Shows:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$show_count</td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Venue Capacity:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$venue_capacity</td>
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Seats on Sale:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$seats_on_sale<br><span style="font-size:7pt;color:blue;">$seats_on_sale_reason</span></td>
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Ticket Prices:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$ticket_prices</td>
++++
+
+		$pad.="</tr>";	
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Average Ticket Price:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$average_ticket_price</td>
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Deal:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$deal_title</td>
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Guarantee:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3>$guarantee</td>
++++
+
+		$pad.="</tr>";	
+		
+		$row++;		
+		
+		if($showing_id>0)
+		{		
+			$pad.='<tr bgcolor="#FFFFFF">';
+		
+			&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Deal Sheet:</td>
++++
+		
+			&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3><a href="javascript:viewDealSheet($showing_id);"><span style="text-decoration:none;"><img border=0 src="/images/tools/16px/paste.gif" width="16" height="16" align="absmiddle"> </span>View</a></td>
++++
+
+			$pad.="</tr>";	
+			
+			$row++;
+			
+			$pad.='<tr bgcolor="#FFFFFF">';
+		
+			&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Edit Visit:</td>
++++
+		
+			&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3><a href="javascript:editVisit($showing_id);"><span style="text-decoration:none;"><img border=0 src="/images/tools/16px/search.gif" width="16" height="16" align="absmiddle"> </span>Edit</a></td>
++++
+
+			$pad.="</tr>";				
+		}
+		else
+		{
+			$pad.='<tr bgcolor="#FFFFFF">';
+		
+			&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5">Deal Sheet:</td>
++++
+		
+			&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3 style="color:red;font-weight:bold;">PENCIL BOOKING</td>
++++
+
+			$pad.="</tr>";	
+			
+			$row++;
+			
+			$pad.='<tr bgcolor="#FFFFFF">';
+		
+			&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" bgcolor="#f5f5f5"></td>
++++
+		
+			&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" colspan=3></td>
++++
+
+			$pad.="</tr>";							
+		}		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;">Profit & Loss:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td width="150" align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;"><a name="profit_loss$part_id"></a>Profit & Loss:</td>
+        <td colspan=2 width=250 align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;">Final Figures </td>		
++++
+
+		$pad.="</tr>";																
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Per Show  Potential B.O:</td>		
++++
+		
+
+		
+		&add_cell($row, $col, <<"+++");
+        <td width="150" align="right" valign="top">$per_show_gross</td>	
+        <td width="120" align="right" valign="top" bgcolor="#f5f5f5">Final Attendance:</td>		
+        <td width="130" align="right" valign="top">$current_attendance</td>				
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		$vs_entry = $booking->get_venue_status_entry('actual_gross_box_office', 1);
+		$vs_value = $vs_entry->value;
+		$vs_id = $vs_entry->get_id;
+		
+		&add_cell($row, 0, <<"+++");
+		<td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Gross Potential B.O:</td>		
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td width="150" align="right" valign="top">$deal->{_total_gross}</td>			
+        <td width="120" align="right" valign="top" bgcolor="#f5f5f5">Attendance Capacity:</td>		
+        <td width="130" align="right" valign="top">$attendance_capacity%</td>		
++++
+
+		$pad.="</tr>";				
+
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+#		$vs_entry = $booking->get_venue_status_entry('actual_gross_box_office', 1);
+#		$vs_value = $vs_entry->value;
+#		$vs_id = $vs_entry->get_id;
+
+		$vs_entry = $booking->get_venue_status_entry('marketing_contra', 1);
+		$vs_value = $vs_entry->value;
+		$vs_id = $vs_entry->get_id;
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Marketing Contra:</td>		
++++
+		
+#		&add_cell($row, 0, <<"+++");
+#        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Actual Gross B.O:</td>		
+#+++
+		
+		&add_cell($row, $col, <<"+++");		
+        <!--<td width="150" align="right" valign="top"><input $booking_disabled type="text" name="actual_gross_box_office_$booking_id" id="actual_gross_box_office_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'actual_gross_box_office', this);"></td>		-->
+        <td width="150" align="right" valign="top"><input $booking_disabled type="text" name="marketing_contra_$booking_id" id="marketing_contra_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'marketing_contra', this);"></td>		
+        <td width="120" align="right" valign="top" bgcolor="#f5f5f5">Avg Gross Ticket Price:</td>		
+        <td width="130" align="right" valign="top" id="average_gross_ticket_price_$booking_id">&pound;$average_gross_ticket_price</td>				
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+#		$vs_entry = $booking->get_venue_status_entry('actual_net_box_office', 1);
+#		$vs_value = $vs_entry->value;
+#		$vs_id = $vs_entry->get_id;	
+
+		$vs_entry = $booking->get_venue_status_entry('contra', 1);
+		$vs_value = $vs_entry->value;
+		$vs_id = $vs_entry->get_id;		
+		
+#		&add_cell($row, 0, <<"+++");
+#        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Actual NET B.O:</td>		
+#+++
+
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Contra:</td>	
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <!--<td width="150" align="right" valign="top"><input $booking_disabled type="text" name="actual_net_box_office_$booking_id" id="actual_net_box_office_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'actual_net_box_office', this);"></td>		-->
+        <td width="150" align="right" valign="top"><input $booking_disabled type="text" name="contra_$booking_id" id="contra_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'contra', this);"></td>		
+        <td width="120" align="right" valign="top" bgcolor="#f5f5f5">Avg NET Ticket Price:</td>		
+        <td width="130" align="right" valign="top" id="average_net_ticket_price_$booking_id">&pound;$average_net_ticket_price</td>				
++++
+
+		$pad.="</tr>";
+		
+		$row++;		
+		
+#		$pad.='<tr bgcolor="#FFFFFF">';
+#		
+#		$vs_entry = $booking->get_venue_status_entry('marketing_contra', 1);
+#		$vs_value = $vs_entry->value;
+#		$vs_id = $vs_entry->get_id;		
+#		
+#		&add_cell($row, 0, <<"+++");
+#        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Marketing Contra:</td>		
+#+++
+#		
+#		&add_cell($row, $col, <<"+++");
+#        <td width="150" align="right" valign="top"><input $booking_disabled type="text" name="marketing_contra_$booking_id" id="marketing_contra_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'marketing_contra', this);"></td>		
+#		<td colspan=2></td>
+#+++
+#
+#		$pad.="</tr>";		
+#		
+#		$row++;		
+#		
+#		$pad.='<tr bgcolor="#FFFFFF">';
+#		
+#		$vs_entry = $booking->get_venue_status_entry('contra', 1);
+#		$vs_value = $vs_entry->value;
+#		$vs_id = $vs_entry->get_id;				
+#		
+#		&add_cell($row, 0, <<"+++");
+#        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Contra:</td>	
+#+++
+#		
+#		&add_cell($row, $col, <<"+++");	
+#        <td width="150" align="right" valign="top"><input $booking_disabled type="text" name="contra_$booking_id" id="contra_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'contra', this);"></td>		
+#		<td colspan=2></td>		
+#+++
+#
+#		$pad.="</tr>";				
+#		
+#		$row++;		
+#		
+#		$pad.='<tr bgcolor="#FFFFFF">';
+#		
+#		$vs_entry = $booking->get_venue_status_entry('profit_loss', 1);
+#		$vs_value = $vs_entry->value;
+#		$vs_id = $vs_entry->get_id;				
+#		
+#		&add_cell($row, 0, <<"+++");
+#        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Profit/Loss:</td>	
+#+++
+#		
+#		&add_cell($row, $col, <<"+++");	
+#        <td width="150" align="right" valign="top"><input $booking_disabled type="text" name="profit_loss_$booking_id" id="profit_loss_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'profit_loss', this);"></td>		
+#		<td colspan=2></td>		
+#+++
+#
+#		$pad.="</tr>";				
+#		
+#		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;">Website Info:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;"><a name="marketing$part_id" id="marketing$part_id"></a>Website Info:</td>
+        <td colspan=2 align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;"></td>		
++++
+
+		$pad.="</tr>";														
+		
+		$row++;
+
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+		
+
+		my $sfigscell=<<"+++";        
+        <td align="right" valign="top" colspan=2 rowspan=34>	
+		<table width=100% border=0 cellpadding="2" cellspacing="1" bgcolor=#ccccff>
++++
+
+		foreach my $tourdate (@{$booking->ensure_child_array('tourdate')})
+		{
+			if($tourdate->showing_id<=0) { next; }
+			my $date_title = $tourdate->get_datetime_title;
+			my $sales_entry = $tourdate->sales_figures_entry;
+			my $tickets = $booking->tickets_on_sale;
+			
+			if(!$sales_entry)
+			{
+				next;
+			}
+			
+			$sfigscell.=<<"+++";
+		<tr>
+		  <td colspan=6 bgcolor=#ffffff style="color:green;">$date_title</td>
+		</tr>
+		<tr>
+		  <td colspan=6 bgcolor=#e5e5ff><span style="color:red;">$tickets</span> tickets on sale</td>
+		</tr>			
+		<tr align="right" bgcolor=#e5e5e5><td class="sevenPoint">Sld Sts</td>
+		<td class="sevenPoint">Rsd Sts</td><td class="sevenPoint">Sld Csh</td><td class="sevenPoint">Rsd Csh</td><td class="sevenPoint">% Sld</td><td class="sevenPoint">Week</td></tr>	
++++
+
+			my $last_week = 0;
+			foreach my $sales_figures (@{$sales_entry->ensure_child_array('sales_figures')})
+			{
+				my $sold = $sales_figures->sold_seats;
+				my $resd = $sales_figures->reserved_seats;
+				my $gsold = $sales_figures->sold_gross;
+				my $gresd = $sales_figures->reserved_gross;
+				my $pcnt = $sales_figures->percent_sold;
+				my $week = $sales_figures->sold_in_week;
+				my $date_st = $sales_figures->week_start->get_string;
+				my $id = $sales_figures->get_id;
+				
+				$sfigscell.=<<"+++";
+<tr align="left" bgcolor=#f5f5f5>
+		<td colspan=6 class="sevenPoint" style="color:#888888;">$date_st</td>
+</tr>					
+<tr align="right" bgcolor=#ffffff>
+		<td class="sevenPoint" style="color:#444444;">$sold</td>
+		<td class="sevenPoint" style="color:#444444;">$resd</td>
+		<td class="sevenPoint" style="color:#444444;">$gsold</td>
+		<td class="sevenPoint" style="color:#444444;">$gresd</td>
+		<td class="sevenPoint" style="color:#444444;">$pcnt</td>
+		<td class="sevenPoint" style="color:#444444;">$week</td>
+</tr>									
++++
+			}
+		}
+
+		$sfigscell.=<<"+++";
+		</table>
+	</td>
++++
+
+
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+
+		if($showing)
+		{
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" style="background-color:#f5f5f5;">On Sale via Website?:</td>
++++
+		
+		my $onsale = '';
+		
+		if($showing && $showing->onsale eq 'y') { $onsale = ' CHECKED'; }
+		
+		&add_cell($row, $col, <<"+++");
+        <td colspan=3 height="1" align="left" valign="top"><input type="checkbox" onClick="editShowingCheckbox($showing_id, 'onsale', this);" value="y"$onsale></td>
+        
++++
+
+
+
+		##&add_cell($row, $col, $sfigscell);
+
+		$pad.="</tr>";														
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">On Sale Date: </td>
++++
+
+		my $onsaledate = $showing->ensure_onsale_date_string;
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" colspan=3 align="left" valign="top" class="editTd" onClick="editShowingDate($showing_id, 'onsale_date', document.getElementById('showing_onsale_date_$showing_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="showing_onsale_date_$showing_id">
+			$onsaledate</span></td>		
++++
+
+
+		$pad.="</tr>";	
+		
+		$row++;
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Tickets URL: </td>
++++
+
+		my $tickets_url = '';
+		
+		if($showing)
+		{
+			$tickets_url = $showing->parse_tickets_url;
+		}
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" colspan=3 align="left" valign="top" class="editTd">
+			<input type="text" name="tickets_url_$showing_id" id="tickets_url_$showing_id" value="$tickets_url" class="text_field" style="width:300px;text-align:left;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="showingTextFieldChanged($showing_id, 'tickets_url', this);"> <a href="javascript:checkTicketsUrl('tickets_url_$showing_id');">Check URL</a></td>
++++
+
+
+		$pad.="</tr>";	
+		
+		$row++;
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Tickets Region: </td>
++++
+
+		my $tickets_region = '';
+		
+		if($showing)
+		{
+			$tickets_region = $showing->parse_tickets_region;
+		}
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" colspan=3 align="left" valign="top" class="editTd">
+			<input type="text" name="tickets_region_$showing_id" id="tickets_region_$showing_id" value="$tickets_region" class="text_field" style="width:300px;text-align:left;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="showingTextFieldChanged($showing_id, 'tickets_region', this);">
+			<br />
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'London';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">London</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'North West';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">North West</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'North East';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">North East</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'South West';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">South West</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'South East';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">South East</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'Midlands';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">Midlands</a>
+			: 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'Scotland';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">Scotland</a>
+			: 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'Northern Ireland';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">Northern Ireland</a>
+			: 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'East Anglia';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">East Anglia</a>
+			: 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'Wales';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">Wales</a>
+			: 
+			<a href="#" onclick="document.getElementById('tickets_region_$showing_id').value = 'Channel Islands';showingTextFieldChanged($showing_id, 'tickets_region', document.getElementById('tickets_region_$showing_id'));">Channel Islands</a>
+			
+			</td>		
++++
+
+
+		$pad.="</tr>";	
+		
+		$row++;
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Tickets Country: </td>
++++
+
+		my $tickets_country = '';
+		
+		if($showing)
+		{
+			$tickets_country = $showing->parse_tickets_country;
+		}
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" colspan=3 align="left" valign="top" class="editTd">
+			<input type="text" name="tickets_country_$showing_id" id="tickets_country_$showing_id" value="$tickets_country" class="text_field" style="width:300px;text-align:left;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="showingTextFieldChanged($showing_id, 'tickets_country', this);">
+			<br />
+			<a href="#" onclick="document.getElementById('tickets_country_$showing_id').value = 'UK';showingTextFieldChanged($showing_id, 'tickets_country', document.getElementById('tickets_country_$showing_id'));">UK</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_country_$showing_id').value = 'USA';showingTextFieldChanged($showing_id, 'tickets_country', document.getElementById('tickets_country_$showing_id'));">USA</a>
+			 : 
+			<a href="#" onclick="document.getElementById('tickets_country_$showing_id').value = 'Canada';showingTextFieldChanged($showing_id, 'tickets_country', document.getElementById('tickets_country_$showing_id'));">Canada</a>
+			
+			</td>		
++++
+
+
+		$pad.="</tr>";	
+		
+		$row++;
+		
+		
+		}
+		
+		
+$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;">Marketing:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;"><a name="marketing$part_id" id="marketing$part_id"></a>Marketing</td>
+        <td colspan=2 align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;">Sales Figures</td>		
++++
+
+		$pad.="</tr>";														
+		
+		$row++;		
+		
+		##&add_cell($row, $col, $cell);
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Brochure Copy Deadline: </td>
++++
+
+
+		my $cell=<<"+++";
+		<td height="1" colspan=1 valign="top" class="editTd" onClick="editBrochureCopyDeadline($booking_id, document.getElementById('brochure_copy_deadline_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochure_copy_deadline_$booking_id">
+			<script>document.write(getBrochureCopyDeadlineText($booking_id));</script></span></TD>				
++++
+
+
+		$cell.=<<"+++";
+		</td>
+		$sfigscell
++++
+		&add_cell($row, $col, $cell);
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Brochure Proof Date: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="editVenueStatusMultiDateNote($booking_id, 'brochure_proof_date', document.getElementById('brochure_proof_date_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochure_proof_date_$booking_id">
+			<script>document.write(getVenueStatusMultiDateText($booking_id, 'brochure_proof_date'));</script></span></td>		
++++
+
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Brochure Hit Dates: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" valign="top" class="editTd" onClick="editBrochureMailingDates($booking_id, document.getElementById('brochure_hit_dates_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochure_hit_dates_$booking_id">
+			<script>document.write(getBrochureMailingText($booking_id));</script></span></TD>		
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Proof Requested: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="editVenueStatusMultiDateNote($booking_id, 'proof_requested', document.getElementById('brochure_proof_requested_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochure_proof_requested_$booking_id">
+			<script>document.write(getVenueStatusMultiDateText($booking_id, 'proof_requested'));</script></span></td>		
++++
+
+
+		$pad.="</tr>";	
+			
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Proof Seen: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="editVenueStatusMultiDateNote($booking_id, 'proof_seen', document.getElementById('brochure_proof_seen_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochure_proof_seen_$booking_id">
+			<script>document.write(getVenueStatusMultiDateText($booking_id, 'proof_seen'));</script></span></td>		
++++
+
+
+		$pad.="</tr>";		
+		
+		$row++;			
+		
+$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Print Required: </td>
++++
+
+		my $print_required = '';
+		
+		#if($deal)
+		if($deal_id!=0)
+		{
+			$print_required = $deal->print_required;
+		}
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" colspan=1 align="left" valign="top" class="editTd">
+			<input type="text" name="print_required_$deal_id" id="print_required_$deal_id" value="$print_required" class="text_field" style="width:100%;text-align:left;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="dealTextFieldChanged($deal_id, 'print_required', this);"></td>		
+			
++++
+
+
+		$pad.="</tr>";	
+
+
+
+		$pad.="</tr>";	
+		
+		$row++;					
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">View Print Run:</td>
++++
+
+		my $print_style = 'background-color:#ffe5e5;';
+		
+		if($showing)
+		{
+			if($showing->get_child_count('print_req')>0)
+			{
+				$print_style = 'background-color:#e5ffe5;';
+			}
+		}
+		
+		my $print_col='<td height="1" align="right" valign="top"><table width="60"  border="0" cellpadding="1" cellspacing="0">';
+		
+		if($showing)
+		{
+			$print_col.=<<"+++";
+			<tr>
+        <td align="center" style="$print_style" id="printTd_$showing_id">
+         
+           <a href="javascript:viewPrintSheet($showing_id);"><span style="text-decoration:none;"><img src="/images/xtree/cascade.16.gif" width="16" height="16" border="0" align="absmiddle">&nbsp;</span>View</a>
+         </td></tr>
+        
++++
+		}
+		
+		$print_col .= "</table></td>";
+
+
+		&add_cell($row, $col, $print_col);
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Seats on sale:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$seats_on_sale<br>
+        	<span style="font-size:7pt;color:blue;">$seats_on_sale_reason</span></td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;				
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Venue Target:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+	<td height="1" valign="top" class="editTd" onClick="editVenueTarget($booking_id, document.getElementById('venue_target_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="venue_target_$booking_id">$venue_target</span></TD>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Our Target: </td>
++++
+		
+		$vs_entry = $booking->get_venue_status_entry('som_target', 1);
+		$vs_value = $vs_entry->value;
+		$vs_id = $vs_entry->get_id;	
+		
+		my $som_target = $vs_value || 0;
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top"><input type="text" name="som_target_$booking_id" id="som_target_$booking_id" value="$vs_value" class="text_field" style="width:60px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueStatusEntryChanged($booking_id, 'som_target', this);"></td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Current Attendance: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$current_attendance</td>
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Sold In Last Week: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$current_sold_in_week</td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Left To Hit Target: </td>
++++
+
+		my $left_to_hit = $som_target - $current_attendance;
+		
+		if($left_to_hit<0) { $left_to_hit = 0; }
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top" id="left_to_hit_target_$booking_id">$left_to_hit</td>
++++
+
+		$pad.="</tr>";				
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">No Weeks Left: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$no_weeks_left</td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;				
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Progress Report: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="editVenueStatusMultiDateNote($booking_id, 'progress_report', document.getElementById('progress_report_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="progress_report_$booking_id">
+			<script>document.write(getVenueStatusMultiDateText($booking_id, 'progress_report'));</script></span></td>		
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Last Had Stage Show:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="editVenueStatusMultiDateNote($booking_id, 'action', document.getElementById('action_$booking_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="action_$booking_id">
+			<script>document.write(getVenueStatusMultiDateText($booking_id, 'action'));</script></span></td>		
++++
+
+		$pad.="</tr>";							
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">At Risk? </td>
++++
+		
+		$vs_entry = $booking->get_venue_status_entry('at_risk', 1);
+		$vs_value = $vs_entry->value;
+		$vs_id = $vs_entry->get_id;			
+		
+		my $at_risk = '';
+		
+		if($vs_value eq 'yes') { $at_risk = ' CHECKED'; }
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top"><input type="checkbox" onClick="editVenueStatusCheckbox($booking_id, 'at_risk', this);" value="y"$at_risk></td>
++++
+
+
+		$pad.="</tr>";											
+
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Current Gross Box Office: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$current_sold_gross</td>
++++
+
+		$pad.="</tr>";	
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Average Gross Ticket Price: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">&pound;$average_gross_ticket_price</td>
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5"><p>Average NET Ticket Price:</p></td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">&pound;$average_net_ticket_price</td>
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">% On Reserve: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$percent_reserved%</td>
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">% Left To Sell: </td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">$percent_to_sell%</td>
++++
+
+		$pad.="</tr>";			
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;">Production:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top" style="background-color:#99ccff;font-weight:bold;color:#000066;"><a name="production$part_id" id="production$part_id"></a>Production</td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Staff:</td>
++++
+
+		my $staff_part=<<"+++";
+        <td height="1" align="right" valign="top">
+		<table width=100% border=0 cellpadding="2" cellspacing="1" bgcolor=#ccccff>	
++++
+
+		foreach my $tourdate (@{$booking->ensure_child_array('tourdate')})
+		{
+			my $staff_string = $tourdate->get_staff_string($c{tour}->get_staff_hash);		
+			my $tourdate_id = $tourdate->get_id;
+			
+			if(!$showing) { next; }
+			
+			$staff_part.=<<"+++";		
+		<tr>
+		  <td bgcolor=#ffffff style="color:green;" colspan=2>$date_title</td>
+		</tr>
+		<tr valign="top"><td bgcolor=#ffffff class="sevenPoint" style="color:#888888;"><span id="staff_$tourdate_id">$staff_string</span></td>
+		<td width="1" bgcolor=#ffffff style="cursor:hand;"><a href="javascript:$booking_return_false editStaff($tourdate_id, document.getElementById('staff_$tourdate_id'));"><img src="/images/icons/16/user_readwrite.gif" width="16" height="16" align="absmiddle" border=0></a></td>
+		</tr>
+		<tr><td bgcolor=#ffffff height=5 colspan=2></td></tr>
++++
+		}
+		
+		$staff_part.="</table></td>";
+		
+		&add_cell($row, $col, $staff_part);
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Tech Rider Sent:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="$booking_return_false editShowingMultiDateNote($showing_id, 'technical_rider_date', document.getElementById('tech_rider_sent_$showing_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="tech_rider_sent_$showing_id">
+			<script>document.write(getShowingMultiDateText($showing_id, 'technical_rider_date'));</script></span></td>		
++++
+
+
+		$pad.="</tr>";	
+			
+		$row++;				
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Tech Rider Rcvd:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+		<td height="1" align="left" valign="top" class="editTd" onClick="$booking_return_false editShowingMultiDateNote($showing_id, 'technical_rider_date_rcvd', document.getElementById('tech_rider_rcvd_$showing_id'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="tech_rider_rcvd_$showing_id">
+			<script>document.write(getShowingMultiDateText($showing_id, 'technical_rider_date_rcvd'));</script></span></td>		
++++
+
+
+		$pad.="</tr>";	
+			
+		$row++;				
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Notes To Remember:</td>
++++
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">?</td>
++++
+
+		$pad.="</tr>";		
+		
+
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5">Venue has own equipment:</td>
++++
+
+
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">Projector = $projector</td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5"></td>
++++
+
+
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">Screen = $screen</td>
++++
+
+		$pad.="</tr>";		
+		
+		$row++;		
+		
+		$pad.='<tr bgcolor="#FFFFFF">';
+		
+		&add_cell($row, 0, <<"+++");
+        <td width="160" height="1" align="right" valign="top" bgcolor="#f5f5f5"></td>
++++
+		
+
+		
+		&add_cell($row, $col, <<"+++");
+        <td height="1" align="right" valign="top">Projectionist = $projectionist</td>
++++
+		$pad.="</tr>";			
+																		
+	}
+	
+	&write_table();
+}      
+    </table></td>
+  </tr>
+</table>
+<script>
+document.getElementById('mainTable').width = {$c{table_width}};
+</script>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

@@ -1,0 +1,195 @@
+<script>
+	var calendarGui = null;
+	
+{
+	if(defined($c{min_year}))
+	{
+		$OUT.=<<"+++";
+		giMinYear = $c{min_year};
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		giMinYear = 2000;
++++
+	}
+}
+		giMaxYear = 2020;
+		
+	function callback_obj()
+	\{
+		this.purpose = 'to provide a place to stick a function callback for a change of date';
+		
+		return this;
+	\}
+		
+	function reset_calendar()
+	\{
+		set_calendar_display(false);
+			
+		calendarGui	= null;
+	\}
+	
+	function accept_calendar()
+	\{
+		var cal = document.getElementById('calendar');
+		
+		var st = cal.day + '/' + cal.month + '/' + cal.year;
+		
+		if(calendarGui)
+		\{
+			calendarGui.value = st;
+			
+			if(calendar_callback_obj.onUpdate)
+			\{
+				calendar_callback_obj.onUpdate(calendarGui);
+			\}
+		\}
+		
+		reset_calendar();
+	\}
+	
+	function calendar_click(gui)
+	\{
+		if(set_calendar_date(gui.value))
+		\{
+			calendarGui = gui;
+			
+			set_calendar_display(true);
+		\}
+		else
+		\{
+			alert('There is a problem with ' + gui.value);
+		\}
+		
+	\}
+	
+	function get_date_array_from_string(datest)
+	\{
+		var arr = new Array();
+		
+		if((!datest)||(datest==''))
+		\{
+			var dt = new Date();
+			
+			arr[0] = dt.getDate();
+			arr[1] = dt.getMonth() + 1;
+			arr[2] = dt.getFullYear();
+		\}
+		else
+		\{
+			datest = datest.replace(/ /g, "");
+			arr = datest.split("/");
+		
+			for(var i=0; i<arr.length; i++)
+			\{
+				var st = arr[i];
+				st = st.replace(/^0+/, "");
+				
+				var val = parseInt(st);
+			
+				if(val>0)
+				\{
+					arr[i] = val;
+				\}
+				else
+				\{
+					return null;
+				\}
+			\}
+		\}
+		
+		return arr;	
+	\}
+			
+	function set_calendar_date(datest)
+	\{
+		var arr = get_date_array_from_string(datest);
+		
+		if(!arr) \{ return; \}
+		
+		var cal = document.getElementById('calendar');
+		
+		cal.day = arr[0];
+		cal.month = arr[1];
+		cal.year = arr[2];
+		
+		return true;		
+	\}
+	
+	function set_calendar_display(mode)
+	\{
+		if(mode)
+		\{
+			var ctable = document.getElementById('calendar_table');
+			var ciframe = document.getElementById('calendar_iframe');		
+				
+			var bodywidth = document.body.clientWidth;
+			var bodyheight = document.body.clientHeight;
+			var cwidth = 260;
+			var cheight = 260;		
+		
+			var cx = (bodywidth/2) - (cwidth/2) + document.body.scrollLeft;
+			var cy = (bodyheight/2) - (cheight/2) + document.body.scrollTop;
+		
+			ciframe.style.top = cy;
+			ciframe.style.left = cx;
+			ciframe.style.display = 'inline';					
+				
+			ctable.style.top = cy;
+			ctable.style.left = cx;
+			ctable.style.display = 'inline';
+			
+			ciframe.style.width = ctable.clientWidth;
+			ciframe.style.height = ctable.clientHeight;		
+		\}
+		else
+		\{
+			var ctable = document.getElementById('calendar_table');		
+			var ciframe = document.getElementById('calendar_iframe');
+					
+			ctable.style.display = 'none';
+			ciframe.style.display = 'none';		
+		\}
+	\}
+	
+	calendar_callback_obj = new callback_obj();
+</script>
+	
+<span id="calendar_iframe" style="background-color:#ffffff;width:272px;height:323px;left:0px;top:0px;display:none;position:absolute;z-index:1000;"> 
+<iframe width=272 height=323 scrolling=no src="/templates/blank.htm"></iframe>
+</span>
+  
+<TABLE id="calendar_table" style="left:0px;top:0px;width:260px;height:260px;display:none;position:absolute;z-index:1010;" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter"> 
+<tr>		
+<td class="panelinner" style="padding:3px; color:#FFFFFF;" bgcolor="#0A246A" height="2"><b>Calendar</b></td>
+</tr>
+  <TR> 
+	 
+<TD HEIGHT="100%" align="center"> 
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		 CLASS="panelinner"> 
+		  <TR> 
+			 <TD CLASS="panelbody"> 
+				<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="8"> 
+				  <TR> 
+					 
+<TD COLSPAN="2" ALIGN="right" height="58"> 
+						
+<DIV ID="calendar" STYLE="behavior:url(/lib/calendar.htc); width:250px; height:250px;"></DIV>
+<IMG src="/images/layout/clear.gif" BORDER="0" WIDTH="1" HEIGHT="8"><BR><INPUT
+						TYPE="button" VALUE="OK" STYLE="width:75px;"
+						ONCLICK="accept_calendar();" CLASS="button"><IMG
+						src="/images/layout/clear.gif" BORDER="0" WIDTH="8" HEIGHT="1"><INPUT
+						TYPE="button" VALUE="Cancel" STYLE="width:75px;" ONCLICK="reset_calendar();"
+						CLASS="button">
+ </TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		</TABLE>
+</TD> 
+  </TR> 
+</TABLE>		
+

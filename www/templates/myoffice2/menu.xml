@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Users" width="90">
+		<menuitem title="Add" action="get_menu_iframe_query('add_user','Add User');"/>
+		<menuitem title="View/Edit" action="get_menu_iframe_query('users_home','Current Users');"/>
+	</menublock>
+	<menublock title="Venues" width="90">
+		<menuitem title="Add Venue" action="get_menu_iframe_query('venue_form', 'Current Venues');"/>	
+		<menuitem title="Manage Venues" action="get_menu_iframe_query('venue_home', 'Current Venues');"/>
+	</menublock>
+	<menublock title="Tours" width="90">
+		<menuitem title="Manage Tours" action="get_menu_iframe_query('tour_home', 'Current Tours');"/>
+	</menublock>	
+	<menublock title="Booking" width="90">
+		<menuitem title="Add Booking" action="addBooking();"/>	
+		<menuitem title="Booking Progress Sheet" action="get_double_frameset('myoffice2_booking_progress');"/>
+		<menuitem title="Booking Penciled Sheet" action="get_double_frameset('myoffice2_booking_penciled');"/>		
+		<menuitem title="Booking Report" action="get_double_frameset('myoffice2_booking_report');"/>
+		<menuitem title="View Deal Sheet" action="viewDealSheet();"/>				
+	</menublock>
+	<menublock title="Tour &amp; Tick" width="90">
+			<menuitem title="Tour &amp; Tick Sheet" action="get_double_frameset('myoffice2_tourlist');"/>
+	</menublock>
+	<menublock title="Print" width="90">
+			<menuitem title="Add Print Run" action="get_double_frameset('myoffice2_print&amp;page_method=print_form');"/>	
+			<menuitem title="View Print Runs" action="get_double_frameset('myoffice2_print');"/>
+	</menublock>	
+	<menublock title="Sales Figures" width="90">
+			<menuitem title="Sales Figures Sheet" action="get_double_frameset('myoffice2_sales_figures');"/>
+	</menublock>	
+	<menublock title="Venue History" width="90">
+			<menuitem title="Venue History Sheet" action="viewVenueStatus();"/>
+			<menuitem title="Search Venue History" action="searchVenueHistory();"/>
+	</menublock>		
+	<menublock title="Timeline" width="90">
+			<menuitem title="View Timeline" action="viewTimeline();"/>
+	</menublock>			
+</menu_config>

@@ -1,0 +1,105 @@
+<script>
+function viewPupils()
+\{
+	top.get_menu_iframe_query('pupils_home', 'Pupils');
+\}
+
+function viewExamsGeneric()
+\{
+	top.viewExams();
+\}
+
+function viewExams()
+\{
+	var new_loc = '/htmlhub/frames_double?session_id=' + session_id + '&frameset_key=nctest_exams_home&reverse=1';
+
+
+	top.content.location = new_loc;
+\}
+
+function viewAnalysis()
+\{
+	top.progressAnalysis();
+\}
+</script>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" HEIGHT="100%">
+<TR>
+  <TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+	 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="CENTER" VALIGN="MIDDLE"> 
+		<TR> 
+		  <TD COLSPAN="20"> 
+			 <DIV CLASS="panelouter" STYLE="width:100%;"> 
+				<DIV CLASS="panelinner"> 
+				  <DIV CLASS="panelbody" STYLE="padding:8px;" ALIGN="left">
+					 <B>Welcome to TestingTool</B></DIV></DIV></DIV></TD> 
+		</TR> 
+		<TR> 
+		  <TD COLSPAN="20" HEIGHT="26"></TD> 
+		</TR> 
+		<TR> 
+{		
+	if($c{org}->is_generic_nctest)
+	{
+		if($c{session}->is_privilaged('nctest', 'nctest_pupils'))
+		{
+			$OUT.=<<"+++";		
+		  <TD HEIGHT="80" valign=middle align=center><A HREF="#"
+			 onClick="viewPupils();">STUDENTS</A></TD> 
++++
+		}		  
+		if($c{session}->is_privilaged('nctest', 'nctest_exams'))
+		{
+			$OUT.=<<"+++";
+		  <TD HEIGHT="80" valign=middle align=center><A HREF="#"
+			 onClick="viewExamsGeneric();">TESTS</A></TD> 
++++
+		}
+	}
+	else
+	{
+		if($c{session}->is_privilaged('nctest', 'nctest_pupils'))
+		{
+			$OUT.=<<"+++";		
+		<TD WIDTH="30"></TD>
+		  <TD WIDTH="186" HEIGHT="280"><A HREF="#"
+			 ONMOUSEOVER="swap('pupils','/images/nctest/homepage/pupils_over.jpg');"
+			 ONMOUSEOUT="swap('pupils','/images/nctest/homepage/pupils_off.jpg');" 
+			 onClick="viewPupils();"><IMG
+			 SRC="/images/nctest/homepage/pupils_off.jpg"
+			 WIDTH="186" HEIGHT="280" BORDER="0" NAME="pupils"></A></TD> 
+		  <TD WIDTH="30"></TD> 
++++
+		}		  
+		if($c{session}->is_privilaged('nctest', 'nctest_exams'))
+		{
+			$OUT.=<<"+++";
+		<TD WIDTH="30"></TD>	
+		  <TD WIDTH="186" HEIGHT="280"><A HREF="#"
+			 ONMOUSEOVER="swap('exams','/images/nctest/homepage/exams_over.jpg');"
+			 ONMOUSEOUT="swap('exams','/images/nctest/homepage/exams_off.jpg');" 
+			 onClick="viewExams();"><IMG
+			 SRC="/images/nctest/homepage/exams_off.jpg"
+			 WIDTH="186" HEIGHT="280" BORDER="0" NAME="exams"></A></TD> 
+		 <TD WIDTH="30"></TD>
++++
+		}
+		if($c{session}->is_privilaged('nctest', 'nctest_analysis'))
+		{
+			$OUT.=<<"+++";		
+		<TD WIDTH="30"></TD>
+		  <TD WIDTH="168" HEIGHT="280"><A HREF="#"
+			 ONMOUSEOVER="swap('analysis','/images/nctest/homepage/analysis_over.jpg');"
+			 ONMOUSEOUT="swap('analysis','/images/nctest/homepage/analysis_off.jpg');" 
+			 onClick="viewAnalysis();"><IMG
+			 SRC="/images/nctest/homepage/analysis_off.jpg"
+			 WIDTH="186" HEIGHT="280" BORDER="0" NAME="analysis"></A></TD> 
+		<TD WIDTH="30"></TD>
++++
+		}
+	}
+}
+		</TR> 
+	 </TABLE></TD>
+</TR>
+</TABLE> 

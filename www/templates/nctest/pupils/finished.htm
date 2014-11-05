@@ -1,0 +1,116 @@
+<HTML>
+<HEAD>
+<TITLE>TestingTool</TITLE>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<link rel="stylesheet" type="text/css" href="/lib/nctest/styles/default/style.css">
+<script>
+	function submitForm(id)
+	\{
+		document.partForm.sub_question_id.value = id;
+		
+		document.partForm.submit();
+	\}
+	
+	function finishQuizGeneric()
+	\{
+		document.partForm.method.value = 'finish_quiz_generic';
+		
+		document.partForm.submit();		
+	\}
+	
+	function finishQuiz()
+	\{
+		document.partForm.method.value = 'finish_quiz';
+		
+		document.partForm.submit();		
+	\}
+</script>
+<style type="text/css">
+<!--
+.style2 \{
+	font-size: 22px;
+	color: #880000;
+\}
+-->
+</style>
+</HEAD>
+<body>
+<form method="POST" action="{$c{script}}" name="partForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="sub_question_form">
+<input type="hidden" name="sub_question_id" value="">
+<input type="hidden" name="save_sub_question_id" value="finish">
+<table height="100%" width="100%" cellpadding="0" cellspacing="0" border="0">
+{
+	if($c{org}->is_generic_nctest)
+	{
+		if($c{exam_login}->finished)
+		{
+			$OUT.=<<"+++";
+		You have already finished this test - please logout by closing this window.
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+<tr>
+<td align="left" valign="top" class="window_instructions">			
+		Once you are happy with your answers - please click the FINISH button below.<br><br>
+		<b style="color:red;">WARNING</b> - please ensure that you have completely finished as you will not have the change to come back and correct answers.<br><br>
+		If you want to return and change answers - DO NOT click FINISH and close this window.  Later, you can use the login information provided - your answers are saved.<br><br>
+<input type="button" value="FINISH..." onClick="finishQuizGeneric();" class="login_button">
+</td>
+</tr>		
++++
+		}
+	}
+	else
+	{
+		if(!$c{exam_login}->is_bridge_login)
+		{
+			$OUT.=<<"+++";
+	<tr>
+		<td align="left" valign="top" class="window_instructions">You have now finished
+		  the quiz - please tell the teacher that you have finished.</td>
+	</tr>
++++
+		}
+		else
+		{
+			if($c{exam_login}->finished)
+			{
+				my $score = $c{exam_login}->get_total_marks;
+				my $total_score = $c{exam_login}->get_total_question_marks;
+		
+				$OUT.=<<"+++";
+	<tr>
+	<td align="left" valign="top" class="window_instructions">You have now finished
+		  the quiz - below is your mark<br>
+<br>
+<span class="style2">$score / $total_score
+</span></td>
+	</tr>	
++++
+			}
+			else
+			{
+					$OUT.=<<"+++";
+	<tr>
+		<td align="left" valign="top" class="window_instructions">TO FINISH THE QUIZ CLICK THE BUTTON BELOW:<br><br>
+		
+		<input type="button" value="FINISH QUIZ..." onClick="finishQuiz();" class="login_button">
+		
+</td>
+	</tr>	
++++
+			}
+		}
+	}
+}
+</table>
+<script>
+		parent.tree.partLoaded();
+</script>
+</form>
+</body>
+</HTML>

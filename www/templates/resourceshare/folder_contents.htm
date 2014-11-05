@@ -1,0 +1,976 @@
+<!--Folders Here-->
+
+<script>
+	var folders = new Object();
+	var resources = new Object();
+{
+	if($c{folderview}->can_edit_item($c{current_folder}))
+	{
+		$OUT.=<<"+++";
+	current_folder_editable = true;	
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+	current_folder_editable = false;		
++++
+	}
+}
+	//var current_folder_editable = {$c{user}->can_edit_item($c{current_folder}, 1)};
+	//var current_folder_editable = true;
+	var current_folder_id = {$c{current_folder}->get_database_id};
+	var auto_folder_value = '{$c{current_folder}->auto_value}';
+	var contributed_id = '{$c{folderview}->{contributed_id} || 0}';
+	var auto_folder_value = '{$c{folderview}->{auto_folder_value} || ''}';
+	var recycle_bin_selected = false;
+	var download_count = 1;
+
+	var original_description = '';
+
+	var select_colors = new Object();
+
+	select_colors.selected = new Object();
+	select_colors.selected.bgColor = '#FFECCC';
+	select_colors.selected.border = '1px solid #FBAF2D';
+
+	select_colors.cut = new Object();
+	select_colors.cut.bgColor = '#E5FAE5';
+	select_colors.cut.border = '1px solid #00CA00';
+
+	select_colors.copy = new Object();
+	select_colors.copy.bgColor = '#EAEEFA';
+	select_colors.copy.border = '1px solid #3059CA';
+
+
+	function new_folder(id, folder_id, org_id, auto_value, title, unique_id, created, notes, editable, website_id, website_root, thumbnail_path, type_title, desc)
+	\{
+		var folder = new Object();
+
+		folder.id = id;
+		folder.folder_id = folder_id;
+		folder.org_id = org_id;
+		
+		folder.title = title;
+		folder.unique_id = unique_id;
+		folder.created = created;
+		folder.notes = notes;
+		folder.editable = editable;
+		folder.itemtype = 'folder';
+		folder.website_id = website_id;
+		folder.website_root = website_root;
+		folder.thumbnail_path = thumbnail_path;
+		folder.auto_value = auto_value;
+		folder.type_title = type_title;
+		folder.desc = desc;
+
+		folders[folder.id] = folder;
+	\}
+
+	function new_resource(id, folder_id, title, created, modified, mime, author, url, users_id, notes, keywords, size, editable, thumbnail_path, type_title)
+	\{
+		var resource = new Object();
+
+		resource.id = id;
+		resource.folder_id = folder_id;
+		resource.title = title;
+		resource.created = created;
+		resource.modified = modified;
+		resource.mime = mime;
+		resource.author = author;
+		resource.users_id = users_id;
+		resource.notes = notes;
+		resource.keywords = keywords;
+		resource.size = size;
+		resource.editable = editable;
+		resource.itemtype = 'resource';
+		resource.url = url;
+		resource.thumbnail_path = thumbnail_path;
+		resource.type_title = 'Resource';
+
+		resources[resource.id] = resource;
+	\}
+
+{
+	my $contributedfolders = $c{folderview}->get_contributed_folders;
+	my $folderarr = $c{folderview}->get_folders;
+	my $resourcearr = $c{folderview}->get_resources;		
+
+	foreach my $folder (@$folderarr)
+	{
+		my $id = $folder->get_id;
+		my $org_id = 0;
+		my $folder_id = $folder->folder_id;
+
+		my $title = $folder->get_value('title');
+
+		$title =~ s/'/\\'/g;
+
+		my $created = $folder->get_created_title;
+		my $notes = $folder->get_notes_js_title;
+		my $editable = $c{user}->can_edit_item($folder, 1);
+		my $unique_id = $folder->get_value('unique_id');
+		my $website_root = $folder->website_root;
+		my $website_id = $folder->website_id;
+		my $thumbnail = $folder->thumbnail_path;
+		my $auto_value = $folder->auto_value;
+		my $type_title = $folder->entity_title;
+		
+		if($website_id!~/\d/) { $website_id = 'null'; }
+
+		$OUT.=<<"+++";
+new_folder('$id', '$folder_id', 0, '$auto_value', '$title', '$unique_id', '$created', '$notes', $editable, $website_id, '$website_root', '$thumbnail', '$type_title');
++++
+	}
+	
+	foreach my $contributed_folder (@$contributedfolders)
+	{
+		my $org_id = $contributed_folder->org_id;
+		my $id = $contributed_folder->get_id;
+		my $title = $contributed_folder->title;
+		my $website_id = $contributed_folder->website_id;
+		my $folder_id = $contributed_folder->folder_id;
+		my $type_title = $contributed_folder->entity_title;
+		
+		$OUT.=<<"+++";
+new_folder('$id', '$folder_id', $org_id, auto_folder_value, '$title', '', '', '', false, $website_id, '', '', '$type_title');
++++
+	}
+
+	foreach my $resource (@$resourcearr)
+	{
+		if(!$resource) { next; }
+		my $id = $resource->get_id;
+		my $folder_id = $resource->folder_id;
+		my $title = $resource->get_value('title');
+		my $created = $resource->get_created_title;
+		my $modified = $resource->get_modified_title;
+		my $users_id = $resource->get_value('users_id');
+		my $author = $resource->get_value('author');
+		my $mime = $resource->get_mime_title;
+		my $url = $resource->get_url(1);
+		my $notes = $resource->get_notes_js_title;
+		my $keywords = $resource->get_keywords_js_title;
+		my $size = $resource->get_size_title;
+		my $editable = $c{user}->can_edit_item($resource, 1);
+		my $thumbnail = $resource->thumbnail_path;
+		
+		$title =~ s/'/\\'/g;
+		$author =~ s/'/\\'/g;		
+		
+		$OUT.=<<"+++";
+new_resource($id, $folder_id, '$title', '$created', '$modified', '$mime', '$author', $url, $users_id, '$notes', '$keywords', '$size', $editable, '$thumbnail');
++++
+	}
+}
+
+	function get_resource_description(resource_id)
+	\{
+		var resource_obj = resources[resource_id];
+
+		var users_title = top.get_user_title(resource_obj.users_id);
+
+		var author = resource_obj.author;
+
+		if(author=='')
+		\{
+			author = users_title;
+		\}
+
+		var thumbnail = '';
+
+		if(resource_obj.thumbnail_path!='')
+		\{
+			thumbnail = '<img src="/pub/resourceshare/' + resource_obj.thumbnail_path + '"><p>';
+		\}
+		
+		var linked_folder = '';
+		
+		if(resource_obj.folder_id!=current_folder_id)
+		\{
+			linked_folder = '<a href="javascript:view_linked_folder(' + resource_obj.folder_id + ', ' + resource_obj.id + ');">View Linked Folder</a><p>';
+		\}
+
+		var text = 	'<b>' + resource_obj.title + '</b><br>'
+				+	'<a href="javascript: download_resource(' + resource_id + ');" class="recycle">Download Resource</a><p>'
+				+	linked_folder
+				+	resource_obj.mime + '<p>'
+				+	thumbnail				
+				+	'Author: ' + author + '<br>'
+				+	'Created By: ' + users_title + '<p>'
+				+	'Modified:<br>' + resource_obj.modified + '<p>'
+				+	'Size: ' + resource_obj.size + '<p>'
+				+	'Keywords: <br>' + resource_obj.keywords + '<p>'
+				+	resource_obj.notes;
+
+		return text;
+	\}
+	
+	function view_timeline()
+	\{
+		top.view_timeline(current_folder_id);
+	\}
+	
+	function view_linked_folder(folder_id, resource_id)
+	\{
+		top.view_linked_folder(folder_id, resource_id);
+	\}
+
+	function get_recycle_bin_description()
+	\{
+		var text = '<b>Recycle Bin</b><br><br>'
+				+	'<a href="javascript: view_recycle_bin();" class="recycle">View Folders/Resources</a>';
+
+		return text;
+	\}
+
+	function get_folder_description(folder_id)
+	\{
+		var folder_obj = folders[folder_id];
+		
+		var thumbnail = '';
+
+		if(folder_obj.thumbnail_path!='')
+		\{
+			thumbnail = '<img src="/pub/resourceshare/' + folder_obj.thumbnail_path + '"><p>';
+		\}		
+
+		var text = 	'<b>' + folder_obj.title + '</b><br>'
+				+	folder_obj.type_title + '<p>'
+				+	thumbnail						
+				+	'Created:<br>' + folder_obj.created + '<p>'
+				+	'Unique Id: ' + folder_obj.unique_id + '<p>';
+				+	folder_obj.notes;
+
+		return text;
+	\}
+
+	function set_description(text)
+	\{
+		document.getElementById('description').innerHTML = text;
+		document.getElementById('space_used_tr').style.display = 'none';
+	\}
+
+	function reset_description()
+	\{
+		document.getElementById('description').innerText = original_description;
+		document.getElementById('space_used_tr').style.display = 'inline';
+	\}
+
+	function enter_folder(folder_id)
+	\{
+		var folder = folders[folder_id];
+		
+		top.set_current_folder(folder_id, folder.org_id, folder.auto_value);
+
+		event.cancelBubble = true;
+	\}
+	
+	function viewPage(page)
+	\{
+		top.set_current_folder(current_folder_id, contributed_id, auto_folder_value, page);
+	\}
+
+	function deselect_item_id(id, mode)
+	\{
+		var td_id = mode + id;
+
+		var elem = document.getElementById(td_id);
+
+		elem.bgColor = '';
+		elem.style.border = '1px solid #ffffff';
+	\}
+
+	function select_item_td(id, mode, key)
+	\{
+		var td_id = mode + id;
+
+		var elem = document.getElementById(td_id);
+
+		if(!key)
+		\{
+			key = 'selected';
+		\}
+
+		var color_obj = select_colors[key];
+
+		elem.bgColor = color_obj.bgColor;
+		elem.style.border = color_obj.border;
+	\}
+
+	function select_recycle_bin()
+	\{
+		deselect_item();
+
+		var color_obj = select_colors.selected;
+
+		var elem = document.getElementById('recycle_bin');
+
+		elem.bgColor = color_obj.bgColor;
+		elem.style.border = color_obj.border;
+
+		set_description(get_recycle_bin_description());
+
+		recycle_bin_selected = true;
+
+		event.cancelBubble = true;
+	\}
+
+	function select_resource(resource_id)
+	\{
+		deselect_item();
+
+		var resource = resources[resource_id];
+
+		top.set_selected_resource(resource);
+
+		select_item_td(resource_id, 'resource');
+		
+		if(resource.editable)
+		\{
+			show_resource_options('Resource');
+		\}
+
+		set_description(get_resource_description(resource_id));
+
+		if(event)
+		\{
+			event.cancelBubble = true;
+		\}
+	\}
+	
+	function show_resource_options(item_title)
+	\{
+		document.getElementById('add_options_tr').style.display = 'none';	
+		document.getElementById('selected_options_tr').style.display = 'inline';		
+		
+		document.getElementById('itemtitle1').innerText = item_title;	
+		document.getElementById('itemtitle2').innerText = item_title;			
+	\}
+	
+	function hide_resource_options()
+	\{
+		document.getElementById('add_options_tr').style.display = 'inline';	
+		document.getElementById('selected_options_tr').style.display = 'none';			
+	\}
+
+	function download_current_resource()
+	\{
+		var mode = top.get_selected_item_mode();
+		var id = top.get_selected_item_id();
+
+		if((mode=='resource')&&(id>0))
+		\{
+			download_resource(id);
+		\}
+	\}
+
+	function download_resource(resource_id)
+	\{
+		top.download_resource(resource_id);
+	\}
+	
+	function edit_current_folder()
+	\{
+		top.selected_item_id = current_folder_id;
+		top.selected_item_mode = 'folder';
+		top.edit_item();
+	\}
+	
+	function edit_selected_item()
+	\{
+		top.edit_item();
+		event.cancelBubble = true;
+	\}
+	
+	function delete_selected_item()
+	\{
+		top.delete_item();
+		event.cancelBubble = true;	
+	\}
+
+	function select_folder(folder_id)
+	\{
+		deselect_item();
+
+		var folder = folders[folder_id];
+
+		top.set_selected_folder(folder);
+
+		select_item_td(folder_id, 'folder');
+		
+		if((folder.editable)&&(folder.website_root!='y'))
+		\{
+			show_resource_options(folder.type_title);
+		\}
+
+		set_description(get_folder_description(folder_id));
+
+		event.cancelBubble = true;
+	\}
+
+	function deselect_recycle_bin()
+	\{
+		var item_td = document.getElementById('recycle_bin');
+
+		item_td.bgColor = '';
+		item_td.style.border = '1px solid #ffffff';
+
+		reset_description();
+
+		recycle_bin_selected = false;
+	\}
+
+	function deselect_item()
+	\{
+		if(recycle_bin_selected)
+		\{
+			deselect_recycle_bin();
+
+			return;
+		\}
+
+		var item_id = top.get_selected_item_id();
+
+		if(item_id)
+		\{
+			var mode = top.get_selected_item_mode();
+
+			if(mode)
+			\{
+				var item_td = document.getElementById(mode + item_id);
+
+				if(item_td)
+				\{
+					item_td.bgColor = '';
+					item_td.style.border = '1px solid #ffffff';
+				\}
+			\}
+		\}
+
+		reset_description();
+		hide_resource_options();
+
+		top.reset_selected_item();
+	\}
+	
+	function editUser(id)
+	\{
+		var new_loc = href + '&method=clients_edit_user&appname=resourceshare_clientms&object_id=' + id;
+		
+		document.location = new_loc;
+	\}
+
+	function view_recycle_bin()
+	\{
+		document.location = href + '&method=resources_recycle_bin';
+	\}
+
+	function body_loaded()
+	\{
+		ContextMenu.intializeContextMenu();
+
+{
+	if($c{params}->{alert_text}=~/\w/)
+	{
+		my $text = $c{params}->{alert_text};
+
+		$OUT.=<<"+++";
+		alert('$text');
++++
+	}
+}
+	\}
+
+	top.reset_selected_item();
+	
+{
+	my $address = $c{current_folder}->get_js_address($c{folderview}->{view_org});
+	my $js_id = $c{current_folder}->get_js_id;
+	my $js_parent_id = $c{current_folder}->js_parent_id;
+	my $edit = $c{user}->can_edit_item($c{current_folder}, 1);
+	
+	$OUT.=<<"+++";
+top.assign_current_folder_details('$address', $js_id, $js_parent_id, contributed_id, auto_folder_value, $edit);
++++
+}
+	document.body.onclick = deselect_item;
+</script>
+<style>
+a.recycle \{color:#0000FF\}
+a.recycle:hover \{color:#FF0000\}
+</style>
+
+
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<link rel="STYLESHEET" type="text/css" href="/lib/contextmenu/contextmenu.css">
+<body onload="body_loaded();" oncontextmenu="contextForBody(this)">
+<!--<body onload="body_loaded();" >-->
+<script src="/lib/contextmenu/contextmenu.js"></script>
+<script src="/lib/contextmenu/ieemu.js"></script>
+
+<script>
+{
+	$c{up_enabled} = 'false';
+
+	if($c{current_folder}->is_root)
+	{
+		$c{up_enabled} = 'true';
+	}
+
+	$OUT.="";
+}
+function contextForBody(obj)
+\{
+//	return;
+   var eobj,popupoptions;
+
+   popupoptions = [
+   					new ContextItem("Up",function()\{top.go_up();\},{$c{up_enabled}}),
+						new ContextSeperator(),
+						new ContextItem("New Folder",function()\{top.create_folder();\}, !current_folder_editable),						
+						new ContextItem("New File",function()\{top.create_file();\}, !current_folder_editable),
+						new ContextItem("New Web Link",function()\{top.create_link();\}, !current_folder_editable),
+						new ContextItem("New Note",function()\{top.create_text();\}, !current_folder_editable)
+   				  ];
+   ContextMenu.display(popupoptions);
+\}
+
+function contextForResource(obj, id)
+\{
+   var eobj,popupoptions;
+
+   var resource_obj = resources[id];
+
+   popupoptions = [
+						new ContextItem("Download",function()\{top.download();\}),
+						new ContextItem("Edit",function()\{top.edit_item();\}, !resource_obj.editable),
+						new ContextItem("Security Settings",function()\{top.edit_security();\}, !resource_obj.editable),
+						new ContextItem("Show Versions",function()\{top.versions();\}),
+						new ContextItem("Delete",function()\{top.delete_item();\}, !resource_obj.editable),
+						new ContextSeperator(),
+						new ContextItem("Cut",function()\{top.cut();\}, !resource_obj.editable),
+						new ContextItem("Copy",function()\{top.copy();\})
+   				  ];
+   ContextMenu.display(popupoptions);
+\}
+
+function contextForFolder(obj, id)
+\{
+   var eobj,popupoptions;
+
+   var folder_obj = folders[id];
+   
+   if(folder_obj.website_root=='y')
+   \{
+   		popupoptions = [];
+   \}
+   else if(folder_obj.website_id==0)
+   \{
+   		popupoptions = [
+						new ContextItem("Edit",function()\{top.edit_item();\}, !folder_obj.editable),
+						new ContextItem("Security Settings",function()\{top.edit_security();\}, !folder_obj.editable),
+						new ContextItem("Delete",function()\{top.delete_item();\}, !folder_obj.editable),
+						new ContextSeperator(),
+						new ContextItem("Cut",function()\{top.cut();\}, !folder_obj.editable),
+						new ContextItem("Copy",function()\{top.copy();\})
+   				  		];
+	\}
+	else
+	\{
+   		popupoptions = [
+						new ContextItem("Edit",function()\{top.edit_item();\}, !folder_obj.editable),
+						new ContextItem("Delete",function()\{top.delete_item();\}, !folder_obj.editable),						
+						new ContextSeperator(),
+						new ContextItem("Cut",function()\{top.cut();\}, !folder_obj.editable),
+						new ContextItem("Copy",function()\{top.copy();\})
+   				  		];
+	\}
+	
+   ContextMenu.display(popupoptions);
+\}
+</script>
+
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+<TD WIDTH="180" ALIGN="LEFT" VALIGN="TOP" NOWRAP>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+{
+	my $icon = $c{current_folder}->get_large_icon;
+	
+	$OUT.=<<"+++";
+        <tr>
+          <td><img src="$icon" width="48" height="48"></td>
+        </tr>	
++++
+}
+        <tr>
+          <td style="font-size:12px;font-weight:bold; padding-top:10px;" height="40" valign="top" align="left">{$c{current_folder}->display_title}</td>
+        </tr>
+        <tr>
+        <td align=left valign=top>
+		<span id="add_options_tr" style="display:ndone;">
+		<table border="0" cellspacing="0" cellpadding="3">
+{
+	my $can_add_resource = $c{folderview}->can_add_resource;
+	my $can_add_folder = $c{folderview}->can_add_folder;
+
+	if($c{current_folder}->is_job_files_folder)
+	{
+		if($c{user}->admin)
+		{
+
+			$OUT.=<<"+++";
+              <tr align="left" valign="top">
+                <td><a href="javascript:top.create_client();" style="color:#0033CC;"><img src="/images/icons/16x16/folder_cubes.gif" width="16" height="16" border="0" align="absmiddle"> Add new client </a></td>
+            </tr>			
++++
+		}
+	}
+	else
+	{
+		if($can_add_resource)
+		{
+			if(!$c{current_folder}->is_users_folder)
+			{
+				$OUT.=<<"+++";
+              <tr align="left">
+                <td><a href="javascript:edit_current_folder();" style="color:#0033CC;"><img src="/images/icons/16x16/folder_edit.gif" width="16" height="16" align="absmiddle" border=0> Edit this folder </a></td>
+</tr>		
+              <tr align="left" valign="top">
+                <td><a href="javascript:top.create_folder();" style="color:#0033CC;"><img src="/images/icons/16x16/folder_new.gif" width="16" height="16" border="0" align="absmiddle"> Add new folder </a></td>
+            </tr>
+              <tr align="left">
+                <td><a href="javascript:top.create_discussion();" style="color:#0033CC;"><img src="/images/icons/16x16/question_and_answer.gif" width="16" height="16" border="0" align="absmiddle"> Start a discussion </a></td>
+</tr>
+              <tr align="left">
+                <td><a href="javascript:top.create_text();" style="color:#0033CC;"><img src="/images/icons/16x16/document_new.gif" width="16" height="16" border="0" align="absmiddle"> Add a note </a></td>
+</tr>
+              <tr align="left">
+                <td><a href="javascript:top.create_link();" style="color:#0033CC;"><img src="/images/icons/16x16/star_yellow_new.gif" width="16" height="16" border="0" align="absmiddle"> Add a webpage link </a></td>
+</tr>
+              <tr align="left">
+                <td><a href="javascript:top.create_file();" style="color:#0033CC;"><img src="/images/icons/16x16/document_up.gif" width="16" height="16" border="0" align="absmiddle"> Upload a document </a></td>
+</tr>
++++
+			}
+		}
+		
+		if($c{current_folder}->is_jobfile)
+		{
+			$OUT.=<<"+++";
+              <tr align="left">
+                <td><a href="javascript:view_timeline();" style="color:#0033CC;"><img src="/images/icons/16x16/window_time.gif" width="16" height="16" align="absmiddle" border=0> View Jobfile Timeline </a></td>
+</tr>					
++++
+		}
+	}
+}
+<tr align="left">
+<td height=15></td>
+</tr>
+</table></span>
+<span  id="selected_options_tr" style="display:none;">
+<table border="0" cellspacing="0" cellpadding="3">
+
+              <tr align="left" valign="top">
+                <td><a href="#" onClick="edit_selected_item();" style="color:#0033CC;"><img src="/images/icons/16x16/edit.gif" width="16" height="16" align="absmiddle" border=0> Edit <span id="itemtitle1">Resource</span></a></td>
+            </tr>
+              <tr align="left">
+                <td><a href="#" onClick="delete_selected_item();" style="color:#0033CC;"><img src="/images/icons/16x16/delete.gif" width="16" height="16" align="absmiddle" border=0> Delete <span id="itemtitle2">Resource</span></a></td>
+</tr>
+<tr align="left">
+<td height=15></td>
+</tr>
+</table>
+</span>
+
+</td>
+        </tr>		
+        <tr>
+          <td id="description" align=left valign=top>Select an item to view its
+            description</td>
+        </tr>
+        <tr id="space_used_tr">
+          <td align=left valign=top><br>
+            <table border="0" cellspacing="0" cellpadding="3">
+{
+	if($c{current_folder}->is_users_folder)
+	{
+		my $user = $c{current_folder}->load_user;
+		my $email = $user->username;
+		my $user_id = $user->get_id;
+		
+		$OUT.=<<"+++";
+              <tr align="left" valign="top" height="20">
+                <td colspan="2">username:</td>
+                <td>$email</td>
+              </tr>	
+			  <tr align="left" valign="top" height="20">
+                <td colspan="3"><a href="javascript:editUser($user_id);">Edit this users details</a></td>
+              </tr>	
++++
+	}
+	elsif((!$c{folderview}->{folder}->exists)&&($c{folderview}->{folder}->folder_id==0))
+	{
+		my $space_used = $c{space_used};
+		my $space_free = $c{space_free};
+    my $total_space = $c{total_space};
+		my $href = $c{href};
+
+		$OUT.=<<"+++";
+              <tr align="left" valign="top" height="20">
+                <td colspan="2">Total Space:</td>
+                <td>$total_space</td>
+              </tr>
+
+              <tr align="left">
+                <td><table width=15 height=15 border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+                    <tr>
+                      <td bgcolor="#FFFFFF">&nbsp;</td>
+                    </tr>
+                  </table></td>
+                <td>Used:</td>
+                <td>$space_used</td>
+              </tr>
+              <tr align="left">
+                <td><table width=15 height=15 border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+                    <tr>
+                      <td bgcolor="#D4D0C8">&nbsp;</td>
+                    </tr>
+                  </table></td>
+                <td>Free:</td>
+                <td>$space_free</td>
+              </tr>
+              <tr align="center">
+                <td colspan="3"><br> <img width=120 height=90 src="$href&method=draw_graph"></td>
+              </tr>
++++
+	}
+} </table>
+
+</td>
+        </tr>
+        <tr>
+          <td align=left valign=top>
+            
+
+</td>
+        </tr>
+		
+      </table>
+
+</TD>
+<td width="10"></td>
+<TD ALIGN="center" VALIGN="TOP">
+<table border=0 cellpadding=3 cellspacing=10>
+<tr>
+<!--Folders Here-->
+
+{
+	my $col_count = 0;
+
+	my $orgfolders = $c{folderview}->get_contributed_folders;
+	my $folderarr = $c{folderview}->get_folders;
+	my $resourcearr = $c{folderview}->get_resources;	
+	
+	foreach my $folder (@$orgfolders)
+	{
+		my $title = $folder->title;
+		my $id = $folder->get_id;
+
+		my $src = '';
+		my $link = '';
+		my $end_link = '';
+		
+		$src = $folder->get_icon;
+
+		$link=<<"+++";
+<a oncontextmenu="contextForFolder(this, '$id'); select_folder('$id');" onClick="select_folder('$id');" onDblClick="enter_folder('$id');" style="cursor:hand;">
++++
+
+		$end_link = '</a>';
+
+		$OUT.=<<"+++";
+<td width=80 valign=top align=center id="folder$id" style="border:1px solid #ffffff;">$link<img src="$src" width="32" height="32"><br>
+$title$end_link</td>
++++
+		$col_count++;
+
+		if($col_count==5)
+		{
+			$col_count = 0;
+
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+	
+	if($orgfolders)
+	{
+		my $count = @$orgfolders;
+		
+		if($count>0)
+		{
+			$OUT.=<<"+++";
+		</tr><tr><td height=20 colspan=20><hr></td></tr><tr>
++++
+			$col_count = 0;	
+		}
+	}
+	
+	foreach my $folder (@$folderarr)
+	{
+		my $title = $folder->title;
+		my $id = $folder->get_id;
+
+		my $src = '';
+		my $link = '';
+		my $end_link = '';
+
+		if((!$c{user}->can_see_item($folder))&&(!$folder->is_website_folder))
+		{
+			next;
+		}
+		else
+		{
+			$src = $folder->get_grey_icon;
+		}
+
+		$src = $folder->get_icon;
+
+		$link=<<"+++";
+<a oncontextmenu="contextForFolder(this, '$id'); select_folder('$id');" onClick="select_folder('$id');" onDblClick="enter_folder('$id');" style="cursor:hand;">
++++
+
+		$end_link = '</a>';
+
+		$OUT.=<<"+++";
+<td width=80 valign=top align=center id="folder$id" style="border:1px solid #ffffff;">$link<img src="$src" width="32" height="32"><br>
+$title$end_link</td>
++++
+		$col_count++;
+
+		if($col_count==5)
+		{
+			$col_count = 0;
+
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+
+	foreach my $resource (@$resourcearr)
+	{
+		if(!$resource) { next; }
+		
+		my $title = $resource->get_value('title');
+		my $id = $resource->get_id;
+
+		my $src = '';
+		my $link = '';
+		my $end_link = '';
+
+		$src = $resource->get_icon;
+
+			$link=<<"+++";
+<a oncontextmenu="contextForResource(this, $id); select_resource($id);" onClick="select_resource($id);" onDblClick="download_resource($id);"  style="cursor:hand;">
++++
+
+		$end_link = '</a>';
+		
+		if($resource->folder_id != $c{current_folder}->get_id)
+		{
+			$src = $resource->get_grey_icon;
+			
+			#$link = '';
+			#$end_link = '';
+		}
+
+		$OUT.=<<"+++";
+<td width=80 valign=top align=center id="resource$id" style="border:1px solid #ffffff;">$link<img src="$src" border=0><br>$title$end_link</td>
++++
+
+		$col_count++;
+
+		if($col_count==5)
+		{
+			$col_count = 0;
+
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+
+	if($c{current_folder}->is_root)
+	{
+		$OUT.=<<"+++";
+<td width=80 valign=top align=center id="recycle_bin" style="border:1px solid #ffffff;">
+<a onClick="select_recycle_bin();" onDblClick="view_recycle_bin();" style="cursor:hand;"><img src="/images/icons/32/recyclebin.gif" border=0><br>Recycle Bin</a></td>
++++
+	}
+
+	if($c{folderview}->{_resource_pages}>1)
+	{
+		$OUT.=<<"+++";
+</tr><tr><td height=20 colspan=20><hr></td></tr><tr>
+<tr><td colspan=20>
+<table width="100%" border=0 cellpadding=3 cellspacing=0>
+<tr>
+<td width=100>View page:</td>
++++
+
+		my $current_page = $c{params}->{page} || 0;
+
+		for(my $page=0; $page<$c{folderview}->{_resource_pages}; $page++)
+		{
+			my $label = $page + 1;
+	
+			if($page!=$current_page)
+			{
+				$OUT.=<<"+++";
+			<td><a style="text-decoration:underline;" href="javascript:viewPage($page);">$label</a></td><td width=10></td>
++++
+			}
+			else
+			{
+				$OUT.=<<"+++";
+	<td><b>$label</b></td><td width=10></td>		
++++
+			}
+		}
+		
+		$OUT.=<<"+++";
+</tr></table></td></tr>
++++
+	}
+}
+</table>
+</td></tr></table>
+<script>
+{
+	if($c{params}->{tree_reload})
+	{
+		$OUT.=<<"+++";
+top.content.sidebar.content.document.location.reload();
++++
+	}
+
+	if($c{params}->{clear_clipboard})
+	{
+		$OUT.=<<"+++";
+top.reset_clipboard_item();
++++
+	}
+}
+
+			original_description = document.getElementById('description').innerHTML;
+			</script>
+<span id="download_span">
+</span>
+

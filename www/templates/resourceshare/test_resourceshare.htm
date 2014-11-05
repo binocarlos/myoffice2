@@ -1,0 +1,91 @@
+
+<html>
+<head>
+
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<link rel="STYLESHEET" type="text/css" href="/lib/contextmenu/contextmenu.css">
+</head>
+
+<body onload="ContextMenu.intializeContextMenu()" oncontextmenu="contextForBody(this)">
+
+<script src="/lib/contextmenu/contextmenu.js"></script>
+<script src="/lib/contextmenu/ieemu.js"></script>
+
+<script>
+function contextForBody(obj)
+{
+   var eobj,popupoptions
+   popupoptions = [
+   					new ContextItem("Up",function(){window.location.reload();},true),
+						new ContextItem("Print",function(){window.print();})
+   				  ]
+   ContextMenu.display(popupoptions)
+}
+
+function contextForResource(obj)
+{
+   var eobj,popupoptions
+   popupoptions = [
+						new ContextItem("Download",function(){window.print();}),
+						new ContextItem("Edit",function(){window.print();}),
+						new ContextItem("Security Settings",function(){window.print();}),
+						new ContextItem("Show Versions",function(){window.print();}),
+						new ContextItem("Delete",function(){window.print();}),
+						new ContextSeperator(),
+						new ContextItem("Cut",function(){window.print();}),
+						new ContextItem("Copy",function(){window.print();}),
+						new ContextItem("Paste",function(){window.print();})
+   				  ]
+   ContextMenu.display(popupoptions)
+}
+
+</script>
+
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+<TD WIDTH="180" ALIGN="LEFT" VALIGN="TOP" NOWRAP>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td><img src="/images/icons/48/mydocuments.gif" width="48" height="48"></td>
+</tr>
+<tr>
+<td style="font-size:12px;font-weight:bold; padding-top:10px;" height="40" valign="top" align="left">Webkit Resources</td>
+</tr>
+<tr>
+<td id="description" align=left valign=top>&nbsp;</td>
+</tr>
+</table>
+
+</TD>
+<td width="10"></td>
+<TD ALIGN="center" VALIGN="TOP">
+<table border=0 cellpadding=3 cellspacing=10>
+<tr>
+<!--Folders Here-->
+
+<td width=80 valign=top align=center id="folder2" style="border:1px solid #ffffff;"><a oncontextmenu="contextForResource(this);" onClick="select_folder(2);" onDblClick="enter_folder(2);" style="cursor:hand;">
+<img src="/images/icons/32/folder_closed.gif" width="32" height="32"><br>
+Access Codes</a></td>
+<td width=80 valign=top align=center id="folder7" style="border:1px solid #ffffff;"><a oncontextmenu="contextForResource(this);" onClick="select_folder(7);" onDblClick="enter_folder(7);" style="cursor:hand;">
+<img src="/images/icons/32/folder_closed.gif" width="32" height="32"><br>
+Dan Test</a></td>
+<td width=80 valign=top align=center id="resource8" style="border:1px solid #ffffff;"><a oncontextmenu="contextForResource(this);" onClick="select_resource(8);"  style="cursor:hand;">
+<img src="/images/icons/32/jpeg.gif" border=0><br>00008752</a></td>
+<td width=80 valign=top align=center id="resource1" style="border:1px solid #ffffff;"><img src="/images/icons/32/jpeg_grey.gif" border=0><br>bfair</td>
+<td width=80 valign=top align=center id="resource2" style="border:1px solid #ffffff;"><a oncontextmenu="contextForResource(this);" onClick="select_resource(2);"  style="cursor:hand;">
+<img src="/images/icons/32/jpeg.gif" border=0><br>blue</a></td>
+</tr><tr>
+<td width=80 valign=top align=center id="resource7" style="border:1px solid #ffffff;"><a oncontextmenu="contextForResource(this);" onClick="select_resource(7);"  style="cursor:hand;">
+<img src="/images/icons/32/text.gif" border=0><br>Test Note</a></td>
+<td width=80 valign=top align=center id="resource3" style="border:1px solid #ffffff;"><a oncontextmenu="contextForResource(this);" onClick="select_resource(3);"  style="cursor:hand;">
+<img src="/images/icons/32/html.gif" border=0><br>Webkit tv</a></td>
+
+</table>
+</td></tr></table>
+
+</html>
+

@@ -1,0 +1,125 @@
+<HTML>
+<HEAD>
+<style>
+td {font-family:tahoma,verdana; font-size:11px; color:#000000;}
+</style>
+<script>
+
+function clearAddresses()
+\{
+	document.location = href + '&method=schools_build_details_download&clear_addresses=1';
+\}
+
+function clearSerials()
+\{
+	document.location = href + '&method=schools_build_details_download&clear_serials=1';
+\}
+
+function downloadAddresses()
+\{
+	document.location = href + '&method=details_download_addresses';
+\}
+
+function downloadSerials()
+\{
+	document.location = href + '&method=details_download_serials';
+\}
+
+function set_title(text)
+\{
+	document.getElementById('title').innerText = text;
+\}
+
+function addSchoolDetails(id)
+\{
+	document.location = href + '&method=schools_build_details_download&school_id=' + id;
+\}
+
+function addProductInvoice(id)
+\{
+	document.location = href + '&method=schools_build_details_download&product_invoice_id=' + id;
+\}
+</script>
+</HEAD>
+  <META HTTP-EQUIV="MSThemeCompatible" Content="no">
+ <BODY style="background:#D4D0C8; border:0px; margin:0px;">
+<div style="width:100%;height:200px;overflow-y:auto;"> 
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="2" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+<TR>
+  <TD WIDTH="100%" HEIGHT="100%" align="left" valign="top"><table width="100%"  border="0" cellpadding="3" cellspacing="1" bgcolor="#e5e5e5">
+<tr bgcolor="#D4D0C8">
+<td colspan="3"><a name="addresses"></a>Current School Addresses In Download<br>
+<a href="#serials">View Serial Numbers</a></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td height=10 colspan="3"></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td colspan="3"><input type="button"  value="Download" CLASS="button2" onClick="downloadAddresses();"> 
+- 
+<input type="button"  value="Clear" CLASS="button2" onClick="clearAddresses();"></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td height=10 colspan="3"></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td><strong>Name</strong></td>
+<td><strong>Postcode</strong></td>
+</tr>
+{
+	foreach my $ref (@{$c{session}->{download_school_data}})
+	{
+		my $name = $ref->{name};
+		my $city = $ref->{city};
+		my $postcode = $ref->{postcode};
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#D4D0C8">
+<td>$name</td>
+<td>$postcode</td>
+</tr>
++++
+	}
+}
+</table>
+  
+  <br>
+<table width="100%"  border="0" cellpadding="3" cellspacing="1" bgcolor="#e5e5e5">
+<tr bgcolor="#D4D0C8">
+<td colspan="3"><a name="serials"></a>Current Serial Numbers In Download<br>
+<a href="#addresses">View Addresses</a></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td height=10 colspan="3"></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td colspan="3"><input type="button"  value="Download" CLASS="button2" onClick="downloadSerials();"> 
+- 
+<input type="button"  value="Clear" CLASS="button2" onClick="clearSerials();"></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td height=10 colspan="3"></td>
+</tr>
+<tr bgcolor="#D4D0C8">
+<td><strong>School Name</strong></td>
+<td><strong>Product</strong></td>
+</tr>
+{
+	foreach my $ref (@{$c{session}->{download_serials}})
+	{
+		my $product_name = $ref->{product_name};
+		my $school_name = $ref->{school_name};
+		my $licence_name = $ref->{licence_level};
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#D4D0C8">
+<td>$school_name</td>
+<td>$product_name</td>
+</tr>
++++
+	}
+}
+</table></TD>
+</TR>
+</TABLE></div></BODY>
+</HTML>

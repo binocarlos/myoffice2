@@ -1,0 +1,70 @@
+<html>
+<head>
+<link rel="stylesheet" href="/templates/diary/lib.css" type="text/css">
+<style type="text/css">
+body {background:#ffffff; border:0px; margin:0px;}
+</style>
+
+</head>
+<body onload="do_data_load();">
+		
+		
+<table border="0" cellspacing="0" cellpadding="2" height="70" align="center" width="480">
+<tr>
+<td align="center" valign="middle" colspan="3" height="20">
+<p class="small">Welcome <span id="users_name"> </span> &nbsp of  &nbsp<span id="org_name"> </span>. &nbsp&nbsp 
+It is<b class="red"> <span id="today_date"> </span> </b></p>
+</td>
+</tr>
+<tr valign="top" align="center">
+<td width="33%" height="2">
+<table border="0" cellspacing="0" cellpadding="2">
+        <tr> 
+          <td width="1%"><img src="/images/nav/cross.gif" width="16" height="16" align="absmiddle"></td>
+          <td width="99%"><a href="#" onClick="parent.get_method('log_out');">Log-Out</a> 
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td><a href="#" onClick="parent.get_method('address_home');">Contacts</a></td>
+        </tr>
+      </table>
+</td>
+<td width="33%" height="2">
+<table border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td height="4" width="4%"><img src="/images/nav/users.gif" width="16" height="16"></td>
+<td height="4" width="96%"><a href="#" onClick="parent.get_method('users_home');"> Manage Users</a></td>
+</tr>
+<tr>
+<td width="4%"><img src="/images/nav/edit.gif" width="16" height="16"></td>
+<td width="96%"><a href="#" onClick="parent.get_method('consumers_home');">Manage Events</a></td>
+</tr>
+</table>
+</td>
+<td width="33%" height="2">
+<table border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td height="4" width="4%"><img src="/images/nav/qmark.gif" width="16" height="16"></td>
+<td height="4" width="96%"> <a href="#" onClick="parent.get_method('help_home');">Help</a></td>
+</tr>
+<tr>
+<td width="4%"><img src="/images/nav/about.gif" width="16" height="16"></td>
+<td width="96%"><a href="#" onClick="parent.get_method('about_home');">About</a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<script>
+	function do_data_load()
+	{
+		var data_obj = parent.get_toolbar_data();
+
+		document.all('users_name').innerText = data_obj.users_name;
+		document.all('org_name').innerText = data_obj.org_name;
+		document.all('today_date').innerText = data_obj.date_st;		
+	}
+</script>
+</body>
+</html>

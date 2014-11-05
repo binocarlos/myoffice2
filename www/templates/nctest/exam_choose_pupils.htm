@@ -1,0 +1,115 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var classes = new Object();
+
+	function newClass(id, total)
+	\{
+		var classObj = new Object();
+		classObj.id = id;
+		classObj.total = total;
+
+		classes[classObj.id] = classObj;
+	\}
+
+	function editClassPupils(class_id)
+	\{
+		var query = '&method=exams_class_choose_pupils&class_id=' + class_id + '&title=Choose Pupils';
+
+		var ret = top.get_modal_window_return(query, 520, 530);
+
+		if(ret)
+		\{
+			var classObj = classes[class_id];
+			classObj.total = ret;
+
+			reapplyClassTotal(classObj.id);
+		\}
+	\}
+
+	function reapplyClassTotal(class_id)
+	\{
+		var classObj = classes[class_id];
+
+		document.getElementById('selected_' + class_id).innerText = classObj.total;
+		updatePupilTotals();
+	\}
+
+	function updatePupilTotals()
+	\{
+		var total = 0;
+
+		for(var class_id in classes)
+		\{
+			var classObj = classes[class_id];
+			total += classObj.total;
+		\}
+
+		//document.getElementById('topTotal').innerText = total;
+		document.getElementById('bottomTotal').innerText = total;
+	\}
+
+</script>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%" HEIGHT="100%">
+  <TR>
+	 <TD HEIGHT="100%" WIDTH="100%">
+		<TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+		  <TR>
+			 <TD ALIGN="RIGHT" VALIGN="TOP" CLASS="panelbody" HEIGHT="100%" WIDTH="100%">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+
+<TR>
+ <TD colspan="2">
+<TABLE CELLPADDING="2" CELLSPACING="0" BORDER="0" WIDTH="100%">
+ <TR>
+ 	<TD CLASS="panel" WIDTH="80">&nbsp;</TD>
+	<TD CLASS="panel" WIDTH="85" align="center">&nbsp;Pupils&nbsp;Selected&nbsp;</TD>
+	<TD CLASS="panel" WIDTH="150">&nbsp;Year</TD>
+	<TD CLASS="panel" WIDTH="*">&nbsp;Class</TD>
+	<TD WIDTH="13"></TD>
+ </TR>
+</TABLE></TD>
+</TR>
+<TR>
+ <TD HEIGHT="100%" WIDTH="100%" BGCOLOR="#FFFFFF" CLASS="insetouter" colspan="2">
+<DIV STYLE="overflow-y:scroll; width:100%; height:100%;" CLASS="insetinner">
+<TABLE CELLPADDING="3" CELLSPACING="0" BORDER="0" bordercolor="#ffffff" BGCOLOR="#FFFFFF" WIDTH="100%">
+{
+	foreach my $class (@{$c{exam}->ensure_child_array('class')})
+	{
+		my $year = $class->get_year_title(1);
+		my $name = $class->name;
+		my $selected = $c{exam}->class_pupil_count($class->get_id);
+		my $id = $class->get_id;
+
+		$OUT.=<<"+++";
+<script>
+newClass($id, $selected);
+</script>
+  <tr ondblclick="editClassPupils($id);">
+ <td nowrap valign=middle WIDTH="80" align="center"><a style="color:#0000FF" href="javascript:editClassPupils($id);">Add / Remove</a></td>  
+     <td nowrap valign=middle WIDTH="85" align="center"><span id="selected_$id">$selected</span></td>
+    <td nowrap valign=middle WIDTH="150">$year</td>
+    <td nowrap valign=middle WIDTH="*">$name</td>
+  </tr>
++++
+	}
+}
+</TABLE>
+</DIV>
+</TD>
+</TR>
+<TR>
+<td><input type="button" class="button" value="Back" style="width:100px; margin-top:8px;" onClick="document.location = href + '&method=control_panel_home&phase=pupils&exam_id={$c{exam}->get_id}';"></td>
+ <TD ALIGN="RIGHT" style="padding-right:140px;padding-top:13px;"><b>Total Pupils:</b> <b id="bottomTotal" style="color:#ff0000;">Pupils Selected</b></TD>
+</TR>
+</TABLE>
+				</TD>
+		  </TR>
+		</TABLE></TD>
+  </TR>
+</TABLE>
+
+
+<script>
+	updatePupilTotals();
+</script>

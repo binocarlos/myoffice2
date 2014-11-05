@@ -1,0 +1,144 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	var checkBoxIds = new Array();
+
+	function runRobot()
+	\{
+		document.location = href + '&method=yell_robot_run';
+	\}
+
+	function selectAll()
+	\{
+		for(var i=0; i<checkBoxIds.length; i++)
+		\{
+			document.getElementById(checkBoxIds[i]).checked = true;
+		\}
+	\}
+	
+	function deselectAll()
+	\{
+		for(var i=0; i<checkBoxIds.length; i++)
+		\{
+			document.getElementById(checkBoxIds[i]).checked = false;
+		\}
+	\}	
+	
+	function createSchool(postcode)
+	\{
+		document.location = href + '&method=schools_view_school_by_postcode&refresh=1&postcode=' + postcode;
+	\}
+</script>
+<body>
+<form method="GET" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="yell_robot_home">
+<table border="0" cellpadding="10" cellspacing="1" bgcolor="#666666">
+<tr align="left" bgcolor="#FFFFFF">
+<td colspan="2" valign="middle"><strong>
+Yell Robot
+</strong></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td align="right" valign="middle">Total Schools Found: </td>
+  <td align="right" valign="middle"><strong>{$c{school_count}}</strong></td>
+</tr>
+<tr align="left" bgcolor="#FFFFFF">
+<td valign="middle" colspan=2><p>Postcodes are auto wildcarded from the END <br>    
+<br>
+    e.g. bs2 becomes bs2* automatically <br> 
+<br> 
+school name (including DOES NOT) is auto wildcarded both the START and END...<br>
+<br>
+e.g. primary becomes *primary* automatically <br>
+<br>
+School Name Contains is an OR search (i.e. any one will match)<br>
+<br>
+School Name DOES NOT Contain is an AND search (i.e. any one will not match) </p>
+</td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td align="right" valign="middle">School Name Contains: </td>
+  <td align="left" valign="middle"><input name="name" type="text" class="text_field" id="name" value="{$c{params}->{name}}" style="width:100%;"></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td align="right" valign="middle">School Name DOES NOT Contain: </td>
+  <td align="left" valign="middle"><input name="namenot" type="text" class="text_field" id="namenot" value="{$c{params}->{namenot}}" style="width:100%;"></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td align="right" valign="middle">Postcode: </td>
+  <td align="left" valign="middle"><input name="postcode" type="text" class="text_field" id="postcode" value="{$c{params}->{postcode}}" style="width:100%;"></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td align="right" valign="middle">Limit: </td>
+  <td align="left" valign="middle"><input name="limit" type="text" class="text_field" id="limit" value="{$c{params}->{limit} || 1000}" style="width:100%;"></td>
+</tr>
+<tr align="left" bgcolor="#FFFFFF">
+  <td valign="middle" colspan=2 style="color:red;">
+  {$c{org}->get_child_count('school_data')} results from search </td>
+ </tr>
+<tr bgcolor="#FFFFFF">
+  <td align="center" valign="middle"><input onClick="runRobot();" type="button" DISABLED value="RUN ROBOT!" class="button" style="background-color:#CC0000; color:#FFFFFF; font-weight:bold;"></td>
+  <td align="right" valign="middle"><input type="submit" value="View Schools" class="button"></td>
+</tr>
+</table>
+</form>
+<form method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="schools_excel_sheet">
+<input type="hidden" name="postcode" value="{$c{params}->{postcode}}">
+<input type="hidden" name="name" value="{$c{params}->{name}}">
+<input type="hidden" name="namenot" value="{$c{params}->{namenot}}">
+<input type="hidden" name="limit" value="{$c{params}->{limit}}">
+<input type="submit" value="Download Schools" class="button">
+<br>
+<br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td><strong>Name</strong></td>
+    <td><strong>Address</strong></td>
+    <td><strong>Postcode</strong></td>
+    <td><strong>Phone</strong></td>
+  <td>&nbsp;</td>
+</tr>
+{
+	foreach my $school (@{$c{org}->ensure_child_array('school_data')})
+	{
+		my $name = $school->name;
+		my $address = $school->html_address;
+		my $postcode = $school->postcode;
+		my $phone = $school->phone;
+		my $school_id = $school->get_id;
+		
+		if($name=~/</) { next; }
+		
+		my $checked = $c{session}->{download_schools}->{$school->get_id};
+		
+		if($checked) { $checked = ' CHECKED'; }
+		
+		my $checkbox=<<"+++";
+<script>
+checkBoxIds.push('download_$school_id');
+</script>
+<input type="checkbox" name="download_$school_id" id="download_$school_id" value="y"$checked>		
++++
+	
+		$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF">
+    <td>$name</td>
+    <td>$address</td>
+    <td>$postcode</td>
+    <td>$phone</td>
+  <td><input type="button" value="Create School" class="button" onClick="createSchool('$postcode');"></td>
+</tr>
++++
+	}
+}
+</table>
+</form>
+</body>
+</html>
+
+
+

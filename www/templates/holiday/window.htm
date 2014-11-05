@@ -1,0 +1,84 @@
+<HTML>
+  <HEAD>
+	 <TITLE>Attendance Manager</TITLE>
+		<script src="/lib/holiday/app.js"></script>
+		<script src="/lib/hidestatus.js"></script>
+		<script src="/lib/error.js"></script>
+		<link rel="stylesheet" type="text/css" href="/lib/app.css">
+		<script>
+var href = '{$c{href}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+{
+if(!$c{session_id})
+{
+		$OUT.=<<"+++";
+var accounttype = 'login';
+var appname = 'login';
++++
+}
+elsif($c{user}->admin)
+{
+		$OUT.=<<"+++";
+var accounttype = 'admin';
+var appname = '$c{app_name}';
++++
+}
+else
+{
+		$OUT.=<<"+++";
+var accounttype = 'user';
+var appname = '$c{app_name}';
++++
+}
+}
+			function application_logout()
+			\{
+				get_menu_query('&method=iframe_title_frame&title=Log Out&frame_method=log_out');
+			\}
+
+			</script>
+<script src="/lib/robohelp_csh.js"></script>
+	</HEAD>
+<body STYLE="background:#D4D0C8; border:0px; margin:0px;">
+<DIV ID="window_loading" STYLE="display:block; width:100%; height:100%; background-color:#D4D0C8;"><TABLE WIDTH="100%" HEIGHT="100%" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE"><B>Loading...</B></TD></TR></TABLE></DIV>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="21" BORDER="0"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">{$c{menu}}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+				 <TR>
+					<TD>
+					 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR>
+						 <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="application_logout();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A><IMG src="/images/menus/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="holiday_toggle_sidemenu();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_users.gif" WIDTH="31" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; <span id="showhidetitle">Hide</span> Employees</A></TD>
+
+<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent">{$c{org}->get_logo_tag}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3"><IMG src="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%"><IFRAME SRC="{$c{href}}&method=home_frameset" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="auto" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD></TR></TABLE></TD>
+	 </TR>
+	</TABLE>
+
+</body>
+</HTML>

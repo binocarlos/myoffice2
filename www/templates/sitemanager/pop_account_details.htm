@@ -1,0 +1,92 @@
+<!--#include virtual="temp_include.htm" -->
+<html>
+<head>
+<title>Mailbox Settings for {$c{pop_account}->get_value('name')}</title>
+<style>
+BODY \{margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+TD \{cursor:default; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.button \{height:23px; width:75px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.section_title \{font-family:tahoma,verdana; font-size:11px; background:#D4D0C8;\}
+.copyfield \{width:100%; vertical-align:top; font-family:tahoma,verdana; font-size:11px; color:#000000; background-color:#d4d0c8; border:0px;\}
+</style>
+</head>
+<body bgcolor="#D4D0C8">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%">
+<tr><td width="100%" height="100%" align="center" valign="middle">
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  <TD WIDTH="100%" HEIGHT="100%" ALIGN="LEFT" VALIGN="TOP">
+ <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Mailbox Settings&nbsp;</FONT></TD><TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR>
+<TD width="100%" align="left">
+
+<div style="overflow:auto; height:145px; width:100%;">
+<table border="0" cellspacing="0" cellpadding="3" height="100">
+{
+	my $main_address = $c{pop_account}->get_value('email_address');
+		
+	my $address_st = "$main_address";
+		
+	my @all_addresses = ($address_st);
+		
+	my $aliases = $c{pop_account}->get_alias_address_array;
+	
+	foreach my $alias (@$aliases)
+	{
+		push(@all_addresses, '<i>'.$alias.'</i>');
+	}
+	
+	my $all_address_st = join('<br>', @all_addresses);
+	
+	$c{all_address_st} = $all_address_st;
+
+	$OUT.="";	
+}
+
+<tr align="left" valign="top">
+<td>Name: </td>
+<td>{$c{pop_account}->get_value('name')}</td>
+</tr>
+<tr align="left" valign="top">
+<td><img src="/images/clear.gif" width="1" height="2"><br>Incoming (POP3) Server: </td>
+<td><input type="text" value="{$c{pop_account}->get_pop_server}" class="copyfield" readonly></td>
+</tr>
+<tr align="left" valign="top">
+<td><img src="/images/clear.gif" width="1" height="2"><br>Outgoing (SMTP) Server: </td>
+<td><input type="text" value="{$c{pop_account}->get_smtp_server}" class="copyfield" readonly></td>
+</tr>
+<tr align="left" valign="top">
+<td>Email Addresses: </td>
+<td>{$c{all_address_st}}</td>
+</tr>
+<tr align="left" valign="top">
+<td><img src="/images/clear.gif" width="1" height="2"><br>Username: </td>
+<td><input type="text" value="{$c{pop_account}->get_value('unix_username')}" class="copyfield" readonly></td>
+</tr>
+<tr align="left" valign="top">
+<td><img src="/images/clear.gif" width="1" height="2"><br>Password: </td>
+<td><input type="text" value="{$c{pop_account}->get_value('unix_password')}" class="copyfield" readonly></td>
+</tr>
+</table>
+</div>
+
+</td>
+</tr>
+</table>
+
+</TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+
+ </TD>
+</TR>
+<TR>
+  <TD ALIGN="RIGHT"><IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR><input type="button" class="button" value="Close" onclick="top.window.close();"></TD>
+</TR>
+</TABLE>
+
+
+</td>
+</tr>
+</table>
+</body>
+</html>

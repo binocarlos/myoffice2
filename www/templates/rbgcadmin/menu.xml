@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Edit" width="140">
+		<menuitem title="Scrolling News" action="rbgc_get_main_query('&amp;method=scrolling_news');"/>
+		<menuitem title="General News" action="rbgc_get_main_query('&amp;method=general_news');"/>
+		<menuitem title="Social Calendar" action="rbgc_get_main_query('&amp;method=social_calendar');"/>
+		<menuitem title="Society Dates" action="rbgc_get_main_query('&amp;method=society_dates');"/>		
+		<menuitem title="Log Out" action="rbgc_logout();"/>
+	</menublock>
+</menu_config>

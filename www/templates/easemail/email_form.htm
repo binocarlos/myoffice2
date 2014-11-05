@@ -1,0 +1,238 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	// this enables the user to edit the lists without losing their details
+	
+	var bypass_validation = false;
+	
+	function test_url()
+	\{
+		var form = document.email_form;
+		
+		var url = form.html_url.value;
+		
+		if(url!="")
+		\{
+			if(url.indexOf("http")!=0)
+			\{
+				url = 'http://' + url;
+			\}		
+
+			window.open(url);
+		\}
+		else
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a URL to test';
+		\}
+	\}
+	
+	function validate_email_form()
+	\{
+		if(bypass_validation)
+		\{
+			return true;
+		\}
+		
+		var form = document.email_form;
+
+		if(form.subject.value=="")
+		\{
+			document.getElementById('error_span').innerText = 'Please Enter a Subject';
+
+			return false;
+		\}
+		
+		if(form.from.value=="")
+		\{
+			document.getElementById('error_span').innerText = 'Please Enter a From Address';
+
+			return false;
+		\}
+		
+		if(form.plain_content.value=="")
+		\{
+			document.getElementById('error_span').innerText = 'You must type something into the Plain Content';
+
+			return false;
+		\}
+		
+		return true;
+	\}
+	
+	function edit_email_lists()
+	\{
+		bypass_validation = true;
+		
+		document.email_form.edit_lists_mode.value = 'y';
+		document.email_form.submit();
+	\}
+</script>
+
+<style type="text/css">
+<!--
+.style1 {color: #990000}
+-->
+</style>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="email_form" method="POST" action="{$c{script}}" onSubmit="return validate_email_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="easemail_email_form_submit">
+<input type="hidden" name="edit_lists_mode" value="n">
+<input type="hidden" name="email_id" value="{$c{email}->get_id}">
+<input type="hidden" name="list_string" value="{$c{email}->get_value('list_string')}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Email Details&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                                <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="4">
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="top">Subject:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"> 
+                                      <input name="subject" type="text" class="text_field" id="subject" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{email}->get_value('subject')}">
+                                    </TD>
+                                    <TD rowspan="7" ALIGN="LEFT" VALIGN="top" width=15></TD>
+                                    <TD rowspan="7" ALIGN="LEFT" VALIGN="top"> 
+                                      <table width="100%" border="0" cellspacing="1" cellpadding="6">
+                                        <tr> 
+                                          <td>Lists to Be Sent To:</td>
+                                        </tr>
+{
+	if(($c{email}->exists)&&(!$c{email}->is_sent)) 
+	{
+		$OUT.=<<"+++"; 
+                                        <tr> 
+                                          <td> 
+                                            <input type="button" CLASS="button" style="width:75px;" onClick="edit_email_lists();"  value="Edit">
+                                          </td>
+                                        </tr>
++++
+	}
+} 
+                                        <tr> 
+                                          <td>{$c{list_description}}</td>
+                                        </tr>
+                                      </table>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="top">From:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"> 
+                                      <input name="from" type="text" class="text_field" id="from" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{email}->get_value('from_address')}">
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD height="27" ALIGN="LEFT" VALIGN="top">HTML 
+                                      URL:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"> 
+                                      <table width="100%" border="0" cellspacing="1" cellpadding="0">
+                                        <tr> 
+                                          <td> 
+                                            <input name="html_url" type="text" class="text_field" id="html_url" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{email}->get_value('html_url')}">
+                                          </td>
+                                          <td> 
+                                            <input name="button" type="button" CLASS="button" style="width:50px;" onClick="test_url();"  value="Test">
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="right" VALIGN="top">HTML Content:<br>
+<br>
+<span class="style1">(will not apply if you have entered a <br>
+HTML URL)! </span><br>
+                                      <br>
+                                      <br>
+                                  </TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"> 
+                                      <textarea name="html_content" class="text_field" id="html_content" style="width:100%; height:200px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{email}->get_value('html_content')}</textarea>
+                                    </TD>
+                                  </TR>								  
+                                  <TR> 
+                                    <TD ALIGN="right" VALIGN="top">Plain Content:<br>
+                                      <br>
+                                      <br>
+                                    </TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"> 
+                                      <textarea name="plain_content" class="text_field" id="plain_content" style="width:100%; height:200px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{email}->get_plain_content}</textarea>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="right" VALIGN="top">Footer Text:<br>
+                                      <br>
+                                      <font size="1">delete for <br>
+                                      no footer</font><br>
+                                      <br>
+                                    </TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"> 
+                                      <textarea name="footer_text" class="text_field" id="footer_text" style="width:100%; height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{email}->get_plain_footer}</textarea>
+                                    </TD>
+                                    <TD rowspan="6" ALIGN="LEFT" VALIGN="top"></TD>
+                                    <TD rowspan="6" ALIGN="LEFT" VALIGN="top">&nbsp;</TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="right" VALIGN="top">Send To A Friend 
+                                      Text: <br>
+                                      <br>
+                                      <font size="1">delete for <br>
+                                      no send to a friend<br>
+                                      <br>
+                                      (this only works <br>
+                                      for HTML emails)</font></TD>
+                                    <TD ALIGN="LEFT" VALIGN="top">
+                                      <textarea name="send_to_a_friend" class="text_field" id="send_to_a_friend" style="width:100%; height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{email}->get_send_to_a_friend_footer}</textarea>
+                                    </TD>
+                                  </TR>
+                                  <TR>
+                                    <TD ALIGN="right" VALIGN="top">&nbsp;</TD>
+                                    <TD ALIGN="LEFT" VALIGN="top">&nbsp;</TD>
+                                    <TD ALIGN="LEFT" VALIGN="top"></TD>
+                                    <TD ALIGN="LEFT" VALIGN="top">&nbsp;</TD>
+                                  </TR>
+                                </TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{email}->{error_text}}</span></TD>
+                        <TD ALIGN="RIGHT" VALIGN="MIDDLE">
+                          <input name="button" type="button" CLASS="button" style="width:75px;" onClick="document.location = href + '&method=easemail_home';"  value="Cancel">
+                          &nbsp; 
+{
+	if(!$c{email}->is_sent)
+	{
+		$OUT.=<<"+++";						  
+                          <input type="submit" name="Submit" value="Save Details" CLASS="button" style="width:75px;">
++++
+	}
+}
+                        </TD>
+</TR></TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

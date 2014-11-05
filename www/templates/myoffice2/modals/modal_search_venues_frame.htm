@@ -1,0 +1,179 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+	var returnValue;
+	function viewAll()
+	\{
+		var form = document.searchForm;
+		
+		form.search.value = '';
+		form.submit();
+	\}
+	
+	function chooseVenue()
+	\{
+{	
+	if($c{params}->{modal}=~/\w/)
+	{
+		$OUT.=<<"+++";
+		top.close();
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		document.submitForm.submit();
++++
+	}
+}					
+	\}
+	
+	function selectVenue(id, title)
+	\{
+	
+{
+	if($c{params}->{modal}=~/\w/)
+	{
+		$OUT.=<<"+++";
+		top.returnValue = id;
+		document.getElementById('venueTd').innerHTML = title;		
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		document.submitForm.venue_id.value = id;
+		document.getElementById('venueTd').innerHTML = title;
++++
+	}
+}
+
+	\}
+
+</script>
+
+<style type="text/css">
+.body \{ background-color:#D4D0C8; \}
+</style>
+
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="top">
+
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+        <legend>Find Venue </legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Fine Venue</u><br>
+<br>
++++
+}
+            <table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+              <tr>
+                <td colspan=2 width=100%> <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr valign="top">
+                      <td width="100%" height="400" align="left"><iframe name="venues" id="venues" frameborder="no" width="100%" height="100%" scrolling="auto" src="{$c{href}}&method=modal_search_venues_page"></iframe>                   </td>
+                      <td width="30"></td>
+                      <td>
+<form method="GET" action="{$c{script}}" style="margin:0;" name="searchForm" target="venues">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="modal_search_venues_page">
+                        <table>
+<tr style="padding-bottom:5px;">
+<td>Search:</td>
+<td align="LEFT"><input name="search" type="TEXT" class="text_field" id="search" style="width:120px;" value=""></td>
+</tr>
+<tr align="right" style="padding-bottom:5px;">
+  <td colspan="2"><input type="button" class="button" value="View All" onClick="viewAll();">
+  &nbsp;
+  <input type="submit" class="button" value="Search">    
+  
+    
+    </td>
+  </tr>
+					  </table>
+</form>  
+
+<form method="GET" action="{$c{script}}" name="submitForm" style="margin:0px;padding:0px;">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{params}->{submit_method}}">
+<input type="hidden" name="venue_id" value="">
+<br>
+<table width="100%">
+  <tr style="padding-bottom:5px;">
+    <td width="1">Venue:</td>
+    <td align="LEFT" id="venueTd" style="color:red;">&nbsp;</td>
+  </tr>
+{
+	if($c{no_tour}=~/\w/)
+	{
+		return '';
+	}
+	
+	if($c{tour_options}=~/\w/)
+	{
+		$OUT.=<<"+++";
+  <tr style="padding-bottom:5px;">
+    <td width="1">Tour:</td>
+    <td align="LEFT"><select name="tour_id" class="text_field" id="tour_id" style="width:150px;">
+      $c{tour_options}
+    </select></td>
+  </tr>  
++++
+	}
+	else
+	{
+		my $tour_id = $c{tour}->get_id;
+		my $name = $c{tour}->name;
+		
+		$OUT.=<<"+++";
+
+  <tr style="padding-bottom:5px;">
+    <td width="1">Tour:</td>
+    <td align="LEFT" style="color:blue;"><input type="hidden" name="tour_id" value="$tour_id">$name</td>
+  </tr>  
++++
+	}
+}
+  <tr align="left" style="padding-bottom:5px;">
+    <td colspan="2">&nbsp;
+        <input type="button" class="button" value="Choose Venue" onClick="chooseVenue();">    </td></tr>
+</table>
+</form>
+
+                    </td>
+                    </tr>
+                  </table></td>
+              </tr>
+          </table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+        </div>
+      </fieldset>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span></font></TD>
+            <TD ALIGN="RIGHT" VALIGN="TOP">            
+
+			<input type="button" onClick="top.returnValue=null;top.close();" value="Close" class="button2" style="width:75px;">            </TD>
+</TR>
+</TABLE>
+
+
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

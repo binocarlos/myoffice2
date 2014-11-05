@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<title>Color Picker</title>
+<script type="text/javascript" src="/lib/slidebar.js"></script>
+<style type="text/css">
+<!--
+
+td						{font-size: 10px; font-family: verdana}
+
+.outerSlideContainer	{width: 150; height: 6;  margin-left: 0; border: 0px;}
+.gradContainer			{width: 140; height: 6; border: 1px inset window; position: absolute; z-index: 4; font-size: 1; overflow: hidden;
+						margin-left: 5px;}
+.sliderHandle			{width: 11; height: 14; cursor: hand;
+						border: 0 outset white; overflow: hidden;
+						z-index: 5;}
+.sliderHandle img		{width: 11; height: 14;}
+.lineContainer			{position: absolute; width: 139; height: 6; z-index: 0; margin-left: 5px;}
+.line					{width: 139; height: 6; z-index: 0;
+						overflow: hidden; filter: alpha(style=1)}
+#colorBox				{width: 20; height: 20; border: 1 inset window; margin-left: 2px;}
+#colorImage				{width: 164; height: 20; border: 1px inset window; cursor: hand;}
+
+input	{width: 25px; padding: 0; margin: 0px; font-size: 10px; margin-left: 0px; border: 1px inset window;}
+
+body	{background: buttonface; border: 0; margin: 5px;}
+-->
+</style>
+
+
+<script type="text/javascript">
+<!--
+
+function hsvToRgb(hsv) {
+	var rgb = new Object();
+	var i, f, p, q, t;
+
+
+	if (hsv.s == 0) {
+		// achromatic (grey)
+		rgb.r = rgb.g = rgb.b = hsv.v;
+		return rgb;
+	}
+	hsv.h /= 60;			// sector 0 to 5
+	i = Math.floor( hsv.h );
+	f = hsv.h - i;			// factorial part of h
+	p = hsv.v * ( 1 - hsv.s );
+	q = hsv.v * ( 1 - hsv.s * f );
+	t = hsv.v * ( 1 - hsv.s * ( 1 - f ) );
+	switch( i ) {
+		case 0:
+			rgb.r = hsv.v;
+			rgb.g = t;
+			rgb.b = p;
+			break;
+		case 1:
+			rgb.r = q;
+			rgb.g = hsv.v;
+			rgb.b = p;
+			break;
+		case 2:
+			rgb.r = p;
+			rgb.g = hsv.v;
+			rgb.b = t;
+			break;
+		case 3:
+			rgb.r = p;
+			rgb.g = q;
+			rgb.b = hsv.v;
+			break;
+		case 4:
+			rgb.r = t;
+			rgb.g = p;
+			rgb.b = hsv.v;
+			break;
+		default:		// case 5:
+			rgb.r = hsv.v;
+			rgb.g = p;
+			rgb.b = q;
+			break;
+	}
+	
+	return rgb;
+}
+
+/*
+var t = new Object();
+t.h = 180;
+t.s = 0.5;
+t.v = 0.5;
+
+alert(hsvToRgb(t).r)*/
+
+function calculateRGB() {
+	if (window.event.button == 1 && dragobject == null) {
+		var hsv = new Object();
+		var h = window.event.srcElement.offsetHeight;
+		var y = window.event.offsetY;
+		
+		hsv.h = 360 * window.event.offsetX / window.event.srcElement.offsetWidth;
+		
+		if (y > h/2) {
+			hsv.s = 1.0;
+			hsv.v = 2 * (h - y) / h;
+		}
+		else {
+			hsv.v = 1.0;
+			hsv.s = y / (h/2);
+		}
+		
+		var rgb = hsvToRgb(hsv);
+				
+		public_setColor(rgb.r, rgb.g, rgb.b);
+		
+	}
+}
+
+function update(el) {
+	var red   = Math.round(255*redSlider.value);
+	var green = Math.round(255*greenSlider.value);
+	var blue  = Math.round(255*blueSlider.value);
+	
+	var color = "RGB(" + red + "," + green + "," + blue + ")";
+
+	colorBox.style.backgroundColor = color;
+	
+	redLeft.style.background = "RGB(" + 0 + "," + green + "," + blue + ")";
+	redRight.style.background = "RGB(" + 255 + "," + green + "," + blue + ")";
+	greenLeft.style.background = "RGB(" + red + "," + 0 + "," + blue + ")";
+	greenRight.style.background = "RGB(" + red + "," + 255 + "," + blue + ")";
+	blueLeft.style.background = "RGB(" + red + "," + green + "," + 0 + ")";
+	blueRight.style.background = "RGB(" + red + "," + green + "," + 255 + ")";
+	
+	redInput.value = Math.round(red);
+	greenInput.value = Math.round(green);
+	blueInput.value = Math.round(blue);
+	
+	raiseIt();
+}
+
+function updateInput(slider) {
+	var v = parseInt(window.event.srcElement.value);
+	
+	if (!isNaN(v)) {
+		setValue(slider, Math.min(256, v)/256);
+		raiseIt();
+	}
+}
+
+function clickOnGrad(sliderEl) {
+	setValue(sliderEl, Math.min(Math.abs((event.offsetX+1)/event.srcElement.offsetWidth), 1.0));
+}
+
+function init() {
+	public_setColor(0.5, 0.5, 0.5);
+}
+
+function public_setColor(r, g, b) {
+	setValue(redSlider, Math.min(1.0, r));
+	setValue(greenSlider, Math.min(1.0, g));
+	setValue(blueSlider, Math.min(1.0, b));
+	
+	raiseIt();
+}
+
+function public_getColor() {
+	var o = new Object();
+	o.r = redSlider.value;
+	o.g = greenSlider.value;
+	o.b = blueSlider.value;	
+
+	return o;
+}
+
+function raiseIt() {
+	var o = new Object();
+	o.r = redSlider.value;
+	o.g = greenSlider.value;
+	o.b = blueSlider.value;
+	
+	if (window.external.raiseEvent)
+		window.external.raiseEvent("oncolorchange", o);
+}
+
+//-->
+</script>
+
+</head>
+<body onselectstart="window.event.returnValue = false; window.event.cancelBubble = true;"
+ondragstart="return false"
+onload="init()" scroll="no">
+
+<table>
+<tr>
+	<td style="text-align: right">R</td>
+	<td>
+	<span class="outerSlideContainer">
+		<div class="gradContainer" onclick="clickOnGrad(redSlider)"></div>
+ 		<div class="lineContainer" id="redRight" style="background: RGB(255, 0, 0);">
+			<div class="line" id="redLeft" style="background: RGB(0,0,0);">
+			</div>
+		</div>
+		<div id="redSlider" class="sliderHandle" type="x" value="0" title="Drag me to change the amount of red"
+		onchange="update(this)"><img src="arrow.gif"></div>
+	</span>
+	</td>
+	<td>
+		<input type="text" id="redInput" onchange="updateInput(redSlider)" onselectstart="window.event.cancelBubble = true">
+	</td>
+</tr>
+<tr>
+	<td style="text-align: right">G</td>
+	<td>
+	<span class="outerSlideContainer">
+		<div class="gradContainer" onclick="clickOnGrad(greenSlider)"></div>
+ 		<div class="lineContainer" id="greenRight" style="background: RGB(0, 255, 0);">
+			<div class="line" id="greenLeft" style="background: RGB(0, 0, 0);">
+			</div>
+		</div>
+		<div id="greenSlider" class="sliderHandle" type="x" value="0" title="Drag me to change the amount of green"
+		onchange="update(this)"><img src="arrow.gif"></div>
+	</span></td>
+	<td>
+		<input type="text" id="greenInput" onchange="updateInput(greenSlider)" onselectstart="window.event.cancelBubble = true">
+	</td>
+</tr>
+<tr>
+	<td style="text-align: right">B</td>
+	<td>
+	<span class="outerSlideContainer">
+		<div class="gradContainer" onclick="clickOnGrad(blueSlider)"></div>
+		<div class="lineContainer" id="blueRight" style="background: RGB(0, 0, 255);">
+			<div class="line" id="blueLeft" style="background: RGB(0, 0, 0);">
+			</div>
+		</div>
+		<div id="blueSlider" class="sliderHandle" type="x" value="0" title="Drag me to change the amount of blue"
+		onchange="update(this)"><img src="arrow.gif"></div>
+	</span>
+	</td>
+	<td>
+		<input type="text" id="blueInput" onchange="updateInput(blueSlider)" onselectstart="window.event.cancelBubble = true">
+	</td>
+</tr>
+</table>
+
+<img src="color.jpg" id="colorImage" onmousemove="calculateRGB()" onmousedown="calculateRGB()" title="Click to select color from this palette"
+onselectstart="window.event.returnValue = false; window.event.cancelBubble = true;">
+
+<span id="colorBox"></span>
+
+
+</body>
+</html>

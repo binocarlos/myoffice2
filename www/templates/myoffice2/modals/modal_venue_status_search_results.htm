@@ -1,0 +1,264 @@
+<!--#include virtual="../temp_include.htm" -->
+
+<script>
+var showings = new Object();
+
+var current_id = null;
+
+function viewVisit()
+\{
+	if(current_id==null)
+	\{
+		alert('Please choose a visit from the search results...');
+		return;
+	\}
+	
+	var showing = showings[current_id];
+	
+	var ref = new Object();
+	ref.venue_id = showing.venue_id;
+	ref.showing_id = showing.id;
+	
+	top.returnValue = ref;
+	top.close();	
+\}
+
+function viewVenue()
+\{
+	if(current_id==null)
+	\{
+		alert('Please choose a visit from the search results...');
+		return;
+	\}
+	
+	var showing = showings[current_id];
+	
+	var ref = new Object();
+	ref.venue_id = showing.venue_id;
+
+	top.returnValue = ref;
+	top.close();
+\}
+
+function newShowing(id, venue_id, tour_name, venue_name, dates, visit, venue, attendance, daterange)
+\{
+	var showing = new Object();
+	
+	showing.id = id;
+	showing.tour_name = tour_name;
+	showing.venue_name = venue_name;
+	showing.dates = dates;
+	showing.visit = visit;
+	showing.venue = venue;
+	showing.attendance = attendance;
+	showing.daterange = daterange;
+	showing.venue_id = venue_id;
+	
+	showings[showing.id] = showing;
+\}
+
+function selectShowing(id)
+\{
+	var showing = showings[id];
+	
+	current_id = id;
+	
+	document.getElementById('tourTd').innerHTML = showing.tour_name;
+	document.getElementById('venueNameTd').innerHTML = showing.venue_name;
+	document.getElementById('datesTd').innerHTML = showing.dates;
+	document.getElementById('visitTd').innerHTML = showing.visit;
+	document.getElementById('venueTd').innerHTML = showing.venue;
+	document.getElementById('attendanceTd').innerHTML = showing.attendance;
+	document.getElementById('daterangeTd').innerHTML = showing.daterange;
+\}
+
+</script>
+
+<style type="text/css">
+.body \{ background-color:#D4D0C8; \}
+</style>
+
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="10" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="left" valign="top">
+
+<table border=0 cellpadding=0 cellspacing=0 width=100%>
+
+<tr align="left" valign="top"><td width="250">
+{
+	my $tour_name = $c{tour}->name;
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+        <legend>Search Query For $tour_name</legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Search Query For $tour_name</u><br>
++++
+}
+		 <table width="96%"  border="0" cellpadding="5" cellspacing="1" bgcolor="#A0A0A0">
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan=2><b style="color:red;">{$c{tour}->{result_count}}</b> Results In Set </td>
+                        </tr>			
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan=2>YOUR SEARCH:</td>
+                        </tr>								 
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Visit:</td>
+                          <td style="color:#884444;font-size:7pt;">{$c{tour}->{visit_query}}</td>
+                        </tr>		 
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Venue:</td>
+                          <td style="color:#884444;font-size:7pt;">{$c{tour}->{venue_query}}</td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Attendance:</td>
+                          <td style="color:#884444;font-size:7pt;">{$c{tour}->{attendance_query}}</td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Dates:</td>
+                          <td style="color:#884444;font-size:7pt;">{$c{tour}->{daterange_query}}</td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td height=20 colspan="2"></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan=2>VENUE INFO:</td>
+                        </tr>								
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Tour:</td>
+                          <td style="color:blue;"><span id="tourTd">&nbsp;</span></td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Venue:</td>
+                          <td><span id="venueNameTd">&nbsp;</span></td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Dates:</td>
+                          <td style="color:green;font-size:7pt;"><span id="datesTd">&nbsp;</span></td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Visit:</td>
+                          <td style="color:#aa8800;font-size:7pt;"><span id="visitTd">&nbsp;</span></td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Venue:</td>
+                          <td style="color:#aa8800;font-size:7pt;"><span id="venueTd">&nbsp;</span></td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Attendance:</td>
+                          <td style="color:#aa8800;font-size:7pt;"><span id="attendanceTd">&nbsp;</span></td>
+                        </tr>
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td>Dates:</td>
+                          <td style="color:#aa8800;font-size:7pt;"><span id="daterangeTd">&nbsp;</span></td>
+                        </tr>
+                        <tr align="right" valign="top" bgcolor="#D4D0C8">
+                          <td colspan="2"><input style="width:100%;" type="button" class="button" value="Venue Status For Whole Venue" onClick="viewVenue();">
+                          <br>
+                          <br>
+                          <input style="width:100%;" type="button" class="button" value="Venue Status For Just This Visit" onClick="viewVisit();"></td>
+                        </tr>
+          </table>   
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");		  
+        </div>
+      </fieldset>
++++
+}</td>
+	  <td width=50></td>
+	  <td height="500">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+	  <fieldset>
+        <legend>The following are the results of the search...</legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>The following are the results of the search...</u>
++++
+}
+		<div style="width:100%;height:500px;overflow-y:auto;">
+                        <table width="100%"  border="0" cellpadding="5" cellspacing="0">
+
+                        <tr align="left">
+                          <td align="right">Tour </td>							
+                          <td align="left">Venue</td>							
+                          <td>Dates</td>					  
+                          <td width="1" align="right">View</td>							  
+                          </tr>
+{
+	foreach my $showing_ref (@{$c{tour}->{search_results}})
+	{
+		my $tour = $c{org}->get_child('tour', $showing_ref->{tour_id});
+		my $tourdates = $showing_ref->{_tourdate_refs};
+		
+		my $date_st = '';
+		my $date_parts;
+		
+		foreach my $tourdate_ref (@$tourdates)
+		{
+			push(@$date_parts, $tourdate_ref->{date});
+		}
+		
+		my $date_st = join('<br>', @$date_parts);
+		
+		my $venue_title = $showing_ref->{venue_name};
+		my $tour_name = $tour->name;
+		
+		my $visit_result = Webkit::AppTools->js_quote($showing_ref->{visit_query});
+		my $venue_result = Webkit::AppTools->js_quote($showing_ref->{venue_query});
+		my $attendance_result = Webkit::AppTools->js_quote($showing_ref->{attendance_query});
+		my $daterange_result = Webkit::AppTools->js_quote($showing_ref->{daterange_query});	
+		my $js_venue = Webkit::AppTools->js_quote($venue_title);	
+		my $js_tour = Webkit::AppTools->js_quote($tour_name);
+		
+		my $showing_id = $showing_ref->{showing_id};		
+		my $venue_id = $showing_ref->{venue_id};
+		
+		$OUT.=<<"+++";
+<script>
+newShowing($showing_id, $venue_id, '$js_tour', '$js_venue', '$date_st', '$visit_result', '$venue_result', '$attendance_result', '$daterange_result');
+</script>		
+                        <tr align="left" valign="top">
+                          <td style="color:blue;">$tour_name</td>								
+                          <td>$venue_title</td>							
+                          <td style="font-size:7pt;color:green;">$date_st</td>
+                          <td align="right"><a href="javascript:selectShowing($showing_id);"><img src="/images/tools/16px/properties.gif" width="16" height="16" border="0" alt="View Info"></a></td>						  
+                        </tr>
++++
+	}
+}
+          </table>
+
+		</div>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");		
+        </div>
+      </fieldset>
++++
+}
+</td></tr></table>
+<br>                   
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span></font></TD>
+          <TD ALIGN="RIGHT" VALIGN="TOP">     
+
+			<input type="button" onClick="document.location='{$c{href}}&method=modal_venue_status_search';" value="Back" class="button2" style="width:75px;">
+			<input type="button" onClick="top.returnValue=null;top.close();" value="Close" class="button2" style="width:75px;">			&nbsp;&nbsp;		   </TD>
+</TR>
+</TABLE></td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

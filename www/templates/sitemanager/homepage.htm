@@ -1,0 +1,68 @@
+<style>
+body \{margin:0px;\}
+</style>
+<script>
+function get_menu_query(query)
+\{
+	var new_loc = href + query;
+	document.location = new_loc;
+	
+\}
+</script>
+<body>
+<div class="pageouter" style="width:100%; height:100%;">
+<div class="pageinner" style="width:100%; height:100%; padding:15px 17px 17px 17px;">
+
+<font class="welcome">Welcome to the SiteManager.</font><br>
+<br>
+<div class="panelouter" style="width:500px;"><div class="panelinner"><div class="panelbody" style="padding:5px;">
+{
+	if($c{user}->is_privilaged('sitemanager', 'emailmanager'))
+	{
+		$OUT.=<<"+++";
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ 
+<TR>
+	
+<TD WIDTH="100%" style="padding-left:5px;" height="2">You have <b style="color:#FF0000">$c{pop_count}</b> Email Boxes and <b style="color:#FF0000">$c{alias_count}</b> Email Addresses.</TD>
+
+<TD ALIGN="CENTER" valign="top" height="2">
+<input type="button" value="View" class="button" style="width:50px;" onClick="get_menu_query('&amp;method=email_home');" name="button2">
+</TD>
+
+ </TR>
+</TABLE> 
++++
+	}
+}
+<p>
+{
+	if($c{user}->is_privilaged('sitemanager', 'sitestatistics'))
+	{
+		$OUT.=<<"+++";
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+ 
+<tr>
+	
+<td style="padding-left:5px;" width="100%" height="2">The most recent  website statistics were generated on <b style="color:#FF0000">$c{recent_stats_date}</b></td>
+<td height="2">
+<input type="button" value="View" class="button" style="width:50px;" onClick="get_menu_query('&amp;method=stats_home');" name="button">
+</td>
+</tr>
+
+</table>
++++
+	}
+}
+<p>
+
+
+</div></div></div>
+
+
+
+
+
+</div></div>
+</body>
+</html>

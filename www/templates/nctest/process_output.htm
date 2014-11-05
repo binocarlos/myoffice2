@@ -1,0 +1,26 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	
+	function goHome()
+	\{
+		document.location = href + '&method=control_panel_home&period_date={Webkit::Date->parse_to_sql($c{exam}->period_date)}';
+	\}
+</script>
+<body>
+ <span class="welcome">Processing Quiz </span><br>
+<br>
+The output of the quiz processing is shown in a log below.<br>
+<br>
+<input name="Submit" type="submit" class="button" value="Home" onClick="goHome();"> 
+<br>
+<br>
+<table width="600" border="0" cellpadding="10" cellspacing="1" bgcolor="#666666">
+  <tr>
+    <td bgcolor="#FFFFFF"><strong>Process Output Log </strong></td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF">{$c{log}}</td>
+  </tr>
+</table>
+</body>
+

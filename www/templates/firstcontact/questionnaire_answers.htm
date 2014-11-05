@@ -1,0 +1,35 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+</script>
+
+<body>
+{$c{org}->{_question_text}}<br><br>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="top"><table width="100%" border="0" cellpadding="10" cellspacing="1" bgcolor="#e5e5e5">
+{
+	foreach my $ref (@{$c{org}->{_answer_refs}})
+	{
+		my $name = $ref->{name};
+		my $text = $ref->{answer};
+		
+		$OUT.=<<"+++";
+<tr align="left" valign="top" bgcolor="#FFFFFF">
+<td width=200>$name</td>
+<td><textarea style="width:100%;height:120px;">$text</textarea></td>
+</tr>
++++
+	}
+}
+</table>
+
+
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

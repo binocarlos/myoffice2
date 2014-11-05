@@ -1,0 +1,278 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	
+	function createInvoice()
+	\{
+		var loc = href + '&method=supplier_product_invoice_form&supplier_id={$c{supplier}->get_id}';
+		
+		document.location = loc;
+	\}
+	
+	function viewInvoice(id)
+	\{
+		document.location = href + '&method=supplier_product_invoice_form&product_invoice_id=' + id;
+	\}
+	
+	function deleteInvoice(id)
+	\{
+		if(window.confirm('Are you sure you want to remove this invoice?'))
+		\{
+			document.location = href + '&back_to_supplier={$c{supplier}->get_id}&method=product_invoice_delete_submit&product_invoice_id=' + id;
+		\}	
+	\}
+	
+	function validateSupplierForm()
+	\{
+		var form = document.supplier_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the supplier');
+			return false;
+		\}
+
+		return true;
+	\}
+	
+	function viewSerialNumbersForLicenceCode(supplier_id, product_code, licence_code)
+	\{
+		document.location = href + '&method=supplier_view_codes&supplier_id=' + supplier_id + '&product_code=' + product_code + '&licence_code=' + licence_code;	
+	\}
+	
+	function viewSerialNumbersForDay(supplier_id, product_code, epoch_days)
+	\{
+		document.location = href + '&method=supplier_view_codes&supplier_id=' + supplier_id + '&product_code=' + product_code + '&epoch_days=' + epoch_days;
+	\}
+	
+</script>
+<body>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td height="100%" align="center" valign="middle"><table width="100%" height="100%"  border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td width="50%">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Serial Number Batches Issued To Supplier </legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="1" bgcolor="#000000">
+  <TR bgcolor="#D4D0C8" style="padding-bottom:5px;"> 
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>  
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Product</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">Dates Issued  
+  </TD>
+  <TD ALIGN="LEFT" VALIGN="MIDDLE">Licences Issued </TD>
+</TR>
+{
+	my $supplier_id = $c{supplier}->get_id;
+	
+	foreach my $product_code (keys %{$c{supplier}->{_serial_number_summary_map}})
+	{
+		my $product_title = $c{org}->get_product_name($product_code);
+		my $color = $c{org}->get_product_color($product_code);	
+		
+		$OUT.=<<"+++";
+  <TR valign="top" bgcolor="#D4D0C8" style="padding-bottom:5px;"> 
+<TD ALIGN="LEFT">
+<table width=24 height=24 border=1 cellpadding=0 cellspacing=1 bgcolor=#000000>
+<tr>
+<td width=24 height=24 bgcolor="#$color"></td>
+</tr>
+</table>
+</TD>  
+    <TD ALIGN="LEFT" nowrap style="padding-right:5px;">$product_title</TD>
+    <TD ALIGN="LEFT">
++++
+
+		foreach my $epoch_day (sort keys %{$c{supplier}->{_serial_number_summary_map}->{$product_code}->{epoch_days}})
+		{
+			my $date = Webkit::Date->now;
+			$date->set_epoch_days($epoch_day);
+			my $date_title = $date->get_string;	
+			
+			$OUT.=<<"+++";
+<a href="javascript:viewSerialNumbersForDay($supplier_id, '$product_code', $epoch_day);">$date_title</a><br>
++++
+		}
+		
+		$OUT.=<<"+++";
+  </TD>
+  <TD ALIGN="LEFT">  
+<table width=100% border=0 cellpadding="3" cellspacing="1" bgcolor="#e5e5e5">  
++++
+
+		foreach my $licence_code (keys %{$c{supplier}->{_serial_number_summary_map}->{$product_code}->{licence_codes}})
+		{
+			my $serial_array = $c{supplier}->{_serial_number_summary_map}->{$product_code}->{licence_codes}->{$licence_code};
+			
+			my $count = @$serial_array;
+			
+			my $licence_title = Webkit::EB::SerialNumber->get_licence_title($licence_code);
+				
+			$OUT.=<<"+++";
+<tr valign="top" bgcolor="#D4D0C8"><td align="right" style="font-size:7pt;font-weight:bold;">
+<a href="javascript:viewSerialNumbersForLicenceCode($supplier_id, '$product_code', '$licence_code');">$licence_title</a></td>
+<td width=30 align=right style="font-size:7pt;color:#880000;font-weight:bold;">x $count</td>
+</tr>
++++
+		}
+		
+		$OUT.=<<"+++";
+</table>
+</TD>
+</tr>		
++++
+			
+	}
+}
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Issue More Codes" CLASS="button2" style="width:150px;" onClick="document.location='{$c{href}}&method=supplier_issue_codes&supplier_id={$c{supplier}->get_id}';"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+<tr>
+<td height=20></td>
+</tr>
+<tr>
+<td>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Invoices Sent To Supplier </legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="1" bgcolor="#000000">
+  <TR bgcolor="#D4D0C8" style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Date Sent </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">Amount 
+  </TD>
+  <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+  <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>  
+</TR>
+{
+	foreach my $invoice (@{$c{supplier}->ensure_child_array('product_invoice')})
+	{
+		my $date_string = $invoice->get_date_string;
+		my $amount = $invoice->amount;
+		my $id = $invoice->get_id;
+		
+		$OUT.=<<"+++";
+  <TR bgcolor="#D4D0C8" style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">$date_string</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">$amount</TD>
+  <TD ALIGN="LEFT" VALIGN="MIDDLE"><a href="javascript:deleteInvoice($id);"><img src="/images/icons/24x24/document_delete.gif" width="24" height="24" border=0 alt="Delete this invoice"></a></TD>
+  <TD ALIGN="LEFT" VALIGN="MIDDLE"><a href="javascript:viewInvoice($id);"><img src="/images/icons/24x24/document_find.gif" width="24" height="24" border=0 alt="View this invoice"></a></TD>  
+</TR>
++++
+	}
+}
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" name="Button" value="Create Invoice" CLASS="button2" style="width:75px;" onClick="createInvoice();">
+<input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+<tr>
+<td height=20></td>
+</tr>
+<tr valign="top">
+<td height="100%">
+<form action="{$c{script}}" method="POST" name="supplier_form" onSubmit="return validateSupplierForm();" style="margin:0px;padding:0px;">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="supplier_form_submit">
+<input type="hidden" name="supplier_id" value="{$c{supplier}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Supplier Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE width="400" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="name" type="text" class="text_field" id="name" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{supplier}->name}">
+  </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">Notes:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><textarea name="notes" type="text" class="text_field" id="notes" style="width:100%;height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{supplier}->notes}</textarea></TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{supplier}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

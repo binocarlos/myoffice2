@@ -1,0 +1,181 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var giMinYear = 2000;
+
+	var giMaxYear = 2020;
+	
+	var dateArray = new Array();
+	
+{
+	my @epochs = split(/:/, $c{value});
+	
+	foreach my $epoch (@epochs)
+	{
+		my $date = Webkit::Date->new($epoch);
+		my $st = $date->get_string;
+		
+		$OUT.=<<"+++";
+	dateArray[dateArray.length] = '$st';
++++
+	}
+}
+
+	function addDate()
+	\{
+		var value = document.getElementById('date').value;
+		
+		if(value=='') \{ return; \}	
+		
+		dateArray[dateArray.length] = value;
+		writeDateTable();
+	\}
+	
+	function deleteDate(index)
+	\{
+		var newArr = new Array();
+		
+		for(var i=0; i<dateArray.length; i++)
+		\{
+			if(i!=index)
+			\{
+				newArr[newArr.length] = dateArray[i];
+			\}		
+		\}
+
+		dateArray = newArr;
+		writeDateTable();		
+	\}
+
+	function writeDateTable()
+	\{
+		var html = '<table border=0 cellpadding=3 cellspacing=0>';
+		
+		for(var i=0; i<dateArray.length; i++)
+		\{
+			html += '<tr><td>' + dateArray[i] + '</td><td><a href="javascript:deleteDate(' + i + ');"><img src="/images/icons/16/recyclebin.gif" width="16" height="16" border=0></a></td></tr>';
+		\}
+		
+		html += '</table>';
+		
+		document.getElementById('dateSpan').innerHTML = html;
+	\}
+	
+	function submitForm()
+	\{
+		document.date_form.date_string.value = dateArray.join(':');
+		return 1;
+	\}
+</script>
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}>
+<tr>
+<td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} align="center" valign="top">
+<style>
+.tab-page \{height:100%;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+{Webkit::Browser->if_not_mac('<script type="text/javascript" src="/lib/tabpane.js"></script>')}
+<form method="POST" action="{$c{script}}" style="margin:0;" name="date_form" onSubmit="return submitForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="editors_multidate_submit">
+<input type="hidden" name="date_string" value="">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}><tr><td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Edit Dates</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Add Date</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Add Date</u><br><br>
++++
+}
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Add Date:&nbsp;</td>
+<td align="LEFT"><input name="date" type="TEXT" class="text_field" id="date" style="width:100px;" value="{Webkit::Date->now->get_string}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<td align="LEFT"><A ONCLICK="calendar_click(document.date_form.date);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+<td align="LEFT" width=30></td>
+<td align="LEFT"><input type="button" name="Button" value="Add" class="button" onClick="addDate();"></td>
+</tr>
+</table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
++++
+}
+
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Current Dates</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Current Dates</u><br><br>
++++
+}
+
+<span id="dateSpan"></span>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+</div>
+</div>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="submit" value="OK" CLASS="button2" style="width:75px;">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</table>
+
+
+</form>
+</td>
+</tr>
+</table>
+<script>	
+		{Webkit::Browser->if_not_mac('setupAllTabs();')}
+		writeDateTable();
+</script>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

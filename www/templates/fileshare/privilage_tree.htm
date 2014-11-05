@@ -1,0 +1,290 @@
+<html>
+<head>
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<script>
+
+	var new_privilage_id = 0;
+
+	var global_mode = null;
+	var clients = new Object();
+	var clients_arr = new Array();
+	var users = new Object();
+	var users_arr = new Array();
+	var document_privilages = new Object();
+	var document_privilages_arr = new Array();
+	
+	function getXmlPacket()
+	\{
+		var packet = "<privilages>\n";
+		
+		if(global_mode)
+		\{
+			packet += '<privilage id="all" users_id="0" org_id="0" mode="' + global_mode + '"/>' + "\n";
+		\}
+		else
+		\{ 
+			for(var users_id in users)
+			\{
+				var userobj = users[users_id];
+			
+				var priv_mode = userobj.privilage.mode;
+				
+				var priv_id = userobj.privilage.id;
+			
+				packet += '<privilage id="' + priv_id + '" users_id="' + userobj.id + '" org_id="' + userobj.org_id + '" mode="' + priv_mode + '"/>' + "\n";
+			\}
+		\}
+		
+		packet += "</privilages>";
+		
+		return packet;
+	\}
+	
+	function initialise_js_data()
+	\{
+		for(var doc_priv_id in document_privilages)
+		\{
+			var doc_priv = document_privilages[doc_priv_id];
+			
+			var userobj = users[doc_priv.users_id];
+				
+			userobj.privilage = doc_priv;
+		\}
+		
+		for(var users_id in users)
+		\{
+			var userobj = users[users_id];
+			
+			var clientobj = clients[userobj.org_id];
+			
+			clientobj.addUser(userobj);
+			
+			userobj.ensurePrivilage();
+			
+			userobj.updateIcon();
+		\}		
+
+	\}
+	
+	function new_client(id, name)
+	\{
+		this.id = id;
+		this.name = name;
+
+		clients[this.id] = this;
+		clients_arr[clients_arr.length] = this;
+		
+		this.users_array = new Array();
+		
+		this.addUser = client_add_user;
+		
+		return this;
+	\}
+	
+	function client_add_user(userobj)
+	\{
+		this.users_array[this.users_array.length] = userobj.id;
+	\}
+	
+	function new_user(id, org_id, name, xTree)
+	\{
+		this.id = id;
+		this.org_id = org_id;
+		this.name  = name;
+		this.xTreeId = xTree.id;
+		
+		users[this.id] = this;
+		users_arr[users_arr.length] = this;
+		
+		this.ensurePrivilage = user_ensure_privilage;
+		this.updateIcon = user_update_icon;
+		
+		return this;
+	\}
+	
+	function user_update_icon()
+	\{
+		var access = this.privilage.mode;
+		
+		var icon = '/images/fileshare/user_' + access + '.gif';
+		
+		document.getElementById(this.xTreeId + '-icon').src = icon;
+	\}
+	
+	function user_ensure_privilage()
+	\{
+		if(!this.privilage)
+		\{
+			new_privilage_id++;
+			
+			var privilageobj = new new_document_privilage('new' + new_privilage_id, this.org_id, this.id, 'ro');
+			
+			this.privilage = privilageobj;
+		\}
+	\}
+	
+	function new_document_privilage(id, org_id, users_id, mode)
+	\{
+		this.id = id;
+		this.org_id = org_id;
+		this.users_id = users_id;
+		this.mode = mode;
+		
+		document_privilages[this.id] = this;
+		document_privilages_arr[document_privilages_arr.length] = this;
+		
+		return this;
+	\}
+	
+	function select_user(id)
+	\{
+		var userobj = users[id];
+		
+		var clientobj = clients[userobj.org_id];
+		
+		var privmode = userobj.privilage.mode;
+	
+		var passedname = userobj.name + ' (' + clientobj.name + ')';
+		
+		parent.select_user(id, passedname, privmode);
+	\}
+	
+	function select_client(id)
+	\{
+		var clientobj = clients[id];
+		
+		parent.select_client(id, clientobj.name);
+	
+	\}
+	
+	function select_all_clients()
+	\{
+		parent.select_all_clients();
+	\}
+	
+	function apply_global_details(privmode)
+	\{
+		global_mode = privmode;
+		
+		for(var i=0; i<=users_arr.length; i++)
+		\{
+			var userobj = users_arr[i];
+			
+			if((userobj)&&(userobj.privilage))
+			\{
+				userobj.privilage.mode = privmode;
+				userobj.updateIcon();
+			\}
+		\}
+	\}
+	
+	function apply_details(id, select_mode, privmode)
+	\{
+		if(select_mode=='user')
+		\{
+			var userobj = users[id];
+			
+			userobj.privilage.mode = privmode;
+			userobj.updateIcon();
+			
+			global_mode = null;
+		\}
+		
+		if(select_mode=='client')
+		\{
+			var clientobj = clients[id];
+			
+			for(var i=0; i<clientobj.users_array.length; i++)
+			\{
+				var users_id = clientobj.users_array[i];
+				
+				var userobj = users[users_id];
+				
+				userobj.privilage.mode = privmode;
+				userobj.updateIcon();
+			\}
+			
+			global_mode = null;			
+		\}
+	\}
+
+tree = new WebFXTree('{$c{tree_title}}');
+tree.action = "javascript: select_all_clients();";
+
+{
+	my $priv_arr = $c{priv_arr};
+	
+	foreach my $priv (@$priv_arr)
+	{
+		my $id = $priv->get_id;
+		my $user_id = $priv->get_value('users_id');
+		my $org_id = $priv->get_value('org_id');
+		my $mode = $priv->get_value('mode');
+		
+		$OUT.=<<"+++";
+new new_document_privilage($id, $org_id, $user_id, '$mode');
++++
+	}
+	
+	my $client_arr = $c{orgs};
+	
+	foreach my $client (@$client_arr)
+	{
+		my $client_id = $client->get_id;
+		my $client_name = $client->get_value('name');
+		
+		my $userarr = $client->get_child_array('users');		
+
+		$OUT.=<<"+++";
+var client$client_id = new WebFXTreeItem('$client_name');
+client$client_id.action = "javascript: select_client($client_id);";
+new new_client($client_id, '$client_name');
++++
+
+		my $count = @$userarr;
+		
+		if($count==0)
+		{
+			$OUT.=<<"+++";
+client$client_id.icon = "/images/xtree/foldericon.png";
++++
+		}
+
+		$OUT.=<<"+++";
+tree.add(client$client_id);
++++
+		
+		foreach my $user (@$userarr)
+		{
+			my $id = $user->get_id;
+			my $name = $user->get_fullname;
+			my $org_id = $user->get_value('org_id');
+
+			$OUT.=<<"+++";
+var users$id = new WebFXTreeItem('$name');
+users$id.action = "javascript: select_user($id);";
+users$id.icon = '/images/fileshare/user.gif';
+
+client$client_id.add(users$id);
+
+new new_user($id, $client_id, '$name', users$id);
++++
+		}
+	}
+}
+
+</script>
+</head>
+<body bgcolor=#FFFFFF onLoad="parent.showPrivTab();" style="margin:1px 5px 5px 5px;">
+<script>
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+initialise_js_data();
+</script>
+</body>
+</html>

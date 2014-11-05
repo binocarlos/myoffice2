@@ -1,0 +1,99 @@
+<html>
+<head>
+<link rel="stylesheet" href="/wk/lib/xtree.css" type="text/css">
+<script src="/wk/lib/xtree.js"></script>
+<script src="/wk/lib/resourceshare/privilage_tree.js"></script>
+<script>	
+tree = new WebFXTree('ALL (public and logged-in) Users');
+tree.action = "javascript: select_tree();";
+tree.setBehavior('explorer');
+{
+	my $priv_arr = $c{item}->get_access_control_refs;
+	
+	foreach my $priv (@$priv_arr)
+	{
+		my $org_id = $priv->{org_id} || 'null';
+		my $users_id = $priv->{users_id} || 'null';
+		my $department_id = '\''.$priv->{department_id}.'\'';
+		
+		$department_id =~ s/''/null/;
+		
+		my $code = $priv->{code};
+		
+		$OUT.=<<"+++";
+new new_privilage($org_id, $department_id, $users_id, '$code');
++++
+	}
+	
+	my $org_array = $c{org_array};
+	
+	foreach my $org (@$org_array)
+	{
+		my $org_id = $org->get_id;
+		my $org_name = $org->get_js_value('name');
+		
+		$OUT.=<<"+++";
+var org$org_id = new WebFXTreeItem('$org_name');
+org$org_id.action = "javascript: select_org($org_id);";
+new new_org($org_id, '$org_name', org$org_id);
+
+tree.add(org$org_id);
++++
+	
+		my $department_arr = $org->ensure_child_array('department');
+	
+		foreach my $department (@$department_arr)
+		{		
+			my $dept_id = $department->get_id;
+			my $dept_name = $department->get_value('name');		
+
+			$OUT.=<<"+++";
+var dept$dept_id = new WebFXTreeItem('$dept_name');
+dept$dept_id.action = "javascript: select_department('$dept_id');";
+new new_department('$dept_id', $org_id, '$dept_name', dept$dept_id);
+
+org$org_id.add(dept$dept_id);
++++
+
+			my $userarr = $department->ensure_child_array('users');
+		
+			foreach my $user (@$userarr)
+			{			
+				my $id = $user->get_id;
+				my $name = $user->get_fullname;
+				my $dept_id = $user->get_value('department_id');
+
+				$name =~ s/'/\\'/g;
+
+				$OUT.=<<"+++";
+var users$id = new WebFXTreeItem('$name');
+users$id.action = "javascript: select_user($id);";
+users$id.icon = '/wk/images/resourceshare/user.gif';
+dept$dept_id.add(users$id);
+
+new new_user($id, '$dept_id', '$name', users$id);
++++
+			}
+		}
+	}
+}
+
+item_access_code = '{$c{item}->access_code}';
+item_title = '{$c{item_title}}';
+
+if(item_access_code=='') \{ item_access_code = 'readwrite'; \}
+
+</script>
+</head>
+<body bgcolor=#FFFFFF style="margin:2px 5px 5px 5px; border:2px inset;">
+<script>
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+initialise_objects();
+</script>
+</body>
+</html>

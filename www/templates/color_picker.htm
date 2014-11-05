@@ -1,0 +1,23 @@
+
+<SCRIPT LANGUAGE="Javascript" SRC="/lib/color_picker/ColorPicker2.js"></SCRIPT>
+<SCRIPT LANGUAGE="Javascript" SRC="/lib/color_picker/PopupWindow.js"></SCRIPT>
+<SCRIPT LANGUAGE="Javascript" SRC="/lib/color_picker/AnchorPosition.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript">
+var cp = new ColorPicker(); // DIV style
+
+function color_changed(col)
+\{
+	document.getElementById('color_td').bgColor = col;
+\}
+</SCRIPT>
+
+<table width=100% border=0 cellpadding=0 cellspacing="0">
+<tr>
+<td width=1 id="color_td" align="center" style="border:1px inset;"><A style="cursor:hand;" onClick="cp.select(document.all('color'),'pick');return false;" NAME="pick" ID="pick"><img src="/images/clear.gif" border="0" width="32" height="32"></a></td>
+<td width="16" height="16"></td>
+<td>Click on the colour to change<INPUT TYPE="hidden" value="{$c{col}}" id="color" NAME="color"></td>
+</tr>
+</table>
+
+<SCRIPT LANGUAGE="JavaScript">cp.writeDiv()</SCRIPT>
+<script>color_changed('{$c{col}}');</script>

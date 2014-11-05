@@ -1,0 +1,88 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function do_ok()
+	\{
+		var new_loc = href + '&method=easemail_list_home';
+		
+		document.location = new_loc;
+	\}
+
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Upload Results&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                                <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+ <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">List:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{list_title}} 
+                                    </TD>
+                                  </TR>								
+                                  <TR> 
+                                    
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">Total Uploaded: 
+                                  </TD>
+                                    <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{total}} 
+                                      </strong></TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Duplicates 
+                                      Found: </TD>
+                                    <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{duplicates}} 
+                                      </strong></TD>
+                                  </TR>
+                                  <TR> 
+                                    
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">Bad Addresses 
+                                    Found: </TD>
+                                    <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{bad_addresses}} 
+                                      </strong></TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Total Inserted: 
+                                    </TD>
+                                    <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{inserted}} 
+                                      </strong></TD>
+                                  </TR>								  								  								  
+                                </TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{error_text}}</span></TD>
+                        <TD ALIGN="RIGHT" VALIGN="MIDDLE"> 
+                          
+                        <input type="button" value="OK" CLASS="button" style="width:75px;" onClick="do_ok();">
+                        </TD>
+</TR></TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

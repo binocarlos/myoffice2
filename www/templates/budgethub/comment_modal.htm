@@ -1,0 +1,110 @@
+<!--#include virtual="/temp_include.htm" -->
+<html>
+<head>
+<title>Field Comment</title>
+<style>
+BODY \{margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+TD \{cursor:default; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.button \{height:23px; width:75px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.section_title \{font-family:tahoma,verdana; font-size:11px; background:#D4D0C8;\}
+.copyfield \{width:100%; vertical-align:top; font-family:tahoma,verdana; font-size:11px; color:#000000; background-color:#d4d0c8; border:0px;\}
+.text_area \{font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px;\}
+.text_field2 \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; BORDER-BOTTOM: #FFDEAD solid 2px; BORDER-LEFT: #C07300 solid 2px; BORDER-RIGHT: #FFDEAD solid 2px; BORDER-TOP:  #C07300 solid 2px; background-color:#FFF5E6;\}
+</style>
+
+<script>
+
+	function setStatus(text)
+	\{
+		document.getElementById('statustext').innerText = text;
+		
+		setTimeout("clearStatus();", 5000);
+	\}
+	
+	function clearStatus()
+	\{
+		document.getElementById('statustext').innerText = '';
+	\}
+
+	function apply_form()
+	\{
+		var text = document.getElementById('comment_text').value;
+		
+		window.returnValue = text;
+		
+		window.close();
+	\}
+	
+	function assign_text_value()
+	\{
+		var text = window.dialogArguments;
+		
+		document.getElementById('comment_text').value = text;
+	\}
+			
+	function cancel_form()
+	\{
+		window.close();
+	\}
+	
+</script>
+</head>
+<body bgcolor="#D4D0C8">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%">
+<tr><td width="100%" height="100%" align="center" valign="middle">
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  
+<TD WIDTH="100%" HEIGHT="102" ALIGN="LEFT" VALIGN="TOP">
+ <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title">
+&nbsp;Field Comment&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR>
+<TD width="100%" align="left">
+
+
+<table border="0" cellspacing="0" cellpadding="3">
+
+<tr align="left" valign="top">
+<td>Title: </td>
+<td>
+{$c{params}->{title}}
+</td>
+</tr>
+<tr align="left" valign="top">
+<td>Comment:</td>
+<td>
+<textarea name="comment_text" id="comment_text" class="text_area" cols="40" rows="5"></textarea>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td colspan="2"><span style="color:red;" id="statustext"></span></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+</TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+
+ </TD>
+</TR>
+<TR>
+  <TD ALIGN="RIGHT"><IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<input type="button" class="button" value="Cancel" onclick="cancel_form();">
+<img src="/images/clear.gif" width="8" height="1" align="absmiddle">
+<input type="button" class="button" value="Apply" name="Submit" onClick="apply_form();">
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+</table>
+<script>
+	assign_text_value();
+</script>
+</body>
+</html>

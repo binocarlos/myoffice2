@@ -1,0 +1,73 @@
+<!--#include virtual="holiday/temp_include.htm" -->
+
+<script>
+
+	function validate_userform()
+	\{
+		var ret = true;
+		var form = document.userform;
+		var required_texts = new Array('firstname', 'surname', 'username', 'password');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			\{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			\}
+		\}
+
+		if(form.department_id)
+		\{
+			if((form.department_id.value>0)&&(form.otherdepartment.value!=''))
+			\{
+				form_error('You must choose either a department OR enter a new one');
+				ret = false;
+			\}
+		\}
+
+		return ret;
+	\}
+
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+	\}
+
+</script>
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="userform" onSubmit="return validate_userform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="user_id" value="{$c{formuser}->get_id}">
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+ <TR id="form_tr" style="display: inline;">
+	<TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+
+<TABLE BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelouter">
+ <TR>
+	<TD CLASS="panelinner">
+{$c{user_form}}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%"><TR><TD HEIGHT="5"></TD></TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="red"><B ID="error_span">{$c{formuser}->{error_text}}</B></FONT></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><INPUT TYPE="submit" VALUE="{$c{submit_title}}" CLASS="button"><IMG src="/images/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><input type="button" value="Cancel" class="button" name="Button" onClick="document.location='{$c{href}}&method={$c{session}->{view_method}}';" STYLE="width:75px;"></TD></TR></TABLE>
+
+</TD>
+</TR><TABLE></TD>
+		</TR>
+		<tr id="cal_tr" style="display: none;">
+<td align="center" valign="middle">{$c{calendar_table}}</td>
+		</tr>
+	 </TABLE>
+</form>
+<script type="text/javascript">
+setupAllTabs();
+</script>
+
+

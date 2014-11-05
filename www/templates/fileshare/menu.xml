@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu_config>
+
+	<menublock title="File Sharing" width="140">
+		<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Upload File&amp;frame_method=documents_add_document');"/>
+		<menuitem title="View" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Files&amp;frame_method=documents_home');"/>
+	</menublock>
+
+</menu_config>

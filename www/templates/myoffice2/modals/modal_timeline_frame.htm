@@ -1,0 +1,175 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+var isModal = true;
+var months = new Array();
+
+function monthChange(gui)
+\{
+	timeline.monthClick(gui.value);
+\}
+
+function clearMonths()
+\{
+	document.getElementById('jumpToTd').innerHTML = '';
+	months = new Array();	
+\}
+
+function addMonth(key, title)
+\{
+	var month = new Object();
+	month.key = key;
+	month.title = title;
+	
+	months[months.length] = month;
+\}
+
+function writeMonthSelect()
+\{
+	var html = '<select name="jump_to" id="jump_to" class="text_field" style="width:100%;" onChange="monthChange(this);">';
+	
+	for(var i=0; i<months.length; i++)
+	\{
+		var month = months[i];
+		
+		html += '<option value="' + month.key + '">' + month.title + '</option>';
+	\}
+	
+	html += '</select>';
+	
+	document.getElementById('jumpToTd').innerHTML = html;
+\}
+</script>
+
+<style type="text/css">
+.body \{ background-color:#D4D0C8; \}
+</style>
+
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="top">
+
+<form method="GET" action="{$c{script}}" style="margin:0;" name="timelineForm" target="timeline">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="modal_timeline_page">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+        <legend>Timeline</legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Timeline</u><br><br>
++++
+}
+            <table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+              <tr>
+                <td colspan=2 width=100%> <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr valign="top">
+                      <td height="400" align="left" width=100%><iframe name="timeline" id="timeline" frameborder="no" width="100%" height="100%" scrolling="auto" src="{$c{href}}&method=modal_timeline_page&from={$c{from}}&to={$c{to}}"></iframe>                      </td>
+                      <td width="20"></td>
+                      <td width="100"><table cellpadding="3" cellspacing="0">
+  <tr>
+    <td width="1">Tour:</td>
+    <td align="LEFT" colspan=2><select name="tour_id" class="text_field" id="tour_id" style="width:100%;">
+      {$c{tour_options}}
+    </select></td>
+  </tr>  					  
+<tr>
+<td>From:</td>
+<td align="LEFT"><input name="from" type="TEXT" class="text_field" id="from" style="width:100px;" value="{$c{from}}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<td align="LEFT"><A style="cursor:hand;" ONCLICK="calendar_click(document.timelineForm.from);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr>
+<tr>
+  <td>To:</td>
+  <td align="LEFT"><input name="to" type="TEXT" class="text_field" id="to" style="width:100px;" value="{$c{to}}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");  
+  <td align="LEFT"><A style="cursor:hand;" ONCLICK="calendar_click(document.timelineForm.to);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr>
+<tr>
+  <td>View:</td>
+  <td colspan=2><select name="view" id="view" class="text_field" style="width:150px;">
+	<option value="normal" selected>Booking Timeline</option>
+	<option value="not_booked">Venues Not Booked</option>
+  </select></td>
+</tr>
+<tr align="right">
+  <td colspan="3"><input type="submit" class="button" value="View" onClick="clearMonths();"></td>
+  </tr>
+  <tr><td height=50 colspan=3></td>
+  </tr>
+<tr>
+<td>Jump:</td>
+<td align="LEFT" colspan=2 id="jumpToTd">
+</td>
+</tr>
+					  </table>
+                      </td>
+                    </tr>
+                  </table></td>
+              </tr>
+          </table>
+		  
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");		  
+        </div>
+        </fieldset>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span></font></TD>
+            <TD ALIGN="RIGHT" VALIGN="TOP">            
+<table border=0 cellpadding="0" cellspacing="0">
+<tr>
+{
+	if($c{params}->{confirmMessage}=~/\w/)
+	{
+		my $message = $c{params}->{confirmMessage};
+		my $confirm_return = '';
+		
+		if($c{params}->{done_return}!~/\w/)
+		{
+			$confirm_return = 'top.returnValue=true;';
+		}
+		
+		$OUT.=<<"+++";
+<td style="color:red;">$message</td>
+<td width=30></td>
+<td><input type="button" onClick="$confirm_return top.close();" value="OK" class="button2" style="width:75px;"></td>		
+<td width=30></td>
++++
+	}
+}
+<td><input type="button" onClick="top.returnValue=null;top.close();" value="Cancel" class="button2" style="width:75px;"></td>
+</tr></table></TD>
+</TR>
+</TABLE>
+
+</form>
+</td>
+</tr>
+</table>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

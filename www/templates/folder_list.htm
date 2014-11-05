@@ -1,0 +1,177 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+	var objStrings = new Object();
+	
+{
+	foreach my $object (@{$c{objects}})
+	{	
+		my $id = $object->get_id;
+		my $st = '';
+
+		foreach my $def (@{$c{defs}})
+		{
+			my $value;
+			
+			if($def->{prop}=~/\w/)
+			{
+				$value = $object->get_value($def->{prop});
+			}
+			elsif($def->{method}=~/\w/)
+			{
+				my $method = $def->{method};
+				
+				my $args = $def->{args};
+				
+				$value = $object->$method(@$args);
+			}
+			elsif($def->{value}=~/\w/)
+			{
+				$value = $def->{value};
+			}
+			
+			my $title = $value;
+
+			$title =~ s/<.*?>//g;
+			
+			if($def->{width} eq '*')
+			{
+				$c{objTitles}->{$id} = '$title';
+			}
+						
+			$st .= $def->{title}.': '.$title.'<br>';
+		}
+		
+		$OUT.=<<"+++";
+	objStrings.$id = '$st';
++++
+	}
+}
+	
+	function clickObj(id)
+	\{
+		alert(id);
+	\}
+	
+	function normal_method(method)
+	\{
+		var new_loc = href + '&method=' + method;
+		
+		document.location = new_loc;
+	\}
+
+	function object_method(method)
+	\{
+		var selectedRow = thl_selRow;
+		
+		if(selectedRow.id>0)
+		\{
+			var object_tag = 'object';
+			
+{
+	if($c{object_tag}=~/\w/)
+	{
+		$OUT.=<<"+++";
+			object_tag = '$c{object_tag}';
++++
+	}
+}
+			var new_loc = href + '&method=' + method + '&' + object_tag + '_id=' + selectedRow.id;
+
+			document.location = new_loc;
+		\}
+	\}
+
+{
+	my $button_texts = undef;
+	
+	my $button_refs = $c{button_refs};
+	
+	foreach my $button_ref (@$button_refs)
+	{
+		my $title = $button_ref->{title};
+		my $method = $button_ref->{method};
+		my $key = $button_ref->{key};
+		my $jsfunc = 'object_method';
+		my $width = 75;
+		
+		if($key!~/\w/)
+		{
+			$key = $title;
+			$key =~ s/\W//g;
+		}
+			
+		if($button_ref->{normal_method}=~/\w/)
+		{
+			$method = $button_ref->{normal_method};
+			$jsfunc = 'normal_method';
+		}
+		
+		if($button_ref->{js_func}=~/\w/)
+		{
+			$jsfunc = $button_ref->{js_func};
+		}		
+		
+		if($button_ref->{width}=~/\d/)
+		{
+			$width = $button_ref->{width};
+		}
+		
+		if($width!~/px$/)
+		{
+			$width.='px';
+		}
+		
+		$key = 'object_button_'.$key;
+		
+		my $button_text=<<"+++";
+<input type="BUTTON" name="$key" id="$key" value="$title" class="button2" style="width:$width;" onClick="$jsfunc('$method');">
++++
+
+		push(@$button_texts, $button_text);
+	}
+	
+	my $join="<br><br>";
+
+	$c{all_button_text} = join($join, @$button_texts);
+	
+	$OUT.="";	
+}
+</script>
+
+<table width="100%"  border="0" cellspacing="0" cellpadding="3">
+  <tr>
+    <td width="240"><span id="detailsSpan"></span></td>
+    <td>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr>
+{
+	my $rowCount = 0;
+	
+	foreach my $obj (@{$c{objects}})
+	{
+		my $id = $obj->get_id;
+		my $title = $c{objTitles}->{$id);
+		
+		$OUT.=<<"+++";
+<td align="center">
+<a style="cursor:hand;" href="javascript: clickObj($id);"><img src="/images/icons/32/folder_closed.gif" width="32" height="32" border=0><br>$title</a>
+</td>
++++
+
+		$rowCount++;
+		
+		if($rowCount>=5)
+		{
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+}
+</tr>
+</table>
+	
+	</td>
+  </tr>
+</table>

@@ -1,0 +1,192 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	function codesClick(id)
+	\{
+		var query = '&method=inivigilators_list_login_codes&exam_id=' + id + '&title=Log In Codes';
+		
+		var ret = top.get_modal_window_return(query, 420, 520);	
+	\}
+	
+	function sittingClick(id)
+	\{
+		var new_loc = href + '&method=invigilators_form&exam_sitting_id=' + id;
+	
+		top.content.page.content.location = new_loc;
+	\}
+	
+	function finishQuiz()
+	\{
+		document.location = href + '&method=control_panel_phase_finished&exam_id={$c{exam}->get_id}&force_phase=invigilate';
+	\}
+	
+	function createSitting()
+	\{
+		var new_loc = href + '&method=exams_exam_sitting_form&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+	
+	function moreInfo()
+	\{
+		var new_loc = href + '&method=exams_sittings_home&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+  <tr>
+    <td bgcolor="#666666"><strong style="color:#FFFFFF;">Invigilate {$c{org}->test_title} Sittings </strong></td>
+  </tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	my $active_sitting = $c{exam}->get_active_exam_sitting;
+	
+	if((!$c{exam}->has_completed_phase('finished'))&&(!$active_sitting))
+	{
+		if(!$c{org}->is_generic_nctest)
+		{
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Create New Sitting" onClick="createSitting();"></td>
+</tr>
++++
+		}
+	}
+	
+	if($c{exam}->phase eq 'pupils')
+	{
+		my $test_title = $c{org}->test_title;
+		
+		if(!$c{org}->is_generic_nctest)
+		{
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Finish $test_title" onClick="finishQuiz();"></td>
+</tr>
++++
+		}
+	}
+}
+</table>
+<br>
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+<input type="button" class="button" value="More Info" onClick="moreInfo();">
+<br>
+<br>
++++
+	}
+}
+<table border="0" cellpadding="2" cellspacing="1" bgcolor="#d5d5d5">
+<tr bgcolor="#FFFFFF">
+  <td colspan=5><b>Quiz Sittings </b></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td>ID</td>
+  <td>Date</td>
+  <td>No.</td>
+  <td>Status</td>
+  <td>&nbsp;</td>
+  </tr>
+{
+	foreach my $sitting (@{$c{exam}->ensure_child_array('exam_sitting')})
+	{
+		my $date = $sitting->get_sitting_date_title;
+
+		my $pupils = $sitting->pupil_count;
+		my $remaining = $sitting->to_complete_count;
+		my $progress = ($pupils-$remaining).'/'.$pupils;
+		my $status = $sitting->get_status_title(1);
+		my $id = $sitting->get_id;
+		my $exam_id = $sitting->exam_id;
+		
+		my $bg = ' bgcolor=#ffffff';
+		
+		if(!$sitting->closed)
+		{
+			$bg = ' bgcolor=#ccffcc';
+		}
+		
+		$OUT.=<<"+++";
+<tr $bg>
+  <td>$id</td>
+  <td>$date</td>
+  <td>$progress</td>
+  <td>$status</td>
+  <td><input class="button" type="button" value="View" onClick="sittingClick($id);"></td>
+  </tr>
++++
+
+		if($c{org}->is_generic_nctest)
+		{
+			$OUT.=<<"+++";
+<tr $bg>
+	<td colspan=5>
+   <input class="button" type="button" value="Login Codes" onClick="codesClick($exam_id);">
+    </td>	  
+</tr>
++++
+		}
+	}
+}
+</table>
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+<br>
+Quiz sittings are periods of time during which pupils can login to this quiz and answer questions.<br>
+<br>
+Every night at 10pm, all quiz sittings from that day will automatically be closed. <br>
+<br>
+Therefore, for each day you hold an examination, you will need to create a new sitting (using the button above).<br>
+<br>
+This will ensure that an acturate record of the quizes activity is kept in terms of dates the exam was held.<br>
+<br>
+Below is an overview of the quiz sittings for this quiz (if the date is n/a, it means the sitting is not yet open).<br>
+<br>
+You can click the More Info button above to view a complete listing of all sittings and related statistics.
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+<br><br>
+	Click the 'View' button above to get a list of the Students who have logged in and taken this test.<br><br>
+	Click the 'Login Codes' button above to get a list of the login codes students should use to access this test.
++++
+	}
+}
+
+</body>
+

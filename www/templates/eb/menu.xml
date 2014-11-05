@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Manage Users" width="90">
+		<menuitem title="Add" action="get_menu_iframe_query('add_user','Add User');"/>
+		<menuitem title="View/Edit" action="get_menu_iframe_query('users_home','Current Users');"/>
+	</menublock>
+	<menublock title="Accounts" width="90">
+		<menuitem title="View Schools" action="get_double_frameset('eb_schools_frame');"/>
+		<menuitem title="View Suppliers" action="get_double_frameset('eb_suppliers_frame');"/>	
+	</menublock>
+	<menublock title="Products / Activities" width="90">
+		<menuitem title="Manage Products" action="get_menu_iframe_query('product_home','Products');"/>	
+		<menuitem title="Manage Activities" action="loadActivities();"/>
+		<menuitem title="View Activity Links" action="get_menu_iframe_query('activity_links','Activity Links');"/>		
+	</menublock>
+	<menublock title="Reports" width="90">
+		<menuitem title="CSV School Account Based Reports" action="get_menu_iframe_query('account_csv_report','School Account Reports');"/>			
+		<menuitem title="Usage/Expiry Log Report" action="get_menu_iframe_query('usage_log_report','Usage Log Report');"/>		
+	<menuitem title="Schools Disk Download" action="get_menu_iframe_query('schools_disk_report','Schools Disk Download');"/>										
+	</menublock>	
+	<menublock title="Tools" width="90">
+		<menuitem title="Options" action="get_menu_iframe_query('options_home','Options');"/>	
+		<menuitem title="Emailer" action="get_menu_iframe_query('emailer_upload','Emailer');"/>		
+		<menuitem title="Flatten Website" action="get_menu_iframe_query('download_flat_website','Flatten Website');"/>					
+		<menuitem title="Download Custom CD" action="get_menu_iframe_query('download_custom_cd','Download Custom CD');"/>		
+	</menublock>
+</menu_config>

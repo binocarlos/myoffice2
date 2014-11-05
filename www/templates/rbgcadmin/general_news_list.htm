@@ -1,0 +1,30 @@
+<!--#include virtual="temp_include.htm" -->
+<p><b><u>General News</u></b></p>
+<p><a href="{$c{href}}&method=add_general_news">Add News</a></p>
+<table border="0" cellspacing="1" cellpadding="3" bgcolor="#666666">
+<tr bgcolor="#dddddd">
+<td><b>Title</b></td>
+<td><b>News</b></td>
+<td align="right">&nbsp;</td>
+<td align="right">&nbsp;</td>
+</tr>
+{
+	my $arr = $c{org}->get_child_array('general_news');
+	foreach my $newsobj (@$arr)
+	{
+		my $title = $newsobj->get_value('title');
+		my $news = $newsobj->get_value('news');
+		my $id = $newsobj->get_id;
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">
+<td class="small">$title</td>
+<td class="tiny7" align="right">$news</td>
+<td align="right" bgcolor="#FFFFFF" class="small"><a href="$c{href}&method=delete_general_news&news_id=$id">Remove</a></td>
+<td align="right" bgcolor="#FFFFFF" class="small"><a href="$c{href}&method=edit_general_news&news_id=$id">Edit</a></td>
+</tr>
++++
+	}
+}
+
+</table>

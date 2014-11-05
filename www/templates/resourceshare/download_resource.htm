@@ -1,0 +1,31 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	var new_loc = href + '&method=resources_download_resource&resource_id=' + {$c{resource}->get_id};
+
+	function start_download_timeout()
+	\{
+		setTimeout("download_resource();", 100);
+	\}
+
+	function download_resource()
+	\{
+		document.location = new_loc;
+	\}
+
+
+</script>
+<body style="background-color:#D4D0C8; margin:8px;" onload="download_resource();">
+<table border="0" cellpadding="0" cellspacing="0" width="375" height="100%">
+<tr>
+<td align="left" valign="middle" style="padding-bottom:8px;"><img src="{$c{resource}->get_icon_src}" width=32 height=32 align="absmiddle">&nbsp;&nbsp;<strong> Downloading {$c{resource}->get_value('title')}</strong></td>
+</tr>
+<tr align="right">
+<td height="100%" valign="bottom"><input type="button" class="button2" onClick="top.close();" value="Close" style="width:75px;"></td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

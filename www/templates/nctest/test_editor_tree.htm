@@ -1,0 +1,399 @@
+<html>
+<head>
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<style type="text/css">
+.button \{height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</style>
+<script>
+
+var currentQuestionId = null;
+var currentSubQuestionId = null;
+var selectMode = null;
+
+function resetSelectedIds()
+\{
+	currentQuestionId = null;
+	currentSubQuestionId = null;
+\}
+
+function resetTreeToolbar()
+\{
+	var settings = new Object();
+
+	settings.add = false;
+	settings.edit = false;
+	settings.del = false;
+	
+	parent.title.applySettings(settings);
+\}
+
+////////////////////////////////
+////////////////////////////////
+// Branch Logic
+////////////////////////////////
+////////////////////////////////
+
+function addItem()
+\{
+	if(selectMode=='question') \{ addQuestion(); \}
+	else if(selectMode=='sub_question') \{ addSubQuestion(); \}
+\}
+
+function editItem()
+\{
+	if(selectMode=='test') \{ editTest(); \}
+	else if(selectMode=='instructions') \{ editInstructions(); \}
+	else if(selectMode=='assessment_group') \{ editAssessmentGroups(); \}
+	else if(selectMode=='question') \{ editQuestion(currentQuestionId); \}
+	else if(selectMode=='sub_question') \{ editSubQuestion(currentSubQuestionId); \}
+\}
+
+function deleteItem()
+\{
+	if(selectMode=='question') \{ deleteQuestion(); \}
+	else if(selectMode=='sub_question') \{ deleteSubQuestion(); \}
+\}
+
+////////////////////////////////
+////////////////////////////////
+// Test
+////////////////////////////////
+////////////////////////////////
+
+function selectTest()
+\{
+	resetSelectedIds();
+	selectMode = 'test';
+	
+	var settings = new Object();
+
+	settings.add = false;
+	settings.edit = false;
+	settings.del = false;
+	
+	parent.title.applySettings(settings);
+	resetMainFrame();
+\}
+
+////////////////////////////////
+////////////////////////////////
+// Assessment Groups
+////////////////////////////////
+////////////////////////////////
+
+function selectAssessmentGroups()
+\{
+	resetSelectedIds();
+	selectMode = 'assessment_group';
+	
+	var settings = new Object();
+
+	settings.add = false;
+	settings.edit = true;
+	settings.del = false;
+	
+	parent.title.applySettings(settings);
+\}
+
+function editAssessmentGroups()
+\{
+	get_mainFrame_query('&method=tests_assessment_groups_form');
+\}
+
+////////////////////////////////
+////////////////////////////////
+// Instructions
+////////////////////////////////
+////////////////////////////////
+
+function selectInstructions()
+\{
+	resetSelectedIds();
+	selectMode = 'instructions';
+	
+	var settings = new Object();
+
+	settings.add = false;
+	settings.edit = true;
+	settings.del = false;
+	
+	parent.title.applySettings(settings);
+\}
+
+function editInstructions()
+\{
+	get_mainFrame_query('&method=tests_instructions_form');
+\}
+
+////////////////////////////////
+////////////////////////////////
+// Question
+////////////////////////////////
+////////////////////////////////
+
+function selectQuestion(id)
+\{
+	resetSelectedIds();
+	currentQuestionId = id;
+	selectMode = 'question';	
+	
+	var settings = new Object();
+
+	settings.add = true;
+	settings.edit = true;
+	settings.del = true;
+	
+	parent.title.applySettings(settings);	
+\}
+
+
+function addQuestion()
+\{
+	var query = '&title=Add Question&method=tests_question_form&after_id=' + currentQuestionId;
+	var result = top.get_modal_window_return(query, 500, 400);
+	
+	if(result)
+	\{
+		document.location.reload();
+	\}
+\}
+
+function editQuestion(question_id)
+\{
+	if(!question_id) \{ return; \}
+
+	var query = '&title=Edit Question&method=tests_question_form&question_id=' + question_id;
+	
+	top.openWindow(href + query, 550, 550);	
+	
+	return;
+	
+	var result = top.get_modal_window_return(query, 550, 550);	
+	
+	if(result)
+	\{
+		resetMainFrame();	
+		document.location.reload();
+	\}
+\}
+
+function deleteQuestion()
+\{
+	if(!currentQuestionId) \{ return; \}
+	
+	var sure = window.confirm('Are you absolutely sure you want to delete this question?');
+	
+	if(sure)
+	\{
+		resetMainFrame();	
+		document.location = href + '&method=tests_question_delete_submit&question_id=' + currentQuestionId;
+	\}
+\}
+
+////////////////////////////////
+////////////////////////////////
+// SubQuestion
+////////////////////////////////
+////////////////////////////////
+
+function selectSubQuestion(id)
+\{
+	resetSelectedIds();
+	currentSubQuestionId = id;
+	selectMode = 'sub_question';	
+	
+	var settings = new Object();
+
+	settings.add = true;
+	settings.edit = true;
+	settings.del = true;
+	
+	parent.title.applySettings(settings);	
+\}
+
+function addSubQuestion()
+\{
+	if(window.confirm('This will insert a part after the currently selected one - are you sure?'))
+	\{
+		var query = '&method=tests_insert_sub_question_submit&after_id=' + currentSubQuestionId;
+
+		document.location = href + query;
+	\}
+\}
+
+function editSubQuestion(sub_question_id)
+\{
+	if(!sub_question_id) \{ return; \}
+
+	get_mainFrame_query('&method=tests_sub_question_form&sub_question_id=' + sub_question_id);
+\}
+
+function deleteSubQuestion()
+\{
+	if(!currentSubQuestionId) \{ return; \}
+	
+	var sure = window.confirm('Are you absolutely sure you want to delete this part?');
+	
+	if(sure)
+	\{
+		resetMainFrame();
+		document.location = href + '&method=tests_sub_question_delete_submit&sub_question_id=' + currentSubQuestionId;
+	\}
+\}
+
+function resetMainFrame()
+\{
+	get_mainFrame_query('&method=tests_edit_test_home');
+\}
+
+function get_mainFrame_query(query)
+\{
+	if(top.isSubQuestionSaved())
+	\{
+		var new_loc = href + query;
+	
+		top.content.page.content.document.location = new_loc;
+	\}
+\}
+
+function loadEditorToolbar()
+\{
+	var loc = '/templates/nctest/sub_question_form_toolbar.htm';
+	top.content.page.setTitleUrl(loc);
+	top.content.page.setTitleHeight(62);
+\}
+
+function unloadEditorToolbar()
+\{
+	top.content.page.resetTitleHeight();
+	top.content.page.resetTitleUrl();	
+\}
+
+// this loads the toolbar for the left-hand tree
+// only called once (per this page loaded)
+function loadTreeToolbar()
+\{
+	var loc = '/templates/nctest/sub_question_tree_toolbar.htm';
+	
+	if(top.content.sidebar.currentTitleUrl!=loc)
+	\{
+		top.content.sidebar.setTitleUrl(loc);
+		top.content.sidebar.setTitleHeight(62);	
+	\}
+	else
+	\{
+		resetTreeToolbar();
+	\}
+\}
+
+function unloadTreeToolbar()
+\{
+	top.content.sidebar.resetTitleHeight();
+	top.content.sidebar.resetTitleUrl();
+\}
+
+function applyTreeString(expand)
+\{
+	var tree_string = questiontree.toString();
+
+	document.getElementById('menutree').innerHTML = tree_string;
+	
+	if(expand) \{ questiontree.expandAll(); \}
+\}
+
+{
+	my $test_title = $c{test}->get_value('name');
+	$test_title =~ s/'/\\'/g;
+	
+	my $tree_title = $test_title.' Questions';
+	
+	$OUT.=<<"+++";
+var questiontree = new WebFXTree('$tree_title');
+questiontree.setBehavior('explorer');
+questiontree.action = "javascript: selectTest();";
+questiontree.icon = '/images/xtree/cascade.16.gif';
+questiontree.openIcon = '/images/xtree/cascade.16.gif';
+
+var instructions = new WebFXTreeItem('Instructions');
+instructions.action = "javascript: selectInstructions();";
+instructions.icon = '/images/icons/16/instructions.gif';
+instructions.openIcon = '/images/icons/16/instructions.gif';
+instructions.dblAction = "editInstructions();";
+
+questiontree.add(instructions);
++++
+
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+var assessmentgroups = new WebFXTreeItem('Assessment Groups');
+assessmentgroups.action = "javascript: selectAssessmentGroups();";
+assessmentgroups.icon = '/images/icons/16/group.gif';
+assessmentgroups.openIcon = '/images/icons/16/group.gif';
+assessmentgroups.dblAction = "editAssessmentGroups();";
+
+questiontree.add(assessmentgroups);
+
++++
+	}
+
+	my $questions = $c{test}->get_child_array('question');
+	
+	if(@$questions<=0)
+	{
+		$OUT.=<<"+++";
+var addQuestionOption = new WebFXTreeItem('Add Question');
+addQuestionOption.action = "javascript: addQuestion();";
+addQuestionOption.dblAction = "addQuestion();";
+
+questiontree.add(addQuestionOption);		
++++
+	}
+
+	foreach my $question (@$questions)
+	{
+		my $qid = $question->get_id;
+		my $title = $question->get_value('title');
+		my $order = $question->get_value('numberorder');
+		
+		$title =~ s/'/\\'/g;
+		
+		$OUT.=<<"+++";		
+var question$qid = new WebFXTreeItem('$order - $title');
+question$qid.action = "javascript: selectQuestion($qid);";
+question$qid.dblAction = "editQuestion($qid);";
+questiontree.add(question$qid);
+question$qid.icon = '/images/xtree/questionmark.16.gif';
+question$qid.openIcon = '/images/xtree/questionmark.16.gif';
++++
+
+		foreach my $sub_question (@{$question->ensure_child_array('sub_question')})
+		{
+			my $sqid = $sub_question->get_id;
+			my $order = $sub_question->get_order_title;
+			
+			$OUT.=<<"+++";
+	var subquestion$sqid = new WebFXTreeItem('($order)');
+	subquestion$sqid.action = "javascript: selectSubQuestion($sqid);";
+	subquestion$sqid.dblAction = "editSubQuestion($sqid);";	
+	question$qid.add(subquestion$sqid);
+	subquestion$sqid.icon = '/images/xtree/tilehorizontally.16.gif';
+  subquestion$sqid.openIcon = '/images/xtree/tilehorizontally.16.gif';
++++
+		}
+	}
+}
+
+</script>
+</head>
+<body style="margin:0px;">
+<div style="margin:8px;">
+<span id="menutree"></span>
+</div>
+<script>
+	loadTreeToolbar();	
+	applyTreeString(true);
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+	my $positions = [
+		{
+			x => 144,
+			y => 266 },
+		{
+			x => 144,
+			y => 367 } ];
+			
+	my $image_count = 2;
+	
+	my $image_icons = $c{org}->get_image_icons($image_count);
+	my $text_icons = $c{org}->get_text_icons;
+	
+	my $i=0;
+	
+	foreach my $icon (@$image_icons)
+	{	
+		my $src = $icon->get_web_image_src;
+		my $link = $icon->get_value('link');
+			
+		my $x = $positions->[$i]->{x}.'px';
+		my $y = $positions->[$i]->{y}.'px';
+		
+		$OUT.=<<"+++";
+ <DIV STYLE="position:absolute; left:$x; top:$y;"><A HREF="$link"><IMG SRC="$src" WIDTH="163" HEIGHT="91" BORDER="0"></A></DIV> 
++++
+
+		$i++;
+	}
+	
+	foreach my $icon (@$text_icons)
+	{
+		my $link = $icon->get_value('link');
+		
+		my $title = $icon->get_value('title');
+		my $comment = $icon->get_value('comment');
+		
+		$OUT.=<<"+++";		 
+					 <B><A HREF="$link">$title</A></B><BR>
+					 $comment<BR>
+					 
+					 <IMG SRC="/img/clear.gif" WIDTH="1" HEIGHT="5"><BR>
++++
+	}	
+}

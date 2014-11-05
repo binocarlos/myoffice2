@@ -1,0 +1,92 @@
+<HTML>
+
+  <HEAD>
+
+	 <TITLE>BudgetHub</TITLE>
+
+<link rel="stylesheet" type="text/css" href="/lib/app.css">
+<style>
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#404040 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#404040 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;\}
+</style>
+<script>
+
+	var href = '{$c{href}}';
+	
+
+	var sidebar_mode = true;
+
+</script>
+
+<script src="/lib/budgethub/app.js"></script>
+
+
+</HEAD>
+
+  <body topmargin=0 rightmargin=0 leftmargin=0 bottommargin=0 marginwidth=0 marginheight=0 STYLE="background:#D4D0C8; border:0px;">
+<script src="/lib/menu_code.js"></script>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD height=1>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="insetinner">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="1" BORDER="0"><IMG SRC="/images/menus/menu_left.gif" WIDTH="3" HEIGHT="18" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">
+<script>
+{$c{menu}}
+</script>
+</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <tr>
+	 <td height=1>
+	 
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0"
+
+			  CELLSPACING="1">
+
+				<TR>
+
+				  
+<TD VALIGN="middle" WIDTH="100%"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="2" BORDER="0">
+
+<a style="cursor:hand;" onClick="budgetHub_toggle_sidemenu();">
+ <font face="Arial, Helvetica, sans-serif" size="2">
+ <img id="sidemenu_img" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle"> <b id="sidemenu_title"> Hide Toolbar</b></font></a>
+
+</TD>
+
+				  
+<TD VALIGN="MIDDLE" BGCOLOR="#FFFFFF" ALIGN="CENTER" STYLE="border-left:#808080 1px solid; border-right:#FFFFFF 1px solid; border-top:#808080 1px solid; border-bottom:#FFFFFF 1px solid;"><img style="border:#D4D0C8 1px solid;" src="/images/holiday/webkitlogo.gif" width="75" height="42" border="0"></TD>
+
+				</TR>
+
+			 </TABLE>
+			</td></tr>
+	 <TR>
+		<TD HEIGHT="1"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="1" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><DIV ID="loading" STYLE="display:inline; width:100%; height:100%; background-color:#FFFFFF; position:relative; text-align:center; vertical-align:middle;">
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%" CLASS="insetouter">
+	 <TR>
+		<TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;" CLASS="iframeinner"><B>Loading...</B></TD>
+	 </TR>
+	</TABLE></DIV><IFRAME SRC="{$c{href}}&method=home_frameset" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="auto" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD>
+	 </TR>
+	</TABLE>
+</body>
+
+
+</HTML>

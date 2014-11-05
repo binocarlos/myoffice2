@@ -1,0 +1,217 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script src="/templates/skillsaudit/audit_analysis.js"></script>
+<script>
+	var giMinYear = 2004;
+
+	var giMaxYear = 2010;
+</script>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+  <td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/target_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> LA - Target analysis </b>
+  </td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;"><img id="imghelp" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Help</td>
+  </tr></table>
+  </td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">This page shows a summary of the 1-10  questions answered across the whole LA. <br>      
+      <br>
+      There are <b style="color:red;">{$c{org}->{_visitor_count}}</b> visitors  present in the result set.      <br>
+      <br>
+      The filter is set as follows: <br>
+	  <table border=0 cellpadding=5 cellspacing=0>
+	<tr>
+	  <td align=right>Audit between </td>
+	  <td style="color:blue;">{$c{org}->{from_date}} and {$c{org}->{from_date}}</td></tr>	  
+{
+	my @props = qw(subject keystage school_type postcode);
+	
+	foreach my $prop (@props)
+	{
+		my $value = $c{params}->{$prop};
+		
+		if(($value=~/\w/)&&($value!=-1))
+		{
+			$OUT.=<<"+++";
+	<tr><td align=right>$prop =</td><td style="color:red;">$value</td></tr>
++++
+		}
+	}
+}
+</table>
+      <br>
+Click on the Plus ( <img id="img$id" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> ) and Minus ( <img id="img$id" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> ) symbols to show and hide more detail about each question group... <br>
+<br>
+      Please note these are  average results across teachers from the whole LA. <br>
+To look at specific individuals outside  the average, please choose a school from the tree on the left where you will find a list of teachers. </td>
+  </tr>	
+  <tr><td colspan=3 height=20></td></tr>
+<td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#6600aa; background-color:#f5e5ff;"><b style="color:#6600aa; font-size:13px; font-variant:small-caps;">
+      <table width=100% border=0 cellpadding=0 cellspacing=0>
+        <tr>
+          <td> <b style="color:#6600aa; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/timeline_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> Target Analysis BAR Graph </b> </td>
+          <td width=100 align="right" onClick="toggleGroup('graph');" style="cursor:hand;color:blue;"><img id="imggraph" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Graph&nbsp;&nbsp;</td>
+        </tr>
+      </table>
+    </b></td>
+  </tr>
+  <tr id="trgraph" style="display:none;">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffff;"><img src="{$c{href}}&method=visitors_group_targets_graph&school_id={$c{params}->{school_id}}&from_date={$c{org}->{from_date}}&to_date={$c{org}->{to_date}}&subject={$c{params}->{subject}}&keystage={$c{params}->{keystage}}&school_type={$c{params}->{school_type}}&postcode={$c{params}->{postcode}}"></td>  
+  <tr><td colspan=3 height=20></td>  
+  
+<tr>
+    <td width="50%" bgcolor="#ffe5e5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#990000;"><b style="color:#990000; font-size:13px; font-variant:small-caps;">Need to improve</b></td>
+    <td></td>
+    <td width="50%" bgcolor="#e5ffe5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#339900;"><b style="color:#339900; font-size:13px; font-variant:small-caps;">Doing well</b></td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#fff2f2" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#990000;"><span style="font-size:11px;"><span style="font-size:11px;">Shows question groups with an average </span>score of <b>less than 6</b>.<br>The groups are ordered with the <b>Lowest</b> first.</span></td>	
+    <td></td>
+    <td width="50%" bgcolor="#f2fff2" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#339900;"><span style="font-size:11px;">Shows question groups with an average score of <b>more than 6</b>.<br>The groups are ordered with the <b>Highest</b> first.</span></td>	
+  </tr>  
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#990000; background-color:#FFF2F2;">
+  
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+        
+{
+	my $notok_count = 0;
+	foreach my $question_group (@{$c{org}->{_notok_array}})
+	{
+		$notok_count++;
+		
+		my $title = $question_group->{title};
+		my $average = $question_group->{average_score};
+		my $priority = $question_group->{average_priority_score};
+
+		my $leading_answer = $question_group->{_leading_answer};
+		my $text = $leading_answer->{question_text};
+		
+		my $leading_priority = $leading_answer->{_priority_score};
+		
+		my $id = 'notok'.$notok_count;
+		
+		$OUT.=<<"+++";	
+	
+          <tr bgcolor="#ffffff">
+            <td width="100%" bgcolor="#ffe5e5" style="border-width:1px 1px 1px 1px; border-color:#990000;" class="r"><a href="javascript:toggleGroup('$id');" style="text-decoration:none;color:#990000;"><img id="img$id" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> <b>$title</b></a></td>
+          </tr>
+          <tr bgcolor="#ffffff">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="r"><table width=100% border=0 cellpadding=3 cellspacing=0>
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp; $text</td>
+</tr>
+			</table>
+			</td>
+          </tr>								  
+          <tr bgcolor="#ffffff" style="display:none;" id="tr$id">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="r"><table width=100% border=0 cellpadding=3 cellspacing=0>
++++
+
+		foreach my $answer (@{$question_group->{_order_array}})
+		{
+			my $text = $answer->{question_text};
+			my $priority = $answer->{_priority_score};
+			
+			$OUT.=<<"+++";
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp; $text</td>
+</tr>
++++
+		}
+
+		$OUT.=<<"+++";			
+			</table>
+			</td>
+          </tr>						
+                <tr>
+       <td height="10"></td>
+      </tr>	 					
++++
+	}
+}
+</table>
+
+    </td>
+    <td><img src="/images/clear.gif" width="10" height="1"></td>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#339900; background-color:#F2FFF2;">
+
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+
+{
+	my $ok_count = 0;
+	foreach my $question_group (@{$c{org}->{_ok_array}})
+	{
+		$ok_count++;
+		
+		my $title = $question_group->{title};
+		my $average = $question_group->{average_score};
+		my $priority = $question_group->{average_priority_score};
+
+		my $leading_answer = $question_group->{_leading_answer};
+		my $text = $leading_answer->{question_text};
+		
+		my $leading_priority = $leading_answer->{_priority_score};
+		
+		my $id = 'ok'.$ok_count;
+		
+		$OUT.=<<"+++";	
+          <tr bgcolor="#ffffff">
+            <td width="100%" bgcolor="#e5ffe5" style="border-width:1px 1px 1px 1px;" class="g"><a href="javascript:toggleGroup('$id');" style="text-decoration:none;color:#339900;"><img id="img$id" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> <b>$title</b></a></td>
+          </tr>
+          <tr bgcolor="#ffffff">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="g"><table width=100% border=0 cellpadding=3 cellspacing=0>
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp; $text</td>
+</tr>
+			</table>
+			</td>
+          </tr>					
+          <tr bgcolor="#ffffff" style="display:none;" id="tr$id">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="g"><table width=100% border=0 cellpadding=3 cellspacing=0>
++++
+			
+			
+		foreach my $answer (@{$question_group->{_order_array}})
+		{
+			my $text = $answer->{question_text};
+			my $priority = $answer->{_priority_score};
+			
+			$OUT.=<<"+++";
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp; $text</td>
+</tr>
++++
+		}
+					
+		$OUT.=<<"+++";			
+			</table>
+			</td>
+          </tr>				
+		  <tr><td height=10></td></tr>				  			  
++++
+	}
+}
+</table>
+
+    </td>
+	</tr>
+</table>
+{$c{calendar_table}}
+</body>
+</html>
+
+
+

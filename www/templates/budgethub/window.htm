@@ -1,0 +1,139 @@
+<HTML>
+<HEAD>
+<TITLE>BudgetHub</TITLE>
+<style type="text/css">
+<!--
+.statustext \{  font-family: Tahoma, Verdana, Arial; font-size: 12px; color: #990000\}
+.dis \{zoom:100%; filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=1, OffY=1, Color='#FFFFFF', Positive='true'); color:#808080; padding-left:1px;\}
+.dis2 \{padding:4px 4px 1px 3px;\}
+.but \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; padding:3px 3px 1px 3px;\}
+.but2 \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;  padding:3px 3px 1px 3px;\}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="/lib/app.css">
+<script src="/lib/budgethub/app.js"></script>
+<script src="/lib/kit.js"></script>
+<script src="/lib/hidestatus.js"></script>
+<script src="/lib/error.js"></script>
+<script>
+window.focus();
+window.moveTo(0,0);
+window.resizeTo(screen.availWidth, screen.availHeight);
+
+var href = '{$c{href}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+{
+if(!$c{session_id})
+{
+		$OUT.=<<"+++";
+var accounttype = 'login';
+var appname = 'login';
++++
+}
+elsif($c{user}->admin)
+{
+		$OUT.=<<"+++";
+var accounttype = 'admin';
+var appname = '$c{app_name}';
++++
+}
+else
+{
+		$OUT.=<<"+++";
+var accounttype = 'user';
+var appname = '$c{app_name}';
++++
+}
+}
+			var session_id = '{$c{session_id}}';
+			var script = '{$c{script}}';
+
+			{$c{country_js}}
+		</script>
+<script src="/lib/robohelp_csh.js"></script>
+</HEAD>
+<body STYLE="background:#D4D0C8; border:0px; margin:0px;">
+<DIV ID="window_loading" STYLE="display:block; width:100%; height:100%; background-color:#D4D0C8;"><TABLE WIDTH="100%" HEIGHT="100%" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE"><B>Loading...</B></TD></TR></TABLE></DIV>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="21" BORDER="0"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">{$c{menu}}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+				 <TR>
+				 	<TD><TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="indent">
+							<TR>
+								<TD width=260><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="22" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0"
+							  ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0"  ALIGN="ABSMIDDLE"><A id="new" ONCLICK="budgetHub_get_main_query('&method=create_new_budget');" CLASS="buttonoff" style="padding:1px;"><IMG SRC="/images/tools/16px/new.gif" ALT="New" WIDTH="16" HEIGHT="16" BORDER="0"
+							  ALIGN="absmiddle"></A><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"><A id="open" ONCLICK="budgetHub_open_budget();" CLASS="buttonoff" style="padding:1px;"><IMG SRC="/images/tools/16px/open.gif" ALT="Open" WIDTH="16" HEIGHT="16" BORDER="0"
+							  ALIGN="absmiddle"></A><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"><A id="save" ONCLICK="budgetHub_save_budget();" CLASS="buttonoff" style="padding:1px;"><IMG SRC="/images/tools/16px/save.gif" ALT="Save" WIDTH="16" HEIGHT="16" BORDER="0"
+							  ALIGN="absmiddle"></A></TD>
+							  <td><span class="statustext" id="statustext"></span></td>
+							</TR>
+						 </TABLE></TD>
+				 </TR>
+				 <TR>
+					<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR ALIGN="CENTER" VALIGN="MIDDLE">
+<TD ALIGN="LEFT"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"></TD>
+<TD WIDTH="49" ID="logout"><DIV onClick="budgetHub_get_main_query('&method=logout');" onMouseOver="this.className='but2';" onMouseOut="this.className='but';" CLASS="but"><IMG SRC="/images/tools/16px/logout.gif" HEIGHT="16" WIDTH="16" BORDER="0"><br>Log Out</DIV></TD>
+<TD WIDTH="12" ALIGN="center"><img src="/images/tools/16px/divider.gif" width="2" height="33"></TD>
+<TD><span id="hidetotals" style="display:none;"><A id="hidetotals" ONCLICK="budgetHub_toggle_sidemenu();" style="padding:4px;"><IMG SRC="/images/menus/but_calculator.gif" WIDTH="18" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; <span id="hidetotals_title">Hide</span> Totals</A></span>
+<IFRAME SRC="{$c{href}}&method=save_form" WIDTH="1" HEIGHT="1" NAME="save" SCROLLING="no" FRAMEBORDER="no" STYLE="display:none;"></IFRAME>
+</TD>
+</TR>
+</TABLE>
+</TD>
+<TD ALIGN="left" VALIGN="MIDDLE" CLASS="indent" width="100%">
+<table border="0" cellspacing="0" cellpadding="0" height="100%">
+<tr>
+<td width=1200 height="50">
+<IFRAME SRC="{$c{href}}&method=budget_toolbar" WIDTH="100%" HEIGHT="100%" NAME="budget_toolbar" SCROLLING="no" FRAMEBORDER="no" STYLE="display:block;"></IFRAME>
+</td>
+</tr>
+</table>
+</TD>
+<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent">{$c{org}->get_logo_tag}</TD>
+</TR>
+</TABLE>
+</TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%"><IFRAME SRC="{$c{href}}&method=budgethub_home" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="no" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD></TR></TABLE></TD>
+	 </TR>
+	</TABLE>
+<script>
+var winbuts = new Array('new', 'open', 'save', 'hidetotals', 'logout');
+
+apply_winbuts(winbuts);
+
+//var ww = screen.width - 60;
+//var wh = screen.height - 40;
+
+//window.resizeTo(ww, wh);
+//window.moveTo((screen.width/2)-(ww/2), (screen.height/2)-(wh/2));
+</script>
+</body>
+</HTML>

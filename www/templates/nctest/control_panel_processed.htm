@@ -1,0 +1,141 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	
+	function processExam()
+	\{
+		var new_loc = href + '&method=analysis_process_exam&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+	
+	function markingAnalysis()
+	\{
+		var new_loc = href + '&method=analysis_auto_marking_redirect&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+	
+	function questionAnalysis()
+	\{
+		var new_loc = href + '&method=analysis_question_report_frameset&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.location = new_loc;
+	\}
+	
+	function levelAnalysis()
+	\{
+		var new_loc = href + '&method=analysis_level_report_frameset&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.location = new_loc;
+	\}
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+  <tr>
+    <td bgcolor="#666666"><strong style="color:#FFFFFF;">Analyse Results </strong></td>
+  </tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	my $title = $c{org}->test_title;
+	
+	if((($c{exam}->is_before_phase('processed'))||($c{user}->is_webkit))&&(!$c{exam}->is_manual))
+	{
+		
+		if(!$c{org}->is_generic_nctest)
+		{
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Process $title" onClick="processExam();"></td>
+</tr>
++++
+		}
+	}
+	
+	if(!$c{exam}->processed)
+	{
+		if(!$c{org}->is_generic_nctest)
+		{	
+			$OUT.=<<"+++";
+<tr><td style="color:red;font-weight:bold;">This $title has not been processed!</td></tr>
++++
+		}
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	if(!$c{exam}->is_manual)
+	{
+		$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Marking Analysis" onClick="markingAnalysis();"></td>
+</tr>
+<tr>
+  <td><input type="button" class="button" value="Question Analysis" onClick="questionAnalysis();"></td>
+</tr>
++++
+	}
+
+	if($c{exam}->phase eq 'processed')
+	{
+		$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Level Analysis" onClick="levelAnalysis();"></td>
+</tr>
++++
+	}
+}
+</table>
+<br>
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+Processing a quiz means turning scores (e.g 34.5 / 50) into Assessments (e.g. level 4a). <br>
+<br>
+This is performed as to the assessment groups created in the quiz paper. <br>
+<br>
+The automatic marking analysis gives you an overview of the system marks assigned for the quiz.<br>
+<br>
+The question analysis gives you a summary of which questions were scored by which pupils.<br>
+<br>
+The level analysis is a summary of the levels attained by each pupil as a result of this quiz.
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+	Processing is not really needed (it is used in other versions of the system) but will complete the grid of tests shown on the left.
++++
+	}
+}
+</body>
+

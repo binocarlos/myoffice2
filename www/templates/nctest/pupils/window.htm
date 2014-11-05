@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>TestingTool</TITLE>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<link rel="stylesheet" type="text/css" href="/lib/nctest/styles/default/style.css">
+<script language="javascript">
+window.focus();
+window.moveTo(0,0);
+window.resizeTo(screen.availWidth, screen.availHeight);
+</script>
+</HEAD>
+<body class="window_body">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	<TR>
+		<TD>
+		<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="window_insetouter">
+			<TR>
+				<TD CLASS="window_insetinner">
+				<table cellpadding="3" cellspacing="0" border="0" width="100%">
+					<tr>
+						<td><img src="/lib/nctest/styles/default/window_user.gif" width="32" height"23" border="0"></td>
+						<td nowrap class="window_pupil">{$c{pupil}->get_fullname}</td>
+						<td width="100%" align="center" class="window_testtitle">{$c{exam}->name}</td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+				</TD>
+			</TR>
+		</TABLE>
+		</TD>
+	</TR>
+	<TR>
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	</TR>
+	<TR>
+		<TD HEIGHT="100%" COLSPAN="2">
+		<IFRAME SRC="{$c{href}}&method=test_instructions" WIDTH="100%" HEIGHT="100%" NAME="test" SCROLLING="no" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME>
+		</TD>
+	</TR>
+</TABLE>
+
+</body>
+</HTML>

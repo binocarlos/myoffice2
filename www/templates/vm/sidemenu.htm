@@ -1,0 +1,56 @@
+<!--#include virtual="temp_include.htm" -->
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		parent.parent.parent.holiday_get_query(query);
+	\}
+
+var tree = new WebFXTree('Employees');
+{
+	my $arr = $c{org}->get_child_array('department');
+	
+	foreach my $department (@$arr)
+	{
+		my $department_id = $department->get_id;
+		my $department_name = $department->get_value('name');
+		
+		my $arr = $department->get_child_array('users');
+		
+		if(!$arr)
+		{
+			next;
+		}		
+
+		$OUT.=<<"+++";
+var department$department_id = new WebFXTreeItem('$department_name');
+
+tree.add(department$department_id);
++++
+
+		foreach my $user (@$arr)
+		{
+			my $id = $user->get_id;
+			my $name = $user->get_fullname;
+
+			$OUT.=<<"+++";
+var users$id = new WebFXTreeItem('$name');
+users$id.action = "javascript: get_xTree_query('&method=view_year&users_id=$id');";
+users$id.icon = '/images/holiday/employee.gif';
+
+department$department_id.add(users$id);
++++
+		}
+	}
+}
+
+document.write(tree.toString());
+
+tree.expandAll();
+
+</script>
+
+
+

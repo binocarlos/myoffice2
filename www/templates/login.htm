@@ -1,0 +1,129 @@
+<!--#include virtual="temp_include.htm" -->
+<head>
+<title>Webkit::Application Login</title>
+</head>
+
+<body style="border:2px inset;">
+
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+	  HEIGHT="100%">
+		<TR>
+		  <TD HEIGHT="100%" WIDTH="100%" VALIGN="MIDDLE" ALIGN="CENTER">
+			 
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				
+<TR>
+				  
+<TD ALIGN="CENTER" VALIGN="TOP" WIDTH="180">
+					 
+<FORM METHOD="POST" ACTION="{$c{script}}" STYLE="margin:0;">
+						
+<INPUT TYPE="hidden" NAME="method" VALUE="authenticate">
+						
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"
+						 CLASS="panelouter" HEIGHT="100%">
+						  
+<TR>
+							 
+<TD HEIGHT="100%">
+								
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0"
+								 CELLSPACING="0" CLASS="panelinner" HEIGHT="100%">
+								  
+<TR>
+									 
+<TD CLASS="panelbody" HEIGHT="100%">
+										
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0"
+										 HEIGHT="100%" WIDTH="100%">
+										  
+<TR>
+											 
+<TD ALIGN="CENTER" VALIGN="TOP"
+											  HEIGHT="100%">
+												
+<TABLE BORDER="0" CELLPADDING="0"
+												 CELLSPACING="0" HEIGHT="100%">
+												  
+<TR>
+													 
+<TD COLSPAN="2"
+													  ALIGN="LEFT" BACKGROUND="/images/holiday/panelt.gif" HEIGHT="13"><IMG
+														src="/images/holiday/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13"
+														ALIGN="ABSMIDDLE"><FONT CLASS="section_title">&nbsp;Sign In&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13"
+													  VALIGN="TOP"><IMG src="/images/holiday/paneltr.gif" BORDER="0"
+														WIDTH="2" HEIGHT="13"></TD>
+</TR>
+												  
+<TR>
+													 
+<TD WIDTH="2"
+													  BACKGROUND="/images/holiday/panell.gif"><IMG src="/images/holiday/clear.gif"
+														WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+<TD WIDTH="100%" HEIGHT="100%"
+													  ALIGN="LEFT" VALIGN="TOP">
+														
+<TABLE WIDTH="100%" BORDER="0"
+														 CELLPADDING="8" CELLSPACING="0">
+														  
+<TR>
+															 
+<TD ALIGN="LEFT"
+															  VALIGN="TOP">Email:<BR>
+<INPUT ONFOCUS="this.className='text_field2';" ONBLUR="this.className='text_field';" TYPE="text" NAME="username" CLASS="text_field"
+																STYLE="width:150px">
+<BR>
+<BR>
+Password:<BR>
+<INPUT ONFOCUS="this.className='text_field2';" ONBLUR="this.className='text_field';" TYPE="password" NAME="password"
+																CLASS="text_field" STYLE="width:150px">
+ </TD>
+</TR>
+														
+</TABLE>
+</TD>
+<TD WIDTH="2"
+													  BACKGROUND="/images/holiday/panelr.gif"><IMG src="/images/holiday/clear.gif"
+														WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+</TR>
+												  
+<TR>
+													 
+<TD HEIGHT="2" COLSPAN="3"
+													  BACKGROUND="/images/holiday/panelb.gif" ALIGN="RIGHT"><IMG
+														src="/images/holiday/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+</TR>
+												
+</TABLE>
+</TD>
+</TR>
+										  
+<TR>
+											 
+<TD ALIGN="RIGHT">
+<INPUT TYPE="SUBMIT"
+												VALUE="Sign In" CLASS="button" STYLE="width:75px">
+</TD>
+</TR>
+										
+</TABLE>
+</TD>
+</TR>
+								
+</TABLE>
+</TD>
+</TR>
+						
+</TABLE>
+</FORM>
+<BR>
+<FONT
+					 COLOR="red">{$c{login_status}}</FONT> </TD>
+</TR>
+			 
+</TABLE>
+</TD>
+		</TR>
+	 </TABLE>
+</body>

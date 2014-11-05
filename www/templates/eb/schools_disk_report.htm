@@ -1,0 +1,118 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+</script>
+<body>
+<form method="GET" action="{$c{href}}" name="invoiceForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="schools_disk_report_submit">
+<table border="0" align="center" cellpadding="20" cellspacing="0" style="display:inline;">
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Schools Disk SQL Download: </legend>
+<div class="seccontent" align="left">
+
+<TABLE width="400" BORDER="0" CELLPADDING="5" CELLSPACING="0">  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>select * from schools_disk where </TD>
+  </TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><textarea name="sql" type="text" class="text_field" id="sql" style="width:100%;height:200px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{params}->{sql}}</textarea></TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><p>use '%' as the wildcard sign and 'like' as the comparison operator:<br>
+<br>
+where postcode = 'BS7 8DF' ---------- this will give you an exact match<br>
+<br>
+where postcode like 'BS7%' ---------- this will give you all starting with 'BS7'<br>
+<br>
+------------------------------------------------------------------------------------<br>
+<br>
+name like '%nursery%'<br>
+and<br> 
+!(name like '%junior%')<br>
+<br>
+-------------------------------------------------------------------------------------<br>
+<br>
+postcode like 'BS%'<br>
+and<br>
+(<br>
+ name like '%nursery%'<br>
+and<br>
+!(name like '%junior%')<br>
+)
+<br>
+</p>
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>&nbsp;</TD>
+</TR>   
+</TABLE>
+
+</div>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+<td align="left"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" CLASS="button2" style="width:125px;" value="Download Report"></TD>
+</TR>
+</TABLE>
+<br>
+<br>
+<strong>Schools Disks Fields</strong> <br>
+<br> 
+name<br>
+leaname<br>
+gfl<br> 
+schooltype<br>
+denomination<br>
+address1<br>
+address2<br>
+address3<br>
+town<br>
+county<br>
+area<br>
+postcode<br>
+postcode_area<br>
+sub_postcode<br>
+phone<br>
+fax<br>
+url<br>
+email<br>
+gender<br>
+numberboys<br>
+numbergirls<br>
+pupils<br>
+headteachertitle<br>
+headteacherfirstname<br>
+headteacherlastname<br>
+designation<br>
+urban_rural<br>
+sixth_form</td>
+</tr>
+</table>
+</form>
+</body>
+</html>
+
+
+

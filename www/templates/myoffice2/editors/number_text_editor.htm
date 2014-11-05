@@ -1,0 +1,91 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function submitForm()
+	\{		
+		var ret = new Object();
+		ret.number = document.getElementById('number').value;
+		ret.notes = document.getElementById('notes').value;
+		
+		top.returnValue = ret;
+		top.close();
+		
+		return 1;
+	\}
+</script>
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}>
+<tr>
+<td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} align="center" valign="top">
+<style>
+.tab-page \{height:100%;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+{Webkit::Browser->if_not_mac('<script type="text/javascript" src="/lib/tabpane.js"></script>')}
+<table border="0" cellpadding="0" cellspacing="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}><tr><td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Edit Tickets On Sale</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Tickets On Sale</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Tickets On Sale</u><br><br>
++++
+}
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT"> Tickets:&nbsp;</td>
+<td align="LEFT"><input name="number" type="TEXT" class="text_field" id="number" style="width:100px;" value="{$c{params}->{number}}"></td>
+<td align="LEFT">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+  <td align="RIGHT" valign="top">Reason:: </td>
+  <td align="LEFT"><textarea name="notes" id="notes" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:140px; height:80px;">{$c{params}->{notes}}</textarea></td>
+  <td align="LEFT">&nbsp;</td>
+</tr>
+</table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+</div>
+</div>
++++
+}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="button" value="OK" CLASS="button2" style="width:75px;" onClick="submitForm();">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</table>
+
+</td>
+</tr>
+</table>
+<script>	
+		{Webkit::Browser->if_not_mac('setupAllTabs();')}
+</script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>Tree</title>
+<link rel="stylesheet" TYPE="text/css" HREF="/lib/nctest/styles/default/style.css">
+<script>
+
+var selectedId = null;
+
+var subQuestions = new Object();
+
+var loaded = true;
+
+function addSubQuestion(sqid)
+\{
+	subQuestions[sqid] = sqid;
+\}
+
+function item_over(id)
+\{
+	if(selectedId==id) \{ return; \}
+	
+	document.getElementById(id + '_n').className = 'tree_number_over';
+	document.getElementById(id + '_q').className = 'tree_question_over';
+\}
+
+function item_out(id)
+\{
+	if(selectedId==id)
+	\{
+		document.getElementById(id + '_n').className = 'tree_number_selected';
+		document.getElementById(id + '_q').className = 'tree_question_selected';	
+	\}
+	else
+	\{
+		document.getElementById(id + '_n').className = 'tree_number';
+		document.getElementById(id + '_q').className = 'tree_question';
+	\}
+\}
+
+function setLoaded(val)
+\{
+	loaded = val;
+\}
+
+function load_part(id)
+\{	
+	if(id==selectedId) \{ return; \}
+	
+	var oldId = selectedId;
+	
+	selectedId = id;
+	
+	if(oldId)
+	\{
+		item_out(oldId);
+	\}
+	
+	document.getElementById(id + '_n').className = 'tree_number_selected';
+	document.getElementById(id + '_q').className = 'tree_question_selected';
+	
+	top.content.page.summary.document.location = href + '&method=analysis_auto_marking&sub_question_id=' + id;
+\}
+</script>
+</head>
+<body style="margin:10px 5px 10px 10px;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<!-- Start Row Start -->
+	<tr>
+		<td colspan="3"><img src="/lib/nctest/styles/default/tree_root.gif" border="0"></td>
+	</tr>
+<!-- Start Row End -->
+{
+	my $questions = $c{test}->get_child_array('question');
+	my $sub_questions = $c{test}->get_child_array('sub_question');
+	
+	my $part_count = @$sub_questions;
+	my $count = 0;
+
+	foreach my $question (@$questions)
+	{
+		my $qid = $question->get_id;
+		my $title = $question->get_value('title');
+		my $order = $question->get_value('numberorder');
+		
+		my $sub_questions = $question->ensure_child_array('sub_question');
+		my $sub_question_count = @$sub_questions;
+		
+		foreach my $sub_question (@$sub_questions)
+		{
+			my $sqid = $sub_question->get_id;
+			my $sqorder = $sub_question->get_order_title;
+			$count++;
+			
+			my $selected = '';
+			
+			if($sub_question->get_id==$c{selected_sqid})
+			{
+				$selected = '_selected';
+				$OUT.=<<"+++";
+<script>
+	selectedId = $sqid;
+</script>
++++
+			}
+			
+			my $part_title = $order;
+			
+			if($sub_question_count>1)
+			{
+				$part_title.=$sqorder;
+			}
+			
+			my $num_id = $sqid.'_n';
+			my $q_id = $sqid.'_q';
+			
+			my $tree_img = 't';
+			
+			if($count==$part_count)
+			{
+				$tree_img = 'l';
+			}
+		
+			$OUT.=<<"+++";
+<script>
+	addSubQuestion($sqid);
+</script>
+<!-- Normal Row Start -->
+	<tr onclick="load_part($sqid);" onmouseover="item_over($sqid);" onmouseout="item_out($sqid);" style="cursor:hand;">
+		<td><img src="/lib/nctest/styles/default/tree_$tree_img.gif" border="0"></td>
+		<td id="$num_id" title="Click to view question" class="tree_number$selected" nowrap>$part_title</td>
+		<td id="$q_id" title="Click to view question" class="tree_question$selected" nowrap>$title</td>
+	</tr>
+<!-- Normal Row End -->
+	
+<!-- Spacer Row Start -->
+	<tr>
+		<td colspan="3"><img src="/lib/nctest/styles/default/tree_space.gif" border="0"></td>
+	</tr>
+<!-- Spacer Row End -->	
++++
+		}
+	}
+}
+
+</table>
+</body>
+</html>

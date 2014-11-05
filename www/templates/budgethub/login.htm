@@ -1,0 +1,70 @@
+<!--#include virtual="temp_include.htm" -->
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table border="0" cellspacing="0" cellpadding="5" align="center">
+<tr>
+<td align="center"><b>Login</b></td>
+</tr>
+<tr>
+<td align="center">
+
+<form method="POST" action="">
+<input type="hidden" name="method" value="authenticate">
+<table width="400" border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td align="right">Email Address:</td>
+<td>
+<input type="text" name="username" class="text_input">
+</td>
+</tr>
+<tr>
+<td align="right">Password:</td>
+<td>
+<input type="password" name="password" class="text_input">
+</td>
+</tr>
+<tr align="center">
+<td colspan="2">
+<input type="submit" value="Login" class="form_submit">
+</td>
+</tr>
+<tr align="center">
+<td colspan="2"><b class="red">{$c{login_status}}</b></td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
+<tr>
+<td align="center">
+<form method="get" action="{$c{script}}">
+<input type="hidden" name="method" value="remind_password">
+<table width=100% cellpadding="5" cellspacing="0">
+<tr align="center">
+<td>
+<b>Forgotten Your Password?</b></td>
+</tr>
+<tr align="center">
+<td>enter your email address below and you<br>
+ will be sent an email with your password:</td>
+</tr>
+<tr>
+<td align="center">
+<input type="text" name="email" class="text_input">
+</td>
+</tr>
+<tr>
+<td align="center">
+<input type="submit" value="Remind Me" class="form_submit">
+</td>
+</tr>
+<tr>
+<td align="center"><b class="red">{$c{remind_status}}</b></td>
+</tr>
+</table>
+
+</form>
+</td>
+</tr>
+</table>
+</body>

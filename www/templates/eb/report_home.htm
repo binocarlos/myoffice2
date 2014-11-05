@@ -1,0 +1,95 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+</script>
+<body>
+<form method="GET" action="{$c{href}}" name="invoiceForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="invoices_make_report_submit">
+<table border="0" align="center" cellpadding="20" cellspacing="0" style="display:none;">
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Report Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0">  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Invoices From:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <input name="from" type="text" class="text_field" id="from" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{from}}"></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Invoices To:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"> 
+      <input name="to" type="text" class="text_field" id="to" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{to}}"></TD>
+  </TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Search For: </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="which_date" type="radio" id="which_dateStart" value="start" checked>
+<label for="which_dateStart"> start date </label>
+<input name="which_date" type="radio" id="which_dateEnd" value="end">
+<label for="which_dateEnd"> end date </label>
+</TD>
+</TR>    
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Mode: </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="mode" type="radio" id="modeAll" value="all" checked><label for="modeAll"> all </label>
+<input name="mode" type="radio" id="modeDemo" value="demo"><label for="modeDemo"> demo </label>
+<input name="mode" type="radio" id="modePaid" value="paid"><label for="modePaid"> paid </label>
+</TD>
+</TR>     
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Group By: </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="group" type="radio" id="groupInvoice" value="invoice" checked>
+<label for="groupInvoice"> invoice</label>
+<input name="group" type="radio" id="groupSchool" value="school">
+<label for="groupSchool"> school </label>
+</TD>
+</TR>   
+</TABLE>
+
+</div>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+<td align="center"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" CLASS="button2" style="width:125px;" value="Download Report"></TD>
+</TR>
+</TABLE></td>
+</tr>
+</table>
+<script>
+
+</script>
+</form><br><br>
+<form method="GET" action="{$c{href}}" name="invoiceForm">
+<div align="center">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="make_certificate_report">
+</div>
+</form>
+
+STILL TO DO !!!
+</body>
+</html>
+
+
+

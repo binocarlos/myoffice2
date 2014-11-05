@@ -1,0 +1,145 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+
+</script>
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+ 
+<tr>
+	
+<td width="280" align="LEFT" valign="TOP">
+<table border="0" cellpadding="0" cellspacing="0" class="panelouter" width="260">
+ 
+<tr>
+	
+<td height="100%" class="panelinner">
+	 
+<table border="0" cellpadding="5" cellspacing="0" height="100%" width="100%">
+		
+<tr>
+		 
+<td align="left" valign="TOP" height="100%">
+<fieldset>
+<legend>Budget Details</legend>
+<table width="100%" height="150" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td class="seccontent" align="left" valign="top">
+
+<table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0" id="summarydesc" style="display:inline;">
+<tr>
+<td align="center" valign="middle">
+Click once on a budget to the right<br>
+to view the general details.
+</td>
+</tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" id="summarytable" style="display:none;">
+ 
+<tr style="padding-bottom:5px;">
+	
+<td align="right" valign="TOP">Title:&nbsp;</td>
+<td align="LEFT" valign="TOP" width="100%"><span id="doc_title"></span></td>
+</tr>
+  
+<tr style="padding-bottom:5px;">
+	
+<td align="right" valign="TOP">Author:&nbsp;</td>
+<td align="LEFT" valign="TOP" width="100%"><span id="doc_author"></span></td>
+</tr>
+ 
+ 
+<tr style="padding-bottom:5px;">
+	
+<td align="right" valign="TOP">Created:&nbsp;</td>
+<td align="LEFT" valign="TOP"><span id="doc_created"></span></td>
+</tr>
+ 
+<tr style="padding-bottom:5px;">
+	
+<td align="right" valign="TOP">Modified:&nbsp;</td>
+<td align="LEFT" valign="TOP"><span id="doc_modified"></span></td>
+</tr>
+ 
+<tr style="padding-bottom:5px;">
+	
+<td align="right" valign="TOP">Comment:&nbsp;</td>
+<td align="LEFT" valign="TOP"><span id="doc_notes"></span></td>
+</tr>
+ 
+<tr>
+	
+<td align="LEFT" valign="TOP" colspan="2"><br>
+<span id="status" style="color:red;"></span></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</fieldset>
+		 </td>
+</tr>
+		
+<tr>
+		 
+<td align="right">
+<table border="0" cellpadding="0" cellspacing="0" id="summarybuttons" style="display:none;">
+ 
+<tr>
+	
+	
+<td align="CENTER" width="96">
+<input type="BUTTON" name="button12" value="Edit" class="button" style="width:75px;" onClick="edit_doc();">
+</td>
+<td width="75" align="RIGHT">
+<input type="BUTTON" name="button12" value="Delete" class="button" style="width:75px;" onClick="delete_doc();">
+</td>
+</tr>
+</table>
+</td>
+</tr>
+	 
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td align="LEFT" valign="TOP">
+<table border="0" cellspacing="5" cellpadding="0">
+<tr>
+{
+	my $count = 0;
+
+	foreach my $budget (@{$c{budgets}})
+	{
+		$count++;
+		
+		my $name = $budget->get_value('name');
+		
+		$OUT.=<<"+++";
+<td width=60 align="center" valign=top class="foldertext">
+<img src="/images/nav/bigfolder.gif" width="32" height="27" border="0" alt="Edit $budget->{name}"><br>
+$name
+</td>
+<td width=15></td>
++++
+
+		if($count>=4)
+		{
+			$OUT.=<<"+++";
+</tr>
+<tr>
++++
+		
+			$count = 0;
+		}
+	}
+}
+
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<p>&nbsp;</p>
+</body>

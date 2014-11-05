@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<menu_config>
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+	<menublock title="Employees" width="95">
+		<menuitem title="Add New" action="get_xTree_query('&amp;method=add_user');"/>
+		<menuitem title="View / Edit" action="get_xTree_query('&amp;method=users_home');"/>
+	</menublock>
++++
+	}
+}
+	<menublock title="Time Off" width="130">
+		<menublock title="Book Holiday" width="150">
+			<menuitem title="One Days Holiday" action="get_xTree_query('&amp;method=add_holiday&amp;reason=holiday');"/>
+			<menuitem title="Several Days Holiday" action="get_xTree_query('&amp;method=add_holiday&amp;reason=holiday&amp;multi=y');"/>
+		</menublock>
+		<menublock title="Other Reasons" width="150">
+			<menuitem title="One Day Off" action="get_xTree_query('&amp;method=add_holiday&amp;reason=other');"/>
+			<menuitem title="Several Days Off" action="get_xTree_query('&amp;method=add_holiday&amp;reason=other&amp;multi=y');"/>
+		</menublock>
+		<menublock title="Off Sick" width="150">
+			<menuitem title="One Day Sick" action="get_xTree_query('&amp;method=add_holiday&amp;reason=sick');"/>
+			<menuitem title="Several Days Sick" action="get_xTree_query('&amp;method=add_holiday&amp;reason=sick&amp;multi=y');"/>
+		</menublock>
+		<menublock title="Owed Days" width="150">
+			<menuitem title="One Day Owed" action="get_xTree_query('&amp;method=add_holiday&amp;reason=owed');"/>
+			<menuitem title="Several Days Owed" action="get_xTree_query('&amp;method=add_holiday&amp;reason=owed&amp;multi=y');"/>
+		</menublock>
+	</menublock>
+	<menublock title="Views" width="80">
+		<menuitem title="Days" action="get_xTree_query('&amp;method=view_day&amp;day=today');"/>
+		<menuitem title="Weeks" action="get_xTree_query('&amp;method=view_week&amp;week=thisweek');"/>
+		<menuitem title="Months" action="get_xTree_query('&amp;method=view_month&amp;month=thismonth');"/>
+	</menublock>
+</menu_config>

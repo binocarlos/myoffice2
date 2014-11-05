@@ -1,0 +1,215 @@
+<script>
+	// The bottom drop-down depends on the top one's value
+// I.e. the statements are a property of the subjects and
+// when the subject changes - so do the statements
+
+	var subjects = new Object();
+	var statements = new Object();
+	var subjectMap = new Object();
+	
+	function setStatementDisplay(mode)
+	\{
+		var questionSpan = document.getElementById('questionSpan');
+		var statementTable = document.getElementById('statementTable');
+		var editStatementTable = document.getElementById('editStatementTable');
+		
+		if(mode)
+		\{
+			questionSpan.style.display = 'none';
+			statementTable.style.display = 'none';
+			editStatementTable.style.display = 'inline';
+		\}
+		else
+		\{
+			questionSpan.style.display = 'inline';
+			statementTable.style.display = 'inline';
+			editStatementTable.style.display = 'none';					
+		\}
+	\}
+	
+	function addSubject(id, title)
+	\{
+		var subject = new Object();
+		subject.id = id;
+		subject.title = title;
+
+		subjects[subject.id] = subject;
+	\}
+	
+	function addStatement(id, subject_id, code, text)
+	\{
+		var statement = new Object();
+		statement.id = id;
+		statement.subject_id = subject_id;
+		statement.code = code;
+		statement.text = text;
+		
+		statements[statement.id] = statement;
+		
+		if(subjectMap[subject_id]==null)
+		\{
+			subjectMap[subject_id] = new Array();
+		\}
+		
+		var arr = subjectMap[subject_id];
+		
+		arr[arr.length] = statement;
+	\}
+	
+	// This sets the statement value to begin the page with
+	
+	function setExistingValue(statementId)
+	\{
+		if(statementId==null) 
+		\{
+			subjectChanged();
+		\}
+		else
+		\{
+			var statement = statements[statementId];
+			document.question_form.statement_of_ability_id.value = statement.id;
+		
+			document.question_form.subject_id.value = statement.subject_id;
+		
+			subjectChanged();
+		
+			statementChanged(statement.id);
+		\}
+	\}
+	
+	// the subject changed therefore we need to rebuild the statement options
+	function subjectChanged()
+	\{
+		var subjectId = document.question_form.subject_id.value;
+		
+		var statementArray = subjectMap[subjectId];
+
+		if(!statementArray) \{ return; \}
+		
+		var html = '';
+		
+		for(var i=0; i<statementArray.length; i++)
+		\{
+			var statement = statementArray[i];
+			var subject = subjects[statement.subject_id];
+			var sel = '';
+			
+			if(statement.id==document.question_form.statement_of_ability_id.value)
+			\{
+				sel = ' bgcolor=#ffffff';
+			\}
+			
+			html += '<table width=100% border=0 cellpadding=3 cellspacing=0 style="border: solid #aaaaaa 1px;">';
+			html += '<tr id="statementTr_' + statement.id + '"' + sel + ' style="cursor:hand;" onClick="statementChanged(' + statement.id + ');"><td align=left width=30>' + statement.code + '</td>';
+			html += '<td align=left valign=top>' + statement.text + '</td></tr>';
+			html += '</table><br>';			
+		\}
+		
+		document.getElementById('statementTableTd').innerHTML = html;
+	\}
+	
+	// changes the statement_of_ability_id in the form when the statement option changes
+	function statementChanged(statementId)
+	\{		
+		var existing_id = document.question_form.statement_of_ability_id.value;
+		
+		if(parseInt(existing_id)>0)
+		\{
+			var elem = document.getElementById('statementTr_' + existing_id);
+			
+			if(elem)
+			\{
+				elem.bgColor = '';
+			\}
+		\}
+		
+		var statement = statements[statementId];
+		var subject = subjects[statement.subject_id];
+		
+		if(!statement) \{ return; \}
+		
+		document.getElementById('statementDiv').innerHTML = statement.text;
+		document.getElementById('statementDesc').innerHTML = ' - ' + subject.title + ' (' + statement.code + ')';
+		document.question_form.statement_of_ability_id.value = statement.id;
+		
+		document.getElementById('statementTr_' + statement.id).bgColor = '#ffffff';		
+		
+		setStatementDisplay(false);
+	\}	
+{
+	my $statements = $c{assessment_group}->ensure_child_array('statement_of_ability');
+
+	foreach my $statement (@$statements)
+	{
+		my $id = $statement->get_id;
+		my $subject_id = $statement->get_value('subject_id');
+		my $code = $statement->get_value('code');
+		my $text = $statement->get_js_value('statement', 1);
+		
+		$OUT.=<<"+++";
+addStatement($id, '$subject_id', '$code', '$text');
++++
+	}
+	
+	my $subjects = &Webkit::NcTest::NCHub::get_subject_array;
+	
+	foreach my $subject (@$subjects)
+	{
+		my $id = $subject->{code};
+		my $title = $subject->{title};
+		
+		$OUT.=<<"+++";
+addSubject('$id', '$title');
++++
+	}
+}
+</script>
+<input type="hidden" name="statement_of_ability_id" value="{$c{assessment_group}->get_value('statement_of_ability_id')}">
+<TABLE width="450" BORDER="0" CELLPADDING="0" CELLSPACING="0" id="statementTable">
+
+  <TR id="statementEditTr" style="padding-bottom:5px;"> 
+	<TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Statement:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+      <input type="button" class="button" value="Edit" onClick="setStatementDisplay(true);">  <span id="statementDesc"></span>  </TD>
+  </TR>
+  <TR id="statementTr" style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" colspan=2>
+      <div id="statementDiv" style="padding:4px;text-align:left;">&nbsp;</div> 
+    </TD>
+  </TR>
+</TABLE>
+<br>
+<TABLE width="450" BORDER="0" CELLPADDING="0" CELLSPACING="0" id="editStatementTable" style="display:none;">
+  <TR style="padding-bottom:5px;">                               
+	<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap colspan=2>
+	  <input type="button" class="button" value="Cancel" onClick="setStatementDisplay(false);">
+	</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">                               
+	<TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Subject:</TD>
+                                    
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+		<select name="subject_id" size="1" style="width:350px;" class="text_field" onChange="subjectChanged();">
+			{&Webkit::NcTest::NCHub::get_subject_options({ nocore => 1 })}
+		</select>
+	</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">                            
+	<TD colspan=2 ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap id="statementTableTd">
+	</TD>
+  </TR>  
+</TABLE>
+
+<script>
+
+{
+	my $id = $c{assessment_group}->get_value('statement_of_ability_id');
+
+	if(!$id>0) { $id = 'null'; }
+	
+	$OUT.=<<"+++";
+setExistingValue($id);
++++
+}
+</script>
+

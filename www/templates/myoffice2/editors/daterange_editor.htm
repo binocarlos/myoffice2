@@ -1,0 +1,144 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var giMinYear = 2000;
+
+	var giMaxYear = 2020;
+	
+{
+	if($c{params}->{from}!~/\w/)
+	{
+		my $from = Webkit::Date->now;
+		$from->epoch_days(-30);
+		$c{params}->{from} = $from->get_string;
+	}
+	elsif($c{params}->{from} eq 'undefined')
+	{
+		$c{params}->{from} = '';
+	}
+	
+	if($c{params}->{to}!~/\w/)
+	{
+		my $to = Webkit::Date->now;
+		$to->epoch_days(30);
+		$c{params}->{to} = $to->get_string;
+	}
+	elsif($c{params}->{to} eq 'undefined')
+	{
+		$c{params}->{to} = '';
+	}
+}
+
+	function submitForm()
+	\{
+		var ret = new Object();
+		ret.from = document.getElementById('from').value;
+		ret.to = document.getElementById('to').value;
+		
+		top.returnValue = ret;
+		top.close();
+		
+		return 1;
+	\}
+</script>
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}>
+<tr>
+<td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} align="center" valign="top">
+<style>
+.tab-page \{height:100%;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+{Webkit::Browser->if_not_mac('<script type="text/javascript" src="/lib/tabpane.js"></script>')}
+<table border="0" cellpadding="0" cellspacing="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}><tr><td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Edit Date Range</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Current Date Range</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Current Date Range</u><br><br>
++++
+}
+<table border="0" cellpadding="0" cellspacing="0">
+{
+	if($c{params}->{from_title}!~/\w/)
+	{
+		$c{params}->{from_title} = 'From';
+	}
+	
+	if($c{params}->{to_title}!~/\w/)
+	{
+		$c{params}->{to_title} = 'To';
+	}
+	
+	$OUT.="";
+}
+<tr style="padding-bottom:5px;">
+<td align="RIGHT"> {$c{params}->{from_title}}:&nbsp;</td>
+<td align="LEFT"><input name="from" type="TEXT" class="text_field" id="from" style="width:100px;" value="{$c{params}->{from}}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('from'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT"> {$c{params}->{to_title}}:&nbsp;</td>
+<td align="LEFT"><input name="to" type="TEXT" class="text_field" id="to" style="width:100px;" value="{$c{params}->{to}}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('to'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr>
+</table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+</div>
+</div>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="button" value="OK" CLASS="button2" style="width:75px;" onClick="submitForm();">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</table>
+</td>
+</tr>
+</table>
+<script>	
+		{Webkit::Browser->if_not_mac('setupAllTabs();')}
+</script>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

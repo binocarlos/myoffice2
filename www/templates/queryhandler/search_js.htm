@@ -1,0 +1,88 @@
+<form method="GET" action="{$c{script}}" name="searchform">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="query_search_js">
+<input type="hidden" name="client_id" value="">
+<input type="hidden" name="term" value="">
+</form>
+
+<script>
+
+var query = new Array();
+var query_objects = new Object();
+
+function submit_searchform(client_id, term)
+\{
+	document.searchform.client_id.value = client_id;
+	document.searchform.term.value = term;
+
+	document.searchform.submit();
+\}
+
+function get_query_obj(id)
+\{
+	return query_objects[id];
+\}
+
+function new_query(id, ticket_no, client, user, submitted, answered, title, keywords, question, answer)
+\{
+	var query_obj = new Object();
+	
+	query_obj.id = id;
+	query_obj.ticket_no = ticket_no;
+	query_obj.client = client;
+	query_obj.user = user;
+	query_obj.submitted = submitted;
+	query_obj.answered = answered;
+	query_obj.title = title;
+	query_obj.keywords = keywords;
+	query_obj.question = question;
+	query_obj.answer = answer;
+	
+	query[query.length] = query_obj;
+	query_objects[query_obj.id] = query_obj;
+\}
+
+{	
+	foreach my $query (@{$c{query_array}})
+	{
+		my $props = {
+			id => $query->get_id,
+			ticket_no => $query->get_value('ticket_no'),
+			client_name => $query->get_client_name,
+			user_name => $query->get_user_fullname,
+			submitted => $query->get_submitted_title,
+			answered => $query->get_answered_title,
+			title => $query->get_value('title'),
+			keywords => $query->get_keywords_string,
+			question => $query->get_question_js,
+			answer => $query->get_answer_js };
+		
+		foreach my $key (keys %$props)
+		{
+			$props->{$key} =~ s/\\//g;
+			$props->{$key} =~ s/'/\\'/g;
+		}
+		
+		my $term = $c{params}->{term};
+		
+		if($term=~/\w/)
+		{
+			$props->{title} =~ s/$term/<span style="background-color: #ffffff;">$term<\/span>/gi;
+			$props->{keywords} =~ s/$term/<span style="background-color: #ffffff;">$term<\/span>/gi;
+			$props->{question} =~ s/$term/<span style="background-color: #ffffff;">$term<\/span>/gi;
+			$props->{answer} =~ s/$term/<span style="background-color: #ffffff;">$term<\/span>/gi;						
+		}
+
+		$OUT.=<<"+++";
+new_query($props->{id}, '$props->{ticket_no}', '$props->{client_name}', '$props->{user_name}', '$props->{submitted}', '$props->{answered}', '$props->{title}', '$props->{keywords}', '$props->{question}', '$props->{answer}');
++++
+	}
+
+	if(($c{params}->{client_id}>0)||($c{params}->{term}=~/\w/))
+	{
+		$OUT.=<<"+++";
+parent.assign_search_results(query);
++++
+	}
+}
+</script>

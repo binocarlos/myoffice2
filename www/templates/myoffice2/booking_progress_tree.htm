@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<img src="/images/tools/16px/resources.gif" width=16 height=16 align="absmiddle"> = <u>Venue</u><br>
+<br>
+<img src="/images/xtree/cascade.16.gif" width=16 height=16 align="absmiddle"> = <u>Booking</u><br>
+<br>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		top.appContent.page.frames[1].location = loc;
+	\}
+	
+	function viewAll()
+	\{
+		top.appContent.page.frames[1].viewAll();
+	\}
+	
+	function viewVenue(venue_id)
+	\{
+		top.appContent.page.frames[1].viewVenue(venue_id);
+	\}
+	
+	function viewBooking(booking_id)
+	\{
+		top.appContent.page.frames[1].viewBooking(booking_id);
+	\}
+
+var tree = new WebFXTree('{$c{tour}->name} Booking Progress Venues');
+tree.action = "javascript: viewAll();";
+
+{			
+	foreach my $venue (@{$c{tour}->ensure_child_array('venue')})
+	{
+		my $title = $venue->get_city_title;
+		my $venue_id = $venue->get_id;
+		
+		$title =~ s/'/\\'/g;
+		
+		$OUT.=<<"+++";
+var venue$venue_id = new WebFXTreeItem('$title');
+venue$venue_id.icon = '/images/tools/16px/resources.gif';
+venue$venue_id.openIcon = '/images/tools/16px/resources.gif';
+venue$venue_id.action = "javascript: viewVenue($venue_id);";
+
+tree.add(venue$venue_id)
++++
+
+		foreach my $booking (@{$venue->ensure_child_array('booking')})
+		{
+			my $date_title = $booking->get_date_title('created');
+			my $booking_id = $booking->get_id;
+			
+			$OUT.=<<"+++";
+var booking$booking_id = new WebFXTreeItem('$date_title');
+booking$booking_id.icon = '/images/xtree/cascade.16.gif';
+booking$booking_id.openIcon = '/images/xtree/cascade.16.gif';
+booking$booking_id.action = "javascript: viewBooking($booking_id);";
+
+venue$venue_id.add(booking$booking_id);
++++
+		}
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

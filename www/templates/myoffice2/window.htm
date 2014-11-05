@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<TITLE>MyOffice</TITLE>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<style type="text/css">
+<!--
+.statustext \{  font-family: Tahoma, Verdana, Arial; font-size: 12px; color: #990000\}
+-->
+</style>
+{
+	my $browser = Webkit::Browser->new;
+	
+	my $css_file = '/lib/app.css';
+	
+	if($browser->{os} eq 'mac')
+	{
+		$css_file = '/lib/app_mac.css';
+	}
+	
+	$OUT.=<<"+++";
+<link rel="stylesheet" href="$css_file" type="text/css"/>
++++
+}
+<script>
+window.focus();
+window.moveTo(0,0);
+window.resizeTo(screen.availWidth, screen.availHeight);
+
+var href = '{$c{href}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+var appname = '{$c{app_name}}';
+var session_id = '{$c{session_id}}';
+var script = '{$c{script}}';
+
+</script>
+<script src="/lib/myoffice2/window.js"></script>
+</HEAD>
+<body STYLE="background:#D4D0C8; border:0px; margin:0px;">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD><DIV ID="menuhl" STYLE="display:none; width:100%; height:23px; background:#FFFF00; position:absolute; z-index:-2000;"></DIV>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="21" BORDER="0"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">{$c{menu}}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+
+				 <TR>
+					<TD>
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent">
+<IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+<A ONCLICK="application_logout();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A>
+&nbsp;&nbsp;&nbsp;
+<A ONCLICK="go_home();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_home.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Home</A>
+<IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+Current Tour:&nbsp;&nbsp;&nbsp;
+<select class="text_field" style="width:200px;" id="tour_id" name="tour_id" onChange="load_new_tour(this.value);">{$c{tour_options}}</select>					  
+&nbsp;&nbsp;&nbsp;
+<a href="http://www.singalonga.net/wp-content/themes/singalonga/myoffice/processor.php" target="_blank">Update Website...</a>
+
+</TD>
+<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent">{$c{org}->get_logo_tag}</TD>
+</TR>
+</TABLE>
+</TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%">
+		<IFRAME SRC="/htmlhub/frames_double?session_id={$c{session_id}}&frameset_key=myoffice2_homepage" WIDTH="100%" HEIGHT="100%" id="appContent" NAME="appContent" SCROLLING="no" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD></TR></TABLE></TD>
+	 </TR>
+	</TABLE>
+</body>
+</HTML>

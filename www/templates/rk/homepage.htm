@@ -1,0 +1,320 @@
+<style>
+body \{margin:0px;\}
+a \{color:#0000FF\}
+a:hover \{color:#FF0000\}
+</style>
+<script>
+function get_menu_query(query)
+\{
+	var new_loc = href + query;
+	document.location = new_loc;
+
+\}
+</script>
+<body style="padding:10px;">
+
+<div class="panelouter"><div class="panelinner"><div class="panelbody" style="padding:8px;">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  <TD valign="top" width="140"><fieldset style="height:120px;">
+<legend>Queries</legend>
+<div class="seccontent" align="left">
+{
+	$c{to_answer_title} = 'that you still need to answer';
+
+	if($c{org}->is_client)
+	{
+		$c{to_answer_title} = 'that still need answering';
+	}
+
+	$OUT.="";
+}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP">You have <b style="color:#FF0000">{$c{query_count}}</b> queries {$c{to_answer_title}}.</TD>
+</TR>
+<TR>
+  <TD ALIGN="CENTER" VALIGN="BOTTOM" height="50">
+{
+	if($c{org}->is_client)
+	{
+		$OUT.=<<"+++";
+<input type="button" value="Submit Query" class="button" style="width:100px;" onclick="top.get_menu_query('&method=iframe_title_frame&title=Create Query&frame_method=queries_client_add_query&appname=queryhandler');">
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+<input type="button" value="Answer Queries" class="button" style="width:100px;" onclick="top.get_menu_query('&method=iframe_title_frame&title=Current Queries&frame_method=queries_org_home&appname=queryhandler');">
++++
+	}
+}
+		</TD>
+</TR>
+</TABLE>
+</div>
+</fieldset></TD>
+  <TD width="10"></TD>
+  <TD valign="top" width="590"><fieldset style="height:120px;">
+<legend>File Sharing</legend>
+<div class="seccontent" align="left">
+<table border="0" cellpadding="0" cellspacing="0" width="555">
+<tr>
+	<td colspan="5" style="padding-bottom:8px;">The three most recently modified documents are:</td>
+</tr>
+<tr style="padding-bottom:5px;">
+	<td><b>Title</b></td>
+	<td style="padding-left:5px;"><b>Author</b></td>
+	<td style="padding-left:5px;" width="100"><b>Modified</b></td>
+	<td width="70" align="center"><b>Type</b></td>
+	<td style="padding-left:5px;" width="1" rowspan="4" valign="bottom"><input type="button" value="View Files" class="button" style="width:100px;" onClick="top.get_menu_query('&method=iframe_title_frame&title=Files&frame_method=documents_home&appname=fileshare');" name="button"></td>
+</tr>
+{
+	foreach my $document (@{$c{document_array}})
+	{
+		my $title = $document->get_value('title');
+		my $author = $document->get_author_name;
+		my $modified = $document->get_modified_title;
+		my $img = $document->get_small_icon;
+
+		$OUT.=<<"+++";
+<tr style="padding-bottom:2px;">
+<td>$title</td>
+<td style="padding-left:5px;">$author</td>
+<td style="padding-left:5px;">$modified</td>
+<td align="center"><img src="$img"></td>
+</tr>
+
++++
+	}
+}
+</table>
+</div>
+</fieldset></TD>
+</TR>
+</TABLE>
+</div></div></div>
+<br><br>
+<table border=0 cellpadding=5 width=100% height="250">
+<tr valign="top">
+{
+	$c{table_link_array} = undef;
+
+	if($c{user}->admin)
+	{
+		my $org_title = $c{org}->get_value('name');
+
+		my $link=<<"+++";
+<td align="right"><b>$org_title Users :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Add User&frame_method=add_user&appname=rk');">
+		Add User
+	</a><br>
+	<a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Current Users&frame_method=users_home&appname=rk');">
+	Edit Users
+	</a>
+</td>
++++
+		push(@{$c{table_link_array}}, $link);
+	}
+
+	if(!$c{org}->is_client)
+	{
+		if($c{user}->is_privilaged('rk', 'clientms'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Clients :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=clients_tree&frame_method=clients_add_client&appname=clientms');">
+		Add Client
+	</a><br>
+	<a href="javascript:top.get_menu_query('&method=clients_tree&appname=clientms');">
+	Edit Clients
+	</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'queryhandler'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Queries :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Current Queries&frame_method=queries_org_home&appname=queryhandler');">
+View/Edit All Queries
+</a></td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'faqs'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Client FAQ's :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=View FAQs&frame_method=faq_home_client&appname=rk&app_proxy=1');">
+View/Edit FAQ's
+</a><br>
+<a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Add an FAQ&frame_method=faq_add_faq_client&appname=rk&app_proxy=1');">
+Add an FAQ
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'fileshare'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>File Sharing :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Files&frame_method=documents_home&appname=fileshare');">
+View All
+</a><br>
+<a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Upload File&frame_method=documents_add_document&appname=fileshare');">
+Upload New
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'news'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Homepage News :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Current News&frame_method=news_home&appname=news');">
+View/Edit News Items
+</a><br>
+<a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Add News&frame_method=news_add_news&appname=news');">
+Add a News Item
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+
+
+		if($c{user}->is_privilaged('rk', 'faqs'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Pre-Sales  FAQs :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=View FAQs&frame_method=faq_home_normal&appname=rk&app_proxy=1');">
+View/Edit FAQs
+</a><br>
+<a href="javascript:top.get_menu_query('&amp;method=iframe_title_frame&amp;title=Add an FAQ&amp;frame_method=faq_add_faq_normal&appname=rk&app_proxy=1');">
+Add an FAQ
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'sitestatistics'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Website Statistics :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=stats_home&appname=sitemanager');">
+View Statistics
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'emailmanager'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Email :</b></td>
+<td><a href="javascript:top.get_menu_query('&method=email_home&appname=sitemanager');">
+View/Edit Email Accounts
+</a>
+<br>
+<a href="javascript:top.get_menu_query('&method=email_home&main_frame_method=email_add_pop_account_frameset&appname=sitemanager');">
+Add a Mailbox
+</a>
+<br>
+<a href="javascript:top.get_menu_query('&method=email_home&main_frame_method=email_add_alias_frameset&appname=sitemanager');">
+Add an Address
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+	}
+	else
+	{
+		if($c{user}->is_privilaged('rk', 'queryhandler'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>Queries :</B></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Current Queries&frame_method=queries_client_home&appname=queryhandler');">
+View/Edit All Queries
+</a><br>
+<a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Create Query&frame_method=queries_client_add_query&appname=queryhandler');">
+Submit Query
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'faqs'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>FAQs :</B></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=View FAQs&frame_method=faq_client_home&appname=rk&app_proxy=1');">
+View FAQs
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+
+		if($c{user}->is_privilaged('rk', 'fileshare'))
+		{
+			my $link=<<"+++";
+<td align="right"><b>File Sharing :</B></td>
+<td><a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Files&frame_method=documents_home&appname=fileshare');">
+View All
+</a>
+<br>
+<a href="javascript:top.get_menu_query('&method=iframe_title_frame&title=Upload File&frame_method=documents_add_document&appname=fileshare');">
+Upload New
+</a>
+</td>
++++
+
+			push(@{$c{table_link_array}}, $link);
+		}
+	}
+
+	my $col_count = 0;
+
+	foreach my $link (@{$c{table_link_array}})
+	{
+		$col_count++;
+
+		$OUT.=$link;
+
+		if($col_count==3)
+		{
+			$col_count=0;
+
+			$OUT.="</tr><tr valign=top>";
+		}
+	}
+}
+</tr>
+</table>
+
+</body>
+</html>

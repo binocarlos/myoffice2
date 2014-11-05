@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="News" width="140">
+		<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add News&amp;frame_method=news_add_news');"/>
+		<menuitem title="View" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=news_home');"/>
+	</menublock>
+	<menublock title="FAQs" width="140">
+		<menuitem title="Add FAQ" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add an FAQ&amp;frame_method=faq_add_faq_client');"/>
+		<menuitem title="View FAQs" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=View FAQs&amp;frame_method=faq_home_client');"/>
+	</menublock>
+</menu_config>

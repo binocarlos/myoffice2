@@ -1,0 +1,19 @@
+body {background-color:#FFFFFF; margin:10px 20px 10px 10px;}
+td {font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+.subject {font-weight:bold; font-variant:small-caps; padding-left:5px;}
+.group_arrow {background-color:#20437F;}
+.group_td {padding-left:4px; font-weight:bold; color:#FFFFFF; background-color:#48618A; border-width:1px 1px 1px 0px; border-style:solid; border-color:#20437F;}
+.level_arrow {background-color:#6C95DA;}
+.level_td {padding-left:4px; font-weight:bold; color:#000000; background-color:#B2CFFF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#6C95DA;}
+.level_marks {padding:0px 67px 0px 4px; color:#000000; background-color:#B2CFFF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#6C95DA;}
+.level_total {padding:0px 3px 0px 5px; color:#000000; background-color:#B2CFFF; border-width:1px 0px 1px 0px; border-style:solid; border-color:#6C95DA;}
+.level_percentage {padding:0px 7px 0px 4px; color:#000000; background-color:#B2CFFF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#6C95DA;}
+.level_field {text-align:right; padding:0px 2px 0px 0px; width:30px; height:16px; font-family:tahoma,verdana,arial; font-size:11px; margin:0px; border-top:1px solid #404040; border-left:1px solid #404040; border-right:1px solid #D4D0C8; border-bottom:1px solid #D4D0C8;}
+.level_fieldtd {background-color:#6C95DA;}
+.level_required {padding:0px 3px 0px 5px; color:#000000; background-color:#B2CFFF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#6C95DA;}
+.input_arrow {background-color:#6C95DA;}
+.input_td {padding-left:4px; font-weight:bold; color:#000000; background-color:#D8E7FF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#B5CAEC;}
+.input_view {background-color:#D8E7FF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#B5CAEC;}
+.input_marks {padding:0px 7px 0px 4px; background-color:#D8E7FF; border-width:1px 1px 1px 0px; border-style:solid; border-color:#B5CAEC;}
+.input_field {text-align:right; padding:0px 2px 0px 0px; width:30px; height:16px; font-family:tahoma,verdana,arial; font-size:11px; margin:0px; border-top:1px solid #404040; border-left:1px solid #404040; border-right:1px solid #D4D0C8; border-bottom:1px solid #D4D0C8;}
+.input_fieldtd {background-color:#B5CAEC;}

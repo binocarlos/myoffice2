@@ -1,0 +1,158 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function dateUpdated()
+	\{
+
+	\}
+	
+	function validatePupilForm()
+	\{
+		var form = document.pupil_form;
+		
+		if(form.surname.value=="")
+		\{
+			alert('Please enter a surname for the pupil');
+			return false;
+		\}
+		
+		if(form.firstname.value=="")
+		\{
+			alert('Please enter a firstname for the pupil');
+			return false;
+		\}		
+		
+		return true;
+	\}
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="pupil_form" method="POST" action="{$c{script}}" onSubmit="return validatePupilForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="pupils_pupil_form_submit">
+<input type="hidden" name="pupil_id" value="{$c{pupil}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Pupil Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Firstname:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input type="text" name="firstname" value="{$c{pupil}->firstname}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Surname:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input type="text" name="surname" value="{$c{pupil}->surname}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+    </TD>
+  </TR>
+{
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+		<input type="hidden" name="sex" value="m">
+		<input type="hidden" name="sen" value="N">
+		<input type="hidden" name="sen_type" value="">
+		<input type="hidden" name="ethnicity" value="-1">
+		<input type="hidden" name="date_of_birth" value="1/1/2000">
+		<input type="hidden" name="year_left_school" value="0">
++++
+	}
+	else
+	{
+		my $year_left_value = $c{pupil}->year_left_school;
+		my $calendar_value = $c{pupil}->get_calendar_value('date_of_birth');
+		my $ethnicity_value = $c{pupil}->get_ethnicity_options;
+		my $sen_type_options = $c{pupil}->get_sen_type_options;
+		my $sen_options = $c{pupil}->get_sen_options;
+		my $sex_options = $c{pupil}->get_sex_options;
+		
+		$OUT.=<<"+++";  
+  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Sex:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <select name="sex" size="1" style="width:100%;" class="text_field">     
+        $sex_options     
+      </select>
+</TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>SEN:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">
+      <select name="sen" size="1" style="width:100%;" class="text_field">     
+        $sen_options      
+      </select></TD>
+  </TR>
+   <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>SEN Type:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <select name="sen_type" size="1" style="width:100%;" class="text_field">     
+        $sen_type_options      
+      </select>
+</TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Ethnicity:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <select name="ethnicity" size="1" style="width:100%;" class="text_field">     
+        $ethnicity_value 
+      </select>
+</TD>
+  </TR>    
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>DOB:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><INPUT CLASS="text_field" TYPE="TEXT" NAME="date_of_birth" STYLE="width:120px;" READONLY="READONLY" VALUE="$calendar_value"><IMG src="/images/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A style="cursor:hand;" ONCLICK="calendar_click(document.pupil_form.date_of_birth);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Year Left School :</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="year_left_school" type="text" class="text_field" id="year_left_school" style="width:80px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="$year_left_value">
+    </TD>
+  </TR>
++++
+	}
+}
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{pupil}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+{$c{calendar_table}}
+
+<script>
+calendar_callback_obj.onUpdate = dateUpdated;
+</script>
+</body>
+</html>
+
+
+

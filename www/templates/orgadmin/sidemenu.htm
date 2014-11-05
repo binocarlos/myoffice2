@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		parent.page.location = loc;
+	\}
+
+var tree = new WebFXTree('Orgs');
+
+{
+	foreach my $org (@{$c{orgs}})
+	{
+		my $org_id = $org->get_id;
+		my $org_name = $org->get_js_value('name');
+		
+		my $userarr = $org->get_child_array('users');		
+
+		$OUT.=<<"+++";
+var org$org_id = new WebFXTreeItem('$org_name');
+org$org_id.action = "javascript: get_xTree_query('&method=edit_org_details&org_id=$org_id');";
++++
+
+		my $count = @$userarr;
+		
+		if($count==0)
+		{
+			$OUT.=<<"+++";
+org$org_id.icon = "/images/xtree/foldericon.png";
++++
+		}
+
+		$OUT.=<<"+++";
+tree.add(org$org_id);
++++
+		
+		foreach my $user (@$userarr)
+		{
+			my $id = $user->get_id;
+			my $name = $user->get_fullname;
+			$name =~ s/'/\\'/g;
+
+			$OUT.=<<"+++";
+var users$id = new WebFXTreeItem('$name');
+users$id.action = "javascript: get_xTree_query('&method=edit_user_details&users_id=$id');";
+users$id.icon = '/images/holiday/employee.gif';
+
+org$org_id.add(users$id);
++++
+		}
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

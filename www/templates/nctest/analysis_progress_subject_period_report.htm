@@ -1,0 +1,88 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var graphMode = false;
+var selectedCellId = null;
+
+var origBgColors = new Object();
+
+function viewTopicBreakdown(topic_id)
+\{
+	var loc = href + '&method=analysis_progress_topic_period_report&topic_id={$c{report}->{topic_id}}&period_date={$c{report}->{period_date}}';
+	
+	document.location = loc;
+\}
+
+function trRollOver(tr)
+\{
+	origBgColors[tr.id] = tr.bgColor;
+	
+	tr.bgColor = '#ffe5e5';
+\}
+
+function trRollOut(tr)
+\{
+	tr.bgColor = origBgColors[tr.id];
+\}
+
+
+</script>
+
+<table  border="0" cellspacing="1" cellpadding="0">
+  <tr valign="top">
+    <td>
+        <table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+          <tr bgcolor="#FFFFFF">
+            <td colspan="2"><b> {$c{report}->{title}} </b><br>{$c{report}->{params_st}}</td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Period: </td>
+            <td><b style="color:red;">{$c{report}->get_period_title}</b></td>
+          </tr>		  
+          <tr bgcolor="#FFFFFF">
+            <td>Subject: </td>
+            <td><b style="color:red;">{$c{report}->{subject}}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Total NC Score: </td>
+            <td><b style="color:black;">{$c{report}->get_subject_total}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Avg. NC Score:</td>
+            <td><b style="color:black;">{$c{report}->get_subject_avg}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Avg. Level: </td>
+            <td><b style="color:red;">{$c{report}->get_subject_level}</b></td>
+          </tr>
+        </table>
+</td>
+  </tr>
+</table>
+<br>
+<input type="button" class="button" value="Close" onClick="top.close();">&nbsp;
+  <input name="printButton" id="printButton" type="button" class="button" onClick="self.print();" value="Print">
+<br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td><strong>Topic</strong></td>
+    <td><strong>Level</strong></td>
+    <td><strong>NC Score </strong></td>
+  </tr>
+{
+	foreach my $ref (@{$c{report}->{data}})
+	{
+		my $nc_score = $ref->{rounded_avg};
+		my $topic_id = $ref->{topic_id};
+		my $level = $ref->{score_level};
+
+		$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF" id="tr$topic_id">
+    <td>$topic_id</td>
+    <td>$level</td>
+    <td>$nc_score</td>
+  </tr>
++++
+	}
+}
+</table>

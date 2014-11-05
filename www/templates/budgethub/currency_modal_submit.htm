@@ -1,0 +1,201 @@
+<!--#include virtual="/temp_include.htm" -->
+<html>
+<head>
+<title>Field Currency</title>
+<style>
+BODY \{margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+TD \{cursor:default; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.button \{height:23px; width:75px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.section_title \{font-family:tahoma,verdana; font-size:11px; background:#D4D0C8;\}
+.copyfield \{width:100%; vertical-align:top; font-family:tahoma,verdana; font-size:11px; color:#000000; background-color:#d4d0c8; border:0px;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px;\}
+.text_field2 \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; BORDER-BOTTOM: #FFDEAD solid 2px; BORDER-LEFT: #C07300 solid 2px; BORDER-RIGHT: #FFDEAD solid 2px; BORDER-TOP:  #C07300 solid 2px; background-color:#FFF5E6;\}
+</style>
+<script>
+
+	var selectedRow = null;
+	var manualMode = false;
+	
+	function select_row(id)
+	\{
+		if(selectedRow)
+		\{
+			selectedRow.bgColor = '';
+		\}
+		
+		selectedRow = document.getElementById(id);
+		
+		selectedRow.bgColor = '#ddddff';
+	\}
+	
+	function set_current_rate()
+	\{
+		manualMode = false;
+		document.currencyform.currency_rate.value = {$c{current_rate}};	
+	\}
+	
+	function set_manual_rate()
+	\{
+		manualMode = true;
+	\}
+	
+	function set_previous_rate(value)
+	\{
+		manualMode = false;
+		document.currencyform.currency_rate.value = value;
+	\}
+
+	function validate_form()
+	\{
+		if(!manualMode)
+		\{
+			return true;
+		\}
+
+		var value = parseFloat(document.currencyform.manual_rate.value);
+		
+		if(isNaN(value))
+		\{
+			setStatus('Please enter a manual rate');
+			
+			return false;
+		\}
+		
+		document.currencyform.currency_rate.value = value;
+		
+		return true;
+	\}
+		
+	function setStatus(text)
+	\{
+		document.getElementById('statustext').innerText = text;
+		
+		setTimeout("clearStatus();", 5000);
+	\}
+	
+	function clearStatus()
+	\{
+		document.getElementById('statustext').innerText = '';
+	\}
+
+			
+	function cancel_form()
+	\{
+		window.close();
+	\}
+	
+</script>
+</head>
+<body bgcolor="#D4D0C8">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%">
+<tr><td width="100%" height="100%" align="center" valign="middle">
+<form name="currencyform" id="currencyform" method="GET" action="{$c{script}}" onSubmit="return validate_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="field_currency_modal_submit_confirm">
+<input type="hidden" name="current_currency" value="{$c{current_currency}}">
+<input type="hidden" name="field_title" value="{$c{params}->{title}}">
+<input type="hidden" name="currency_to_id" value="{$c{currency_to_id}}">
+<input type="hidden" name="currency_rate" value="{$c{current_rate}}">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  
+<TD WIDTH="100%" HEIGHT="102" ALIGN="LEFT" VALIGN="TOP">
+ <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title">
+&nbsp;Choose Field Currency&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR>
+<TD width="100%" align="left">
+
+
+<table border="0" cellspacing="0" cellpadding="3">
+
+<tr align="left" valign="top">
+<td>Title: </td>
+<td colspan="2">
+{$c{params}->{title}}
+</td>
+</tr>
+<tr align="left" valign="top">
+<td colspan="3" height=10>
+
+</td>
+</tr>
+<tr align="left" valign="top">
+<td colspan="3">
+Converting {$c{from_title}} to {$c{to_title}}
+</td>
+</tr>
+<tr align="left" valign="top">
+<td colspan="3" height=10>
+
+</td>
+</tr>
+<tr align="left" valign="top" id="current_rate_tr">
+<td>Current Rate:</td>
+<td>{$c{current_rate}}</td>
+<td>
+<input type="radio" name="selected" onClick="select_row('current_rate_tr');set_current_rate();" checked>
+</td>
+</tr>
+<tr align="left" valign="top" id="manual_rate_tr">
+<td>Manual Rate:</td>
+<td>
+<input type="text" class="text_field" name="manual_rate" id="title" value="" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">
+
+</td>
+<td>
+<input type="radio" name="selected"  onClick="select_row('manual_rate_tr');set_manual_rate();">
+</td>
+</tr>
+{
+	my $trid = 0;
+	
+	my $prevs = $c{previous_currencies};
+	
+	foreach my $currency (@$prevs)
+	{
+		my $rate = $currency->{rate};
+		$trid++;
+		
+		$OUT.=<<"+++";
+<tr align="left" valign="top" id="previous_rate_tr$trid">
+<td>Previous Rate:</td>
+<td>$rate
+</td>
+<td>
+<input type="radio" name="selected"  onClick="select_row('previous_rate_tr$trid');set_previous_rate($rate);">
+</td>
+</tr>
++++
+	}
+}
+<tr align="left" valign="top">
+<td colspan="3"><span style="color:red;" id="statustext"></span></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+</TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+
+ </TD>
+</TR>
+<TR>
+  <TD ALIGN="RIGHT"><IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<input type="button" class="button" value="Cancel" onclick="cancel_form();">
+<img src="/images/clear.gif" width="8" height="1" align="absmiddle">
+<input type="submit" class="button" value="Apply" name="Submit">
+</TD>
+</TR>
+</TABLE>
+</form>
+
+</td>
+</tr>
+</table>
+<script>
+select_row('current_rate_tr');
+</script>
+</body>
+</html>

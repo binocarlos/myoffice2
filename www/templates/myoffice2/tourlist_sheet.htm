@@ -1,0 +1,556 @@
+<!--#include virtual="temp_include.htm" -->
+<script src="/lib/myoffice2/lib.js"></script>
+<script>
+	var bookings = new Object();
+	var showings = new Object();
+	var tourdates = new Object();
+	var printReqs = new Object();
+	
+	function printPage()
+	\{
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+	self.print();
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	alert("To print this page on a Mac, please follow these instructions...\\n\\n1. Hold down control and right click on the page.\\n\\n2.Click on -Open Frame in New Window- from the menu.\\n\\n3.Once the new window has opened, use the File -> Print menu option.");
++++
+}
+	\}	
+	
+	function getShowingMultiDateText(showing_id, field)
+	\{		
+		var showing = showings[showing_id];
+		
+		return getMultiDateNoteText(showing[field]);
+	\}		
+	
+	function editShowingMultiDateNote(showing_id, field, td)
+	\{
+		var showing = showings[showing_id];
+				
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, showing[field]);
+		
+		if(!ret) \{ return; \}
+		
+		showing[field] = ret;
+		
+		parent.title.addShowingField(showing.id, field, getMultiDateNoteReturn(ret));
+		td.innerHTML = getMultiDateNoteText(showing[field]);
+	\}		
+	
+	function sponsorshipChange(tourdate_id, gui)
+	\{
+		var tourdate = tourdates[tourdate_id];
+		
+		if(gui.checked)
+		\{
+			tourdate.sponsorship = 'yes';
+		\}
+		else
+		\{
+			tourdate.sponsorship = 'no';
+		\}
+		
+		parent.title.addTourdateField(tourdate_id, 'sponsorship', tourdate.sponsorship);		
+	\}
+	
+	function editPackSent(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+			
+		var ret = get_modal_window_return('&method=editors_multidate&value=' + booking.pack_sent, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, 'pack_sent', ret.value);
+		td.innerHTML = ret.title;
+		booking.pack_sent = ret.value;
+	\}
+	
+	function editEPKDate(showing_id, td)
+	\{
+		var showing = showings[showing_id];
+			
+		var ret = get_modal_window_return('&method=editors_date&date=' + showing.epk_date, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addShowingField(showing_id, 'epk', ret);
+		td.innerHTML = ret;
+		showing.epk_date = ret;
+	\}		
+	
+	function editVisit(showing_id)
+	\{
+		top.get_menu_iframe_query('showing_form&showing_id=' + showing_id, 'Edit Visit');
+	\}
+	
+	function editTrDate(showing_id, td)
+	\{
+		var showing = showings[showing_id];
+			
+		var ret = get_modal_window_return('&method=editors_daterange&from=' + showing.technical_rider_date + '&to=' + showing.technical_rider_date_rcvd + '&from_title=Sent&to_title=Rcvd', 500, 430);
+		
+		if(!ret) \{ return; \}
+		parent.title.addShowingField(showing_id, 'technical_rider_dates', ret.to + ':' + ret.from);				
+
+		td.innerHTML = 'Sent:' + ret.from + '<br>Rcvd:' + ret.to;
+		showing.technical_rider_date = ret.from;
+		showing.technical_rider_date_rcvd = ret.to;		
+	\}	
+	
+	function writeTitles()
+	\{
+		document.write(getHTMLBlock('titles_row'));	
+	\}
+	
+	function writeNonBookedTourdate(hash)
+	\{
+		document.write(getHTMLBlock('non_booked_tourdate_row', hash));		
+	\}
+	
+	function writeTourdate(hash)
+	\{
+		if(!bookings[hash.booking_id])
+		\{
+			var booking = new Object();
+			booking.id = hash.booking_id;
+			booking.pack_sent = hash.pack_sent;
+			
+			bookings[booking.id] = booking;
+		\}
+		
+		if(!printReqs[hash.print_req_id])
+		\{
+			var printReq = new Object();
+			printReq.id = hash.print_req_id;
+			printReq.print_run_id = hash.print_run_id;
+			
+			printReqs[printReq.id] = printReq;
+		\}
+		
+		if(!showings[hash.showing_id])
+		\{
+			var showing = new Object();
+			showing.id = hash.showing_id;
+			showing.technical_rider_date = hash.technical_rider_date;
+			showing.technical_rider_date_rcvd = hash.technical_rider_date_rcvd;
+			showing.epk_date = hash.epk_date;
+			
+			showings[showing.id] = showing;
+		\}
+		
+		if(!tourdates[hash.tourdate_id])
+		\{
+			var tourdate = new Object();
+			tourdate.id = hash.tourdate_id;
+			tourdate.sponsorship = hash.sponsorship;
+			tourdate.notes = hash.js_notes;
+			
+			tourdates[tourdate.id] = tourdate;
+		\}
+		
+		document.write(getHTMLBlock('tourdate_row', hash));		
+	\}
+	
+	function editNotes(tourdate_id, td)
+	\{
+		var tourdate = tourdates[tourdate_id];
+		//openWindow(href + '&method=editors_notes', 500, 430);
+		//return;
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, tourdate.notes);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addTourdateField(tourdate_id, 'general_notes', ret.value);
+		td.innerHTML = ret.title;
+		tourdate.notes = ret.value;
+	\}	
+	
+	function writeMonth(hash)
+	\{
+		document.write(getHTMLBlock('month_row', hash));	
+	\}
+	
+	function writeDate(hash)
+	\{
+		document.write(getHTMLBlock('date_row', hash));	
+	\}	
+	
+	function viewPrintSheet(id)
+	\{
+		var ret = get_modal_window_return('&method=print_assign_print_run&showing_id=' + id, 700, 530);	
+		
+		if(ret)
+		\{
+			if(ret.mode=='view')
+			\{
+				top.get_double_frameset('myoffice2_print&page_method=print_sheet&print_run_id=' + ret.id);
+			\}
+			else
+			\{
+				var td = document.getElementById('printTd_' + id);
+				var bg = '#ffe5e5';
+				
+				if(ret.count>0)
+				\{
+					bg = '#e5ffe5';
+				\}
+
+				td.style.backgroundColor = bg;
+			\}
+		\}	
+	\}
+	
+	function editStaff(id, td)
+	\{
+		var ret = get_modal_window_return('&method=tourlist_assign_staff&tourdate_id=' + id, 650, 560);	
+		
+		if(ret)
+		\{
+			td.innerHTML = ret;
+		\}
+	\}
+	
+	function viewDealSheet(id)
+	\{
+		document.location = href + '&method=booking_deal_summary&showing_id=' + id;
+	\}
+	
+	function createDealSheet(id)
+	\{
+		if(window.confirm('Are you sure you want to ceate a dealsheet from this entry?'))
+		\{
+			top.get_menu_iframe_query('booking_create_dealsheet&booking_id=' + id, 'Create Deal Sheet');
+		\}
+	\}
+	
+	function downloadExcel()
+	\{		
+		window.open(href + '&method=tourlist_excel_sheet&from={$c{params}->{from}}&to={$c{params}->{to}}');
+	\}	
+	
+</script>
+<body onunload="if(parent.title)\{parent.title.resetForm();\}">
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td><table  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><img src="/images/tools/16px/paste.gif" width="16" height="16" align="absmiddle"> = <u>View Dealsheet</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/xtree/tilevertically.16.gif" width="16" height="16" align="absmiddle"> = <u>Assign Print Run</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/xtree/tilehorizontally.16.gif" width="16" height="16" align="absmiddle"> = <u>Change Print Run</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/xtree/cascade.16.gif" width="16" height="16" align="absmiddle"> = <u>View Print Run</u> </td>
+        <td width="30">&nbsp;</td>		
+        <td><span class="editTd"><img src="/images/tools/16px/search.gif" width="16" height="16" align="absmiddle"></span> = <u>Edit Visit </u> </td>
+        <td width="30">&nbsp;</td>		
+        <td><input type="button" value="Print" class="button" onClick="printPage();"></td>		
+        </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td>  <table border=0 cellpadding=3 cellspacing="0"><tr>
+<td><input type="button" class="button" value="View Booking Progress Sheet" onClick="top.get_double_frameset('myoffice2_booking_progress');"></td>
+<td width=30></td>  
+<td><input type="button" class="button" value="View Booking Penciled Sheet" onClick="top.get_double_frameset('myoffice2_booking_penciled');"></td>
+<td width=30></td>  
+<td><input type="button" class="button" id="excelButton" onClick="downloadExcel();" value="Download Excel File"></td>
+  </tr></table></td></tr>   
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td class="welcome"><table width="1140"  border="0" cellpadding="3" cellspacing="1" bgcolor="#e5e5e5">
+{
+	my $month_row=<<"+++";
+      <tr bgcolor="#FFFFFF">
+        <td colspan=12 style="font-size:12px;color:red;font-weight:bold;">__month_title__</td>
+        </tr>
++++
+
+	my $date_row=<<"+++";
+        <tr style="__row_style__">
+        <td width="40" align="right" style="__style__">__day_title__</td>		  
+        <td width="80" align="left" style="__style__">__date_title__</td>
+		<td></td>
+        <td></td>
+        <td></td>		
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>	
+        <td></td>						
+        <td width="50"></td>
+        </tr>
++++
+
+	my $titles_row=<<"+++";
+		 <tr bgcolor="#f0f0f0">
+        <td colspan=2 style="color:#888888;" align=right>Tour</td>				 
+        <td style="color:#888888;">Time</td>  		
+        <td style="color:#888888;">Venue</td>
+        <td style="color:#888888;">DS</td>
+	    <td style="text-decoration:underline;">TR</td>
+	    <td width="60" style="color:#888888;">Print</td>
+	    <td width="60" style="color:#888888;">Own Proj</td>
+	    <td width="60" style="color:#888888;">On Sale</td>
+	    <td width="200" style="text-decoration:underline;">Staff</td>	
+	    <td width="100" style="text-decoration:underline;">Notes</td>				
+	    <td width="50">&nbsp;</td>
+	    </tr>	
++++
+
+	my $tourdate_row=<<"+++";
+	        <tr valign="top" bgcolor="#FFFFFF">  
+		<td colspan="2" align="right" style="color:blue;">__tour_title__</td>		
+        <td align="right" style="color:green;">__time_title__</td>				
+        <td width="250" class="noOverflowX"><div class="noOverflowX" style="width:250px;"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></div></td>
+        <td width="100" align=center style="font-size:8pt;" nowrap><a href="javascript:viewDealSheet(__showing_id__);"><img src="/images/tools/16px/paste.gif" width="16" height="16" border="0" align="absmiddle">__deal_sheet_date__</a></td>
+		<td width="140" align="left">
+		
+		    <table width=100% border=0 cellpadding="5" cellspacing="1" bgcolor=#cccccc>
+		<tr bgcolor=#ffffff>			
+		<td width="1" valign="top">Sent:</td>
+		<td width="100%" align="left" class="editTd" onClick="editShowingMultiDateNote(__showing_id__, 'technical_rider_date', document.getElementById('techridertitle__tourdate_id__'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="techridertitle__tourdate_id__">__technical_rider_title__ &nbsp;</span></td>
+		</tr>
+		<tr bgcolor=#ffffff>
+		<td valign="top">Rcvd:</td>
+		<td width="100%" align="left" class="editTd" onClick="editShowingMultiDateNote(__showing_id__, 'technical_rider_date_rcvd', document.getElementById('techriderrcvdtitle__tourdate_id__'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="techriderrcvdtitle__tourdate_id__">__technical_rider_rcvd_title__ &nbsp;</span></td>
+		</tr>		
+		</table>
+		
+		</td>
+        <td align="center" style="__print_style__" id="printTd___showing_id__">
+         
+           <a href="javascript:viewPrintSheet(__showing_id__);"><span style="text-decoration:none;"><img src="/images/xtree/cascade.16.gif" width="16" height="16" border="0" align="absmiddle">&nbsp;</span>View</a>
+         </td>
+        <td><img src="/images/holiday/__projector_image__.gif" width="14" height="14"></td>
+        <td><img src="/images/holiday/__onsale_image__.gif" width="14" height="14"></td>
+<td width="200" align="left" class="editTd" style="color:#888888;cursor:hand;" onClick="editStaff(__tourdate_id__, document.getElementById('staff__tourdate_id__'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="staff__tourdate_id__">__staff_string__</span></td>
+<td width="100" align="left" class="editTd" style="color:#888888;cursor:hand;" onClick="editNotes(__tourdate_id__, document.getElementById('notes___tourdate_id__'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="notes___tourdate_id__">__notes__</span></td>
+
+        <td width="50" align="left" class="editTd" style="color:#888888;cursor:hand;" onClick="editVisit(__showing_id__, this);" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><img src="/images/tools/16px/search.gif" width="16" height="16"></td>
+        
+        </tr>
++++
+
+	my $non_booked_tourdate_row=<<"+++";
+	        <tr valign="top" bgcolor="#ffe5e5">  
+		<td colspan="2" align="right" style="color:blue;">__tour_title__</td>		
+        <td align="right" style="color:green;">__time_title__</td>				
+        <td width="250" class="noOverflowX"><div class="noOverflowX" style="width:250px;"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></div></td>
+        <td width="80" align=center style="font-size:8pt;"><a href="javascript:createDealSheet(__booking_id__);"><span style="text-decoration:none;"><img src="/images/tools/16px/paste.gif" width="16" height="16" border="0" align="absmiddle">&nbsp;</span>Create</a></td>
+		<td colspan="6" bgcolor="#FFFFFF">&nbsp;</td>
+		</tr>
++++
+
+	$month_row = Webkit::AppTools->js_quote($month_row);
+	$date_row = Webkit::AppTools->js_quote($date_row);
+	$tourdate_row = Webkit::AppTools->js_quote($tourdate_row);
+	$titles_row = Webkit::AppTools->js_quote($titles_row);
+	$non_booked_tourdate_row = Webkit::AppTools->js_quote($non_booked_tourdate_row);	
+	
+	$OUT.=<<"+++";
+	<script>
+addHTMLBlock('month_row', '$month_row');
+addHTMLBlock('date_row', '$date_row');
+addHTMLBlock('tourdate_row', '$tourdate_row');
+addHTMLBlock('titles_row', '$titles_row');
+addHTMLBlock('non_booked_tourdate_row', '$non_booked_tourdate_row');
++++
+
+	my $from_date = $c{tour}->{_tourlist_from_date};
+	my $to_date = $c{tour}->{_tourlist_to_date};
+
+	my $current_month;
+	my $current_date = $from_date->clone;
+	
+	while($current_date->epoch_days<=$to_date->epoch_days)
+	{
+		my $month = $current_date->Month;
+		my $date_title = $current_date->get_string;
+		
+		if($month!=$current_month)
+		{
+			$current_month = $month;
+			my $month_name = Webkit::Date->get_monthname($month);
+			my $year = $current_date->Year;
+			
+			my $month_js_hash = Webkit::AppTools->js_hash({
+				month_title => $month_name.' '.$year });
+		
+		$OUT.=<<"+++";
+
+writeMonth($month_js_hash);
++++
+		}
+		
+		my $date_title = $current_date->get_string;
+		my $day_title = $current_date->week_day_title;
+		
+		my $tourdates = $c{tour}->{_tourlist_map}->{$current_date->epoch_days};
+
+		my $style = 'color:#888888;';
+		my $row_style = 'background-color:#f5f5ff;';
+		
+		my $has_tourdates_boolean = undef;
+		
+		if($tourdates)
+		{
+			foreach my $tourdate (@$tourdates)
+			{
+				my $booking = $c{tour}->get_child('booking', $tourdate->booking_id);			
+			
+				if($booking->date_called !~ /=Pencil Booking Failed/i)
+				{
+					$has_tourdates_boolean = 1;
+				}
+			}
+		}
+		
+		if($has_tourdates_boolean)
+		{
+			$style = 'color:red;';
+			$row_style = 'background-color:#ffffff;';
+		}
+		
+		my $date_js_hash = Webkit::AppTools->js_hash({
+				row_style => $row_style,
+				style => $style,
+				date_title => $date_title,
+				day_title => $day_title });
+		
+		$OUT.=<<"+++";
+
+writeDate($date_js_hash);
++++
+
+		if($has_tourdates_boolean)
+		{
+			$OUT.=<<"+++";
+
+writeTitles();
++++
+		}
+
+		foreach my $tourdate (@$tourdates)
+		{
+			my $showing = $c{tour}->get_child('showing', $tourdate->showing_id);
+			my $booking = $c{tour}->get_child('booking', $tourdate->booking_id);			
+			my $venue = $c{tour}->get_child('venue', $booking->venue_id);
+
+			my $tour = $c{org}->get_child('tour', $tourdate->tour_id);
+
+			$OUT.=<<"+++";
+//FOUND TOURDATE!!!
++++
+
+			if(!$showing)
+			{
+				#if($booking->date_called =~ /=Pencil Booking Failed/i) { next; }
+
+				my $tourdate_js_hash = Webkit::AppTools->js_hash({
+					tour_title => $tour->name,
+					time_title => $tourdate->get_time_title,
+					_tourdate_id => $tourdate->get_id,
+					_booking_id => $booking->get_id,
+					_venue_id => $venue->get_id,
+					venue_title => $venue->get_city_title.$showing });				
+					
+					$OUT.=<<"+++";
+
+writeNonBookedTourdate($tourdate_js_hash);
++++
+			}
+			else
+			{
+				my $deal = $c{tour}->get_child('deal', $showing->deal_id);
+				
+				my $sponsorship_checked = '';
+			
+				if($tourdate->is_sponsored)
+				{
+					$sponsorship_checked = ' CHECKED';
+				}
+			
+				my $print_style = 'background-color:#ffe5e5;';
+			
+				if($showing->get_child_count('print_req')>0)
+				{
+					$print_style = 'background-color:#e5ffe5;';
+				}
+			
+				my $projector_image = 'cross';
+			
+				if($deal->has_projector)
+				{
+					$projector_image = 'tick';
+				}
+				
+				my $onsale_image = 'cross';
+				
+				if($showing->is_onsale)
+				{
+					$onsale_image = 'tick';
+				}
+			
+				my $staff_string = $tourdate->get_staff_string($c{tour}->get_staff_hash);
+				
+				my $technical_rider_date = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($showing->technical_rider_date);
+				my $technical_rider_date_rcvd =  Webkit::MyOffice2::Admin->editors_multidatenote_js_value($showing->technical_rider_date_rcvd);
+				
+				my $tourdate_js_hash = Webkit::AppTools->js_hash({
+					staff_string => $staff_string,
+					projector_image => $projector_image,
+					onsale_image => $onsale_image,
+					print_style => $print_style,
+					_technical_rider_date => $technical_rider_date,
+					_technical_rider_date_rcvd => $technical_rider_date_rcvd,
+					technical_rider_title => $showing->get_technical_rider_title('<br>', 'color:blue'),
+					technical_rider_rcvd_title => $showing->get_technical_rider_rcvd_title('<br>', 'color:blue'),
+					js_notes => $tourdate->get_js_value('general_notes'),
+					notes => $tourdate->get_html_value('general_notes'),
+					epk_date => $showing->get_epk_title,
+					tour_title => $tour->name,
+					deal_sheet_date => $deal->created_title,
+					time_title => $tourdate->get_time_title,
+					pack_sent => $booking->pack_sent,
+					pack_sent_title => $booking->get_multidate_title('pack_sent', ',<br>'),
+					_tourdate_id => $tourdate->get_id,
+					_showing_id => $showing->get_id,
+					_booking_id => $booking->get_id,
+					_deal_id => $deal->get_id,
+					_venue_id => $venue->get_id,
+					sponsorship_checked => $sponsorship_checked,
+					venue_title => $venue->get_city_title });
+		
+				$OUT.=<<"+++";
+
+writeTourdate($tourdate_js_hash);
++++
+			}
+		}
+		
+		$current_date->epoch_days(1);
+	}
+	
+	$OUT.=<<"+++";
+</script>
++++
+}
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>
+
+
+

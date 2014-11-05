@@ -1,0 +1,130 @@
+<HTML>
+
+
+<HEAD>
+
+
+<TITLE>BudgetHub</TITLE>
+
+<style type="text/css">
+<!--
+.statustext \{  font-family: Tahoma, Verdana, Arial; font-size: 12px; color: #990000\}
+-->
+</style>
+<script src="/lib/budgethub/app.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="/lib/app.css">
+
+
+<script>
+
+			var href = '{$c{href}}';
+			var session_id = '{$c{session_id}}';
+			var script = '{$c{script}}';
+
+
+		</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/lib/holiday/norightclick.js"></SCRIPT>
+
+
+</HEAD>
+
+<body topmargin=0 rightmargin=0 leftmargin=0 bottommargin=0 marginwidth=0 marginheight=0 STYLE="background:#D4D0C8; border:0px; margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px;">
+<font class="statustext"></font>
+
+<p>
+<script src="/lib/menu_code.js"></script>
+
+</p>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+
+	 <TR>
+
+		<TD>
+
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0">
+
+			<TR>
+
+			 <TD>
+
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+
+				 <TR>
+
+					<TD><DIV ID="menuhl" STYLE="display:none; width:100%; height:23px; background:#FFFF00; position:absolute; z-index:-2000;"></DIV>
+
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+
+						<TR>
+
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="1" BORDER="0"><IMG SRC="/images/menus/menu_left.gif" WIDTH="3" HEIGHT="18" BORDER="0" ALIGN="absmiddle"></TD>
+
+						 <TD WIDTH="100%">
+
+<script>
+
+{$c{menu}}
+
+</script>
+
+</TD>
+
+						</TR>
+
+					 </TABLE></TD>
+
+				 </TR>
+
+				 <TR>
+
+					<TD>
+
+					 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+
+						<TR>
+
+
+<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="5" HEIGHT="37" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="top.window.close();"><IMG NAME="signout" SRC="/images/menus/menu_signout.gif" WIDTH="78" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff"></A><IMG SRC="/images/menus/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+
+						 <IMG SRC="/images/menus/clear.gif" WIDTH="30" HEIGHT="8" BORDER="0" ALIGN="ABSMIDDLE">
+						 <IFRAME SRC="{$c{href}}&method=save_form" WIDTH="1" HEIGHT="1" NAME="save" SCROLLING="no" FRAMEBORDER="no" STYLE="display:none;"></IFRAME>
+						 <span class="statustext" id="statustext"></span>
+						 </TD>
+
+						 <TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent"><IMG NAME="logo" SRC="/images/budgethub/logo_sm.gif" WIDTH="75" HEIGHT="42" BORDER="0"></TD>
+
+						</TR>
+
+					 </TABLE></TD>
+
+				 </TR>
+
+				</TABLE></TD>
+
+			</TR>
+
+		 </TABLE></TD>
+
+	 </TR>
+
+	 <TR>
+
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+
+	 </TR>
+
+	 <TR>
+
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%"><IFRAME SRC="{$c{href}}&method=home_page" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="auto" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD></TR></TABLE></TD>
+
+	 </TR>
+
+	</TABLE>
+
+</body>
+
+</HTML>

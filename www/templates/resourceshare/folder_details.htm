@@ -1,0 +1,627 @@
+<!--#include virtual="temp_include.htm" -->
+<script src="/wk/lib/formhelp.js">
+</script>
+<script>
+	var currentSection = 'general_info';
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}
+	
+	var helptext = new Object();
+
+	helptext.title = 'Enter the title to display next to the folder';
+	helptext.notes = 'Enter the comment to accompany the folder';
+	helptext.access_code = 'Select the default security setting';
+
+	function validate_folderform()
+	\{
+		var form = document.folderform;
+
+		if(form.title.value=='')
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a Title';
+
+			return false;
+		\}
+		
+		applyRichTextValue();		
+		form.view_text.value = get_keywords_packet();
+		submit_security_form();
+		
+		return true;
+	\}
+	
+	var keyword_hash = new Object();
+
+	var new_keyword_id = 1;
+
+	function new_keyword(id, word, value)
+	\{
+		if(!id)
+		\{
+			id = 'new' + new_keyword_id;
+			new_keyword_id++;
+		\}
+
+		var keyword = new Object();
+		keyword.id = id;
+		keyword.word = word;
+		keyword.value = value;
+
+		keyword_hash[keyword.id] = keyword;
+	\}
+{
+	foreach my $keyword (@{$c{keyword_array}})
+	{
+		my $id = $keyword->{id};
+		my $word = $keyword->{word};
+		my $value = $keyword->{value};
+		
+		$value =~ s/'/\\'/g;
+
+		$OUT.=<<"+++";
+new_keyword($id, '$word', '$value');
++++
+	}
+}
+
+	function get_keywords_packet()
+	\{
+		var packet = "";
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				packet += keyword.word + "=" + keyword.value + "\n";
+			\}
+		\}
+
+		return packet;
+	\}
+
+	function create_keyword()
+	\{
+		var new_word = document.getElementById('new_word');
+		var existing_word = document.getElementById('existing_word');
+		var value = document.getElementById('keyword_value');
+
+		var word = '';
+
+		if(new_word.value!='')
+		\{
+			word = new_word.value;
+		\}
+		else
+		\{
+			word = existing_word.value;
+		\}
+
+		if(word=='')
+		\{
+			
+			return;
+		\}
+
+		if(value.value=='')
+		\{
+			
+			return;
+		\}
+
+		new_keyword(null, word, value.value);
+
+		apply_keyword_table();
+
+		new_word.value = '';
+		value.value = '';
+	\}
+
+	function apply_keyword_table()
+	\{
+		var elem = document.getElementById('keywords_td');
+		
+		if(elem==null) \{ return; \}
+		
+		var html = get_keyword_table();
+
+		elem.innerHTML = html;
+	\}
+
+	function delete_keyword(id)
+	\{
+		var keyword = keyword_hash[id];
+
+		keyword.deleted = true;
+
+		apply_keyword_table();
+	\}
+
+	function get_keyword_table()
+	\{
+		var table = '<table width=100% border=0 cellspacing=0 cellpadding=0>';
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				var keyword_row = 	'<tr><td align=left valign=bottom class="dottedline">'
+								+ '<font class="keyword">' + keyword.word + ' = '
+								+	keyword.value + '&nbsp;</font></td>'
+								+	'<td align=right width=16>'
+								+	'<a style="cursor:hand;" onClick="delete_keyword(\'' + keyword.id + '\');">'
+								+	'<img alt="Delete Keyword" src="/wk/images/icons/16/recyclebin.gif" width=16 height=16 border=0>'
+								+	'</a></td></tr>';
+
+				table += keyword_row;
+			\}
+		\}
+
+		table += '</table>';
+
+		return table;
+	\}
+	
+	function existing_value_changed(select)
+	\{
+		var value = select.value;
+
+		if(value!="-1")
+		\{
+			document.getElementById('keyword_value').value = value;
+		\}
+	\}
+
+	function existing_keyword_changed(select)
+	\{
+		var value = select.value;
+
+		var option_text = '<select onChange="existing_value_changed(this);" size="1" style="width:140px;" class="text_field" name="existing_value" id="existing_value" onFocus="" onBlur="">';
+		option_text += '<option value="-1">&#151;&#151;&#151;&#151;&#151;</option>';
+
+		if(value!="-1")
+		\{
+			var arr = keyword_values[value];
+
+			if(arr)
+			\{
+				for(var i=0; i<arr.length; i++)
+				\{
+					var value = arr[i];
+
+					option_text += '<option value="' + value + '">' + value + '</option>';
+				\}
+			\}
+		\}
+
+		option_text += '</select>';
+
+		document.getElementById('existing_value_span').innerHTML = option_text;
+	\}
+	
+	function extra_option_changed(gui, text_id)
+	\{
+		var value = gui.value;
+		
+		if((value!='')&&(value!='-1'))
+		\{
+			document.getElementById(text_id).value = value;
+		\}
+	\}	
+	
+</script>
+
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="top">
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<script type="text/javascript" src="/wk/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="folderform" onSubmit="return validate_folderform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_folder_form_submit">
+<input type="hidden" name="folder_id" value="{$c{folder}->get_id}">
+<input type="hidden" name="view_text" value="">
+<input type="hidden" name="access_code" id="access_code" value="{$c{folder}->access_code}">
+<input type="hidden" name="from_website" value="{$c{params}->{from_website}}">
+<input type="hidden" name="privilage_packet" id="privilage_packet" value="">
+<input type="hidden" name="rich_text" id="rich_text" value="">
+<input type="hidden" name="folder_path" id="folder_path" value="{$c{params}->{folder_path}}">
+
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="general_info" selected>General Info</option>
+{
+		if($c{user}->admin)
+		{
+			$OUT.=<<"+++";
+<option value="access_control">Access Control</option>
++++
+		}
+
+		if($c{website})
+		{
+			$OUT.=<<"+++";
+<option value="webpage">Website Display</option>
++++
+		}
+
+		$OUT.=<<"+++";
+<option value="webpage_text">Webpage Text</option>
++++
+
+		if(($c{folder}->is_virtual)&&($c{folder}->exists))
+		{
+			$OUT.=<<"+++";
+<option value="resource_mapping">Keyword Mapping</option>
++++
+		}
+}
+</select>
+</td>
+<td align="left" valign=top>
+<!--
+
+
+	FOLDER DETAILS
+	
+	
+	-->
+<span id="general_info_section" style="display:inline;">	
+<b>General Info</b><br><br>
+<table width="96%" border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">{$c{folder}->entity_title} Title:&nbsp;</td>
+<td align="LEFT"><input type="text" name="title" value="{$c{folder}->get_value('title')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:300px;"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+{
+	if(!$c{folder}->is_forum)
+	{
+		my $link = $c{folder}->url_link;
+		
+		$OUT.=<<"+++";
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Link To:&nbsp;</td>
+<td align="LEFT"><input type="text" name="url_link" value="$link" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:300px;"></td>
+</tr>
++++
+	}
+}
+</table><br>
+<br>
+<b>Resource Ordering</b><br><br>
+<table width="96%" border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Order On Field:&nbsp;</td>
+<td align="LEFT"><input type="text" id="order_field" name="order_field" value="{$c{folder}->get_order_by_field_field}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:300px;"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Reverse:&nbsp;</td>
+<td align="LEFT"><span style="width:50px;"><input type="radio" id="order_reverse" name="order_reverse" value="n" {$c{folder}->get_order_by_field_reverse_checked('n')}> No </span>- <input type="radio" name="order_reverse" value="y" {$c{folder}->get_order_by_field_reverse_checked('y')}> Yes</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Type:&nbsp;</td>
+<td align="LEFT"><span style="width:50px;"><input type="radio" id="order_type" name="order_type" value="t" {$c{folder}->get_order_by_field_type_checked('t')}> Text </span>- <input type="radio" name="order_type" value="n" {$c{folder}->get_order_by_field_type_checked('n')}> Numbers</td>
+</tr>
+</table>
+</span>
+
+<!--
+
+
+	WEBSITE LAYOUT
+	
+	
+	-->
+{
+	if($c{website})
+	{
+		my $website = $c{website};
+		
+		my $layout_options = $website->get_layout_options($c{folder});	
+		
+		$OUT.=<<"+++";
+<span id="webpage_section" style="display:none;">		
+<b>Website Display</b><br><br>
+<table width="96%" border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+            <td width="100" align="RIGHT">Layout:&nbsp;</td>
+<td align="LEFT"><select id="website_layout" size="1" style="width:300px;" class="text_field" name="website_layout">$layout_options</select></td>
+</tr>
+<tr style="padding-bottom:5px;">
+                <td align="RIGHT">Thumbnail:&nbsp;</td>
+                <td align="LEFT"><input name="thumbnail" type="file" class="text_field" id="thumbnail" style="width:365px;" onFocus="" onBlur="" value=""></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Thumbnail Size:&nbsp;</td>
+<td align="LEFT"><input name="thumbnail_size" type="text" class="text_field" id="thumbnail_size" style="width:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="100"> 
+(in pixels - the maximum size of either edge) </td>
+</tr>
+<tr style="padding-bottom:5px;">
+                <td align="RIGHT">Delete Thumbnail:&nbsp;</td>
+<td><input type="checkbox" name="delete_thumbnail" value="y"> </td>
+</tr>
+</table>
+</span>
++++
+	}
+}
+
+<!--
+
+
+	HTML TEXT
+	
+	
+	-->
+<span id="webpage_text_section" style="display:none;">
+<b>Webpage Text</b><br><br>
+<script>
+	function showRichText()
+	\{
+		document.getElementById('plainText').style.display = 'none';
+		document.getElementById('htmlText').style.display = 'block';
+	\}
+	
+	function showPlainText()
+	\{
+		document.getElementById('plainText').style.display = 'block';
+		document.getElementById('htmlText').style.display = 'none';
+	\}
+</script>
+rich text editor <input type="radio" name="text_box_type" value="rich" CHECKED onClick="showRichText();"> - plain text editor <input type="radio" name="text_box_type" value="plain" onClick="showPlainText();"><br><br>
+
+<span id="plainText" style="display:none;">
+<textarea style="width:100%;height:300px;font-family:Tahoma,Verdana;font-size:10pt;" name="plain_text">{$c{folder}->get_value('rich_text')}</textarea>
+</span>
+
+<span id="htmlText">
+<table width=96% border=0 cellpadding=0 cellspacing=0>
+<tr><td align=left>For a new paragraph (with fresh formatting) - Press ENTER</td><td align=right>For a newline without a new paragraph - Press SHIFT + ENTER</td></tr></table>
+<br>
+	<script language="JavaScript" type="text/javascript" src="/wk/lib/newRichEdit/html2xhtml.js"></script>
+	<!-- To decrease bandwidth, use richtext_compressed.js instead of richtext.js //-->
+	<script language="JavaScript" type="text/javascript" src="/wk/lib/newRichEdit/richtext.js"></script>
+	
+<script language="JavaScript" type="text/javascript">
+
+function notesChanged(gui)
+\{
+	if(!window.confirm('Do you want to copy the notes into the webpage text?')) \{ return; \}
+	
+	var value = gui.value;
+	
+	if(!currentRTE) \{ currentRTE = 'rte1'; \}
+
+	var oRTE = frames['rte1'];
+	var oBody = oRTE.document.body;
+	
+
+	oBody.innerHTML = value;
+
+
+	return;
+	oRng.collapse(false);
+	oRng.select();
+\}
+
+function applyRichTextValue()
+\{
+	//make sure hidden and iframe values are in sync before submitting form
+	//to sync only 1 rte, use updateRTE(rte)
+	//to sync all rtes, use updateRTEs
+	updateRTE('rte1');
+	//updateRTEs();
+	//alert("rte1 = " + document.RTEDemo.rte1.value);
+	
+	document.folderform.rich_text.value = document.folderform.rte1.value;
+	
+	//change the following line to true to submit form
+	return false;
+\}
+
+//Usage: initRTE(imagesPath, includesPath, cssFile, genXHTML)
+initRTE("/wk/lib/newRichEdit/images/", "/wk/lib/newRichEdit/", "", true);
+
+//Usage: writeRichText(fieldname, html, width, height, buttons, readOnly)
+writeRichText('rte1', '{$c{folder}->get_js_value('rich_text')}', 540, 300, true, false);
+
+</script>
+</span>
+</span>
+
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+<span id="access_control_section" style="display:none;">		
+<b>Access Control</b><br><br>
+$c{security_tab}
+</span>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">				
++++
+	}
+
+	if(($c{folder}->is_virtual)&&($c{folder}->exists))
+	{
+		my $view_mode_options = $c{folder}->view_mode_options;
+		my $auto_field = $c{folder}->auto_field;
+		my $apply_resource_notes = $c{params}->{apply_resource_notes};
+		my $website_css = $c{folder}->website_css;
+		
+		$OUT.=<<"+++";
+<span id="resource_mapping_section" style="display:none;">		
+<b>Resource Mapping</b><br><br>
+        <table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+          <tr>
+            <td valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+               <tr align="left" style="padding-bottom:5px;">
+               <td colspan="2" nowrap>&nbsp;</td>
+            </tr>							
+                <tr style="padding-bottom:5px;">
+                  <td nowrap align="right">AUTO FIELD:&nbsp;</td>
+                  <td width="100%"><select size="1" style="width:140px;" class="text_field" name="auto_field" id="auto_field">
+                  	
+                    $c{auto_field_options}
+                  
+                  	</select></td>
+                </tr>			
+               <tr align="left" style="padding-bottom:5px;">
+                  <td colspan="2" nowrap>Flatten Folders:&nbsp;               	<input type="checkbox" name="flatten_auto_folders" value="y"></td>
+                  </tr>							
+				  
+				<tr valign="middle"><td height=30 colspan=2><hr width=100%></td>
+				</tr>
+				
+               <tr align="left" style="padding-bottom:5px;">
+               <td nowrap>Extra Commands:&nbsp;</td><td><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="website_css" id="website_css" value="$website_css" style="width:140px;"></td>
+            </tr>							
+				  
+				<tr valign="middle"><td height=30 colspan=2><hr width=100%></td>
+				</tr>				
+				
+				<tr><td colspan=2>&nbsp;</td>
+</tr>							
+                <tr style="padding-bottom:5px;">
+                  <td nowrap align="right">Select Mode:&nbsp;</td>
+                  <td width="100%"><select size="1" style="width:140px;" class="text_field" name="view_mode" id="view_mode">
+                    $view_mode_options
+                  </select></td>
+                </tr>
+				<tr><td colspan=2 height=15></td></tr>			
+                <tr style="padding-bottom:5px;">
+                  <td nowrap align="right">New Field:&nbsp;</td>
+                  <td width="100%"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="new_word" id="new_word" value="" style="width:140px;"></td>
+                </tr>
+                <tr style="padding-bottom:5px;">
+                  <td nowrap align="right">Choose Field:&nbsp;</td>
+                  <td width="100%"><select onChange="existing_keyword_changed(this);" size="1" style="width:140px;" class="text_field" name="existing_word" id="existing_word">$c{existing_keyword_options}
+                    </select></td>
+                </tr>
+                <tr style="padding-bottom:5px;">
+                  <td nowrap align="right">Choose Value:&nbsp;</td>
+                  <td width="100%"><span id="existing_value_span">
+				  <select size="1" style="width:140px;" class="text_field" name="existing_value" id="existing_value">
+				  <option value="-1">&#151;&#151;&#151;&#151;&#151;</option>
+                    </select></span></td>
+                </tr>
+                <tr style="padding-bottom:5px;">
+                  <td nowrap align="right"> New Value:&nbsp;</td>
+                  <td width="100%"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="keyword_value" id="keyword_value" value="" style="width:140px;"></td>
+                </tr>
+                <tr style="padding-bottom:5px;">
+                  <td>&nbsp;</td>
+                  <td align="right" width="100%">
+                    <input type="button" value="Add Field" class="button" onClick="create_keyword();" style="width:100%;">
+                  </td>
+                </tr>
+              </table> </td>
+            <td width="10"><img src="/wk/images/clear.gif" width="10" height="1"></td>
+            <td width="100%" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="3">
+                <tr>
+                  <td id="keywords_td">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td><hr width=80%></td>
+                </tr>				
+				<tr>
+				<td>
+				Selecting an AUTO FIELD will automatically create folders based on the keywords for that field...<br>
+<br>
+Adding new fields and values can be used in one of two ways...<br>
+<br>
+If you select mode of AND or OR and choose some fields and values then resources matching those fields and values will be loaded 'virtually' alongside resources that actually live in the folder...<br>
+<br>
+Selecting 'Apply To Resources' simply gives each of the entered keywords to each resource that lives in this folder...<br></td>
+				</tr>
+              </table> </td>
+          </tr>
+<tr>
+<td colspan="3" valign="top" height=10></td>
+</tr>
+<tr>
+<td colspan="3" valign="top">Enter some notes into the text box below to apply those notes to each resource in this folder... </td>
+</tr>
+<tr>
+<td colspan="3" valign="top"><textarea name="apply_resource_notes" class="text_field" id="apply_resource_notes" style="width:100%; height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">$apply_resource_notes</textarea></td>
+</tr>
+        </table>
+</span>
++++
+	}
+}
+
+
+</div>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{folder}->{error_text}}</span></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+
+</form>
+
+<script>	
+		//setupAllTabs();
+		//document.folderform.title.focus();		
+		//init_help(helptext);
+		
+{
+	if($c{folder}->is_virtual)
+	{
+		$OUT.=<<"+++";
+	apply_keyword_table();	
++++
+	}
+}
+</script>
+</body>
+</html>
+
+
+

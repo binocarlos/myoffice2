@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="/lib/spreadsheet.css" type="text/css">
+<script src="/lib/budgethub/budget_editor.js">
+</script>
+<script src="/lib/budgethub/budget_table.js">
+</script>
+<script src="/lib/budgethub/budget_row.js">
+</script>
+<style type="text/css">
+body \{ margin:0px;padding:0px; \}
+</style>
+<body style="background:#D4D0C8;">
+<table width=100% height=100% border=0 cellpadding=0 cellspacing=0>
+<tr>
+<td align=left valign=top id="editor_container">
+<div STYLE="text-align:center;vertical-align:middle;width:100%;height:100%;">
+<img src="/images/logos/wk_loading.gif" width="68" height="46"><br>
+<br>
+Loading Spreadsheet
+</div>
+</td>
+</tr>
+</table>
+<script>
+	parent.parent.budgetHub_get_sidebar_query('&method=budget_sidebar&budget_id={$c{budget_id}}');
+</script>
+</body>

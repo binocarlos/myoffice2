@@ -1,0 +1,181 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script src="/templates/skillsaudit/audit_analysis.js"></script>
+<script src="/templates/skillsaudit/window.js"></script>
+<script>
+	function goBack()
+	\{
+
+	\}
+	
+	function viewTimeline(id)
+	\{
+		parent.document.location = href + '&method=visitors_school_home&visitor_id=' + id;
+	\}
+	
+	function viewSchool(id)
+	\{
+		parent.document.location = href + '&method=visitors_school_home&school_id=' + id;
+	\}	
+
+	var giMinYear = 2004;
+
+	var giMaxYear = 2010;
+
+
+</script>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+    <td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;"><table width=100% border=0 cellpadding=0 cellspacing=0>
+      <tr>
+        <td> <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/adminmenu/findindividuals.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> LA - Find people &amp; Schools</b> </td>
+        <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;"><img id="imghelp" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Help</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">	The results are decided by averaging scores from audits taken from your school.<br>
+      <br> 
+      <span style="color:red;">{$c{org}->{_match_count}}</span> results shown --- <span style="color:red;">{$c{org}->{_not_shown_count}}</span> results not shown<br>
+      <br>
+      The filter is set as follows: <br>
+	  <table border=0 cellpadding=5 cellspacing=0>
+	<tr>
+	  <td align=right>Audit between </td>
+	  <td style="color:blue;">{$c{org}->{from_date}} and {$c{org}->{to_date}}</td>
+	</tr>	  
+{
+	my @props = qw(type operator percent mode subject keystage school_type postcode);
+	
+	foreach my $prop (@props)
+	{
+		my $value = $c{params}->{$prop};
+		
+		if(($value ne '')&&($value!=-1))
+		{
+			$OUT.=<<"+++";
+	<tr><td align=right>$prop =</td><td style="color:red;">$value</td></tr>
++++
+		}
+	}
+}
+</table>
+	  <br>
+      Please note these are  average results across teachers from your school.<br>
+To look at specific individuals outside  the average, please click the timeline icon for a specific teacher. </td>
+<tr><td width="100%" height=20></td></tr>
+<tr>
+  <td>
+  <TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+  <tr>
+{
+	if($c{params}->{type} ne 'school')
+	{
+		$OUT.=<<"+++";  
+    <td class="t"><b>Person</b></td>  
+	    <td class="t"><b>Key Stages</b></td>  
+		    <td class="t"><b>Subjects</b></td>  
++++
+	}
+}
+    <td class="t"><b>School</b></td>  	
+    <td class="t"><b>School Type</b></td> 	
+    <td class="t" align="center"><b>Average Score</b></td>
+{	
+	if($c{params}->{type} ne 'school')
+	{
+		$OUT.=<<"+++";	
+    <td class="t" align="center"><b>Timeline</b></td>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+	    <td class="t" align="center"><b>School Analysis</b></td>	
++++
+	}
+}
+  </tr>
+ 
+{
+	foreach my $ref (@{$c{org}->{people_refs}})
+	{
+		my $avg = $ref->{avg};
+		my $name = $ref->{visitor_name};
+		my $school = $ref->{school_name};
+		my $school_type = Webkit::SkillsAudit::School->get_type_title($ref->{school_type});
+		my $school_id = $ref->{school_id};
+		my $visitor_id = $ref->{visitor_id};
+		
+		$OUT.=<<"+++";
+<tr>
++++
+		
+		if($c{params}->{type} ne 'school')
+		{
+			my @key_stages = sort split(/:/, $ref->{key_stages});
+		
+			my $key_stage_st = uc(join(', ', @key_stages));
+		
+			my @subjects = sort split(/:/, $ref->{subjects});
+			my @subject_titles;
+		
+			foreach my $subject (@subjects)
+			{
+				push(@subject_titles, Webkit::SkillsAudit::Visitor->subject_title($subject));
+			}
+		
+			my $subject_st = join(', ', @subject_titles);
+		
+			if($subject_st !~ /\w/) { $subject_st = 'none'; }
+			if($key_stage_st !~ /\w/) { $key_stage_st = 'none'; }
+		
+			$OUT.=<<"+++";
+<td align=right class="c1" style="color:blue;">$name</td>
+<td align=right class="c1">$key_stage_st</td>
+<td align=right class="c1"><div style="width:140px;overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">$subject_st</div></td>
++++
+		}
+		
+		$OUT.=<<"+++";
+<td align=right class="c1" style="color:green;">$school</td>
+<td align=right class="c1">$school_type</td>
+<td align=right class="c1">$avg</td>			
++++
+
+		if($c{params}->{type} ne 'school')
+		{
+			$OUT.=<<"+++";
+<td align=center class="c1"><b><a href="javascript:viewTimeline($visitor_id);" class="l2"><img src="/images/skillsaudit/adminmenu/timeline.gif" align="absmiddle" border="0" width="24" height="24" style="padding-bottom:5px;"></a></b></td>
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+<td align=center class="c1"><b><a href="javascript:viewSchool($school_id);" class="l2"><img src="/images/skillsaudit/people_24.gif" align="absmiddle" border="0" style="padding-bottom:5px;"></a></b></td>			
++++
+		}
+	
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+}
+</table>
+  </td>
+</tr>
+</table>
+<br>
+{$c{calendar_table}}
+</body>
+</html>
+
+
+

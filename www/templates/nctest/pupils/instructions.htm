@@ -1,0 +1,21 @@
+<HTML>
+<HEAD>
+<TITLE>TestingTool</TITLE>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<link rel="stylesheet" type="text/css" href="/lib/nctest/styles/default/style.css">
+</HEAD>
+<body>
+<table height="100%" width="100%" cellpadding="0" cellspacing="0" border="0">
+	<tr>
+		<td align="left" valign="top" height="50" class="window_instructions"><font size="5">Hello</font><font size="5"> {$c{pupil}->get_fullname}
+		    ...</font></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top" class="window_instructions">{$c{test}->html_instructions}</td>
+	</tr>
+	<tr>
+		<td align="center" valign="top" height="30"><img src="/lib/nctest/styles/default/start_off.gif" title="Start" style="cursor:hand;" onmouseover="this.src='/lib/nctest/styles/default/start_over.gif';" onmouseout="this.src='/lib/nctest/styles/default/start_off.gif';" border="0" onclick="document.location='{$c{href}}&method=test_frame';"></td>
+	</tr>
+</table>
+</body>
+</HTML>

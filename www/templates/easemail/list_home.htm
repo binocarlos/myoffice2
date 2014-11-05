@@ -1,0 +1,186 @@
+<script>
+
+</script>
+
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+<TD WIDTH="140" ALIGN="LEFT" VALIGN="TOP" NOWRAP>
+
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><img src="/images/icons/48/mydocuments.gif" width="48" height="48"></td>
+        </tr>
+        <tr> 
+          <td style="font-size:12px;font-weight:bold; padding-top:10px;" height="40" valign="top" align="left">{$c{current_list}->get_value('name')} - ({$c{current_list}->get_id})</td>
+        </tr>
+{
+	if(!$c{current_list}->is_root)
+	{
+		my $id = $c{current_list}->get_id;
+		
+        $OUT.=<<"+++"; 
+        <tr> 
+          <td id="description" align=left valign=top><a href="$c{href}&method=easemail_list_form&list_id=$id">Edit 
+            This List</a><br>
+            <br>
+			<a href="javascript: top.delete_current_list();">
+            Delete This List</a></td>
+        </tr>
++++
+	}
+} 
+        <tr> 
+          <td id="description" align=left valign=top height=10></td>
+        </tr>
+        <tr> 
+          <td id="description" align=left valign=top><font color="#999999">{$c{current_list}->get_html_notes}</font></td>
+        </tr>
+        <tr> 
+          <td align=left valign=top height=10></td>
+        </tr>
+        <tr> 
+          <td><b>Child Lists</b></td>
+        </tr>
+        <tr> 
+          <td align=left valign=top height=10></td>
+        </tr>
+{
+	foreach my $list (@{$c{child_list_array}})
+	{
+		my $id = $list->get_id;
+		my $name = $list->get_value('name');
+		
+		$OUT.=<<"+++";
+        <tr> 
+          <td><a href="$c{href}&method=easemail_list_home&list_id=$id"><img src="/images/icons/32/folder_open.gif" border=0 width="32" height="32" align="absmiddle">$name</a></td>
+        </tr>		
++++
+	}
+}
+      </table>
+
+</TD>
+<td width="10"></td>
+    <TD ALIGN="left" VALIGN="TOP"> 
+      <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+        <TR> 
+          <TD> <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+              <TR> 
+                <TD CLASS="panelbody"> <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width=100%>
+                    <TR> 
+                      <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Child Lists&nbsp;</FONT></TD>
+                      <TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+                    </TR>
+                    <TR> 
+                      <TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                      <TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+                          <TR> 
+                            <TD> 
+                              <TABLE width="100%" BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE"> Direct Child 
+                                    Lists:</TD>
+                                  <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{child_list_count}}</strong></TD>
+                                </TR>
+                              <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">Inherited Child 
+                                    Lists: </TD>
+                                  <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{inherited_list_count}}</strong></TD>
+                                </TR>								
+                                <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">Total Child 
+                                    Lists: </TD>
+                                  <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{total_list_count}}</strong></TD>
+                                </TR>
+                              </TABLE>
+                            </TD>
+                          </TR>
+                        </TABLE></TD>
+                      <TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                    </TR>
+                    <TR> 
+                      <TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+                    </TR>
+                  </TABLE>
+                  <BR> <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+                    <TR> 
+                      <TD ALIGN="right" VALIGN="MIDDLE"> 
+                        <input type="button" CLASS="button" style="width:100px;" onClick="top.add_child_list();" value="Add Child List">
+                        &nbsp; 
+                        <input type="button" CLASS="button" style="width:140px;" value="Transfer (obtain) Members" onClick="top.transfer_members();">
+                      </TD>
+                    </TR>
+                  </TABLE></TD>
+              </TR>
+            </TABLE></TD>
+        </TR>
+      </TABLE>
+      <br>
+      <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">	  
+{
+	if(!$c{current_list}->is_root)
+	{
+		$OUT.=<<"+++";
+
+        <TR> 
+          <TD> <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+              <TR> 
+                <TD CLASS="panelbody"> <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width=100%>
+                    <TR> 
+                      <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Members&nbsp;</FONT></TD>
+                      <TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+                    </TR>
+                    <TR>
+                      <TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                      <TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+                          <TR>
+                            <TD> 
+                              <TABLE width="100%" BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE"> Direct Members 
+                                    :</TD>
+                                  <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">$c{child_member_count}</strong></TD>
+                                </TR>
+                              </TABLE>
+                            </TD>
+                          </TR>
+                        </TABLE></TD>
+                      <TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                    </TR>
+                    <TR>
+                      <TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+                    </TR>
+                  </TABLE>
+                  <BR> 
+                  <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+                    <TR> 
+                      <TD ALIGN="right" VALIGN="MIDDLE">
+					    <input type="button" CLASS="button" style="width:50px;" value="Search" onClick="top.search_members();">
+                        &nbsp;
+                        <input type="button" CLASS="button" style="width:50px;" value="Add" onClick="top.add_member();">
+                        &nbsp;
+                        <input type="button" CLASS="button" style="width:50px;" value="Upload" onClick="top.upload_members();">
+                        &nbsp; 
+                        <input type="button" CLASS="button" style="width:75px;" value="Download" onClick="top.download_members();">
+                      </TD>
+                    </TR>
+                  </TABLE></TD>
+              </TR>
+            </TABLE></TD>
+        </TR>
+
++++
+	}
+}
+      </TABLE>
+	  </td>
+  </tr></table>
+
+<script>
+parent.title.set_title('{$c{current_list}->get_value('name')} Details');
+</script>

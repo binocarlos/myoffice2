@@ -1,0 +1,46 @@
+<script>
+function apply_changed_inputs(components)
+\{
+	var st = '';
+	
+	for(var component_id in components)
+	\{
+		st += '<input type="hidden" name="component_' + component_id	+ '" value="">';
+		st += '<input type="hidden" name="type_' + component_id	+ '" value="">';		
+	\}
+	
+	document.getElementById('component_input_span').innerHTML = st;
+	
+	for(var component_id in components)
+	\{
+		var component = components[component_id];
+		
+		document.components_form['component_' + component_id].value = component.content;
+		document.components_form['type_' + component_id].value = component.type;		
+	\}	
+\}
+
+function submit_preview_form(page_id, components)
+\{
+	document.components_form.page_id.value = page_id;
+	document.components_form.method.value = 'siteeditor_save_preview_components';
+	apply_changed_inputs(components);
+	document.components_form.submit();
+\}
+
+function submit_form(page_id, components)
+\{
+	document.components_form.page_id.value = page_id;
+	apply_changed_inputs(components);
+	document.components_form.submit();
+\}
+</script>
+<body>
+<form style="margin:0px;padding:0px;" name="components_form" method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="siteeditor_save_components">
+<input type="hidden" name="page_id" value="">
+<span id="component_input_span"></span>
+</form>
+
+</body>

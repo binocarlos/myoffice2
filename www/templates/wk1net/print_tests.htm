@@ -1,0 +1,14 @@
+{
+	my $array = $c{object_array};
+
+	foreach my $test (@$array)
+	{
+		my $title = $test->get_value('title');
+		my $content = $test->get_value('content');
+
+		$OUT.=<<"+++";
+<b>$title</b><p>
+$content<BR><BR>
++++
+	}
+}

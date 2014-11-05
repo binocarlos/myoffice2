@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="File" width="140">
+		<menuitem title="View Budgets" action="get_menu_query('&amp;method=budgethub_home;');"/>
+		<menuitem title="New" action="budgetHub_get_main_query('&amp;method=create_new_budget&amp;appname=budgethub');"/>
+		<menuitem title="Open" action="budgetHub_open_budget();"/>
+		<menuitem title="Save" action="budgetHub_save_budget();"/>
+		<menuitem title="Save As" action="budgetHub_save_budget_as();"/>
+		<menuitem title="Close" action="budgetHub_get_main_query('&amp;method=home_page&amp;appname=budgethub');"/>
+		<menuitem title="Delete" action="budgetHub_delete_budget();"/>
+		<menuitem title="Log Out" action="budgetHub_get_main_query('&amp;method=logout');"/>
+	</menublock>
+	<menublock title="Edit" width="140">
+		<menublock title="Rows" width="140">
+			<menuitem title="Insert" action="budgetHub_insert_row();"/>
+			<menuitem title="Delete" action="budgetHub_delete_row();"/>
+			<menuitem title="Change Position" action="budgetHub_move_row();"/>
+			<menuitem title="Change Currency" action="budgetHub_change_row_currency();"/>
+			<menuitem title="Edit Comment" action="budgetHub_edit_comment();"/>
+		</menublock>
+		<menublock title="Budget" width="140">
+			<menuitem title="Export To Excel" action="budgetHub_export_excel();"/>
+		</menublock>
+	</menublock>
+	<menublock title="View" width="140">
+		<menuitem title="Cost Summary" action="get_budget_open_query('budget_summary_costs');"/>
+		<menuitem title="Production Quote" action="get_budget_open_query('budget_production_quote');"/>
+		<menuitem title="Fax Sheet" action="get_budget_open_query('budget_fax_sheet');"/>
+	</menublock>
+{
+	if(((!$c{org}->is_client)&&($c{session}->is_privilaged('budgethub', 'clientms')))||($c{user}->admin))
+	{
+		$OUT.=<<"+++";
+	<menublock title="Tools" width="160">
++++
+
+		if((!$c{org}->is_client)&&($c{session}->is_privilaged('budgethub', 'clientms')))
+		{
+			$OUT.=<<"+++";
+			<menublock title="Clients" width="160">
+			<menuitem title="Add Client" action="get_menu_query('&amp;method=clients_tree&amp;frame_method=clients_add_client&amp;appname=clientms');"/>
+			<menuitem title="View/Edit Clients" action="get_menu_query('&amp;method=clients_tree&amp;appname=clientms');"/>
+			</menublock>
++++
+		}
+
+		if($c{user}->admin)
+		{
+			my $org_title = $c{org}->get_value('name');
+
+			$OUT.=<<"+++";
+			<menublock title="Users" width="160">
+			<menuitem title="Add User" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user&amp;appname=budgethub');"/>
+			<menuitem title="View/Edit Users" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home&amp;appname=budgethub');"/>
+			</menublock>
++++
+		}
+
+		$OUT.=<<"+++";
+	</menublock>
++++
+	}
+}
+</menu_config>
+

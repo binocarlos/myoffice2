@@ -1,0 +1,111 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var giMinYear = 2000;
+
+	var giMaxYear = 2010;
+</script>
+<body>
+<form action="{$c{script}}" method="POST" name="print_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="print_form_submit">
+<input type="hidden" name="print_run_id" value="{$c{print_run}->get_id}">
+<table cellpadding="10" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="50%" height="100%" align="center" valign="top">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+<fieldset style="height:100%;">
+<legend>Print Run Details</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Print Run Details
++++
+}
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR style=""> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Tour:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%" style="color:blue;"> 
+      {$c{tour}->name}
+    </TD>
+  </TR> 
+  <TR style=""> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="name" type="text" class="text_field" id="name" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{print_run}->name}">
+    </TD>
+  </TR> 
+  <TR style="display:inline;" id="countryTr">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Start Date:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><table border="0" cellpadding="0" cellspacing="0">
+<tr style="">
+<td align="LEFT"><input name="start_date" type="TEXT" class="text_field" id="start_date" style="width:100px;" value="{$c{print_run}->start_date_title}"></td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+<td align="LEFT"><A ONCLICK="calendar_click(document.print_form.start_date);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr>
+</table> </TD>
+  </TR> 
+  <TR style="display:inline;" id="countryTr">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>End Date:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><table border="0" cellpadding="0" cellspacing="0">
+<tr style="">
+<td align="LEFT"><input name="end_date" type="TEXT" class="text_field" id="end_date" style="width:100px;" value="{$c{print_run}->end_date_title}"></td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+<td align="LEFT"><A ONCLICK="calendar_click(document.print_form.end_date);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr>
+</table> </TD>
+  </TR> 
+  <TR style="display:inline;" id="countryTr">
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Notes:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><textarea name="notes" id="notes" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px; height:120px;">{$c{print_run}->notes}</textarea></TD>
+  </TR>   
+</TABLE>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+</div>
+</fieldset>
++++
+}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{print_run}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE></td>
+</tr>
+</table>
+</form>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

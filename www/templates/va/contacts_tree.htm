@@ -1,0 +1,206 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	function edit_user(id)
+	\{
+		var loc = href + '&method=edit_user&object_id=' + id;
+
+		top.content.page.content.location = loc;
+	\}
+	
+	function edit_all_clients()
+	\{
+		var loc = href + '&method=clients_home_list&appname=clientms';
+		
+		top.content.page.content.location = loc;
+	\}
+	function edit_client(id)
+	\{
+		var loc = href + '&method=clients_edit_users&object_id=' + id + '&appname=clientms';
+
+		top.content.page.content.location = loc;
+	\}
+	
+	function edit_lead(id)
+	\{
+		var loc = href + '&method=lead_form&lead_id=' + id;
+		
+		top.content.page.content.location = loc;
+	\}
+	
+	function leads_home()
+	\{
+		var loc = href + '&method=leads_home';
+		
+		top.content.page.content.location = loc;
+	\}
+
+	function edit_supplier(id)
+	\{
+		var loc = href + '&method=suppliers_form&supplier_id=' + id;
+		
+		top.content.page.content.location = loc;
+	\}
+	
+	function suppliers_home()
+	\{
+		var loc = href + '&method=suppliers_home';
+		
+		top.content.page.content.location = loc;
+	\}
+	function edit_staff(id)
+	\{
+		var loc = href + '&method=edit_user&object_id=' + id;
+		
+		top.content.page.content.location = loc;
+	\}
+
+	function list_staffs(id)
+	\{
+		var loc = href + '&method=users_home';
+		
+		top.content.page.content.location = loc;
+	\}
+	
+	
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		parent.parent.page.clients_home.location = loc;
+	\}
+
+var tree = new WebFXTree('Webkit');
+tree.action = "javascript: get_xTree_query('&method=clients_home_list');";
+
+var clients = new WebFXTreeItem('Clients');
+clients.action = "javascript: edit_all_clients();";
+tree.add(clients);
+
+
+{
+	my $client_arr = $c{orgs};
+	foreach my $client (@$client_arr)
+	{
+		my $client_id = $client->get_id;
+		my $client_name = $client->get_value('name');
+		
+		my $userarr = $client->get_child_array('users');		
+
+		$OUT.=<<"+++";
+var client$client_id = new WebFXTreeItem('$client_name');
+client$client_id.action = "javascript: edit_client($client_id);";
++++
+
+		my $count = @$userarr;
+		
+		if($count==0)
+		{
+			$OUT.=<<"+++";
+client$client_id.icon = "/images/xtree/foldericon.png";
++++
+		}
+
+		$OUT.=<<"+++";
+clients.add(client$client_id);
++++
+		
+		foreach my $user (@$userarr)
+		{
+			my $id = $user->get_id;
+			my $name = $user->get_fullname;
+			
+			if($user->get_value('deleted') eq 'y')
+			{
+				next;
+			}
+
+			$OUT.=<<"+++";
+var users$id = new WebFXTreeItem('$name');
+users$id.action = "javascript: edit_user($id);";
+users$id.icon = '/images/holiday/employee.gif';
+
+client$client_id.add(users$id);
++++
+		}
+	}
+
+$OUT.=<<"+++";
+var leads = new WebFXTreeItem('Leads');
+leads.action = "javascript: leads_home();";
+tree.add(leads);
++++
+
+	my $lead_arr = $c{leads};
+	
+	foreach my $l (@$lead_arr)
+	{
+		my $name = $l->get_value('company_name');
+		my $id = $l->get_id;
+		
+		$OUT.=<<"+++";
+var l$id = new WebFXTreeItem('$name');
+l$id.action = "javascript: edit_lead($id);";
+l$id.icon = '/images/holiday/employee.gif';		
+leads.add(l$id);
++++
+	}
+
+
+$OUT.=<<"+++";
+var suppliers = new WebFXTreeItem('Suppliers');
+suppliers.action = "javascript: suppliers_home();";
+tree.add(suppliers);
++++
+
+
+	my $supp_arr = $c{suppliers};
+	
+	foreach my $s (@$supp_arr)
+	{
+		my $name = $s->get_value('name');
+		my $id = $s->get_id;
+		
+		$OUT.=<<"+++";
+var s$id = new WebFXTreeItem('$name');
+s$id.action = "javascript: edit_supplier($id);";
+s$id.icon = '/images/holiday/employee.gif';
+suppliers.add(s$id);		
++++
+	}
+
+$OUT.=<<"+++";
+var staffs = new WebFXTreeItem('Staffs');
+staffs.action = "javascript: list_staffs();";
+tree.add(staffs);
++++
+
+
+	my $staff_arr = $c{staffs};
+	
+	foreach my $sta (@$staff_arr)
+	{
+		my $name = $sta->get_fullname;
+		my $id = $sta->get_id;
+		
+		$OUT.=<<"+++";
+var sta$id = new WebFXTreeItem('$name');
+sta$id.action = "javascript: edit_staff($id);";
+sta$id.icon = '/images/holiday/employee.gif';
+staffs.add(sta$id);		
++++
+	}
+
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

@@ -1,0 +1,148 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function add_alias()
+	\{
+		var loc = href + '&method=email_add_alias';
+
+		document.location = loc;
+	\}
+
+	function edit_alias()
+	\{
+		var alias_id = document.getElementById('aliases').value;
+
+		if(alias_id>0)
+		\{
+			var loc = href + '&method=email_edit_alias&email_address_id=' + alias_id;
+
+			document.location = loc;
+		\}
+	\}
+
+	function delete_alias()
+	\{
+		var alias_id = document.getElementById('aliases').value;
+
+		if(alias_id>0)
+		\{
+			var loc = href + '&method=email_delete_alias&email_address_id=' + alias_id;
+
+			document.location = loc;
+		\}
+	\}
+
+	function add_pop()
+	\{
+		var loc = href + '&method=email_add_pop_account';
+
+		document.location = loc;
+	\}
+
+	function edit_pop()
+	\{
+		var pop_id = document.getElementById('pop_accounts').value;
+
+		if(pop_id>0)
+		\{
+			var loc = href + '&method=email_edit_pop_account&pop_box_id=' + pop_id;
+
+			document.location = loc;
+		\}
+	\}
+
+	function delete_pop()
+	\{
+		var pop_id = document.getElementById('pop_accounts').value;
+
+		if(pop_id>0)
+		\{
+			var loc = href + '&method=email_delete_pop_account&pop_box_id=' + pop_id;
+
+			document.location = loc;
+		\}
+	\}
+
+	function settings_click()
+	\{
+		var pop_id = document.getElementById('pop_accounts').value;
+		if(pop_id>0)
+		\{
+			show_pop_settings(pop_id);
+		\}
+	\}
+
+	function show_pop_settings(pop_id)
+	\{
+		var loc = href + '&method=email_view_pop_account_details&pop_box_id=' + pop_id;
+
+		var result = this.showModalDialog(loc, null, 'status:no;resizable:yes;dialogWidth:350px;dialogHeight:250px;help:no;scroll:no;');
+	\}
+
+</script>
+
+
+<div class="panelouter" style="width:520px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+
+<fieldset>
+<legend>Mailboxes</legend>
+<div class="seccontent">
+<select name="pop_accounts" id="otheraddresses" size="8" style="width:100%; font-family:tahoma,verdana; font-size:11px; color:#000000;">
+{
+	my $arr = $c{org}->get_child_array('pop_account');
+
+	foreach my $pop_account (@$arr)
+	{
+		my $id = $pop_account->get_id;
+
+		my $address = $pop_account->get_value('name');
+
+		$OUT.=<<"+++";
+<option value="$id">$address</option>
++++
+	}
+}
+</select>
+</div>
+</fieldset>
+<IMG src="/images/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<div align="right"><input type="button" name="add" value="Add" class="button" style="width:75px;" onClick="add_pop();"><img src="/images/clear.gif" width="8" height="1" border="0"><input type="button" name="add2" value="Settings" class="button" style="width:75px;" onClick="settings_click();"><img src="/images/clear.gif" width="8" height="8" border="0"><input type="button" name="edit" value="Edit" class="button" style="width:75px;" onClick="edit_pop();"><img src="/images/holiday/clear.gif" width="8" height="1" border="0"><input type="button" name="delete" value="Delete" class="button" style="width:75px;" onClick="delete_pop();"></div>
+</div></div></div>
+
+<IMG src="/images/clear.gif" WIDTH="1" HEIGHT="15" BORDER="0"><br>
+
+<div class="panelouter" style="width:520px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+<fieldset>
+<legend>Email Aliases</legend>
+<div class="seccontent">
+
+<select name="aliases" id="aliases" size="8" style="width:100%; font-family:tahoma,verdana; font-size:11px; color:#000000;">
+{
+	my $arr = $c{org}->get_alias_array;
+
+	foreach my $alias (@$arr)
+	{
+		my $id = $alias->get_id;
+
+		my $address = $alias->get_value('email_address');
+
+
+		$OUT.=<<"+++";
+<option value="$id">$address</option>
++++
+	}
+}
+</select>
+
+</div>
+</fieldset>
+<IMG src="/images/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<div align="right"><input type="button" name="add" value="Add" class="button" style="width:75px;" onClick="add_alias();"><img src="/images/clear.gif" width="8" height="1" border="0"><input type="button" name="edit" value="Edit" class="button" style="width:75px;" onClick="edit_alias();"><img src="/images/clear.gif" width="8" height="1" border="0"><input type="button" name="delete" value="Delete" class="button" style="width:75px;" onClick="delete_alias();"></div>
+</div></div></div>
+
+
+
+<script>
+
+{$c{settings_script}}
+</script>

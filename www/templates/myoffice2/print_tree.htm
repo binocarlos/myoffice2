@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<img src="/images/tools/16px/copy.gif" width=16 height=16 align="absmiddle"> = <u>Print Run</u><br>
+<br>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		top.appContent.page.frames[1].location = loc;
+	\}
+	
+	function viewPrintRuns()
+	\{
+		var newLoc = href + '&method=print_home';
+		
+		top.appContent.page.frames[1].document.location = newLoc;		
+	\}
+	
+	function viewPrintSheet(id)
+	\{
+		var newLoc = href + '&method=print_sheet&print_run_id=' + id;
+		
+		top.appContent.page.frames[1].document.location = newLoc;
+	\}
+
+var tree = new WebFXTree('{$c{tour}->name} Print Runs');
+tree.action = "javascript: viewPrintRuns();";
+
+{			
+	foreach my $print_run (@{$c{tour}->ensure_child_array('print_run')})
+	{
+		my $title = $print_run->name;
+		my $qtr_title = $print_run->qtr_title;
+		my $print_run_id = $print_run->get_id;
+		
+		$title =~ s/'/\\'/g;
+		
+		$OUT.=<<"+++";
+var print_run$print_run_id = new WebFXTreeItem('$qtr_title : $title');
+print_run$print_run_id.icon = '/images/tools/16px/copy.gif';
+print_run$print_run_id.openIcon = '/images/tools/16px/copy.gif';
+print_run$print_run_id.action = "javascript: viewPrintSheet($print_run_id);";
+
+tree.add(print_run$print_run_id)
++++
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

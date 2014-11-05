@@ -1,0 +1,29 @@
+<script>
+	function viewWebsite(id)
+	\{
+		top.content.page.content.document.location = href + '&method=resources_options&website_id=' + id;
+	\}
+</script>
+
+<table border=0 cellpadding="0" cellspacing="0">
+{
+	foreach my $website (@{$c{org}->ensure_child_array('website')})
+	{
+		my $name = $website->name;
+		my $id = $website->get_id;
+		
+		$OUT.=<<"+++";
+<tr>
+<td>
+<a href="javascript: viewWebsite($id);">
+<img src="/images/icons/16x16/gear_preferences.gif" width="16" height="16" border=0> $name</a>
+</td>
+</tr>
+<tr>
+<td height=5>
+</td>
+</tr>
++++
+	}
+}
+</table>

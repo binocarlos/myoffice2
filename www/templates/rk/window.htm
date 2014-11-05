@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+<TITLE>Robin Kirby Associates</TITLE>
+<style type="text/css">
+<!--
+.statustext \{  font-family: Tahoma, Verdana, Arial; font-size: 12px; color: #990000\}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="/lib/app.css" />
+		<script src="/lib/hidestatus.js"></script>
+		<script src="/lib/error.js"></script>
+<script>
+var href = '{$c{href}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+
+{
+if(!$c{session_id})
+{
+		$OUT.=<<"+++";
+var accounttype = 'login';
+var appname = 'login';
++++
+}
+elsif($c{user}->admin)
+{
+		$OUT.=<<"+++";
+var accounttype = 'admin';
+var appname = '$c{app_name}';
++++
+}
+else
+{
+		$OUT.=<<"+++";
+var accounttype = 'user';
+var appname = '$c{app_name}';
++++
+}
+}
+			var session_id = '{$c{session_id}}';
+			var script = '{$c{script}}';
+
+			function download_file_loc(loc)
+			\{
+				document.docframe.location = loc;
+			\}
+			function get_menu_query(query)
+			\{
+				var new_loc = href + query;
+
+				document.content.location = new_loc;
+
+			\}
+			
+			function go_home()
+			\{
+				get_iframe_query('&title=Robin Kirby Admin&frame_method=rkhome&appname=rk');
+			\}
+			
+			function get_iframe_query(query)
+			\{
+				var new_loc = '/wkhtml/iframe_title_frame/?session_id=' + session_id;
+				new_loc += query;
+
+				document.content.location = new_loc;
+			\}
+
+			function clientms_logout()
+			\{
+				self.close();
+			\}
+
+			function application_logout()
+			\{
+				get_menu_query('&method=iframe_title_frame&title=Log Out&frame_method=log_out');
+			\}
+
+</script>
+</HEAD>
+<body STYLE="background:#D4D0C8; border:0px; margin:0px;" onLoad="document.getElementById('window_loading').style.display='none';">
+<DIV ID="window_loading" STYLE="display:block; width:100%; height:100%; background-color:#D4D0C8;"><TABLE WIDTH="100%" HEIGHT="100%" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE"><B>Loading...</B></TD></TR></TABLE></DIV>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD><DIV ID="menuhl" STYLE="display:none; width:100%; height:23px; background:#FFFF00; position:absolute; z-index:-2000;"></DIV>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="21" BORDER="0"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">{$c{menu}}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+
+				 <TR>
+					<TD>
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="application_logout();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A><img src="/images/clear.gif" width="5" height="1"><A ONCLICK="go_home();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_home.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Home</A>
+<IFRAME SRC="{$c{href}}&method=documents_client_download&appname=fileshare&appname_single=1&nolog=1" WIDTH="1" HEIGHT="1" NAME="docframe" SCROLLING="no" border=0 FRAMEBORDER="no" STYLE="display:none;"></IFRAME>
+						 </TD>
+<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent">{$c{org}->get_logo_tag}</TD>
+</TR>
+</TABLE>
+</TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%">
+		<IFRAME SRC="/wkhtml/iframe_title_frame/?session_id={$c{session_id}}&frame_method=rkhome&title=Robin Kirby Admin&appname=rk" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="no" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD></TR></TABLE></TD>
+	 </TR>
+	</TABLE>
+</body>
+</HTML>

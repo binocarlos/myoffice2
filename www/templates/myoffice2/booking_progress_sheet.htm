@@ -1,0 +1,346 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+var bookings = new Object();
+var venues = new Object();
+
+	function printPage()
+	\{
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+	self.print();
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	alert("To print this page on a Mac, please follow these instructions...\\n\\n1. Hold down control and right click on the page.\\n\\n2.Click on -Open Frame in New Window- from the menu.\\n\\n3.Once the new window has opened, use the File -> Print menu option.");
++++
+}
+	\}
+
+	function venueHistory(venue_id)
+	\{
+		var loc = '/htmlhub/frames_double?session_id=' + session_id + '&frameset_key=myoffice2_venue_status_modal&modal=1&venue_id=' + venue_id;
+		var ret = show_modal_window(loc, 1000, 750);
+	\}
+
+	function writeBooking(hash)
+	\{
+		hash.pack_sent_title = getMultiDateNoteText(hash.pack_sent);
+		hash.date_called_title = getMultiDateNoteText(hash.date_called);
+		
+		newBookingObj(hash.booking_id, hash.pack_sent, hash.date_called, hash.js_notes);
+		document.write(getHTMLBlock('booking_row', hash));
+	\}
+	
+	function writeVenue(hash)
+	\{
+		newVenueObj(hash.venue_id, hash.notes);
+		document.write(getHTMLBlock('venue_row', hash));
+	\}
+	
+	function writeHr()
+	\{
+		document.write(getHTMLBlock('hr_row'));	
+	\}
+	
+	function newVenueObj(id, notes)
+	\{
+		var venue = new Object();
+		venue.id = id;
+		venue.notes = notes;
+		
+		venues[venue.id] = venue;
+	\}
+
+	function newBookingObj(id, pack_sent, date_called, notes)
+	\{
+		var booking = new Object();
+		booking.id = id;
+		booking.pack_sent = pack_sent;
+		booking.date_called = date_called;
+		booking.notes = notes;
+		
+		bookings[booking.id] = booking;
+	\}
+	
+	function editPackSent(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+			
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, booking.pack_sent);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, 'pack_sent', getMultiDateNoteReturn(ret));
+		td.innerHTML = getMultiDateNoteText(ret);
+		booking.pack_sent = ret;
+	\}
+	
+	function editDateCalled(booking_id, td)
+	\{			
+		var booking = bookings[booking_id];
+			
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, booking.date_called);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, 'date_called', getMultiDateNoteReturn(ret));
+		td.innerHTML = getMultiDateNoteText(ret);
+		booking.date_called = ret;
+	\}
+	
+	function editNotes(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.notes);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addBookingField(booking_id, 'notes', ret.value);
+		td.innerHTML = ret.title;
+		booking.notes = ret.value;
+	\}
+	
+	function viewAll()
+	\{
+		document.filterForm.venue_id.value = '';
+		document.filterForm.booking_id.value = '';
+		
+		document.filterForm.submit();	
+	\}
+	
+	function viewVenue(venue_id)
+	\{
+		document.filterForm.venue_id.value = venue_id;
+		document.filterForm.booking_id.value = '';
+		
+		document.filterForm.submit();
+	\}
+	
+	function viewBooking(booking_id)
+	\{
+		document.filterForm.venue_id.value = '';
+		document.filterForm.booking_id.value = booking_id;
+		
+		document.filterForm.submit();	
+	\}
+	
+	function viewFilter(filter)
+	\{
+		document.filterForm.filter.value = filter;
+		
+		document.filterForm.submit();
+	\}
+	
+	function deleteBooking(id)
+	\{
+		if(window.confirm('Are you sure you want to delete this booking entry?'))
+		\{
+			var form = document.filterForm;
+			form.method.value = 'booking_delete_booking_submit';
+			form.object_id.value = id;
+			form.submit();
+		\}
+	\}
+	
+	function failBooking(id)
+	\{
+		alert('This method is no longer used - if you are seeing this then email kai@wk1.net with what you just did!!!');
+		return;
+		
+		if(window.confirm('Are you sure you want to fail this booking entry?'))
+		\{
+			var form = document.filterForm;
+			form.method.value = 'booking_fail_booking_submit';
+			form.object_id.value = id;
+			form.submit();
+		\}
+	\}	
+	
+	function addTourdate(id)
+	\{
+		var ret = get_modal_window_return('&method=editors_datetime&value=&goto_timeline=1', 780, 500);		
+		
+		if(ret)
+		\{
+			document.location = href + '&method=booking_add_pencil_date_submit&booking_id=' + id + '&tourdate_date=' + ret.dateString + '&tourdate_time=' + ret.timeString + '&venue_id=' + document.filterForm.venue_id.value;
+		\}
+	\}	
+	
+	function viewPencilSheet()
+	\{
+		var venue_id = document.filterForm.venue_id.value;
+		var booking_id = document.filterForm.booking_id.value;
+		
+		top.get_double_frameset('myoffice2_booking_penciled&venue_id=' + venue_id + '&booking_id=' + booking_id);
+	\}
+	
+{
+	if($c{params}->{filter}=~/\w/)
+	{
+		my $filter = $c{params}->{filter};
+		
+		$OUT.=<<"+++";
+		parent.title.setFilterValue('$filter');
++++
+	}
+}
+</script>
+<body onunload="if(parent.title)\{parent.title.resetForm();\}">
+<form method="GET" action="{$c{script}}" style="margin:0px;padding:0px;" name="filterForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="booking_progress_sheet">
+<input type="hidden" name="venue_id" value="{$c{params}->{venue_id}}">
+<input type="hidden" name="booking_id" value="{$c{params}->{booking_id}}">
+<input type="hidden" name="object_id" value="">
+<input type="hidden" name="filter" value="{$c{params}->{filter}}">
+</form>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td><table  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><img src="/images/icons/16/recyclebin.gif" width="16" height="16" align="absmiddle"> = <u><b>D</b>elete booking</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/tools/16px/open.gif" width="16" height="16" align="absmiddle"> = <u><b>E</b>nter pencil date</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/tools/16px/search.gif" width="16" height="16" border=0 align="absmiddle"></span></a></b> = <u>Venue History</u></td>
+        <td width="30">&nbsp;</td>
+        <td><input type="button" value="Print" class="button" onClick="printPage();"></td>		
+      </tr>
+    </table></td>
+  </tr>   
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td class="welcome"><table  border="0" cellspacing="0" cellpadding="5">
+{
+	my $venue_row=<<"+++";
+      <tr>
+        <td width="340"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></td>
+        <td width="200" align="right"><span style="color:#888888;">capacity</span> __capacity__ </td>
+        <td width="40" align="right" style="cursor:hand;"><a href="javascript:venueHistory(__venue_id__);"><img src="/images/tools/16px/search.gif" alt="Venue History" width="16" height="16" border=0 align="absmiddle"></a></td>
+      </tr>
+      <tr align="left">
+        <td colspan="3"><table width="700"  border="0" cellpadding="3" cellspacing="1" bgcolor="#cccccc">
+          <tr bgcolor="#f5f5f5">
+            <td width="20" align="center"><b>E</b></td>					  
+            <td>Tour &amp; Info</td>			  
+            <td width="90">Active</td>
+            <td width="100"><u>Pack Sent</u> </td>
+            <td width="100"><u>Date Called</u> </td>
+            <td width="140"><u>Notes</u></td>
+            <td width="20" align="center"><b>D</b></td>
+          </tr>
++++
+
+	my $booking_row=<<"+++";
+          <tr valign="top" bgcolor="#FFFFFF">
+			<td width="20" style="cursor:hand;"><a href="javascript:addTourdate(__booking_id__);" style="__edit_style__"><img src="/images/tools/16px/open.gif" alt="Edit Booking" width="16" height="16" border="0"></a></td>		  
+            <td><span style="color:blue;">__tour_name__</span><br><span style="__status_style__">__status_text__</span></td>		  			  
+            <td width="90">__active__</td>
+            <td width="100" class="editTd" onClick="editPackSent(__booking_id__, document.getElementById('__booking_id__pack_sent'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__pack_sent">__pack_sent_title__</span></td>
+            <td width="100" class="editTd" onClick="editDateCalled(__booking_id__, document.getElementById('__booking_id__date_called'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__date_called">__date_called_title__</span></td>
+            <td width=140 class="editTd" onClick="editNotes(__booking_id__, document.getElementById('__booking_id__notes'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__notes">__notes__</span></td>
+            <td width="20"><a href="javascript:deleteBooking(__booking_id__);" style="__delete_style__cursor:hand;"><img src="/images/icons/16/recyclebin.gif" alt="Delete Booking" width="16" height="16" border="0"></a></td>				
+		  </tr>
++++
+
+	my $hr_row=<<"+++";
+        </table></td>
+        </tr>
+  <tr>
+    <td colspan="3" height=20 align=center style="color:#666666;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</td>
+  </tr>	
++++
+
+	$venue_row = Webkit::AppTools->js_quote($venue_row);
+	$booking_row = Webkit::AppTools->js_quote($booking_row);
+	$hr_row = Webkit::AppTools->js_quote($hr_row);
+	
+	$OUT.=<<"+++";
+	<script>
+addHTMLBlock('venue_row', '$venue_row');
+addHTMLBlock('booking_row', '$booking_row');
+addHTMLBlock('hr_row', '$hr_row');
++++
+
+	foreach my $venue (@{$c{tour}->ensure_child_array('venue')})
+	{
+		my $venue_js_hash = Webkit::AppTools->js_hash({
+			_venue_id => $venue->get_id,
+			notes => $venue->get_js_value('booking_notes'),
+			venue_title => $venue->get_city_title,
+			_capacity => $venue->capacity,
+			_venue_id => $venue->get_id });
+		
+		$OUT.=<<"+++";
+		
+writeVenue($venue_js_hash);
++++
+
+		foreach my $booking (@{$venue->ensure_child_array('booking')})
+		{
+			my $tour = $c{org}->get_child('tour', $booking->tour_id);
+
+			my $status_text = '';
+			my $status_style = '';
+			my $delete_style = '';
+			my $fail_style = '';
+			my $edit_style = '';
+			
+			if($booking->penciled)
+			{
+				$status_text = 'PENCILED for '.$booking->get_first_tourdate_title;
+				$status_style = 'color:green;';
+				$edit_style = 'display:none;';
+			}
+			
+			if($booking->failed)
+			{
+				$status_text = 'FAILED on '.$booking->get_date_title('failed');
+				$status_style = 'color:red;';			
+				$edit_style = 'display:none;';
+				$fail_style = 'display:none;';					
+			}
+			
+			my $notes = $booking->{data}->{booking_note};
+			
+			my $booking_js_hash = Webkit::AppTools->js_hash({
+				_venue_id => $venue->get_id,
+				_booking_id => $booking->get_id,
+				js_notes => Webkit::AppTools->js_quote($notes),
+				active => $booking->get_date_title('created'),
+				_pack_sent => Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->pack_sent),
+				_date_called => Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->date_called),
+				notes => Webkit::AppTools->html_quote($notes),
+				tour_name => $tour->name,
+				status_text => $status_text,
+				status_style => $status_style,
+				delete_style => $delete_style,
+				fail_style => $fail_style,
+				edit_style => $edit_style });
+		
+			$OUT.=<<"+++";
+writeBooking($booking_js_hash);
++++
+		}
+	
+		$OUT.=<<"+++";
+writeHr();
++++
+	}
+	
+	$OUT.=<<"+++";
+</script>
++++
+}
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>
+
+
+

@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+
+<menu_config>
+
+{
+	if(!$c{org}->is_client)
+	{
+		if($c{session}->is_privilaged('rk', 'clientms'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="Clients/Users" width="160">
+		<menublock title="Clients" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=clients_tree&amp;frame_method=clients_add_client&amp;appname=clientms');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=clients_tree&amp;appname=clientms');"/>
+		</menublock>
++++
+		}
+	}
+
+	if($c{user}->admin)
+	{
+		my $org_title = $c{org}->get_value('name');
+
+		$OUT.=<<"+++";
+		<menublock title="$org_title Users" width="90">
+			<menuitem title="Add" action="get_iframe_query('&amp;title=Add User&amp;frame_method=add_user&amp;appname=rk');"/>
+			<menuitem title="View/Edit" action="get_iframe_query('&amp;title=Current Users&amp;frame_method=users_home&amp;appname=rk');"/>
+		</menublock>
++++
+	}
+
+	if(!$c{org}->is_client)
+	{
+		if($c{session}->is_privilaged('rk', 'clientms'))
+		{
+			$OUT.=<<"+++";
+	</menublock>
++++
+		}
+	}
+
+	if(!$c{org}->is_client)
+	{
+		if($c{session}->is_privilaged('rk', 'queryhandler'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="Queries" width="140">
+		<menuitem title="View/Edit All Queries" action="get_iframe_query('&amp;title=Current Queries&amp;frame_method=queries_org_home&amp;appname=queryhandler');"/>
+	</menublock>
++++
+		}
+	}
+	else
+	{
+		if($c{session}->is_privilaged('rk', 'queryhandler'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="Queries" width="140">
+		<menuitem title="Submit Query" action="get_iframe_query('&amp;title=Create Query&amp;frame_method=queries_client_add_query&amp;appname=queryhandler');"/>
+		<menuitem title="View Queries" action="get_iframe_query('&amp;title=Current Queries&amp;frame_method=queries_client_home&amp;appname=queryhandler');"/>
+	</menublock>
++++
+		}
+	}
+
+	if(!$c{org}->is_client)
+	{
+		if($c{session}->is_privilaged('rk', 'faqs'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="Client FAQs" width="120">
+		<menuitem title="Add an FAQ" action="get_iframe_query('&amp;title=Add an FAQ&amp;frame_method=faq_add_faq_client&amp;appname=rk&amp;app_proxy=1');"/>
+		<menuitem title="View/Edit FAQs" action="get_iframe_query('&amp;title=View FAQs&amp;frame_method=faq_home_client&amp;appname=rk&amp;app_proxy=1');"/>
+	</menublock>
++++
+		}
+
+		if($c{session}->is_privilaged('rk', 'fileshare'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="File Sharing" width="110">
+		<menuitem title="Upload New" action="get_iframe_query('&amp;title=Upload File&amp;frame_method=documents_add_document&amp;appname=fileshare');"/>
+		<menuitem title="View All" action="get_iframe_query('&amp;title=Files&amp;frame_method=documents_home&amp;appname=fileshare');"/>
+	</menublock>
++++
+		}
+
+		if(($c{session}->is_privilaged('rk', 'news'))||($c{session}->is_privilaged('rk', 'faqs')))
+		{
+			$OUT.=<<"+++";
+	<menublock title="Edit Website" width="140">
++++
+
+			if($c{session}->is_privilaged('rk', 'news'))
+			{
+				$OUT.=<<"+++";
+		<menublock title="Homepage News" width="150">
+			<menuitem title="Add a News Item" action="get_iframe_query('&amp;title=Add News&amp;frame_method=news_add_news&amp;appname=news');"/>
+			<menuitem title="View/Edit News Items" action="get_iframe_query('&amp;title=Current News&amp;frame_method=news_home&amp;appname=news');"/>
+		</menublock>
++++
+			}
+
+#			if($c{session}->is_privilaged('rk', 'client_list'))
+#			{
+#				$OUT.=<<"+++";
+#		<menublock title="Client List" width="170">
+#			<menuitem title="Add a Client List Entry" action="get_iframe_query('&amp;title=Add Client List Entry&amp;frame_method=client_list_add_client_list&amp;appname=client_list');"/>
+#			<menuitem title="View/Edit Client List Entries" action="get_iframe_query('&amp;title=Current Client List&amp;frame_method=client_list_home&amp;appname=client_list');"/>
+#		</menublock>
+#+++
+#			}
+
+			if($c{session}->is_privilaged('rk', 'faqs'))
+			{
+				$OUT.=<<"+++";
+		<menublock title="Pre-Sales  FAQs" width="130">
+			<menuitem title="Add an FAQ" action="get_iframe_query('&amp;title=Add an FAQ&amp;frame_method=faq_add_faq_normal&amp;appname=rk&amp;app_proxy=1');"/>
+			<menuitem title="View/Edit FAQs" action="get_iframe_query('&amp;title=View FAQs&amp;frame_method=faq_home_normal&amp;appname=rk&amp;app_proxy=1');"/>
+		</menublock>
++++
+			}
+
+			$OUT.=<<"+++";
+	</menublock>
++++
+		}
+
+		if(($c{session}->is_privilaged('rk', 'sitestatistics'))||($c{user}->is_privilaged('rk', 'sitestatistics')))
+		{
+			$OUT.=<<"+++";
+	<menublock title="Website Admin" width="140">
++++
+
+			if($c{session}->is_privilaged('rk', 'sitestatistics'))
+			{
+				$OUT.=<<"+++";
+		<menuitem title="Statistics" action="get_menu_query('&amp;method=stats_home&amp;appname=sitemanager');"/>
++++
+			}
+
+			if($c{session}->is_privilaged('rk', 'emailmanager'))
+			{
+				$OUT.=<<"+++";
+		<menublock title="Email" width="160">
+			<menuitem title="View/Edit Email Accounts" action="get_menu_query('&amp;method=email_home&amp;appname=sitemanager');"/>
+			<menuitem title="Add a Mailbox" action="get_menu_query('&amp;method=email_home&amp;main_frame_method=email_add_pop_account_frameset&amp;appname=sitemanager');"/>
+			<menuitem title="Add an Address" action="get_menu_query('&amp;method=email_home&amp;main_frame_method=email_add_alias_frameset&amp;appname=sitemanager');"/>
+		</menublock>
++++
+			}
+
+			$OUT.=<<"+++";
+	</menublock>
++++
+		}
+	}
+	else
+	{
+		if($c{session}->is_privilaged('rk', 'faqs'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="FAQs" width="140">
+		<menuitem title="View FAQs" action="get_iframe_query('&amp;title=View FAQs&amp;frame_method=faq_client_home&amp;appname=rk&amp;app_proxy=1');"/>
+	</menublock>
++++
+		}
+
+		if($c{session}->is_privilaged('rk', 'fileshare'))
+		{
+			$OUT.=<<"+++";
+	<menublock title="File Sharing" width="140">
+		<menuitem title="Upload New" action="get_iframe_query('&amp;title=Upload File&amp;frame_method=documents_add_document&amp;appname=fileshare');"/>
+		<menuitem title="View All" action="get_iframe_query('&amp;title=Files&amp;frame_method=documents_home&amp;appname=fileshare');"/>
+	</menublock>
++++
+		}
+	}
+}
+</menu_config>

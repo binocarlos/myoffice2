@@ -1,0 +1,61 @@
+<!--#include virtual="temp_include.htm" -->
+
+<body style="background-color:#D4D0C8;">
+<form name="question_form" method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tests_question_choose_component_type_submit">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" valign="top">
+
+<fieldset style="height:100%;">
+<legend>Choose Component Type</legend>
+<div class="seccontent" align="left">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="503">
+<tr>
+<td width="100%" height="100%" valign="middle" align="center">
+<br><br><br><br><br><br>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR> 
+    <TD> 
+        <input type="radio" name="type" value="question" checked>&nbsp;Question Text<br>
+        <input type="radio" name="type" value="comment">&nbsp;Comment Text<br>
+        <input type="radio" name="type" value="image">&nbsp;Image<br>
+        <input type="radio" name="type" value="textline">&nbsp;Text (Single Line)<br>
+        <input type="radio" name="type" value="textbox">&nbsp;Text (Multi Line)<br>
+        <input type="radio" name="type" value="mchoice_checkboxes">&nbsp;Tick Boxes<br>
+        <input type="radio" name="type" value="sum">&nbsp;Sum<br>
+        <input type="radio" name="type" value="multiword">&nbsp;Multiword<br>		
+        <input type="radio" name="type" value="keywords">&nbsp;Keywords<br>						
+        <input type="radio" name="type" value="numeric_range">&nbsp;Numeric Range<br>		
+    </TD>
+  </TR>
+</TABLE>
+
+</td>
+</tr>
+</table>
+
+</div>
+</fieldset>
+
+</td>
+</tr>
+<tr>
+<td align="right">
+
+<input type="submit" name="Submit" value="Set Type" CLASS="button2" style="width:75px;">
+<input type="button"  value="Close" CLASS="button2" style="width:75px;" onClick="top.close();">
+
+</td>
+</tr>
+</table>
+
+</form>
+
+</body>
+</html>
+
+
+

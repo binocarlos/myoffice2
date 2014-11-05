@@ -1,0 +1,165 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+	var current_user_id = null;
+
+	function init_table()
+	\{
+		var table = document.all('tablebody');
+
+		table.onrowselect = table_row_selected;
+	\}
+
+	function table_row_selected()
+	\{
+		current_user_id = event.selected.id;
+	\}
+
+	function user_method(method)
+	\{
+		if(current_user_id>0)
+		\{
+			var new_loc = href + '&method=' + method + '&user_id=' + current_user_id;
+
+			document.location = new_loc;
+		\}
+	\}
+
+</script>
+
+<body>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%" HEIGHT="100%">
+
+  <TR>
+
+	 <TD HEIGHT="100%" WIDTH="100%">
+
+		<TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+
+		  <TR>
+
+			 <TD ALIGN="RIGHT" VALIGN="TOP" CLASS="panelbody" HEIGHT="100%" WIDTH="100%">
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+
+<TR>
+
+ <TD><TABLE ID="tableheader" STYLE="behavior:url(/lib/sort5.htc);" CELLPADDING="2" CELLSPACING="0" BORDER="0" WIDTH="100%" slcolor=#B2B8CD hlcolor=#D9DCE6>
+
+<THEAD>
+
+ <TR>
+{
+	foreach my $ref (@{$c{refs}})
+	{
+		my $width = '';
+		
+		if($ref->{width}=~/\d/)
+		{
+			$width = " WIDTH=$ref->{width}";
+		}
+		
+		$OUT.=<<"+++";
+	<TD CLASS="panel"$width>&nbsp;$ref->{title}</TD>
++++
+	}
+}
+
+ </TR>
+
+</THEAD>
+
+</TABLE></TD>
+
+</TR>
+
+<TR>
+
+ <TD HEIGHT="100%" WIDTH="100%" BGCOLOR="#FFFFFF" CLASS="insetouter"><DIV STYLE="overflow-y:scroll; width:100%; height:100%;" CLASS="insetinner">
+
+<TABLE ID="tablebody" STYLE="behavior:url(/lib/tablehl.htc);" CELLPADDING="2" CELLSPACING="0" BORDER="0" BGCOLOR="#FFFFFF" WIDTH="100%" slcolor=#B2B8CD hlcolor=#D9DCE6>
+
+<THEAD><TR HEIGHT="1"><TD></TD></TR></THEAD>
+
+<TBODY>
+
+{
+	foreach my $obj (@{$c{objs}})
+	{	
+		$OUT.=<<"+++";
+<TR id="$obj->{id}">
++++
+
+		foreach my $ref (@{$c{refs}})
+		{
+			my $value = $obj->{$ref->{field}};
+			
+			my $width = '';
+		
+			if($ref->{width}=~/\d/)
+			{
+				$width = " WIDTH=$ref->{width}";
+			}			
+			
+			$OUT.=<<"+++";
+<TD title=""$width>
+<IMG SRC="/images/clear.gif" WIDTH="3" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+&nbsp;$value</TD>
++++
+		}
+		
+		$OUT.=<<"+++";
+</TR>
++++		
+
+	}
+
+}
+
+		  </TBODY>
+
+				</TABLE></DIV></TD>
+
+</TR>
+
+<TR>
+
+ <TD ALIGN="RIGHT"><IMG SRC="/images/holiday/clear.gif" WIDTH="1"
+
+	HEIGHT="8" BORDER="0"><BR><INPUT TYPE="BUTTON" NAME="edit" VALUE="Edit"
+
+	CLASS="button" STYLE="width:75px;" onClick="user_method('edit_user');"><IMG SRC="/images/holiday/clear.gif"
+
+	WIDTH="8" HEIGHT="1" BORDER="0"><INPUT TYPE="BUTTON" NAME="delete"
+
+	VALUE="Delete" CLASS="button" STYLE="width:75px;" onClick="user_method('delete_user');"></TD>
+
+</TR>
+
+</TABLE>
+
+				</TD>
+
+		  </TR>
+
+		</TABLE></TD>
+
+  </TR>
+
+</TABLE>
+
+<script>
+
+	parent.pagetop.location = '/templates/holiday/list_users_top.htm';
+
+	
+
+	parent.parent.parent.holiday_get_sidebar_query('&method=home_sidebar');
+
+	init_table();
+
+</script>
+
+</body>

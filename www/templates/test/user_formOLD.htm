@@ -1,0 +1,338 @@
+
+
+<table border="0" cellpadding="0" cellspacing="0">
+{
+	if($c{form_config}->{personal_details})
+	{
+		my $firstname = $c{formuser}->get_value('firstname');
+		my $surname = $c{formuser}->get_value('surname');
+		my $position = $c{formuser}->get_value('position');
+		my $phone = $c{formuser}->get_value('phone');
+		
+		$OUT.=<<"+++";
+<tr>
+<td colspan="2" align="LEFT"
+							 background="/images/layout/panelt.gif" height="13"><img
+							 src="/images/layout/paneltl.gif" border="0" width="7" height="13"
+							 align="ABSMIDDLE"><font class="section_title">&nbsp;Personal
+							 Details Overidden For Testing&nbsp;</font></td>
+<td width="2" height="13" valign="TOP"><img
+							 src="/images/layout/paneltr.gif" border="0" width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/layout/panell.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td>
+<table width="100%" border="0" cellpadding="4"
+									 cellspacing="0">
+<tr>
+<td align="RIGHT" valign="MIDDLE"
+										 width="95">Firstname(s):</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="TEXT" name="firstname"
+										 value="$firstname" style="width:160px;">
+</td>
+<td align="RIGHT" valign="MIDDLE" width="95">Surname:</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="text" name="surname" value="$surname"
+										 style="width:160px;">
+</td>
+</tr>
+<tr style="display:{$c{personal_details_dis}};">
+<td align="RIGHT" valign="MIDDLE"
+										 width="95">Position:</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="TEXT" name="position"
+										 value="$position" style="width:160px;">
+</td>
+<td align="RIGHT" valign="MIDDLE" width="95">Phone:</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="text" name="phone" value="$phone"
+										 style="width:160px;">
+</td>
+</tr>
+
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2" background="/images/layout/panelr.gif"><img
+
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3"
+							 background="/images/layout/panelb.gif" align="RIGHT"><img
+							 src="/images/layout/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
++++
+	}
+}
+</table>
+<img src="/images/layout/clear.gif" width="1" height="8" border="0"><br>
+<table border="0" cellpadding="0" cellspacing="0">
+{
+	if($c{form_config}->{signin_details})
+	{
+		my $username = $c{formuser}->get_value('username');
+		my $password = $c{formuser}->get_value('password');
+		
+		
+		$OUT.=<<"+++";
+<tr>
+<td colspan="2" align="LEFT"
+							 background="/images/layout/panelt.gif" height="13"><img
+							 src="/images/layout/paneltl.gif" border="0" width="7" height="13"
+							 align="ABSMIDDLE"><font class="section_title">&nbsp;Sign In
+							 Details&nbsp;</font></td>
+<td width="2" height="13" valign="TOP"><img
+							 src="/images/layout/paneltr.gif" border="0" width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/layout/panell.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td>
+<table width="100%" border="0" cellpadding="4"
+									 cellspacing="0">
+<tr>
+<td align="RIGHT" valign="MIDDLE"
+										 width="95">Email&nbsp;(Username):</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+
+										 class="text_field" type="text" name="username"
+
+										 value="$username" style="width:160px;">
+</td>
+<td align="RIGHT" valign="MIDDLE" width="95">Set Password:</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="text" name="password" value="$password" style="width:160px;">
+</td>
+</tr>
+
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2" background="/images/layout/panelr.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3"
+							 background="/images/layout/panelb.gif" align="RIGHT"><img
+							 src="/images/layout/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
++++
+	}
+}
+</table>
+<img src="/images/layout/clear.gif" width="1" height="8" border="0"><br>
+<table border="0" cellpadding="0" cellspacing="0">
+{
+	if($c{form_config}->{department})
+	{
+		my $department_options = Webkit::Department->get_department_options($c{formorg}, $c{formuser});
+		
+		my $otherdepartment = $c{params}->{otherdepartment};
+		
+		$OUT.=<<"+++";
+<tr>
+<td colspan="2" align="LEFT"
+							 background="/images/layout/panelt.gif" height="13"><img
+							 src="/images/layout/paneltl.gif" border="0" width="7" height="13"
+							 align="ABSMIDDLE"><font class="section_title">&nbsp;Group Details&nbsp;</font></td>
+<td width="2" height="13" valign="TOP"><img
+							 src="/images/layout/paneltr.gif" border="0" width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/layout/panell.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td>
+<table width="100%" border="0" cellpadding="4"
+									 cellspacing="0">
+<tr>
+<td align="RIGHT" valign="MIDDLE" width="95">Group:</td>
+<td align="LEFT" valign="TOP">
+<select name="department_id" size="1" style="width:160px;"
+											class="text_field">
+											$department_options
+</select>
+</td>
+<td align="RIGHT" valign="MIDDLE" width="95">New&nbsp;Group:</td>
+<td align="LEFT" valign="MIDDLE">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="text" name="otherdepartment"
+										 value="$otherdepartment" style="width:160px;">
+ </td>
+</tr></table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2" background="/images/layout/panelr.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3"
+							 background="/images/layout/panelb.gif" align="RIGHT"><img
+							 src="/images/layout/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
++++
+	}
+}
+</table>
+<img src="/images/layout/clear.gif" width="1" height="8" border="0"><br>
+<table border="0" cellpadding="0" cellspacing="0">
+{
+	if($c{form_config}->{privilages})
+	{
+		my $type_options = $c{formuser}->get_type_options;
+
+		$OUT.=<<"+++";
+<tr>
+<td colspan="2" align="LEFT"
+							 background="/images/layout/panelt.gif" height="13"><img
+							 src="/images/layout/paneltl.gif" border="0" width="7" height="13"
+							 align="ABSMIDDLE"><font class="section_title">&nbsp;Access Level&nbsp;</font></td>
+<td width="2" height="13" valign="TOP"><img
+							 src="/images/layout/paneltr.gif" border="0" width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/layout/panell.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td>
+<table cellpadding="4" cellspacing="0">
+<tr>
+<td align="RIGHT" valign="MIDDLE" width="95">Account Type:</td>
+<td align="LEFT" valign="MIDDLE">
+<select name="type" size="1" style="width:160px;" class="text_field">
+											$type_options
+</select>
+</td>
+</tr>
++++
+
+		if($c{form_config}->{privilages} ne 'admin_only')
+		{
+			$OUT.=<<"+++";
+<tr>
+<td align="RIGHT" valign="top">Access:</td>
+<td align="LEFT" valign="MIDDLE">
+<table border="0" cellspacing="0" cellpadding="2">
++++
+
+			$c{formuser}->load_all_privilages;
+		
+			my $main_application_id = $c{main_application_id};
+		
+			if($main_application_id!~/\w/)
+			{
+				$main_application_id = $c{session}->{base_application};
+			}
+
+			my $main_application = Webkit::Apache::ApplicationHub->get_application($main_application_id);
+		
+			my $sub_apps = $main_application->get_subapplication_ids;
+		
+			if(defined($c{sub_applications}))
+			{
+				$sub_apps = $c{sub_applications};
+			}
+
+			my $main_title = $main_application->get_value('title');	
+		
+			my $main_check = $c{formuser}->get_priv_checkbox($main_application->get_id, undef, $c{params});
+		
+			my $sub_application_ids = join(':', @$sub_apps);
+				
+			$OUT.=<<"+++";
+<tr valign="middle">
+<td><b>$main_title</b></td>
+<td align="right">
+$main_check 
+<input type="hidden" name="main_application_id" value="$main_application_id"><input type="hidden" name="sub_application_ids" value="$sub_application_ids">
+</td>
+</tr>
+<tr><td height=10></td></tr>
+<tr valign="middle">
++++
+			my $scount = 0;
+		
+			foreach my $sub_app (@$sub_apps)
+			{
+				$scount++;
+			
+				my $sub_application = Webkit::Apache::ApplicationHub->get_application($sub_app);
+			
+				my $sub_title = $sub_application->get_value('title');			
+				my $sub_check = $c{formuser}->get_priv_checkbox($main_application->get_id, $sub_application->get_id, $c{params});
+		
+				$OUT.=<<"+++";
+<td align="right">$sub_title</td>
+<td align="right">
+$sub_check
+</td>
++++
+
+				if($scount>=2)
+				{
+					$scount=0;
+				
+					$OUT.=<<"+++";
+</tr><tr>
++++
+				}				
+			}
+		
+			$OUT.=<<"+++";
+</tr>
+</table>
+</td>
+</tr>
++++
+		}
+		
+		$OUT.=<<"+++";
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2" background="/images/layout/panelr.gif"><img
+							 src="/images/layout/clear.gif" width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3"
+							 background="/images/layout/panelb.gif" align="RIGHT"><img
+							 src="/images/layout/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
++++
+	}
+}
+</table>

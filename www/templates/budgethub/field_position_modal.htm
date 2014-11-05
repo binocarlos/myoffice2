@@ -1,0 +1,115 @@
+<!--#include virtual="/temp_include.htm" -->
+<html>
+<head>
+<title>{$c{window_title}}</title>
+<style>
+BODY \{margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+TD \{cursor:default; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.button \{height:23px; width:75px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.section_title \{font-family:tahoma,verdana; font-size:11px; background:#D4D0C8;\}
+.copyfield \{width:100%; vertical-align:top; font-family:tahoma,verdana; font-size:11px; color:#000000; background-color:#d4d0c8; border:0px;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px;\}
+.text_field2 \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; BORDER-BOTTOM: #FFDEAD solid 2px; BORDER-LEFT: #C07300 solid 2px; BORDER-RIGHT: #FFDEAD solid 2px; BORDER-TOP:  #C07300 solid 2px; background-color:#FFF5E6;\}
+</style>
+<script>
+	function setStatus(text)
+	\{
+		document.getElementById('statustext').innerText = text;
+		
+		setTimeout("clearStatus();", 5000);
+	\}
+	
+	function clearStatus()
+	\{
+		document.getElementById('statustext').innerText = '';
+	\}
+			
+	function cancel_form()
+	\{
+		window.close();
+	\}
+	
+	function accept_form()
+	\{
+		var field_data = new Object();
+
+		var position = document.getElementById('position').value;
+
+		field_data.position = position;
+		
+		window.returnValue = field_data;
+		window.close();
+	\}
+</script>
+</head>
+<body bgcolor="#D4D0C8">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td width="100%" align="center" valign="middle">
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  
+<TD WIDTH="100%" ALIGN="LEFT" VALIGN="TOP">
+ <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title">
+&nbsp;FieldPosition&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR>
+<TD width="100%" align="left" height="14">
+
+<div style="overflow:auto; width:100%;">
+<table border="0" cellspacing="0" cellpadding="3">
+
+<tr align="left" valign="top">
+<td>Title: </td>
+<td>
+{$c{params}->{title}}</td>
+</tr>
+<tr align="left" valign="top">
+<td>Type:</td>
+<td>
+{$c{type_title}}
+</td>
+</tr>
+<tr align="left" valign="top">
+<td>Currency:</td>
+<td>
+{$c{country_title}}
+</td>
+</tr>
+<tr align="left" valign="top">
+<td>Position:</td>
+<td>
+<select name="position" id="position" size="1" style="width:180px;" class="text_field">
+	{$c{position_options}}
+</select>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td colspan="2"><span style="color:red;" id="statustext"></span></td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+
+</TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+
+ </TD>
+</TR>
+<TR>
+  <TD ALIGN="RIGHT"><IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<input type="button" class="button" value="Cancel" onclick="cancel_form();">
+<img src="/images/clear.gif" width="8" height="1" align="absmiddle">
+<input type="button" class="button" value="Apply" onClick="accept_form();">
+</TD>
+</TR>
+</TABLE>
+
+
+</td>
+</tr>
+</table>
+</body>
+</html>

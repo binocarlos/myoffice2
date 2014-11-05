@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Clients/Users" width="150">
+		<menublock title="Clients" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=clients_tree&amp;frame_method=clients_add_client');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=clients_tree');"/>
+		</menublock>
+		<menublock title="{$c{org}->get_value('name')} Users" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home');"/>
+		</menublock>	
+	</menublock>
+</menu_config>

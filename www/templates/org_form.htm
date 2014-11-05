@@ -1,0 +1,166 @@
+<!--#include virtual="holiday/temp_include.htm" -->
+
+<script>
+
+	function do_cancel()
+	\{
+		var cancel_method = '{$c{cancel_method}}';
+		
+		if(cancel_method!='')
+		\{
+			var new_loc = href + '&method=' + cancel_method;
+			
+			document.location = new_loc;
+		\}
+	\}
+
+	function validate_orgform()
+	\{
+		var ret = true;
+		var form = document.orgform;
+		var required_texts = new Array('name');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			\{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			\}
+		\}
+
+		return ret;
+	\}
+	
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+	\}
+
+</script>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="orgform" onSubmit="return validate_orgform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="org_id" value="{$c{editorg}->get_id}">
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR id="form_tr" style="display: inline;">
+		 <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+			 <TR>
+				<TD>
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"
+					CLASS="panelinner">
+					<TR>
+<TD CLASS="panelbody">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="2" align="LEFT"
+							 background="/images/holiday/panelt.gif" height="13"><img
+							 src="/images/holiday/paneltl.gif" border="0" width="7" height="13"
+							 align="ABSMIDDLE"><font class="section_title">&nbsp;Organisation Details&nbsp;</font></td>
+<td width="2" height="13" valign="TOP"><img
+							 src="/images/holiday/paneltr.gif" border="0" width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/holiday/panell.gif"><img
+							 src="/images/holiday/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td>
+<table width="100%" border="0" cellpadding="4"
+									 cellspacing="0">
+<tr valign="middle">
+<td align="RIGHT"
+										 width="95">Name:</td>
+<td align="LEFT">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="TEXT" name="name"
+										 value="{$c{editorg}->get_value('name')}" style="width:160px;">
+</td>
+<td align="RIGHT" width="95">Website:</td>
+<td align="LEFT">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="text" name="website" value="{$c{editorg}->get_value('website')}"
+										 style="width:160px;">
+</td>
+</tr>
+<tr valign="middle">
+<td align="RIGHT"
+										 width="95">Phone:</td>
+<td align="LEFT">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="TEXT" name="phone"
+										 value="{$c{editorg}->get_value('phone')}" style="width:160px;">
+</td>
+<td align="RIGHT" width="95">Fax:</td>
+<td align="LEFT">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="TEXT" name="fax"
+										 value="{$c{editorg}->get_value('fax')}" style="width:160px;">
+</td>
+</tr>
+<tr valign="top">
+<td align="RIGHT"
+										 width="95">Address:</td>
+<td align="LEFT" colspan="3">
+<textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="address" style="width:100%; height:80px;">{$c{editorg}->get_value('address')}</textarea>
+</td>
+</tr>
+{$c{extra_fields}}
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2" background="/images/holiday/panelr.gif"><img
+
+							 src="/images/holiday/clear.gif" width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3"
+							 background="/images/holiday/panelb.gif" align="RIGHT"><img
+							 src="/images/holiday/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
+</table>
+
+<IMG src="/images/holiday/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<IMG src="/images/holiday/clear.gif" BORDER="0" WIDTH="1" HEIGHT="8">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP"><font color="red"><b id="error_span">{$c{editorg}->{error_text}}</b></font></TD>
+{
+	if(($c{usersmethod})&&($c{editorg}->exists))
+	{
+		my $query = '&method='.$c{usersmethod}.'&object_id='.$c{editorg}->get_id;
+		
+		$c{usersbutton}=<<"+++";
+<INPUT TYPE="button" onClick="document.location=href + '$query';" VALUE="Edit Users" CLASS="button"><IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0">
++++
+
+		$OUT.="";
+	}
+}
+<TD ALIGN="RIGHT" VALIGN="TOP">{$c{usersbutton}}<INPUT TYPE="submit" VALUE="{$c{submit_title}}" CLASS="button"><IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><input type="button" value="Cancel" class="button" name="Button" onClick="do_cancel();" STYLE="width:75px;"></TD>
+</TR>
+</TABLE>
+</TD>
+					</TR>
+				 </TABLE></TD>
+			 </TR>
+			</TABLE>
+</TD>
+		</TR>
+	 </TABLE>
+</form>
+

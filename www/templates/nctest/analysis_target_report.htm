@@ -1,0 +1,88 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function trOver(tr)
+	\{
+		tr.bgColor = '#e5e5ff';
+	\}
+	
+	function trOut(tr)
+	\{
+		tr.bgColor = '#ffffff';
+	\}
+	
+	function viewTopic(topic)
+	\{
+		document.location = href + '&method=analysis_skill_statement_report&{$c{report}->get_query_string({topic_id=>1})}&topic_id=' + topic;
+	\}
+</script>
+
+<table  border="0" cellspacing="1" cellpadding="0">
+  <tr valign="top">
+    <td>
+        <table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+          <tr bgcolor="#FFFFFF">
+            <td width="200"><b>Target  Summary </b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td><b>{$c{report}->{title}}</b><br>{$c{report}->{params_st}}</td>
+          </tr>		    
+
+        </table>
+    </form></td>
+  </tr>
+</table>
+<br>
+Click on each cell to get a breakdown...<br><br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td><strong>Topic</strong></td>
+    <td><strong>Score</strong></td>
+    <td><strong>Marks</strong></td>
+    <td><strong>Percentage</strong></td>
+  </tr>
+{
+	foreach my $ref (@{$c{report}->{data}})
+	{
+		my $topic_id = uc($ref->{topic_id});
+		my $score = sprintf("%.0f", $ref->{totalscore});
+		my $marks = sprintf("%.0f", $ref->{totalmarks});
+		
+		my $percent = 0;
+		
+		if($marks>0)
+		{
+			$percent = sprintf("%.0f", ($score/$marks)*100);
+		}
+		
+		$OUT.=<<"+++";
+  <tr align="right" bgcolor="#FFFFFF" onMouseOver="trOver(this);" onMouseOut="trOut(this);" onClick="viewTopic('$topic_id');" style="cursor:hand;">
+    <td><b>$topic_id</b></td>
+    <td>$score</td>
+    <td>$marks</td>
+    <td><b style="color:red;">$percent</b></td>
+  </tr>
++++
+	}
+}
+</table>
+<br><br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	if($c{report}->{show_pupils}=~/\w/)
+	{
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff><td><strong>Pupils in result set</strong></td>
+</tr>
++++
+
+		foreach my $pupil_name (@{$c{report}->{_pupil_names}})
+		{
+			$OUT.=<<"+++";
+<tr bgcolor=#ffffff><td>$pupil_name</td>
+</tr>		
++++
+		}
+	}
+}
+</table>

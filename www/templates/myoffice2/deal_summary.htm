@@ -1,0 +1,245 @@
+<!--#include virtual="temp_include.htm" -->
+<script>	
+
+</script>
+<body>
+<table border="0" cellpadding="10" cellspacing="0">
+<tr>
+  <td height="1" colspan=3><span class="welcome">Dealsheet for {$c{tour}->name}</span><br><br>
+	<b><a href="javascript:showVenueInfo({$c{venue}->get_id});"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>{$c{venue}->get_city_title}</a></b><br><br>
+  {$c{booking}->get_tourdatetime_titles}<br><br>
+  <span style="color:red;">Created by {$c{user}->get_fullname} on {$c{deal}->created_title}</span>
+  </td>
+</tr>
+<tr>
+<td height="100%" align="left" valign="top">
+
+
+  <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Deal Sheet</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Get In:</TD>
+    <TD width="200" ALIGN="LEFT" VALIGN="MIDDLE"> 
+      {$c{deal}->get_in}
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Running:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->running}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Get Out: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->get_out}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Staffing Level:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->staff_level}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Projector:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->projector}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Projectionist:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->projectionist}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Screen:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->screen}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Merchandising:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->merchandising}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Print Required: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->print_required}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Print Deadline:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->print_deadline}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>In Brochure: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->in_brochure}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Brochure Publication Date: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->brochure_deadline}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Brochure Copy Deadline: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->brochure_copy_deadline}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Brochure Mailing Date: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->brochure_mailing}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Playing Under/Over: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->paying_under_over}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Terms:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->get_html_value('terms')}</TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Notes:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->get_html_value('notes')}</TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Back" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE></td>
+<td align="center" valign="top">&nbsp;</td>
+<td align="center" valign="top"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+  <TR>
+    <TD>
+      <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+        <TR>
+          <TD CLASS="panelbody">        
+		  <fieldset style="height:100%;">
+            <legend>Tourdate Details</legend>
+            <div class="seccontent" align="left">
+              <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD width="100" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Tour:</TD>
+                  <TD width="100" align="left" VALIGN="MIDDLE">{$c{tour}->name}</TD>
+                </TR>
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Venue:</TD>
+                  <TD align="left" VALIGN="MIDDLE">{$c{venue}->get_city_title}</TD>
+                </TR>
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD VALIGN="top" style="padding-right:5px;" nowrap>Dates:</TD>
+                  <TD align="left" VALIGN="MIDDLE">{$c{booking}->get_tourdatetime_titles}</TD>
+                </TR>
+              </TABLE>
+            </div>
+            </fieldset>  
+			<br>     		    
+            <fieldset style="height:100%;">
+            <legend>Deal Figures </legend>
+            <div class="seccontent" align="left">              
+              <table border="0" cellpadding="0" cellspacing="0">
+                <tr align="right" style="padding-bottom:5px;">
+                  <td width="100" valign="MIDDLE" nowrap style="padding-right:5px;">Guarantee:</td>
+                  <td width="100" valign="MIDDLE">{$c{booking}->guarantee}</td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Ticket Prices: </td>
+                  <td valign="MIDDLE">{$c{booking}->get_ticket_price_title}</td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Avg Ticket Price: </td>
+                  <td valign="MIDDLE">{$c{booking}->calculate_average_ticket_price}</td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Capacity:</td>
+                  <td valign="MIDDLE">{$c{venue}->capacity} </td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap> Tickets On Sale:</td>
+                  <td valign="MIDDLE">{$c{deal}->tickets_on_sale} </td>
+                </tr>						
+                <tr align="right" style="padding-bottom:5px;">
+                  <td height=10 colspan=2></td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="top" style="padding-right:5px;" nowrap> Venue Target:</td>
+                  <td width="100" valign="MIDDLE">{$c{booking}->get_html_value('venue_target')} </td>
+                </tr>								
+                <tr align="right" style="padding-bottom:5px;">
+                  <td height=10 colspan=2></td>
+                </tr>				
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Per Show Gross: </td>
+                  <td valign="MIDDLE">{$c{deal}->{_per_show_gross}}</td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Total Gross: </td>
+                  <td valign="MIDDLE">{$c{deal}->{_total_gross}}</td>
+                </tr>
+                <tr align="right" style="padding-bottom:5px;">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Deal:</td>
+                  <td valign="MIDDLE">{$c{deal}->deal_title}</td>
+                </tr>
+              </table>
+            </div>
+            </fieldset>
+			<br>       			
+            <fieldset style="height:100%;">
+            <legend>Sing-A-Long Figures </legend>
+            <div class="seccontent" align="left">
+              <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD width="100" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Gross:</TD>
+                  <TD width="100" VALIGN="MIDDLE">{$c{deal}->{_som_gross}}</TD>
+                </TR>
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>VAT:</TD>
+                  <TD VALIGN="MIDDLE">{$c{deal}->{_som_vat}}</TD>
+                </TR>
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Net:</TD>
+                  <TD VALIGN="MIDDLE">{$c{deal}->{_som_net}}</TD>
+                </TR>
+              </TABLE>
+            </div>
+            </fieldset>  
+			<br>       			  		
+            <fieldset style="height:100%;">
+            <legend>Venue Figures </legend>
+            <div class="seccontent" align="left">
+              <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD width="100" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Gross:</TD>
+                  <TD width="100" VALIGN="MIDDLE">{$c{deal}->{_venue_gross}}</TD>
+                </TR>
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>VAT:</TD>
+                  <TD VALIGN="MIDDLE">{$c{deal}->{_venue_vat}}</TD>
+                </TR>
+                <TR align="right" style="padding-bottom:5px;">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Net:</TD>
+                  <TD VALIGN="MIDDLE">{$c{deal}->{_venue_net}}</TD>
+                </TR>
+              </TABLE>
+            </div>
+            </fieldset>  				
+			
+            </TD>
+        </TR>
+    </TABLE></TD>
+  </TR>
+</TABLE></td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

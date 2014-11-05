@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<menu_config>
+{
+	if((!$c{org}->is_client)&&($c{session}->is_privilaged('va', 'clientms')))
+	{
+		$OUT.=<<"+++";
+	<menublock title="Clients" width="90">
+		<menuitem title="Add" action="get_menu_query('&amp;method=clients_tree&amp;frame_method=clients_add_client&amp;appname=clientms');"/>
+		<menuitem title="View/Edit" action="get_menu_query('&amp;method=clients_tree&amp;appname=clientms');"/>
+	</menublock>
++++
+	}
+
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+		<menublock title="Contacts" width="90">
+			<menuitem title="View Contacts" action="view_contacts_tree();"/>
+		</menublock>
+		<menublock title="Staff" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user&amp;appname=va');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home&amp;appname=va');"/>
+		</menublock>
+		<menublock title="Suppliers" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Supplier&amp;frame_method=suppliers_form&amp;appname=va');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Suppliers&amp;frame_method=suppliers_home&amp;appname=va');"/>
+		</menublock>
+		<menublock title="Leads" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Lead&amp;frame_method=lead_form&amp;appname=va');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Leads&amp;frame_method=leads_home&amp;appname=va');"/>
+		</menublock>
+		<menublock title="Projects" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Project&amp;frame_method=project_form&amp;appname=va');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Projects&amp;frame_method=projects_home&amp;appname=va');"/>
+		</menublock>
+		<menublock title="Tasks" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Task&amp;frame_method=tasks_form&amp;appname=va');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Tasks&amp;frame_method=tasks_home&amp;appname=va');"/>
+		</menublock>
+		<menublock title="Jobs" width="90">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Job&amp;frame_method=job_form&amp;appname=va');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Jobs&amp;frame_method=jobs_home&amp;appname=va');"/>
+			<menuitem title="View Tree" action="view_jobs_tree();"/>
+		</menublock>
++++
+	}
+}
+
+</menu_config>
+

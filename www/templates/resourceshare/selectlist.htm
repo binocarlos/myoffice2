@@ -1,0 +1,43 @@
+<html>
+<head>
+<style>
+.select	{margin:0px; padding:0px; width:100%; font-family:tahoma,arial; font-size:11px; cursor:default;}
+.selected	{background:#FFFFFF; padding:0px; font-family:tahoma,arial; font-size:11px;}
+.selectTable {width:100%; border:2px inset buttonhighlight; background:#d4d0c8;}
+.option	{font-family:tahoma,arial; font-size:11px; width:100%; padding-left:3px; padding-top:1px; padding-bottom:1px; padding-right:3px;}
+.dropDown	{position:absolute; visibility:hidden; width:100%; border:1px solid #000000; background:#FFFFFF; color:#000000;}
+.select .buttondown	{width:11px; font-family:webdings; font-size:11px; border:2px outset buttonhighlight;}
+.iconpad {margin-right:5px;}
+</style>
+<script type="text/javascript" src="/lib/selectlist.js"></script>
+
+</head>
+<body>
+<table cellpadding="5" border="0" cellspacing="0">
+<tr>
+<td width="300"><select style="font-family:tahoma; font-size:11px; width:100%">
+<option>Resources</option>
+<option>Folder 2</option>
+<option>Folder 3</option>
+<option>Folder 4</option>
+<option>Recycle Bin</option>
+</select></td>
+<td width="300">
+
+<script type="text/javascript">
+var optionArray = new Array();
+optionArray[0] = new Option('<img src="/images/icons/16/select_resources.gif" border=0 align="absmiddle" class="iconpad">Resources', "value 1");
+optionArray[1] = new Option('<img src="/images/icons/16/select_folder.gif" border=0 align="absmiddle" class="iconpad">Folder 2', "value 2");
+optionArray[2] = new Option('<img src="/images/icons/16/select_folder.gif" border=0 align="absmiddle" class="iconpad">Folder 3', "value 3");
+optionArray[3] = new Option('<img src="/images/icons/16/select_folder.gif" border=0 align="absmiddle" class="iconpad">Folder 4', "value 4");
+optionArray[4] = new Option('<img src="/images/icons/16/select_recyclebin.gif" border=0 align="absmiddle" class="iconpad">Recycle Bin', "value 5");
+writeSelectBox(optionArray, "select1", 1, "alert(this.options[this.selectedIndex].value)");
+</script>
+
+</td>
+</tr>
+<tr>
+<td colspan="2"><iframe width="100%" height="300" src="http://www.google.com"></iframe></td>
+</tr>
+</table>
+</body>

@@ -1,0 +1,155 @@
+<!--#include file="temp_include.htm" -->
+<script>
+var tableModes = new Object();
+var tdBgCols = new Object();
+
+var selectedTd = null;
+
+function viewExamAnalysis(id)
+\{
+	var new_loc = href + '&method=analysis_question_report_frameset&exam_id=' + id;
+		
+	top.content.page.location = new_loc;
+\}
+
+function viewPhase(examId, phase)
+\{
+	if(selectedTd!=null)
+	\{
+		var elem = document.getElementById(selectedTd);
+
+		
+		elem.bgColor = '';
+	\}
+	
+	var selectedTdElem = document.getElementById('td_' + examId + phase);
+	
+	if(!selectedTdElem)
+	\{
+		return;
+	\}
+	
+	selectedTd = 'td_' + examId + phase;
+	selectedTdElem.bgColor = '#ff0000';
+	
+	var loc = href + '&method=control_panel_phase_' + phase + '&exam_id=' + examId;
+	
+	top.content.sidebar.document.location = loc;
+\}
+
+function tdMouseOver(td)
+\{
+	if(td.id!=selectedTd)
+	\{
+		tdBgCols[td.id] = td.bgColor;
+		td.bgColor = '#ff0000';
+	\}
+\}
+
+function tdMouseOut(td)
+\{
+	if(td.id!=selectedTd)
+	\{
+		td.bgColor = tdBgCols[td.id];
+	\}
+\}
+
+function toggleTable(id)
+\{
+
+\}
+
+function viewPeriod(period)
+\{
+	var loc = href + '&method=control_panel_home&period_date=' + period;
+	
+	document.location = loc;
+\}
+
+function hidePeriod()
+\{
+	var loc = href + '&method=control_panel_home&period_date=none';
+	
+	document.location = loc;
+\}
+</script>
+<body>
+<!--<input type="button" value="Help" name="helpbut" onclick="top.context_help(2);"><br><br>-->
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+	<tr style="padding-bottom:8px;">
+<td>
+<TABLE BGCOLOR="white" WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+  <tr>
+    <td class="t">&nbsp;</td>
+    <td class="t" align="center" nowrap>Assign {$c{org}->pupil_title}s</td>
+    <td class="t" align="center" nowrap>Invigilate</td>
+    <td class="t" align="center" nowrap>Marking</td>
+    <td class="t" align="center" nowrap>Analysis</td>		
+    </tr>		
+{
+	foreach my $exam (@{$c{org}->ensure_child_array('exam')})
+	{
+		my $name = 'Yr '.$exam->yeargroup.' - '.$exam->name.'';
+		
+		if($c{org}->is_generic_nctest)
+		{
+			$name = $exam->name;
+		}
+		
+		if($exam->is_manual) { $name .= '- Manual'; }
+		
+		my $date = $exam->period_date;
+		my $date_row_mode = undef;
+		my $exam_id = $exam->get_id;
+		
+		if($c{user}->is_webkit)
+		{
+			my $test_id = $exam->test_id;
+			
+			$name .= " - ($exam_id) - ($test_id) - ".$exam->phase;
+		}
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td class="t" width="100%"><b>$name</b></td>
++++
+
+		foreach my $phase (@{$exam->generic_phase_array})
+		{
+			my $phase_diff = $exam->phase_difference($phase);
+			
+			my $bgcol = 'green';
+						
+			$OUT.=<<"+++";
+<td class="c4" style="cursor:hand;" align="center" valign="middle" id="td_$exam_id$phase" onClick="viewPhase($exam_id, '$phase');" onMouseOver="tdMouseOver(this);" onMouseOut="tdMouseOut(this);"><img src="/images/nctest/exams/$bgcol.gif" border="0" width="68" height="16"></td>
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+}
+</table>
+<script>
+{
+	if($c{phase}=~/\w/)
+	{
+		my $exam_id = $c{exam_id};
+		my $phase = $c{phase};
+		
+		$OUT.=<<"+++";
+	viewPhase($exam_id, '$phase');
++++
+	}
+	
+	if($c{reset_sidebar})
+	{
+		$OUT.=<<"+++";
+	top.content.sidebar.document.location = href + '&method=control_panel_sidemenu';
++++
+	}
+}
+</script>
+</body>
+</html>

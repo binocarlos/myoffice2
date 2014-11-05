@@ -1,0 +1,203 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function view_folder(resource_id, folder_id)
+	\{
+		var ret_obj = new Object();
+
+		ret_obj.folder_id = folder_id;
+		ret_obj.resource_id = resource_id;
+
+		top.returnValue = ret_obj;
+
+		top.close();
+	\}
+
+	function cancel()
+	\{
+		top.returnValue = false;
+
+		top.close();
+	\}
+
+	function search_resources()
+	\{
+		var search_value = document.getElementById('search').value;
+		var author = document.getElementById('author').value;
+		var modified = document.getElementById('last_modified').value;
+
+		var new_loc = href + '&method=resources_search&search=' + search_value;
+		new_loc += '&author=' + author + '&last_modified=' + modified;
+		
+		
+		if(document.getElementById('advcheck').checked)
+		\{
+			new_loc += '&advcheck=true';
+		\}
+
+		document.location = new_loc;
+	\}
+</script>
+<body style="background-color:#D4D0C8; margin:8px;">
+
+<TABLE WIDTH="625" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+<tr>
+<td colspan="2" style="padding-bottom:8px;" valign="top">
+<fieldset>
+<legend>Search for resources by Title, Notes or Keywords</legend>
+
+<div class="seccontent">
+
+<div id="simpleform" style="display:inline;">
+<table border="0" cellpadding="0" cellspacing="0" width="97%">
+  <tr>
+    <td align="right" nowrap width="65">Search&nbsp;for:&nbsp;</td>
+    <td><input value="{$c{params}->{search}}" type="text" id="search" name="search" class="text_field" style="width:100%; height:19px;"></td>
+    <td align="right" width="80"><input onClick="search_resources();" type="button" value="Search" class="button" style="width:75px; height:19px;"></td>
+  </tr>
+</table>
+</div>
+
+<div id="advancedform" style="display:none;">
+<table border="0" cellpadding="0" cellspacing="0" width="97%">
+  <tr style="padding-bottom:5px;">
+    <td align="right" nowrap width="65">Search&nbsp;for:&nbsp;</td>
+    <td colspan="4"><input value="{$c{params}->{search}}" type="text" id="search" name="search" class="text_field" style="width:100%; height:19px;"></td>
+	</tr>
+  <tr>
+              <td align="right" nowrap width="65">Author:&nbsp;</td>
+              <td width=200><input value="{$c{params}->{author}}" type="text" id="author" name="author" class="text_field" style="width:100%; height:19px;"></td>
+    <td align="right" nowrap width="1">&nbsp;&nbsp;&nbsp;Last&nbsp;modified:&nbsp;</td>
+    <td><select id="last_modified" name="last_modified" class="text_field" style="width:100%; height:19px;">{$c{last_modified_options}}</select></td>
+    <td align="right" width="82"><input onClick="search_resources();" type="button" value="Search" class="button" style="width:75px; height:19px;"></td>
+  </tr>
+</table>
+</div>
+
+</div>
+</fieldset>
+</td>
+</tr>
+<TR>
+ <TD colspan="2">
+<TABLE CELLPADDING="2" CELLSPACING="0" BORDER="0" WIDTH="100%">
+ <TR>
+	<TD CLASS="panel" WIDTH="16">&nbsp;</TD>
+	<TD CLASS="panel" WIDTH="150">&nbsp;Title</TD>
+	<TD CLASS="panel" WIDTH="*">&nbsp;Author</TD>
+	<TD CLASS="panel" WIDTH="100">&nbsp;Modified</TD>
+	<TD CLASS="panel" WIDTH="70">&nbsp;Size</TD>
+	<TD CLASS="panel" WIDTH="60">&nbsp;</TD>
+	<TD WIDTH="13"></TD>
+ </TR>
+</TABLE>
+
+</TD>
+</TR>
+<TR>
+ <TD colspan="2" HEIGHT="100%" WIDTH="100%" BGCOLOR="#FFFFFF" CLASS="insetouter">
+
+<DIV STYLE="overflow-y:scroll; width:100%; height:100%;" CLASS="insetinner">
+<TABLE CELLPADDING="3" CELLSPACING="0" BORDER="0" bordercolor="#ffffff" BGCOLOR="#FFFFFF" WIDTH="100%">
+{
+	my $count = @{$c{resource_array}};
+	
+	if($count>0)
+	{
+		foreach my $resource (@{$c{resource_array}})
+		{
+			my $icon = $resource->get_icon_src;
+			my $user = $resource->{_users_name};
+			my $author = $resource->get_value('author');
+			
+			if($author!~/\w/)
+			{
+				$author = $user;
+			}
+			
+			my $modified = $resource->get_modified_title;
+			my $size = $resource->get_size_title;
+			my $folder_id = $resource->get_value('folder_id');
+			my $resource_id = $resource->get_id;
+			my $title = $resource->get_value('title');
+
+			$OUT.=<<"+++";
+<TR>
+<TD nowrap valign=middle WIDTH="16"><img src="$icon" width=16 height=16></TD>
+<TD nowrap valign=middle WIDTH="150">$title</TD>
+            <TD nowrap valign=middle WIDTH="*">$author</TD>
+<TD nowrap valign=middle WIDTH="100">$modified</TD>
+<TD nowrap valign=middle WIDTH="70" align="right">$size</TD>
+<TD nowrap valign=middle WIDTH="60"><a style="color:#0000FF" href="javascript: view_folder($resource_id, $folder_id);">View Folder</a></TD>
+</TR>
++++
+		}
+	}
+	elsif($c{was_searched})
+	{
+		$OUT.=<<"+++";
+<TR>
+<TD nowrap valign=middle colspan=6>No Results Found, please try again.....</TD>
+</TR>
++++
+	}		
+}
+
+</TABLE>
+</DIV>
+
+</TD>
+</TR>
+<TR>
+<td align="left" style="padding-top:7px;">
+<input type="checkbox" id="advcheck" name="advcheck" value="true" onClick="toggle_search();"><a onclick="toggle_text();">&nbsp;Advanced Search Options</a>
+<script>
+function toggle_text()
+\{
+	if (advcheck.checked)
+	\{
+		advcheck.checked=false;
+		simpleform.style.display='inline';
+		advancedform.style.display='none';
+	\}
+	else
+	\{
+		advcheck.checked=true;
+		advancedform.style.display='inline';
+		simpleform.style.display='none';
+	\}
+\}
+function toggle_search()
+\{
+	if (advcheck.checked)
+	\{
+		advancedform.style.display='inline';
+		simpleform.style.display='none';
+	\}
+	else
+	\{
+		simpleform.style.display='inline';
+		advancedform.style.display='none';
+	\}
+\}
+</script>
+</td>
+
+<TD ALIGN="RIGHT"><input onClick="cancel();" type="button" class="button2" value="Cancel" style="width:75px;"></TD>
+</TR>
+</TABLE>
+{
+	if($c{params}->{advcheck}=~/\w/)
+	{
+		$OUT.=<<"+++";
+<script>
+document.getElementById('advcheck').click();		
+</script>
++++
+	}
+}
+</body>
+</html>
+
+
+

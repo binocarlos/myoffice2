@@ -1,0 +1,74 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.b \{border-style:solid; border-color:#000099;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script>
+	function chooseMuseum(id)
+	\{
+		document.location = href + '&method=website_proxy_change_museum_id&museum_id=' + id;
+	\}
+	
+	function addNewMuseum()
+	\{
+		document.location = href + '&method=website_proxy_change_museum_id';
+	\}
+</script>
+<body>
+<span style="font-size:14pt;">Welcome <b>{$c{museum_login}->name}</b></span>
+<br>
+<br>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/icons/24x24/documents.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> Add New Museum </b></td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;">&nbsp;</td>
+  </tr></table>
+  </td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">Click the button below to create a completely new museum entry on the system... </td>
+  </tr>  
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><input type="button" class="button" value="Add New Museum" onClick="addNewMuseum();"></td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">&nbsp;</td>
+</tr>  
+<tr>
+<td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/icons/24x24/documents.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> CHOOSE EXISTING MUSEUM </b></td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;">&nbsp;</td>
+  </tr></table>
+  </td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">Choose the museum that you want to edit... </td>
+  </tr>
+{
+	foreach my $museum (@{$c{museum_login}->ensure_child_array('museum')})
+	{
+		my $name = $museum->name;
+		my $id = $museum->get_id;
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"> <a href="javascript:chooseMuseum($id);"><img src="/images/icons/24x24/arrow_right_green.gif" width="24" height="24" border="0" align="absmiddle"> $name</a></td>
+</tr>		
++++
+	}
+}
+</table>
+</body>
+</html>
+
+
+

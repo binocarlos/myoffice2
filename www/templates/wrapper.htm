@@ -1,0 +1,33 @@
+<html>
+<head>
+<script src="/wk/lib/kit.js"></script>
+
+<!--
+<script src="/wk/lib/error.js"></script>
+<script src="/wk/lib/hidestatus.js"></script>
+-->
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+{
+if(!$c{session_id})
+{
+		$OUT.=<<"+++";
+var appname = 'login';
++++
+}
+else
+{
+		$OUT.=<<"+++";
+var appname = '$c{app_name}';
++++
+}
+}
+</script>
+
+<link rel="stylesheet" href="/wk/lib/app.css" type="text/css">
+</head>
+{$c{body}}
+</html>

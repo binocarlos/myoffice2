@@ -1,0 +1,397 @@
+<!--#include virtual="temp_include.htm" -->
+<script src="/lib/tablehighlight.js">
+</script>
+<script src="/lib/tablesort.js">
+</script>
+<script>
+
+	function init_table(tableid, sortheadid, sortbodyid)
+	\{
+		if(!tableid)
+		\{
+			tableid = 'tablebody';
+		\}
+		
+		if(!sortheadid)
+		\{
+			sortheadid = 'tablesort_thead';
+		\}
+		
+		if(!sortbodyid)
+		\{
+			sortbodyid = 'tablesort_tbody';
+		\}
+		
+		var table = document.all(tableid);
+		var sort_thead = document.all(sortheadid);
+		var sort_tbody = document.all(sortbodyid);
+		
+		tablesort_init(sort_thead, sort_tbody);
+		init_tablehl(table);
+	\}
+	
+	function normal_method(method, appname)
+	\{
+		var new_loc = href + '&method=' + method;
+		
+		if(appname!='') \{ new_loc += '&appname=' + appname; \}
+		
+		document.location = new_loc;
+	\}
+	
+	function object_list_get_selected_id()
+	\{
+		var selectedRow = thl_selRow;
+		
+		if(selectedRow.id>0)
+		\{
+			return selectedRow.id;
+		\}
+		else
+		\{
+			return null;
+		\}
+	\}
+
+	function object_method(method, appname)
+	\{
+		var selectedRow = thl_selRow;
+		
+		if(selectedRow.id>0)
+		\{
+			var object_tag = 'object';
+			
+{
+	if($c{object_tag}=~/\w/)
+	{
+		$OUT.=<<"+++";
+			object_tag = '$c{object_tag}';
++++
+	}
+}
+			var new_loc = href + '&method=' + method + '&' + object_tag + '_id=' + selectedRow.id;
+			
+			if(appname!='') \{ new_loc += '&appname=' + appname; \}			
+
+			document.location = new_loc;
+		\}
+	\}
+
+</script>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+
+<body style="cursor:default;">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%" HEIGHT="100%">
+  <TR>
+	 <TD HEIGHT="100%" WIDTH="100%">
+		<TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+		  <TR>
+			 <TD ALIGN="RIGHT" VALIGN="TOP" CLASS="panelbody" HEIGHT="100%" WIDTH="100%">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+{
+	if($c{title})
+	{
+		$OUT.=<<"+++";
+<tr><td class="page_title">$c{title}</td></tr>
+<tr><td height="5"></td></tr>
+
++++
+	}
+	
+	if($c{filter_submit_method})
+	{
+		$OUT.=<<"+++";
+<tr>
+<td height="30" valign="top" align="left">
+<form method="GET" action="$c{script}" style="margin:0;" name="list_users_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="$c{filter_submit_method}">
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td>View: &nbsp;</td>
+<td>
+<select name="object_list_filter" class="text_field">
+$c{filter_options}
+</select> &nbsp;</td>
+<td>
+<input type="submit" value="Change" class="button" style="width:75px;height:19px;">
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}
+	
+	if($c{view_page_method})
+	{
+		$OUT.=<<"+++";
+<tr>
+<td height="30" valign="top" align="left">
+<script>
+	function resetAndSubmitPageForm()
+	\{
+		var form = document.page_form;
+		form.search.value = '';
+		form.object_list_filter.value = '';
+		form.limit.value = '';
+		
+		form.submit();
+	\}
+</script>
+<form method="GET" action="$c{script}" style="margin:0;" name="page_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="$c{view_page_method}">
+<input type="hidden" name="search" value="$c{params}->{search}">
+<input type="hidden" name="object_list_filter" value="$c{params}->{object_list_filter}">
+$c{view_page_hiddens}
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td>Viewing: &nbsp;</td>
+<td>
+<select name="limit" class="text_field">
+$c{view_page_options}
+</select> &nbsp;</td>
+<td>
+of $c{view_page_total} $c{view_page_title}
+</td>
+<td width=10></td>
+<td>
+<input type="submit" value="Change" class="button" style="width:75px;height:19px;">
+</td>
+<td>
+<input type="button" value="Reset" class="button" style="width:75px;height:19px;" onClick="resetAndSubmitPageForm();">
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}	
+	
+	if($c{search_submit_method})
+	{
+		my $ignore_params = {
+			search => 1,
+			session_id => 1,
+			method => 1 };
+			
+		my $param_st;
+		
+		foreach my $key (keys %{$c{params}})
+		{
+			if($ignore_params->{$key}) { next; }
+			
+			my $value = $c{params}->{$key};
+			
+			$param_st.=<<"+++";
+<input type="hidden" name="$key" value="$value">			
++++
+		}
+		
+		my $search = $c{params}->{search};
+		
+		$OUT.=<<"+++";
+<tr>
+<td height="30" valign="top" align="left">
+<form method="GET" action="$c{script}" style="margin:0;" name="search_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="$c{search_submit_method}">
+<input type="hidden" name="limit" value="">
+$param_st
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td>Search: &nbsp;</td>
+<td width=200>
+<input name="search" class="text_field" style="width:100%;" value="$search"></td>
+<td>
+<input type="submit" value="Search" class="button" style="width:75px;height:19px;">
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}
+	
+	if($c{extra_table})
+	{	
+		$OUT.=<<"+++";
+	<TR>
+ <TD>
+ $c{extra_table}
+ </TD></TR>	
++++
+	}
+}
+<TR>
+ <TD><TABLE ID="tableheader" CELLPADDING="2" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<THEAD id="tablesort_thead">
+ <TR>
+{
+	foreach my $def (@{$c{defs}})
+	{
+		$OUT.=<<"+++";
+	<TD CLASS="panel" WIDTH="$def->{width}">&nbsp;$def->{title}</TD>
++++
+	}
+}
+	<TD WIDTH="13"></TD>
+ </TR>
+</THEAD>
+</TABLE></TD>
+</TR>
+<TR>
+ <TD HEIGHT="100%" WIDTH="100%" BGCOLOR="#FFFFFF" CLASS="insetouter"><DIV STYLE="overflow-y:scroll; width:100%; height:100%;" CLASS="insetinner">
+<TABLE ID="tablebody" CELLPADDING="3" CELLSPACING="0" BORDER="0" bordercolor="#ffffff" BGCOLOR="#FFFFFF" WIDTH="100%">
+<THEAD>
+<TR HEIGHT="1"><TD></TD></TR></THEAD>
+<TBODY id="tablesort_tbody">
+{
+	foreach my $object (@{$c{objects}})
+	{	
+		my $id = $object->get_id;
+
+		$OUT.=<<"+++";
+<TR id="$id">
++++
+
+		foreach my $def (@{$c{defs}})
+		{
+			my $value;
+			
+			if($def->{prop}=~/\w/)
+			{
+				$value = $object->get_value($def->{prop});
+			}
+			elsif($def->{method}=~/\w/)
+			{
+				my $method = $def->{method};
+				
+				my $args = $def->{args};
+				
+				$value = $object->$method(@$args);
+			}
+			elsif($def->{value}=~/\w/)
+			{
+				$value = $def->{value};
+			}
+			
+			my $align;
+			
+			if($def->{align}=~/\w/)
+			{
+				$align = ' align="'.$def->{align}.'"';
+			}
+		
+			my $width = $def->{width};
+			my $width_px = $width.'px';
+			
+			my $title = $value;
+
+			$title =~ s/<.*?>//g;
+			
+			my $overflow = 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+			
+			if($def->{no_overflow})
+			{
+				$overflow = '';
+			}
+						
+			$OUT.=<<"+++";		 
+<TD nowrap valign=top WIDTH="$width"$align><div title="$title" style="$overflow width:$width_px; padding-left:3px;">$value</div></TD>
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+}
+		  </TBODY>
+				</TABLE></DIV></TD>
+</TR>
+{
+	my $button_texts = undef;
+	
+	my $button_refs = $c{button_refs};
+	
+	foreach my $button_ref (@$button_refs)
+	{
+		my $title = $button_ref->{title};
+		my $method = $button_ref->{method};
+		my $key = $button_ref->{key};
+		my $appname = $button_ref->{appname};		
+		my $jsfunc = 'object_method';
+		my $width = 75;
+		
+		if($key!~/\w/)
+		{
+			$key = $title;
+			$key =~ s/\W//g;
+		}
+			
+		if($button_ref->{normal_method}=~/\w/)
+		{
+			$method = $button_ref->{normal_method};
+			$jsfunc = 'normal_method';
+		}
+		
+		if($button_ref->{js_func}=~/\w/)
+		{
+			$jsfunc = $button_ref->{js_func};
+		}		
+		
+		if($button_ref->{width}=~/\d/)
+		{
+			$width = $button_ref->{width};
+		}
+		
+		if($width!~/px$/)
+		{
+			$width.='px';
+		}
+		
+		$key = 'object_button_'.$key;
+		
+		my $on_click = "$jsfunc('$method', '$appname');";
+		
+		if($button_ref->{confirm_message}=~/\w/)
+		{
+			$button_ref->{confirm_message} =~ s/'/\\'/g;
+			
+			$on_click = "if(window.confirm('$button_ref->{confirm_message}')){$on_click}";
+		}
+		
+		my $button_text=<<"+++";
+<input type="BUTTON" name="$key" id="$key" value="$title" class="button2" style="width:$width;" onClick="$on_click">
++++
+
+		push(@$button_texts, $button_text);
+	}
+	
+	my $join=<<"+++";
++++
+
+	$c{all_button_text} = join($join, @$button_texts);
+	
+	$OUT.="";	
+}
+
+<TR>
+ <TD ALIGN="RIGHT">{$c{all_button_text}}</TD>
+</TR>
+</TABLE>
+				</TD>
+		  </TR>
+		</TABLE></TD>
+  </TR>
+</TABLE>
+<script>
+	init_table('tablebody', 'tablesort_thead', 'tablesort_tbody');
+</script>
+</body>

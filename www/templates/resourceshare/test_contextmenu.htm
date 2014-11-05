@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<title></title>
+<link rel="STYLESHEET" type="text/css" href="/lib/contextmenu/contextmenu.css">
+<script src="ieemu.js"></script>
+</head>
+
+<body onload="ContextMenu.intializeContextMenu()" oncontextmenu="contextForBody(this)">
+
+<button oncontextmenu="contextForButton(this)" id="benluc">futchracka</button>
+
+<span oncontextmenu="contextForSpan(this)" id="darg">fut</span>
+
+<script src="/lib/contextmenu/contextmenu.js"></script>
+<script src="/lib/contextmenu/ieemu.js"></script>
+
+<script>
+
+function contextForBody(obj)
+{
+   var eobj,popupoptions
+   popupoptions = [
+   					new ContextItem("Refresh",function(){window.location.reload();}),
+						new ContextItem("Disabled Item",null,true),
+						new ContextSeperator(),
+						new ContextItem("Print",function(){window.print()},true),
+						new ContextItem("Kill Jared",null,true),
+						new ContextItem("View Source",function(){location='view-source:'+location}),
+						new ContextSeperator(),
+   					new ContextItem("Show Text",function(){window.status=obj.innerText;})
+   				  ]
+   ContextMenu.display(popupoptions)
+}
+
+function showText(obj)
+{
+	self.status=obj.innerText
+}
+
+function contextForSpan(obj)
+{
+   var eobj,popupoptions
+   popupoptions = [
+   						new ContextItem("Show Text",function(){showText(obj);})
+   				  ]
+   ContextMenu.display(popupoptions)
+}
+function hideIt(obj)
+{
+	obj.style.display='none'
+}
+
+function contextForButton(obj)
+{
+   var eobj,popupoptions
+   popupoptions = [
+   						new ContextItem("<b>Hide</b>",function(){hideIt(obj);}),
+   						new ContextItem("Show Text",function(){showText(obj);})
+   				  ]
+   ContextMenu.display(popupoptions)
+}
+
+//window.pageXOffset and window.pageYOffset
+</script>
+
+<select><option>The popup can cover me</option></select>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</body>
+</html>

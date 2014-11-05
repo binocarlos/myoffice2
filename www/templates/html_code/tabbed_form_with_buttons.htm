@@ -1,0 +1,231 @@
+<html>
+<head>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+
+        <title>Site Manager</title>        
+	<script src="/lib/kit.js"></script>
+        <script>
+		var href = '/apps/sitemanager.app?session_id=4ceed0fa8b5edce4d096f7f04e39f722';
+        </script>
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+</head>
+<!--#include virtual="holiday/temp_include.htm" -->
+
+<script>
+
+	function validate_userform()
+	{
+		var ret = true;
+		var form = document.userform;
+		var required_texts = new Array('firstname', 'surname', 'username', 'password');
+
+		for(var i=0; i<required_texts.length; i++)
+		{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			}
+		}
+
+		if(form.department_id)
+		{
+			if((form.department_id.value>0)&&(form.otherdepartment.value!=''))
+			{
+				form_error('You must choose either a department OR enter a new one');
+				ret = false;
+			}
+		}
+
+		return ret;
+	}
+	
+	function form_error(text)
+	{
+		document.all('error_span').innerText = text;
+	}
+
+</script>
+
+<form method="POST" action="/apps/sitemanager.app" style="margin:0;" name="userform" onSubmit="return validate_userform();">
+<input type="hidden" name="session_id" value="4ceed0fa8b5edce4d096f7f04e39f722">
+<input type="hidden" name="method" value="edit_user_submit">
+<input type="hidden" name="user_id" value="2">
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR id="form_tr" style="display: inline;">
+		 <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+			 <TR>
+				<TD>
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"
+					CLASS="panelinner">
+					<TR>
+<TD CLASS="panelbody">
+<style>
+.tab-page {height:300px;width:540px;}
+.label {padding-right:5px; width:77px; padding-bottom:5px;}
+.space {width:10px;}
+.field {padding-bottom:5px;}
+.priv1 {padding-left:15px;}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Personal Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Personal Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>General</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Firstname(s):</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="firstname" value="Dan" style="width:160px;"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Surname:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="surname" value="Baker" style="width:160px;"></TD>
+</TR>
+<TR> 
+ <TD CLASS="label" ALIGN="RIGHT" VALIGN="TOP" ROWSPAN="3" style="padding-top:4px">Address:</TD> 
+ <TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN="3" CLASS="field"><TEXTAREA NAME="address" style="width:160px; height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field">Because he is a very good chap.</TEXTAREA></TD>
+ <TD CLASS="space"></TD>
+ <TD colspan="2" VALIGN="top"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD CLASS="label" ALIGN="RIGHT" VALIGN="MIDDLE">Telephone:</TD> 
+ <TD CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="homephone" value="35 39339 393 9" style="width:160px;"></TD> 
+</TR>
+<TR>
+ <TD CLASS="label" ALIGN="RIGHT" VALIGN="MIDDLE">Mobile:</TD> 
+ <TD CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="mobile" value="93059 39 93 493" style="width:160px;"></TD> 
+</TR>
+<TR>
+ <TD CLASS="label" ALIGN="RIGHT" VALIGN="MIDDLE">Sex:</TD> 
+ <TD CLASS="field" VALIGN="top"><INPUT TYPE="RADIO" NAME="sex" VALUE="m" CHECKED> Male &nbsp;	<INPUT TYPE="RADIO" NAME="sex" VALUE="f"> Female</TD> 
+</TR>
+</TABLE></TD> 
+</TR> 
+</TABLE>
+
+</div>
+</fieldset><br>
+
+</div>
+
+
+		<!--#### Employment Details ####-->
+<div class="tab-page" id="tabPage2">
+<h2 class="tab" id="tabShow2">Employment Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage2" ) );</script>
+<fieldset>
+<legend>General</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Job&nbsp;Title:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="position" value="test" style="width:160px;"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Telephone:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="phone" value="" style="width:160px;"></TD>
+</TR>
+</TABLE>
+</div>
+</fieldset><br>
+</div>
+
+
+<!--#### Account Details ####-->
+<div class="tab-page" id="tabPage3">
+<h2 class="tab"  id="tabShow3">Account Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage3" ) );</script>		
+<fieldset>
+<legend>Log In Details</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Email Address:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="username" value="dan@email.net" style="width:160px;"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Password:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="password" value="coolit" style="width:160px;"></TD>
+</TR>
+		</TABLE>
+</div>
+</fieldset><br>
+<fieldset>
+<legend>Account Privilages</legend>
+<div class="seccontent">
+<table border="0" cellspacing="0" cellpadding="0">
+<TR>
+ <TD ALIGN="RIGHT" VALIGN="MIDDLE" CLASS="label">Account Type:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><select name="type" size="1" style="width:160px;" class="text_field"><option value="admin" SELECTED>Administrator</option>
+<option value="normal">Employee</option>
+</select></TD>
+</TR>
+</table>
+<br>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td><b>Site Manager</b></td>
+<td align="right"><input type="checkbox" name="privilage_sitemanager" value="y" CHECKED>
+<input type="hidden" name="main_application_id" value="sitemanager"><input type="hidden" name="sub_application_ids" value="sitestatistics:emailmanager:siteeditor"></td>
+<td align="right" class="priv1">Site Statistics</td>
+<td align="right"><input type="checkbox" name="privilage_sitemanager_sitestatistics" value="y" CHECKED>
+</td>
+<td align="right" class="priv1">Email Manager</td>
+<td align="right"><input type="checkbox" name="privilage_sitemanager_emailmanager" value="y" CHECKED>
+</td>
+</tr><tr><td></td><td></td>
+<td align="right" class="priv1">Site Editor</td>
+<td align="right"><input type="checkbox" name="privilage_sitemanager_siteeditor" value="y">
+</td>
+</tr>
+</table>
+</div>
+</fieldset>
+	</div>		
+			
+
+</div>
+
+<IMG src="/images/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP"><font color="red"><b id="error_span"></b></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><INPUT TYPE="submit" VALUE="Save User" CLASS="button"><IMG src="/images/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><input type="button" value="Cancel" class="button" name="Button" onClick="document.location='/apps/sitemanager.app?session_id=4ceed0fa8b5edce4d096f7f04e39f722&method=users_home';" STYLE="width:75px;"></TD>
+</TR>
+</TABLE>
+</TD>
+					</TR>
+				 </TABLE></TD>
+			 </TR>
+			</TABLE>
+</TD>
+		</TR>
+	 </TABLE>
+</form>
+<script>
+setupAllTabs();
+</script>
+
+
+
+</html>
+<script>
+
+/////// THE METHOD IS edit_personal_details
+
+</script>
+<script>
+if(document.getElementById('loadingdiv'))
+{
+	document.getElementById('loadingdiv').style.display = 'none';
+}
+</script>

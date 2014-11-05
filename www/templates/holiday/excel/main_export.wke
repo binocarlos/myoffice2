@@ -1,0 +1,87 @@
+<style type="text/css">
+.header { 	font-family: Verdana; 
+			font-size: 12pt; 
+			color: #880000; 
+			text-align: center; 
+			font-weight: bold;
+			border: 1;			
+			background-color: #dddddd; };
+			
+.data_header { 	
+			font-family: Verdana; 
+			font-size: 9pt; 
+			text-align: right;
+			color: #ffffff; 
+			border: 1;
+			background-color: #888888; };			
+			
+.holiday_header { 	
+			font-family: Verdana; 
+			font-size: 10pt; 
+			font-weight: bold;			
+			text-align: left;			
+			color: #ffffff; 
+			border: 1;
+			background-color: #666666; };
+			
+.data { 	
+			font-family: Verdana; 
+			border: 1;
+			font-size: 9pt; 
+			background-color: #ffffff;			
+			color: #000088;  };			
+</style>
+<table id="wkexcel_table" freezerow="6">
+<tr>
+<td colspan=4 class="header">{$c{title}}</td>
+</tr>
+
+<TR> 
+<TD class="data_header" width=120 arialtenwidth=20>Name:</TD>
+<TD class="data" width=120 arialtenwidth=20>{$c{usertitle}}</TD>
+<TD class="data_header" width=120 arialtenwidth=20>&nbsp;</TD>
+<TD class="data" width=120 arialtenwidth=20>&nbsp;</TD>
+</TR>
+<TR> 
+<TD class="data_header">Department: </TD>
+<TD class="data">{$c{depttitle}}</TD>
+
+</TR>
+<TR> 
+<TD class="data_header">Employee Number: </TD>
+<TD class="data">{$c{number}}</TD>
+<TD class="data_header">Holidays Left: </TD>
+<TD class="data">{$c{left}} Days</TD>
+</TR>
+<TR> 
+<TD class="data_header">Type: </TD>
+<TD class="data">{$c{typetitle}}</TD>
+<TD class="data_header">Owed Days: </TD>
+<TD class="data">{$c{owed}} Days</TD>
+</TR>
+<tr>
+<TD class="data_header">Holiday Allowance: </TD>
+<TD class="data">{$c{allow}} Days</TD>
+</tr>
+<tr>
+<td class="holiday_header">Date</td>
+<td class="holiday_header">Reason</td>
+<td colspan=2 class="holiday_header">Notes</td>
+</tr>
+{
+	foreach my $ref (@{$c{refs}})
+	{
+		my $date = $ref->{date}->get_string;
+		my $reason = $ref->{holiday}->get_reason_title;
+		my $notes = $ref->{holiday}->get_notes;
+	
+		$OUT.=<<"+++";
+<tr>
+<td class="data">$date</td>
+<td class="data">$reason</td>
+<td class="data" colspan=2>$notes</td>
+</tr>
++++
+	}
+}
+</table>

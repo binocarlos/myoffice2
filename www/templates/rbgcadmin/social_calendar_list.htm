@@ -1,0 +1,30 @@
+<!--#include virtual="temp_include.htm" -->
+<p><b><u>Social Calendar</u></b></p>
+<p><a href="{$c{href}}&method=add_social_calendar">Add Entry</a></p>
+<table border="0" cellspacing="1" cellpadding="3" bgcolor="#666666">
+<tr bgcolor="#dddddd">
+<td><b>Title</b></td>
+<td><b>Date</b></td>
+<td align="right">&nbsp;</td>
+<td align="right">&nbsp;</td>
+</tr>
+{
+	$arr = $c{org}->get_child_array('social_calendar');
+	foreach my $date (@$arr)
+	{
+		my $datest = $date->get_value('date')->get_string;
+		my $title = $date->get_value('title');
+		my $id = $date->get_id;
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">
+<td class="small">$title</td>
+<td class="tiny7" align="right">$datest</td>
+<td align="right" bgcolor="#FFFFFF" class="small"><a href="$c{href}&method=delete_social_calendar&item_id=$id">Remove</a></td>
+<td align="right" bgcolor="#FFFFFF" class="small"><a href="$c{href}&method=edit_social_calendar&item_id=$id">Edit</a></td>
+</tr>
++++
+	}
+}
+
+</table>

@@ -1,0 +1,78 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+{
+	if($c{params}->{reload_tree})
+	{
+		$OUT.=<<"+++";
+top.content.sidebar.content.document.location = href + '&method=activity_tree';
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
++++
+	}
+}
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">Welcome to the activity manager...<br>
+  <br>
+  You can edit existing Threads / Activities using the tree on the left,<br>
+  or you can add new Threads / Activities using the buttons below... <br>
+  <br>
+  <input type="button" class="button" value="Add A New Set" onClick="document.location = href + '&method=set_form';">
+  <br>
+  <br>
+  <input type="button" class="button" value="Add A New Thread" onClick="document.location = href + '&method=thread_form';">
+  <br>
+  <br>
+  <input type="button" class="button" value="Add A New Activity" onClick="document.location = href + '&method=activity_form';">
+<br>
+<br>
+<br>
+Currently On <a href="http://www.iboard.co.uk/thismonthfree" target="_blank">http://www.iboard.co.uk/thismonthfree</a> <br>
+<br>
+<form method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="update_this_month_free_comments">
+<table width="600" border="0" cellpadding="3" cellspacing="1" bgcolor="#CCCCCC">
+<tr bgcolor="#e5e5e5">
+<td colspan="2"><strong>This Month Free Comments </strong></td>
+</tr>
+<tr>
+<td colspan=2><textarea {$disabled} name="this_month_free_comments" class="text_field" id="this_month_free_comments" style="width:100%; height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{org}->load_this_month_free_message_string}</textarea></td>
+</tr>
+<tr>
+<td colspan=2><input name="Submit" type="submit" class="button" onClick="document.location = href + '&method=set_form';" value="Update"></td>
+</tr>
+<tr bgcolor="#e5e5e5">
+<td><strong>Title</strong></td>
+<td width="100" align="right">&nbsp;</td>
+</tr>
+{
+	foreach my $thread (@{$c{org}->ensure_child_array('thread')})
+	{
+		my $name = $thread->name;
+		my $id = $thread->get_id;
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">
+<td>$name</td>
+<td align="right"><a href="$c{href}&method=thread_remove_this_month_free&thread_id=$id">remove</a></td>
+</tr>
++++
+	}
+}
+</table>
+</form>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+
+
+

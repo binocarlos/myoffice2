@@ -1,0 +1,242 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+{
+	my $now_date = Webkit::Date->now;
+	my $sql_date = Webkit::Date->parse_to_sql($now_date);
+	
+	$OUT.=<<"+++";
+var now_date = '$sql_date';
++++
+}	
+	
+var sql_map = \{
+	simpleDetails:\{
+		select:		'school.name as name,\n'
+				+	'school.address as address,\n'
+				+	'school.city as city,\n'
+				+	'school.county as county,\n'
+				+	'school.postcode as postcode,\n'
+				+	'school.url as url',
+		from:		'eb.school',
+		where:		'school.website_id = 0',
+		group:		'school.id',
+		order:		'school.name' \},
+		
+	contactDetails:\{
+		select:		'school.gfl as gfl,\n'
+				+	'school.name as school_name,\n'
+				+	'school_account.fullname as contact_name,\n'
+				+	'school.url as school_url,\n'
+				+	'school_account.url as person_url,\n'
+				+	'school_account.job_title as job_title,\n'
+				+	'school_account.phone as phone,\n'
+				+	'school_account.email as email',
+		from:		'eb.school, eb.school_account',
+		where:		'school_account.school_id = school.id\n'
+				+	'and school_account.fullname != \'\'',
+		group:		'school_account.id',
+		order:		'school.name, school_account.fullname' \},
+		
+	currentOnlineClub:\{
+		select:		'school.name as name,\n'
+				+	'school_account.fullname as contact_name,\n'
+				+	'school.address as address,\n'
+				+	'school.city as city,\n'
+				+	'school.county as county,\n'
+				+	'school.postcode as postcode,\n'
+				+	'school.url as url,\n'
+				+	'school.online_access_date as online_club_demo_until,\n'
+				+	'product_invoice.valid_from as invoice_valid_from,\n'
+				+	'product_invoice.valid_until as invoice_valid_until,\n'
+				+	'product_invoice.mode as mode,\n'
+				+	'product_invoice.licence_code as licence',
+		from:		'eb.school LEFT JOIN eb.product_invoice on product_invoice.school_id = school.id LEFT JOIN eb.school_account on (school_account.school_id = school.id and school_account.accounttype=\'primary\')',
+		where:		'school.website_id = 0\n'
+				+	'and\n'
+				+	'(\n'
+				+	'	(\n'
+				+	'		school.online_access_date >= \'2006-09-17\'\n'
+				+	'	)\n'
+				+	'	or\n'
+				+	'	(\n'
+				+	'		product_invoice.product_id = 4\n'
+				+	'		and\n'
+				+	'		product_invoice.valid_until >= \'2006-09-17\'\n'
+				+	'	)\n'
+				+	')\n',
+		group:		'school.id',
+		order:		'product_invoice.valid_until DESC, school.online_access_date DESC' \} \};
+				
+function applyMap(mapName, schoolTypeGuiName)
+\{
+	var mapInfo = sql_map[mapName];
+	var form = document.reportForm;
+	
+	form.select.value = mapInfo.select;
+	form.from.value = mapInfo.from;
+	form.where.value = mapInfo.where;
+	form.group.value = mapInfo.group;
+	form.order.value = mapInfo.order;
+	
+	var schoolTypeGUI = document.getElementById(schoolTypeGuiName);
+	
+	if(schoolTypeGUI!=null)
+	\{
+		form.where.value += '\nand school.accounttype = \'' + schoolTypeGUI.value + '\'';
+	\}
+\}				
+</script>
+<body>
+<form method="GET" action="{$c{href}}" name="reportForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="account_csv_report_submit">
+<table border="0" align="center" cellpadding="20" cellspacing="0" style="display:inline;">
+<tr valign="top">
+<td><table width="100%" border="0" cellpadding="0" cellspacing="1">
+<tr>
+<td><strong>Simple School Details</strong></td>
+</tr>
+<tr>
+<td>For school type:</td>
+</tr>
+<tr>
+<td><select id="simpleAccountType" name="simpleAccountType" size="1" style="width:100%;" class="text_field">
+
+{$c{org}->get_account_type_options}
+
+
+</select></td>
+</tr>
+<tr>
+<td><input type="button" name="Button" value="Build" onClick="applyMap('simpleDetails', 'simpleAccountType');"></td>
+</tr>
+</table>
+<br>
+<br>
+<table width="100%" border="0" cellpadding="0" cellspacing="1">
+<tr>
+<td><strong> School Contact Details</strong></td>
+</tr>
+<tr>
+<td>For school type:</td>
+</tr>
+<tr>
+<td><select id="contactAccountType" name="contactAccountType" size="1" style="width:100%;" class="text_field">
+
+
+{$c{org}->get_account_type_options}
+
+
+
+</select></td>
+</tr>
+<tr>
+<td><input type="button" name="Button" value="Build" onClick="applyMap('contactDetails', 'contactAccountType');"></td>
+</tr>
+</table>
+<br>
+<br>
+<table width="100%" border="0" cellpadding="0" cellspacing="1">
+<tr>
+<td><strong>Current Online Club Accounts </strong></td>
+</tr>
+<tr>
+<td>For school type:</td>
+</tr>
+<tr>
+<td><select id="onlineClubAccountType" name="onlineClubAccountType" size="1" style="width:100%;" class="text_field">
+{$c{org}->get_account_type_options}
+
+</select></td>
+</tr>
+<tr>
+<td><input type="button" name="Button" value="Build" onClick="applyMap('currentOnlineClub', 'onlineClubAccountType');"></td>
+</tr>
+</table></td>
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>SQL BUILDER </legend>
+<div class="seccontent" align="left">
+
+<TABLE width="400" BORDER="0" CELLPADDING="5" CELLSPACING="0">  
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>
+<b>SELECT</b><br>
+<br>
+<textarea name="select" type="text" class="text_field" id="select" style="width:100%;height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{params}->{select}}</textarea>
+<b><br>
+<br>
+FROM<br>
+<br>
+<textarea name="from" type="text" class="text_field" id="from" style="width:100%;height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{params}->{from}}</textarea>
+<br>
+<br>
+WHERE<br>
+<br>
+<textarea name="where" type="text" class="text_field" id="where" style="width:100%;height:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{params}->{where}}</textarea>
+<br>
+<br> 
+GROUP BY<br>
+<br>
+<textarea name="group" type="text" class="text_field" id="group" style="width:100%;height:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{params}->{group}}</textarea>
+<br>
+<br>
+ORDER BY<br>
+<br>
+<textarea name="order" type="text" class="text_field" id="order" style="width:100%;height:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{params}->{order}}</textarea>
+</b></TD>
+</TR>  
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>&nbsp;</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><p>You can edit the SQL above before you click 'Download Report'... <br>
+</p>
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><input type="submit" CLASS="button2" style="width:125px;" value="Download Report"></TD>
+</TR>   
+</TABLE>
+
+</div>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+<td align="left"><strong>
+SCHOOL TABLE<br>
+<br>
+<img src="../../images/eb/school_table.gif" width="419" height="348"><br>
+<br>
+SCHOOL ACCOUNT TABLE<br>
+<br>
+<img src="../../images/eb/school_account_table.gif" width="377" height="265"><br>
+<br>
+PRODUCT INVOICE TABLE<br>
+<br>
+<img src="../../images/eb/product_invoice_table.gif" width="387" height="314"></strong></td>
+</tr>
+</table>
+</form>
+</body>
+</html>
+
+
+

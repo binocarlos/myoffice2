@@ -1,0 +1,153 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function goBack()
+	\{
+		var newLoc = href + '&method=visitors_school_home&school_id={$c{school}->get_id}';
+		
+		document.location = newLoc;
+	\}
+	
+	function viewAudit(id)
+	\{
+		var newLoc = href + '&method=visitors_audit_home&audit_id=' + id;
+		
+		document.location = newLoc;
+	\}
+</script>
+
+<body>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset>
+<legend>Visitor / Audit Details</legend>
+<div class="seccontent" align="left">
+<TABLE width="400" BORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR>
+<TD width="60" ALIGN="right" VALIGN="MIDDLE">Name:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{visitor}->name} </TD>
+<TD width="20" ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD width="60" ALIGN="right" VALIGN="MIDDLE">School: </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->name}</TD>
+</TR>
+<TR>
+<TD ALIGN="right" VALIGN="MIDDLE">&nbsp; </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="right" VALIGN="MIDDLE">City:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->city}</TD>
+</TR>
+</TABLE>
+</div>
+</fieldset>
+<div align="right" style="padding-top:8px;"><input type="submit" class="button" value="Back to School Home" onClick="goBack();"></div>
+</td></tr></table>						  
+</td></tr></table>                         
+<br>
+The table and graph below show the progress of audits taken over time.<br>
+<br>
+Click each audit date in the table to view the individual audit breakdown. <br>
+<br>
+     
+
+<TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+  <tr>
+    <td class="t"><b>Audit Taken</b></td>  
+{
+	foreach my $audit (@{$c{visitor}->ensure_child_array('audit')})
+	{
+		my $date = $audit->taken_date;
+		my $id = $audit->get_id;
+		
+		$OUT.=<<"+++";	
+    <td class="t"><b><a href="#"class="l2" onClick="viewAudit($id);">$date</a></b></td>
++++
+	}
+}  </tr>
+
+  <tr>
+      <td class="t"><b style="color:red;">Avg Score</b></td>  
+{
+	my $prev_avg;
+	foreach my $audit (@{$c{visitor}->ensure_child_array('audit')})
+	{
+		my $avg = $audit->{_avg};
+		my $id = $audit->get_id;
+		
+		my $bg = ' bgcolor=';
+		
+		if(!$prev_avg)
+		{
+			$bg .= '#ffffff';
+		}
+		elsif($prev_avg>=$avg)
+		{
+			$bg .= '#ffe5e5';
+		}
+		else
+		{
+			$bg .= '#e5ffe5';
+		}
+		
+		$prev_avg = $avg;
+		
+		$OUT.=<<"+++";	
+    <td $bg align="right" class="c1"><b style="color:red;">$avg</b></td>
++++
+	}
+}  </tr>
+{
+	foreach my $key (sort keys %{$c{visitor}->{_tag_titles}})
+	{
+		my $title = $c{visitor}->{_tag_titles}->{$key};
+		
+		$OUT.=<<"+++";
+<tr>
+<td class="t">$title</td>
++++
+
+		my $prev_avg;
+
+		foreach my $audit (@{$c{visitor}->ensure_child_array('audit')})
+		{
+			my $avg = $audit->{_tag_avgs}->{$key};
+			my $id = $audit->get_id;
+		
+			my $bg = ' bgcolor=';
+		
+			if(!$prev_avg)
+			{
+				$bg .= '#ffffff';
+			}
+			elsif($prev_avg>=$avg)
+			{
+				$bg .= '#ffe5e5';
+			}
+			else
+			{
+				$bg .= '#e5ffe5';
+			}
+		
+			$prev_avg = $avg;
+		
+			$OUT.=<<"+++";
+<td align=right $bg class="c1">$avg</td>			
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+}
+</table>
+<br>
+<img src="{$c{href}}&method=visitors_timeline_graph&visitor_id={$c{visitor}->get_id}">
+</body>
+</html>
+
+
+

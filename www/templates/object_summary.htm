@@ -1,0 +1,20 @@
+<!--#include virtual="myoffice/temp_include.htm" -->
+<table border=0 cellspacing=1 cellpadding=0 bgcolor=#666666 align="center">
+<tr>		
+<td colspan="2" align=center bgcolor=#cccccc class="edit_table_header_cell">
+{$c{table_title}}</td>
+</tr>
+{
+	foreach my $prop (@{$c{properties}})
+	{
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">		
+<td class="white_td">$prop->{title}</td>
+<td class="white_td">
+$prop->{value}
+</td>
+</tr>
++++
+	}
+}
+</table>

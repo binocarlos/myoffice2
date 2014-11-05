@@ -1,0 +1,154 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	
+	function validateSupplierForm()
+	\{
+		var form = document.supplier_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the supplier');
+			return false;
+		\}
+
+		return true;
+	\}
+
+	function deleteSerialNumbers(supplier_id, product_code, licence_code, epoch_day, serial_count)
+	\{
+		if(window.confirm('Are you sure you want to remove these ' + serial_count + ' serial numbers from the system?'))
+		\{
+			document.location = href + '&method=supplier_delete_codes&supplier_id=' + supplier_id + '&product_code=' + product_code + '&licence_code=' + licence_code + '&epoch_days=' + epoch_day;
+		\}
+	\}
+	
+	function copyToClipboard(textElem)
+	\{
+		window.clipboardData.setData('Text',textElem.value);
+	\}
+	
+</script>
+<body>
+<input type="button"  value="Go Back" CLASS="button2" style="width:120px;" onClick="history.back();">
+<br>
+<br>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+{
+	foreach my $licence_code (keys %{$c{supplier}->{_serial_number_batch_summary_map}})
+	{
+		my $sn_string = '';
+		my $supplier_name = $c{supplier}->name;
+		my $supplier_id = $c{supplier}->get_id;
+		my $product_code = $c{params}->{product_code};
+		my $product_title = $c{org}->get_product_name($product_code);
+		my $product_color = $c{org}->get_product_color($product_code);
+		my $licence_title = Webkit::EB::SerialNumber->get_licence_title($licence_code);
+		my $epoch_day = $c{params}->{epoch_days};
+		my $serial_count = 0;
+		
+		foreach my $sn (@{$c{supplier}->{_serial_number_batch_summary_map}->{$licence_code}})
+		{
+			$serial_count++;
+			$sn_string .= $sn->serial_number."\n";
+		}
+		
+		if($epoch_day!~/\w/)
+		{
+			$epoch_day = "''";
+		}
+		
+		$OUT.=<<"+++";
+<tr>
+<td height="100%" align="center" valign="middle"><table width="100%" height="100%"  border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td width="50%" height="100%">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Serial Number Batch </legend>
+<div class="seccontent" align="left">
+
+<TABLE width="400" BORDER="0" CELLPADDING="5" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Issued To:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      $supplier_name
+  </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Issued:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      $c{date_title}
+  </TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">For Product:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+	<table border=0 width=100% cellpadding="0" cellspacing="0">
+	<tr> 
+<td>
+      <b>$product_title</b>
+    </td>
+	<TD width="24" ALIGN="LEFT">
+<table width=24 height=24 border=1 cellpadding=0 cellspacing=1 bgcolor=#000000>
+<tr>
+<td width=24 height=24 bgcolor="#$product_color"></td>
+</tr>
+</table>
+</TD>  	
+    </tr>
+    </table>
+  </TD>
+  
+  </TR>    
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Licence Level:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <b style="color:#ff0000;">$licence_title</b>
+  </TD>
+  </TR>      
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">Codes:<br> 
+<br>
+<a href="javascript:copyToClipboard(document.getElementById('textfield$licence_code'));">copy to clipboard</a></TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+<textarea name="name" type="text" class="text_field" id="textfield$licence_code" readonly style="width:100%;height:180px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">$sn_string</textarea></TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Delete Serial Numbers" CLASS="button2" style="width:120px;" onClick="deleteSerialNumbers($supplier_id, '$product_code', '$licence_code', $epoch_day, $serial_count);"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
++++
+	}
+}
+</table>
+</body>
+</html>
+
+
+

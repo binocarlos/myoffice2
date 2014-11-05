@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Pop the Balloons High Scores</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<link href="/festivals.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" style="padding:0px;margin:0px" bgproperties="fixed">
+<div align="center">
+  
+  <table width="611" border="0" cellpadding="5" align="center">
+    <tr> 
+      <td width="645" align="center" valign="top"><font face="Arial, Helvetica, sans-serif" size="6"><b></b></font> 
+        <div align="left"> 
+          <table width="500" border="0" align="center" cellpadding="3" cellspacing="0">
+            <tr align="center" valign="middle"> 
+              <td width="120"><img src="/images/bfair.jpg" width="120" height="120"></td>
+              <td width="242" class="timesheader">Pop the Balloons<br>
+                Hiscores<br>
+                Fair Version</td>
+              <td width="120"><img src="/images/bfair.jpg" width="120" height="120"></td>
+            </tr>
+          </table>
+        </div></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" class="times14">Pop as many balloons as 
+        you can in the time. When your mouse goes over a balloon it will pop !</td>
+    </tr>
+    <tr>
+      <td align="center" valign="top"><a href="/games/balloonsindex.htm">PLAY 
+        &gt;&gt;&gt;</a></td>
+    </tr>
+    <tr> 
+      <td width="645" align="center" valign="top"> <table width="100%" border="0" align="center" cellpadding="3" cellspacing="0" bgcolor="#000066">
+          <tr> 
+            <td align="center" valign="top"> <table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#FFFFFF">
+                <tr bgcolor="#000066"> 
+                  <td width="10%" align="center" valign="middle"><img src="/images/tinystarw.jpg" width="21" height="20"></td>
+                  <td align="left" valign="middle" class="white14"><font color="#FFFFFF">Name</font></td>
+                  <td width="27%" align="left" valign="middle" class="white14"><font color="#FFFFFF">Score</font></td>
+                  <td width="26%" align="left" valign="middle" class="white14"><font color="#FFFFFF">Date</font></td>
+                </tr>
+ {
+	my $arr = $c{hiscores}; 
+	
+	foreach my $hiscore (@$arr) 
+	{ 
+		my $name = $hiscore->get_name; 
+		my $score = $hiscore->get_score; 
+		my $datest  = $hiscore->get_date; 
+		
+		$OUT.=<<"+++"; 
+                <tr> 
+                  <td width="10%" height="31" align="center" valign="middle"><img src="../images/tinystar.jpg" width="21" height="20"></td>
+                  <td align="left" valign="middle" class="times12b">$name</td>
+                  <td align="left" valign="middle" class="times12b">$score</td>
+                  <td align="left" valign="middle" class="times12b">$datest</td>
+                </tr>
++++
+	}
+}</table></td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td height="29" align="center" valign="top"><a href="/games/balloonsindex.htm" target="_top">Play 
+        Again &gt;&gt;&gt;</a></td>
+    </tr>
+    <tr> 
+      <td height="29" align="center" valign="top"><a href="javascript:top.close();"> 
+        X Close this window X</a></td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

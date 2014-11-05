@@ -1,0 +1,41 @@
+<!--#include virtual="temp_include.htm" -->
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js">
+</script>
+<script src="/lib/budgethub/budget.js">
+</script>
+<script src="/lib/budgethub/department.js">
+</script>
+<script src="/lib/budgethub/field.js">
+</script>
+<script src="/lib/budgethub/simple_cost.js">
+</script>
+<script src="/lib/budgethub/time_cost.js">
+</script>
+<script src="/lib/budgethub/nic_cost.js">
+</script>
+<script src="/lib/budgethub/total_cost.js">
+</script>
+<body bgcolor="#FFFFFF" text="#000000">
+<table cellpadding=3 cellspacing=0 border=0 width="100%">
+<tr>
+<td>
+<span id="tree_container"></span>
+</td>
+</tr>
+</table>
+<script>
+	
+{$c{budget_js}}
+	
+	init_budget();
+	
+parent.parent.budgetHub_setCurrent_budget({$c{budget}->get_id});
+
+document.getElementById('tree_container').innerHTML = budget.xTree.toString();
+budget.initTotalSpans();
+
+budget.xTree.expandAll();
+parent.page.init_budget_table();
+</script>
+</body>

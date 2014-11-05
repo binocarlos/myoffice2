@@ -1,0 +1,260 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+	
+	function checkDateModeTd()
+	\{
+		var from = document.searchForm.rangefrom.value;
+		var to = document.searchForm.rangeto.value;
+		
+		if((from!='')||(to!=''))
+		\{
+			document.getElementById('dateModeTd').innerHTML = '<span style="color:green;">Searching in ENTERED mode</span>';
+		\}
+	\}
+	
+	function noVisitsChanged()
+	\{
+		var visits = document.searchForm.no_visits.value;
+		
+		if(visits!="-1")
+		\{
+			document.getElementById('noVisitsWarningTr').style.display = 'inline';
+		\}
+	\}
+
+</script>
+
+<style type="text/css">
+.body \{ background-color:#D4D0C8; \}
+</style>
+
+
+<body style="background-color:#D4D0C8;">
+
+<form method="POST" action="{$c{script}}" name="searchForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="modal_venue_status_search_results">
+<table cellpadding="10" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="left" valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+        <legend>Search Venue History </legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Search Venue History</u>
++++
+}
+
+		 <table  border="0" cellpadding="5" cellspacing="1" bgcolor="#999999">
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan="4"><strong>Visit - </strong>search for dates on when the show visited a venue </td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">From:</td>
+                          <td><table border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td align="LEFT"><input name="from" type="TEXT" class="text_field" id="from" style="width:100px;" value="{$c{params}->{from}}"></td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");								  
+                              <td align="LEFT"><A ONCLICK="calendar_click(document.searchForm.from);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+                            </tr>
+                          </table></td>
+                          <td align="right">To:</td>
+                          <td><table border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td align="LEFT"><input name="to" type="TEXT" class="text_field" id="to" style="width:100px;" value="{$c{params}->{to}}"></td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");			
+                              <td align="LEFT"><A ONCLICK="calendar_click(document.searchForm.to);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+                            </tr>
+                          </table></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">No. Shows per Visit: </td>
+                          <td><select name="no_shows" class="text_field" id="no_shows" style="width:100%;">
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{no_shows},min=>1,max=>6,gap=>1,null_title=>'---'})}
+                          </select></td>
+                          <td align="right">No. Different Visits: </td>
+                          <td><select name="no_visits" class="text_field" id="no_visits" style="width:100%;" onChange="noVisitsChanged();">
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{no_visits},min=>1,max=>20,gap=>1,null_title=>'---'})}
+                          
+</select></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8" id="noVisitsWarningTr" style="display:none;">
+                          <td colspan="4"><span style="color:red;">This search will GROUP the results by venue (with the most recent visit shown for each venue)...</span></td>
+                        </tr>								
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan="4"><strong>Venue</strong></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">Capacity &gt; </td>
+                          <td><select name="capacity_more" class="text_field" id="capacity_more" style="width:100%;">
+                            
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{capacity_more},min=>100,max=>1000,gap=>100,null_title=>'---'})}
+                          
+                          </select></td>
+                          <td align="right">Capacity &lt; </td>
+                          <td><select name="capacity_less" class="text_field" id="capacity_less" style="width:100%;">
+                            
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{capacity_less},min=>100,max=>1000,gap=>100,null_title=>'---',reverse=>1})}
+                          
+                          </select></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="left"><input name="venues_at_risk" type="checkbox" id="venues_at_risk" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{venues_at_risk})}>
+                          At Risk </td>
+                          <td><input name="projector" type="checkbox" id="projector" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{projector})}>
+                          Projector</td>
+                          <td><input name="screen" type="checkbox" id="screen" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{screen})}>
+                          Screen</td>
+                          <td><input name="projectionist" type="checkbox" id="projectionist" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{projectionist})}>
+                          Projectionist</td>
+                        </tr>						
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan="4"><strong>Attendance</strong></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">More than: </td>
+                          <td><select name="attendance_more" class="text_field" id="attendance_more" style="width:100%;">
+                              
+                            
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{attendance_more},min=>20,max=>95,gap=>5,null_title=>'---'})}
+                          
+                          
+                          </select></td>
+                          <td align="right">Less Than:</td>
+                          <td><select name="attendance_less" class="text_field" id="attendance_less" style="width:100%;">
+                              
+                            
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{attendance_less},min=>20,max=>95,gap=>5,null_title=>'---',reverse=>1})}
+                          
+                          
+                          </select></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">Top Ticket Price: </td>
+                          <td><select name="top_ticket_price" class="text_field" id="top_ticket_price" style="width:100%;">
+                            
+						  {Webkit::AppTools->get_number_select_options({selected=>$c{params}->{top_ticket_price},min=>10,max=>17,gap=>0.5,null_title=>'---',reverse=>1})}
+                          
+                          
+                          </select></td>
+                          <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan="4"><strong>Dates -</strong> search for the dates specified by clicking the tickboxes below - with no dates entered you are searching for fields NOT entered</td>
+                        </tr>	
+                        <tr bgcolor="#D4D0C8">
+                          <td colspan="4"><span style="color:red;" id="dateModeTd">Searching in NOT ENTERED mode</span></td>
+                        </tr>							
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">From:</td>
+                          <td><table border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td align="LEFT"><input name="rangefrom" type="TEXT" class="text_field" id="rangefrom" style="width:100px;" value="{$c{params}->{rangefrom}}" onChange="checkDateModeTd();"></td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");										  
+                              <td align="LEFT"><A ONCLICK="calendar_click(document.searchForm.rangefrom);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+                            </tr>
+                          </table></td>
+                          <td align="right">To:</td>
+                          <td><table border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td align="LEFT"><input name="rangeto" type="TEXT" class="text_field" id="rangeto" style="width:100px;" value="{$c{params}->{rangeto}}" onChange="checkDateModeTd();"></td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");										  
+                              <td align="LEFT"><A ONCLICK="calendar_click(document.searchForm.rangeto);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+                            </tr>
+                          </table></td>
+                        </tr>											
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">Brochure Deadline: </td>
+                          <td><input name="brochure_deadline" type="checkbox" id="brochure_deadline" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{brochure_deadline})}></td>
+                          <td align="right">Brochure Hit Date: </td>
+                          <td><input name="brochure_hit_date" type="checkbox" id="brochure_hit_date" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{brochure_hit_date})}></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">Brochure Proof Date:</td>
+                          <td><input name="brochure_proof_date" type="checkbox" id="brochure_proof_date" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{brochure_proof_date})}></td>
+                          <td align="right" colspan=2></td>
+                        </tr>						
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">Proof Requested:</td>
+                          <td><input name="proof_requested" type="checkbox" id="proof_requested" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{proof_requested})}></td>
+                          <td align="right">Proof Seen: </td>
+                          <td><input name="proof_seen" type="checkbox" id="proof_seen" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{proof_seen})}></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td align="right">Tech Rider Sent: </td>
+                          <td><input name="tech_rider_sent" type="checkbox" id="tech_rider_sent" value="y"{Webkit::AppTools->checkbox_checked($c{params}->{tech_rider_sent})}></td>
+                          <td align="right">Tech Rider Rcvd:</td>
+                          <td><input name="tech_rider_rcvd" type="checkbox" id="tech_rider_rcvd" value="y"{Webkit::AppTools->
+                          checkbox_checked($c{params}->{tech_rider_rcvd})}></td>
+                        </tr>
+                        <tr bgcolor="#D4D0C8">
+                          <td height="10" colspan="4"></td>
+                        </tr>
+
+                        <tr valign="top" bgcolor="#D4D0C8">
+                          <td align="right" valign="middle">Order By :</td>
+                          <td align="right" valign="middle"><select name="order" class="text_field" id="order" style="width:100%;">
+                            <option value="date" selected>Date of visit</option>
+                            <option value="venue">Venue name</option>
+                          </select></td>						  
+                          <td colspan="2" align="center">
+						  <input type="button" onClick="top.returnValue=null;top.close();" value="Close" class="button2" style="width:75px;">
+&nbsp;
+<input type="button" onClick="document.location = href + '&method=modal_venue_status_reset_search';" value="Reset" class="button2" style="width:75px;">
+&nbsp;
+						  <input type="submit" class="button2" style="width:75px;" value="SEARCH"></td>
+            </tr>
+          </table>   
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");		  
+        </div>
+      </fieldset>
++++
+}
+	  </td>
+</tr>
+</table>
+</form>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+<script>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+function searchFormCalendarCallback(gui)
+\{
+	checkDateModeTd();
+\}
+
+	calendar_callback_obj.onUpdate = searchFormCalendarCallback;
++++
+}
+	
+checkDateModeTd();
+noVisitsChanged();
+</script>
+</body>
+</html>
+
+
+

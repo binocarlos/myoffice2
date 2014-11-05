@@ -1,0 +1,73 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body {background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;}
+td {font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+.text_field {height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;}
+.buttonouter {border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;}
+.buttonoff {border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; }
+
+</STYLE>
+<script>
+function addItem()
+{
+	parent.content.addItem();
+}
+
+function editItem()
+{
+	parent.content.editItem();
+}
+
+function deleteItem()
+{
+	parent.content.deleteItem();
+}
+
+function applySettings(obj)
+{
+	for(var key in obj)
+	{
+		setButtonState(key, obj[key]);
+	}
+}
+
+function setButtonState(id, state)
+{
+	var normalState = 'none';
+	var offState = 'inline';
+
+	if(state)
+	{
+		normalState = 'inline';
+		offState = 'none';
+	}
+
+	document.getElementById(id).style.display = normalState;
+	document.getElementById(id + '_dis').style.display = offState;
+}
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<tr>
+		<td style="border-bottom:1px #808080 solid; padding-left:7px;" height="27">Test Questions</td>
+		</tr>
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="bottom" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000; border-top:1px #FFFFFF solid;">
+      <div style="margin:5px;">
+      <table border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+          <td id="add" style="display:none;"><img src="/images/nctest/editor/tree_add.gif" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff"  onClick="addItem();"></td>
+          <td id="add_dis" style="display:inline;"><img src="/images/nctest/editor/tree_add_disabled.gif" CLASS="buttonoff"></td>
+          <td id="edit" style="display:none;"><img src="/images/nctest/editor/tree_edit.gif" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff"  onClick="editItem();"></td>
+          <td id="edit_dis" style="display:inline;"><img src="/images/nctest/editor/tree_edit_disabled.gif" CLASS="buttonoff"></td>
+          <td id="del" style="display:none;"><img src="/images/nctest/editor/tree_delete.gif" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff"  onClick="deleteItem();"></td>
+          <td id="del_dis" style="display:inline;"><img src="/images/nctest/editor/tree_delete_disabled.gif" CLASS="buttonoff"></td>
+        </tr>
+      </table>
+      </div>
+    </TD>
+		</TR>
+</TABLE></BODY>
+</HTML>

@@ -1,0 +1,122 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function validateClassForm()
+	\{
+		var form = document.class_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the class');
+			return false;
+		\}
+		
+		return true;
+	\}
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="class_form" method="POST" action="{$c{script}}" onSubmit="return validateClassForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="pupils_class_form_submit">
+<input type="hidden" name="class_id" value="{$c{class}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>
+{
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.="Student Group";
+	}
+	else
+	{
+		$OUT.="Class";
+	}
+}
+ Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input type="text" name="name" value="{$c{class}->get_value('name')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+    </TD>
+  </TR>
+{
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+		<input type="hidden" name="year" value="-1">
+		<input type="hidden" name="teacher_id" value="-1">
+		<input type="hidden" name="year_left_school" value="-1">
++++
+	}
+	else
+	{
+		my $year_options = $c{class}->get_year_options;
+		my $teacher_options = $c{org}->get_teacher_options({
+			selected => $c{class}->get_value('teacher_id'),
+			null_title => 'None Assigned' });
+		my $year_left_options = $c{class}->get_year_left_school_options;
+		
+		$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Year:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+      <select name="year" size="1" style="width:100%;" class="text_field">     
+        $year_options   
+      </select>
+</TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Teacher:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">      
+      <select name="teacher_id" size="1" style="width:100%;" class="text_field">
+		$teacher_options
+      </select>
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Year Left School: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><select name="year_left_school" size="1" class="text_field" id="year_left_school" style="width:100%;">
+		$year_left_options  
+    </select></TD>
+  </TR>
++++
+	}
+}
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{class}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

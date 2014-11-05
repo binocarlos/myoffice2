@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Users" width="120">
+		<menuitem title="Add User" action="get_menu_iframe_query('add_user','Add User');"/>
+		<menuitem title="View/Edit Users" action="get_menu_iframe_query('users_home','Current Users');"/>
+	</menublock>
+	<menublock title="Questionnaire" width="120">
+		<menuitem title="Overall Analysis" action="get_menu_iframe_query('visitor_analysis', 'Questionnaire Results');"/>	
+		<menuitem title="View Questionnaire Visitors" action="get_menu_iframe_query('questionnaire_home', 'Questionnaire Visitors');"/>
+	</menublock>	
+	<menublock title="Museums" width="120">
+		<menuitem title="Add Museum" action="get_menu_iframe_query('museum_form', 'Add Museum');"/>
+		<menuitem title="View/Edit Museums" action="viewMuseums();"/>
+	</menublock>
+	<menublock title="Museum User Accounts" width="120">
+		<menuitem title="View/Edit Museum Users" action="get_menu_iframe_query('museum_login_home','Current Museum User Accounts');"/>
+		<menuitem title="Museum Updates" action="get_menu_iframe_query('museum_update_home','Museum Updates');"/>
+	</menublock>		
+</menu_config>

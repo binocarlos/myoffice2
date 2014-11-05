@@ -1,0 +1,51 @@
+<body>
+<style>
+a.applink \{color:#0000FF;\}
+a.applink:hover \{color:#FF6F00;\}
+</style>
+<BR>
+<table border="0" cellspacing="0" cellpadding="5">
+<tr >
+{
+	my $arr = $c{application_array};
+
+	my $count = 0;
+	my $mcount = 0;
+	
+	my $arrlength = @$arr;
+	
+	foreach my $app (@$arr)
+	{
+		my $name = $app->get_value('title');
+		my $desc = $app->get_value('description');
+		my $img = $app->get_value('logo');
+		
+		my $url = $c{href};
+		
+		my $rep = $app->get_id.'.app';
+		
+		$url =~ s/\/\w+\.app/\/$rep/;	
+		
+		$url .= '&method=generate_window&reassign_base_application=1';
+		
+		$OUT.=<<"+++";
+<td width="75" align="right"><a href="$url" target="_top"><img src="$img" border="0"></a></td>
+<td align="left" valign="top"><a href="$url" target="_top" class="applink"><b>$name</b></a><br>$desc</td>
++++
+		$count++;
+		$mcount++;
+		
+		if (($count==2)&&($mcount<$arrlength))
+		{
+			$OUT.=<<"+++";
+			</tr><tr>
++++
+			$count = 0;
+		}
+		
+	}
+}
+</tr>
+</table>
+</body>
+</html>

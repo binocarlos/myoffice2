@@ -1,0 +1,59 @@
+<!--#include virtual="myoffice/temp_include.htm" -->
+<table border=0 cellspacing=1 cellpadding=0 bgcolor=#666666>
+<tr bgcolor="#666666">		
+<td colspan="2" align=center class="edit_table_header_cell">
+{$c{table_title}}</td>
+</tr>
+{
+	foreach my $prop (@{$c{properties}})
+	{
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">		
+<td class="white_td" valign="top" align="left">$prop->{title}</td>
+<td width=150 class="white_td">
+$prop->{gui}
+</td>
+</tr>
++++
+	}		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">		
+<td colspan=2 class="white_td" align="center" height=15>
+<div class="status" id="$c{statusname}" align=center>$c{status}</div>
+</td>
+</tr>
++++	if($c{submit_label} =~ /\w/)
+	{
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">		
+<td colspan="2" class="white_td">
+<div align=center>
+<input type="submit" value="$c{submit_label}" class="form_submit">
+</div>
+</td>
+</tr>
++++
+	}	if($c{cancel_method} =~ /\w/)
+	{
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">		
+<td colspan="2" class="white_td" align=center>
+<div align=center>
+<a href="$c{href}&method=$c{cancel_method}">
+Cancel</a></div>
+</td>
+</tr>
++++
+	}	if($c{js_cancel} =~ /\w/)
+	{
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">		
+<td colspan="2" class="white_td" align=center>
+<div align=center>
+<a href="javascript: opener.sub_window_cancel();">
+Cancel</a></div>
+</td>
+</tr>
++++
+	}	
+}
+</table>

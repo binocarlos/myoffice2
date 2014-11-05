@@ -1,0 +1,144 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+	function playMP3(id)
+	\{
+		var elem = document.getElementById(id);
+
+		elem.play();
+	\}
+
+	function cancel()
+	\{
+		top.returnValue = null;
+		top.close();
+	\}
+
+	function save()
+	\{
+		document.component_form.submit();
+	\}
+
+	function changeType()
+	\{
+		document.location = href + '&method=tests_question_choose_component_type';
+	\}
+
+	function submitImageForm()
+	\{
+		var form = component_form;
+
+		if(form.delete_mp3)
+		\{
+			if(form.delete_mp3.value=="1")
+			\{
+				if(form.mp3_file.value!="")
+				\{
+					alert('You cannot choose to delete the MP3 and upload one at the same time');
+					return false;
+				\}
+			\}
+		\}
+
+		showUploading();
+		form.submit();
+	\}
+	
+	function showUploading()
+	\{
+		document.getElementById('formTr').style.display = 'none';
+		document.getElementById('buttonTr').style.display = 'none';
+		document.getElementById('loadingTr').style.display = 'inline';
+	\}
+
+</script>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<body style="background-color:#D4D0C8;">
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="component_form" onSubmit="return validateImageForm();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tests_question_component_form_submit">
+<input type="hidden" name="question_component_id" value="{$c{component}->get_form_id}">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="100%" height="100%">
+<tr id="loadingTr" style="display:none;">
+<td colspan=2 align=center valign=middle>Uploading, please wait ...</td>
+</tr>
+<tr id="formTr">
+<td colspan="2" width="100%" height="100%" valign="top">
+
+<fieldset style="height:100%;">
+<legend>Edit Image</legend>
+<div class="seccontent" align="left">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="503">
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Upload New Image:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><input name="image_file" style="width:393px;" type="file" class="text_field" id="image_file" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value=""></TD>
+  </TR>
+{
+if($c{component}->has_image)
+{
+my $web_path = $c{component}->get_image_web_path;
+
+$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;">
+    <TD colspan="2" ALIGN="center" VALIGN="MIDDLE" width="100%"><img src="$web_path" height=150></TD>
+  </TR>
++++
+}
+}
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Caption:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><input name="caption" style="width:100%;" type="text" class="text_field" id="caption" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{component}->caption}"></TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Caption Position:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="caption_position" size="1" style="width:100%;" class="text_field">
+{$c{component}->get_caption_position_options}
+      </select></TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Upload New MP3 File:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><input type="file" name="mp3_file" value="" style="width:393px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field"></TD>
+  </TR>
+{
+if($c{component}->has_mp3)
+{
+my $embed = $c{component}->get_mp3_embed;
+
+$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Current MP3 File:</TD>
+	<TD ALIGN="LEFT" VALIGN="MIDDLE">$embed - <input type="checkbox" name="delete_mp3" value="1"> Delete MP3?</TD>
+  </TR>
++++
+}
+}
+
+</TABLE>
+
+
+</div>
+</fieldset>
+
+</td>
+</tr>
+<tr id="buttonTr">
+<td><span style="color:#ff0000;" id="error_span">{$c{component}->{error_text}}</span></td>
+<td align="right">
+<input type="button" value="Save" CLASS="button2" style="width:75px;" onClick="submitImageForm();">
+<input type="button"  value="Change Type" CLASS="button2" style="width:75px;" onClick="changeType();">
+<input type="button"  value="Close" CLASS="button2" style="width:75px;" onClick="cancel();">
+</td>
+</tr>
+</table>
+
+</form>
+
+
+</body>
+</html>
+
+
+

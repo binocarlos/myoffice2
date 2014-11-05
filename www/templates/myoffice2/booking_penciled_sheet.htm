@@ -1,0 +1,603 @@
+<!--#include virtual="temp_include.htm" -->
+<script>	
+
+var bookings = new Object();
+var venues = new Object();
+
+	function printPage()
+	\{
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+	self.print();
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	alert("To print this page on a Mac, please follow these instructions...\\n\\n1. Hold down control and right click on the page.\\n\\n2.Click on -Open Frame in New Window- from the menu.\\n\\n3.Once the new window has opened, use the File -> Print menu option.");
++++
+}
+	\}
+
+	function writeVenue(hash)
+	\{
+		newVenueObj(hash.venue_id, hash.venue_title, hash.capacity, hash.notes);
+		document.write(getHTMLBlock('venue_row', hash));
+	\}
+	
+	function writeHr()
+	\{
+		document.write(getHTMLBlock('hr_row'));	
+	\}
+	
+	function writeTourdate(hash)
+	\{
+		document.write(getHTMLBlock('tourdate_row', hash));	
+	\}
+	
+	function writeBooking(hash)
+	\{
+		hash.date_called_title = getMultiDateNoteText(hash.date_called);
+			
+		hash.deal_st = hash.deal;
+		if(hash.deal==0) \{ hash.deal_st = ''; \}
+		
+		hash.guarantee_st = hash.guarantee;
+		if(hash.guarantee==0) \{ hash.guarantee_st = ''; \}
+		
+		newBookingObj(hash.booking_id, hash.venue_id, hash.ticket_price, hash.deal, hash.guarantee, hash.deal_notes, hash.tickets_on_sale, hash.tickets_on_sale_reason, hash.gross, hash.js_venue_target, hash.date_called);
+		document.write(getHTMLBlock('booking_row', hash));
+	\}
+	
+	function newVenueObj(id, title, capacity, notes)
+	\{
+		var venue = new Object();
+		venue.id = id;
+		venue.title = title;
+		venue.capacity = capacity;
+		venue.notes = notes;
+		
+		venues[venue.id] = venue;
+	\}
+	
+	function newBookingObj(id, venue_id, ticket_price, deal, guarantee, deal_notes, tickets_on_sale, tickets_on_sale_reason, gross_box_office, venue_target, date_called)
+	\{
+		var booking = new Object();
+		booking.id = id;
+		booking.venue_id = venue_id;
+		booking.ticket_price = ticket_price;
+		booking.deal = deal;
+		booking.guarantee = guarantee;
+		booking.deal_notes = deal_notes;
+		booking.tickets_on_sale = tickets_on_sale;
+		booking.tickets_on_sale_reason = tickets_on_sale_reason;
+		booking.gross_box_office = gross_box_office;
+		booking.venue_target = venue_target;
+		booking.date_called = date_called;
+		
+		bookings[booking.id] = booking;
+	\}
+	
+	function grossChanged(id, gui)
+	\{
+		var booking = bookings[id];
+		var int = parseInt(gui.value);
+		
+		if(isNaN(int))
+		\{
+			gui.value = booking.gross_box_office;
+		\}
+		else
+		\{
+			parent.title.addBookingField(id, 'gross_box_office', int);		
+			gui.style.fontWeight = 'bold';
+			gui.style.color = '#880000';
+			booking.gross_box_office = int;
+		\}
+	\}
+	
+	function dealChanged(id, gui)
+	\{
+		var booking = bookings[id];
+		var int = parseInt(gui.value);
+		
+		if((isNaN(int))||(int<0)||(int>100))
+		\{
+			gui.value = booking.deal;
+		\}
+		else
+		\{
+			parent.title.addBookingField(id, 'deal', int);		
+			booking.deal = int;
+		\}
+	\}
+	
+	function editTicketsOnSale(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_number_text&number=' + booking.tickets_on_sale + '&notes=' + booking.tickets_on_sale_reason, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, 'tickets_on_sale', ret.number);
+		parent.title.addBookingField(booking_id, 'tickets_on_sale_reason', ret.notes);		
+		td.innerHTML = ret.number + '<br><span style="color:blue;font-size:7pt;">' + ret.notes + '</span>';
+		
+		booking.tickets_on_sale = parseInt(ret.number);
+		booking.tickets_on_sale_reason = ret.notes;
+		
+		calculateGross(booking_id);
+	\}	
+	
+	function guaranteeChanged(id, gui)
+	\{
+		var booking = bookings[id];
+		var int = parseInt(gui.value);
+		
+		if((isNaN(int))||(int<0))
+		\{
+			gui.value = booking.guarantee;
+		\}
+		else
+		\{
+			parent.title.addBookingField(id, 'guarantee', int);		
+			booking.guarantee = int;
+		\}
+	\}	
+	
+	function editDateCalled(booking_id, td)
+	\{			
+		var booking = bookings[booking_id];
+			
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, booking.date_called);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, 'date_called', getMultiDateNoteReturn(ret));
+		td.innerHTML = getMultiDateNoteText(ret);
+		booking.date_called = ret;
+	\}	
+	
+	function editVenueTarget(id, td)
+	\{
+		var booking = bookings[id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.venue_target);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addBookingField(id, 'venue_target', ret.value);
+		td.innerHTML = ret.title;			
+		booking.venue_target = ret.value;
+	\}	
+	
+	function editNotes(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.deal_notes);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addBookingField(booking_id, 'deal_notes', ret.value);
+		td.innerHTML = ret.title;			
+		booking.deal_notes = ret.value;
+	\}
+	
+	function editTicketPrices(booking_id, td)
+	\{
+		var booking = bookings[booking_id];
+		
+		var ret = get_modal_window_return('&method=editors_multiprice&value=' + booking.ticket_price, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addBookingField(booking_id, 'ticket_price', ret.value);
+		td.innerHTML = ret.title;
+		booking.ticket_price = ret.value;
+		
+		calculateGross(booking_id);
+	\}
+	
+	function calculateAverageTicketPrice(string)
+	\{
+		var prices = string.split(/:/);
+		var priceArray = new Array();
+		
+		var noPercentCount = 0;
+		var totalPercent = 0;
+		
+		for(var i=0; i<prices.length; i++)
+		\{
+			var parts = prices[i].split('=');
+			
+			var price = parseFloat(parts[0]);
+			var percent = parseFloat(parts[2]);
+			
+			if(!isNaN(price))
+			\{
+				var ref = new Object();
+				ref.price = price;
+				
+				if(!isNaN(percent))
+				\{
+					ref.percent = percent;
+					totalPercent += percent;
+				\}
+				else
+				\{
+					noPercentCount++;
+				\}
+				
+				priceArray[priceArray.length] = ref;
+			\}
+		\}
+		
+		var remainingPercent = 100 - totalPercent;
+		
+		if(noPercentCount>0)
+		\{
+			var dividedPercent = remainingPercent / noPercentCount;
+			
+			for(var i=0; i<priceArray.length; i++)
+			\{
+				var ref = priceArray[i];
+				
+				if(!ref.percent)
+				\{
+					ref.percent = Math.round(dividedPercent);
+				\}
+			\}
+		\}
+		
+		var total = 0;
+		var count = 0;
+		
+		for(var i=0; i<priceArray.length; i++)
+		\{
+			var ref = priceArray[i];
+			
+			var price = ref.price;
+			var percent = ref.percent;
+			
+			if((!isNaN(price))&&(!isNaN(percent)))
+			\{
+				total += price * percent;
+				count++;
+			\}
+		\}
+		
+		var avg = 0;
+		
+		if(count>0)
+		\{
+			avg = total/100;
+		\}
+		
+		return avg;	
+	\}
+	
+	function calculateGross(booking_id)
+	\{
+		var booking = bookings[booking_id];
+		
+		if(booking.gross_box_office>0)
+		\{
+			return;
+		\}
+		
+		var ticket_price = booking.ticket_price;
+				
+		var avg = calculateAverageTicketPrice(ticket_price);
+		
+		var capacity = booking.tickets_on_sale;
+		
+		var gross = capacity * avg;
+		
+		gross *= 100;
+		
+		gross = Math.round(gross);
+		
+		gross /= 100;
+		
+		document.getElementById('booking_gross_box_office_' + booking.id).innerText = gross;
+	\}
+		
+	
+	function viewAll()
+	\{
+		document.filterForm.venue_id.value = '';
+		document.filterForm.booking_id.value = '';
+		
+		document.filterForm.submit();	
+	\}
+	
+	function viewVenue(venue_id)
+	\{
+		document.filterForm.venue_id.value = venue_id;
+		document.filterForm.booking_id.value = '';
+		
+		document.filterForm.submit();
+	\}
+	
+	function viewBooking(booking_id)
+	\{
+		document.filterForm.venue_id.value = '';
+		document.filterForm.booking_id.value = booking_id;
+		
+		document.filterForm.submit();	
+	\}
+	
+	function deleteBooking(id)
+	\{
+		if(window.confirm('Are you sure you want to delete this booking entry?'))
+		\{
+			var form = document.filterForm;
+			form.method.value = 'booking_delete_booking_submit';
+			form.object_id.value = id;
+			form.submit();
+		\}
+	\}
+	
+	function failBooking(id)
+	\{
+		if(window.confirm('Are you sure you want to fail this booking entry?'))
+		\{
+			var form = document.filterForm;
+			form.method.value = 'booking_fail_pencil_booking_submit';
+			form.object_id.value = id;
+			form.submit();
+		\}
+	\}	
+	
+	function addTourdate(id)
+	\{		
+		var ret = get_modal_window_return('&method=editors_datetime&value=&goto_timeline=1', 780, 500);		
+		
+		if(ret)
+		\{
+			document.location = href + '&method=booking_add_tourdate_submit&booking_id=' + id + '&tourdate_date=' + ret.dateString + '&tourdate_time=' + ret.timeString + '&venue_id=' + document.filterForm.venue_id.value;
+		\}		
+	\}
+	
+	function editTourdate(id)
+	\{
+		var ret = get_modal_window_return('&method=editors_datetime&goto_timeline=1&class=Tourdate&obj_method=get_datetime&id=' + id, 780, 500);		
+		
+		if(ret)
+		\{
+			document.location = href + '&method=booking_edit_tourdate_submit&tourdate_id=' + id + '&tourdate_date=' + ret.dateString + '&tourdate_time=' + ret.timeString + '&venue_id=' + document.filterForm.venue_id.value;
+		\}				
+	\}
+	
+	function createDeal(id)
+	\{
+		if(window.confirm('Are you sure you want to ceate a dealsheet from this entry?'))
+		\{
+			top.get_menu_iframe_query('booking_create_dealsheet&booking_id=' + id, 'Create Deal Sheet');
+		\}
+	\}
+		
+	function deleteTourdate(id)
+	\{
+		if(window.confirm('Are you sure you want to delete this tourdate entry?'))
+		\{
+			document.location = href + '&method=booking_delete_tourdate_submit&tourdate_id=' + id + '&venue_id=' + document.filterForm.venue_id.value;;
+		\}
+	\}		
+	
+	function viewProgressSheet()
+	\{
+		var venue_id = document.filterForm.venue_id.value;
+		var booking_id = document.filterForm.booking_id.value;
+		
+		top.get_double_frameset('myoffice2_booking_progress&venue_id=' + venue_id + '&booking_id=' + booking_id);
+	\}
+	
+	function printPage()
+	\{
+		alert('Printing');
+		top.print();
+	\}
+	
+</script>
+<body onunload="if(parent.title)\{parent.title.resetForm();\}">
+<form method="GET" action="{$c{script}}" style="margin:0px;padding:0px;" name="filterForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="booking_penciled_sheet">
+<input type="hidden" name="redirect" value="booking_penciled_sheet">
+<input type="hidden" name="no_venue" value="1">
+<input type="hidden" name="venue_id" value="{$c{params}->{venue_id}}">
+<input type="hidden" name="booking_id" value="{$c{params}->{booking_id}}">
+<input type="hidden" name="object_id" value="">
+<input type="hidden" name="filter" value="{$c{params}->{filter}}">
+</form>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td><table  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><img src="/images/icons/16/recyclebin.gif" width="16" height="16" align="absmiddle"> = <u><b>D</b>elete booking/tourdate</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/holiday/cross.gif" width="14" height="14" align="absmiddle"> = <u><b>F</b>ail booking</u> </td>
+        <td width="30">&nbsp;</td>
+        <td><img src="/images/holiday/tick.gif" width="14" height="14" align="absmiddle"> = <u><strong>C</strong>reate Dealsheet</u> </td>
+        <td width="30">&nbsp;</td>		
+        <td><img src="/images/icons/16/instructions.gif" width="16" height="16" align="absmiddle"> = <u><b>E</b>dit tourdate</u> </td>
+        <td width="30">&nbsp;</td>		
+        <td><input type="button" value="Print" class="button" onClick="printPage();"></td>
+      </tr>
+    </table>    </td>
+  </tr>   
+
+  <tr>
+    <td height=10></td>
+  </tr>  
+  <tr>
+    <td class="welcome"><table  border="0" cellspacing="0" cellpadding="5">
+{
+	my $venue_row=<<"+++";
+      <tr>
+        <td width="340"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></td>
+        <td width="200" align="right"><span style="color:#888888;">capacity</span> __capacity__ </td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr align="left">
+        <td colspan="3"><table width="1050"  border="0" cellpadding="3" cellspacing="1" bgcolor="#cccccc">
+          <tr bgcolor="#f5f5f5">		  
+            <td width="20" align="center"><b>C</b></td>			  
+            <td width="80">Tour</td>					
+		 	<td></td>			
+            <td align="right"><u>Ticket Prices</u> </td>
+            <td width="100" align="right"><u>Tickets On Sale</u> </td>			
+            <td width="70" align="right">Gross </td>
+            <td width="70" align="right"><u>Deal</u> </td>
+            <td width="70" align="right"><u>Guarantee</u> </td>
+            <td width="100"><u>Date Called</u> </td>						
+            <td width="140"><u>Notes</u></td>
+            <td width="140"><u>Venue Target</u></td>			
+            <td width="20" align="center"><b>D</b></td>
+            <td width="20" align="center"><b>F</b></td>				
+          </tr>	  
++++
+
+	my $booking_row=<<"+++";
+          <tr valign="top" bgcolor="#FFFFFF">  
+			<td align="center" style="cursor:hand;"><a href="javascript:createDeal(__booking_id__);"><img src="/images/holiday/tick.gif" alt="Create Dealsheet" width="14" height="14" border="0"></a></td>					  
+			<td style="color:blue;">__tour_name__</td>								
+            <td width="100"><a href="javascript:addTourdate(__booking_id__);"><img src="/images/xtree/plus.gif" width="19" height="16" border="0" align="absmiddle">add tourdate</a></td>		  
+            <td width="90" align="right" class="editTd" onClick="editTicketPrices(__booking_id__, document.getElementById('__booking_id__ticket_prices'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__ticket_prices">__ticket_price_title__</span></td>
+            <td align="right" class="editTd" onClick="editTicketsOnSale(__booking_id__, document.getElementById('__booking_id__tickets_on_sale'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__tickets_on_sale">__tickets_on_sale__<br>
+            	<span style="color:blue;font-size:7pt;">__tickets_on_sale_reason__</span></span></td>
+            <td align="right"><input type="text" name="booking_gross_box_office___booking_id__" id="booking_gross_box_office___booking_id__" value="__display_gross__" class="text_field" style="width:100%;text-align:right;__gross_style__" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="grossChanged(__booking_id__, this);"></td>
+            <td align="right"><input type="text" name="booking_deal___booking_id__" id="booking_deal___booking_id__" value="__deal_st__" class="text_field" style="width:100%;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="dealChanged(__booking_id__, this);"></td>
+            <td align="right"><input type="text" name="booking_guarantee___booking_id__" id="booking_guarantee___booking_id__" value="__guarantee_st__" class="text_field" style="width:100%;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="guaranteeChanged(__booking_id__, this);"></td>
+            <td width="100" class="editTd" onClick="editDateCalled(__booking_id__, document.getElementById('__booking_id__date_called'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__date_called">__date_called_title__</span></td>			
+            <td width="140" class="editTd" onClick="editNotes(__booking_id__, document.getElementById('__booking_id__notes'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__notes">__deal_notes__</span></td>
+            <td width="140" class="editTd" onClick="editVenueTarget(__booking_id__, document.getElementById('__booking_id__venue_target'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__booking_id__venue_target">__venue_target__</span></td>
+            <td align="center" style="cursor:hand;"><a href="javascript:deleteBooking(__booking_id__);"><img src="/images/icons/16/recyclebin.gif" alt="Delete Booking" width="16" height="16" border="0"></a></td>				
+			<td align="center" style="cursor:hand;"><a href="javascript:failBooking(__booking_id__);"><img src="/images/holiday/cross.gif" alt="Fail Booking" width="14" height="14" border="0"></a></td>								
+			</tr>	
++++
+
+	my $tourdate_row=<<"+++";
+          <tr valign="top" bgcolor="#FFFFFF">
+			<td colspan=11 align="left" style="color:blue;cursor:hand;"><a href="javascript:editTourdate(__tourdate_id__);" style="text-decoration:none;"><img src="/images/icons/16/instructions.gif" alt="Edit Tourdate" width="16" height="16" border="0" align="absmiddle"> __tourdate_title__</a></td>
+            <td align="center" style="cursor:hand;"><a href="javascript:deleteTourdate(__tourdate_id__);"><img style="__tourdate_delete_style__" src="/images/icons/16/recyclebin.gif" alt="Delete Tourdate" width="16" height="16" border="0"></a></td>												
+			<td></td>
+			</tr>
++++
+
+	my $hr_row=<<"+++";
+        </table></td>
+        </tr>
+  <tr>
+    <td colspan="3" height=20 align=center style="color:#666666;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</td>
+  </tr>	
++++
+
+	$venue_row = Webkit::AppTools->js_quote($venue_row);
+	$booking_row = Webkit::AppTools->js_quote($booking_row);	
+	$hr_row = Webkit::AppTools->js_quote($hr_row);
+	$tourdate_row = Webkit::AppTools->js_quote($tourdate_row);
+	
+	$OUT.=<<"+++";
+	<script>
+addHTMLBlock('venue_row', '$venue_row');
+addHTMLBlock('booking_row', '$booking_row');
+addHTMLBlock('hr_row', '$hr_row');
+addHTMLBlock('tourdate_row', '$tourdate_row');
++++
+
+	foreach my $venue (@{$c{tour}->ensure_child_array('venue')})
+	{
+		my $venue_js_hash = Webkit::AppTools->js_hash({
+			notes => $venue->get_js_value('booking_notes'),		
+			venue_title => $venue->get_city_title,
+			_capacity => $venue->capacity,
+			_venue_id => $venue->get_id });
+		
+		$OUT.=<<"+++";
+		
+writeVenue($venue_js_hash);
++++
+
+		foreach my $booking (@{$venue->ensure_child_array('booking')})
+		{
+			my $tour = $c{org}->get_child('tour', $booking->tour_id);
+			
+			my $tickets_on_sale = $booking->tickets_on_sale;
+			
+			if($tickets_on_sale<=0)
+			{
+				$tickets_on_sale = $venue->capacity;
+			}
+			
+			my $gross_style = '';
+			
+			if($booking->gross_box_office>0)
+			{
+				$gross_style = 'font-weight:bold;color:#880000';
+			}
+			
+			my $calculated_gross = $booking->calculate_gross($venue->capacity);
+			my $actual_gross = $booking->gross_box_office || 0;
+			
+			my $booking_js_hash = Webkit::AppTools->js_hash({
+				venue_target => $booking->get_html_value('venue_target'),
+				js_venue_target => $booking->get_js_value('venue_target'),
+				gross_style => $gross_style,
+				ticket_price_title => $booking->get_ticket_price_title,
+				ticket_price => $booking->ticket_price,
+				_date_called => Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->date_called),				
+				_gross => $actual_gross,
+				_display_gross => $calculated_gross,
+				_deal => $booking->deal || 0,
+				_guarantee => $booking->guarantee || 0,
+				_tickets_on_sale => $tickets_on_sale || 0,
+				tickets_on_sale_reason => $booking->get_js_value('tickets_on_sale_reason'),
+				deal_notes => $booking->get_html_value('deal_notes'),
+				tour_name => $tour->name,
+				_venue_id => $booking->venue_id,
+				_booking_id => $booking->get_id });	
+			
+			$OUT.=<<"+++";
+writeBooking($booking_js_hash);
++++
+
+			my $tourdate_count = $booking->get_child_count('tourdate');
+			my $tourdate_delete_style = '';
+			
+			if($tourdate_count==1)
+			{
+				$tourdate_delete_style = 'display:none;';
+			}
+
+			foreach my $tourdate (@{$booking->ensure_child_array('tourdate')})
+			{				
+				my $tourdate_js_hash = Webkit::AppTools->js_hash({
+					tourdate_delete_style => $tourdate_delete_style,
+					_tourdate_id => $tourdate->get_id,
+					tourdate_title => $tourdate->get_datetime_title(1) });
+				
+				$OUT.=<<"+++";
+writeTourdate($tourdate_js_hash);			
++++
+			}
+		}
+	
+		$OUT.=<<"+++";
+writeHr();
++++
+	}
+	
+	$OUT.=<<"+++";
+</script>
++++
+}
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>
+
+
+

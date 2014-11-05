@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		top.content.page.content.location = loc;
+	\}
+	
+	function getPhase(val)
+	\{
+		var query = '&method=control_panel_home&period_date=' + val;
+		
+		var loc = href + query;
+		
+		top.content.page.content.location = loc;
+		top.content.page.title.setPhase(val);
+	\}
+
+var tree = new WebFXTree('{$c{org}->name} Quiz Phases');
+tree.action = "javascript: get_xTree_query('&method=control_panel_home');";
+
+{
+	my $period_dates = $c{org}->{_period_dates};
+	my $phase_id = 0;
+			
+	foreach my $phase (@$period_dates)
+	{
+		$phase_id++;
+		
+		my $sql_date = $phase->{period_date};
+		
+		my $date = Webkit::Date->parse_from_sql($sql_date);
+		
+		my $title = Webkit::Date->get_full_monthname($date->Month).' '.$date->Year;
+		
+		$OUT.=<<"+++";
+var phase$phase_id = new WebFXTreeItem('$title');
+phase$phase_id.action = "javascript: getPhase('$sql_date');";
+
+tree.add(phase$phase_id)
++++
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<menu_config>
+{
+	if($c{session}->is_privilaged('sitemanager', 'emailmanager'))
+	{
+		$OUT.=<<"+++";
+	<menublock title="Email" width="140">
+		<menuitem title="View/Edit Email Accounts" action="sitemanager_get_main_query('&amp;method=email_home');"/>
+		<menuitem title="Add a Mailbox" action="sitemanager_get_main_query('&amp;method=email_home&amp;main_frame_method=email_add_pop_account_frameset');"/>
+		<menuitem title="Add an Email Address" action="sitemanager_get_main_query('&amp;method=email_home&amp;main_frame_method=email_add_alias_frameset');"/>
+	</menublock>
++++
+	}
+
+	if($c{session}->is_privilaged('sitemanager', 'sitestatistics'))
+	{
+		$OUT.=<<"+++";
+	<menublock title="Statistics" width="140">
+		<menuitem title="View" action="sitemanager_get_main_query('&amp;method=stats_home');"/>
+	</menublock>
++++
+	}
+}
+</menu_config>

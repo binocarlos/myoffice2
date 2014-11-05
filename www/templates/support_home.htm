@@ -1,0 +1,78 @@
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<body>
+
+<form method="POST" action="{$c{script}}" style="margin:0;">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="support_submit_query">
+<script>
+var browser;
+var browserName = navigator.appName;
+var browserVersion = parseInt(navigator.appVersion);
+
+if (browserName == "Microsoft Internet Explorer" && 
+         browserVersion == 4 && 
+         navigator.appVersion.indexOf("MSIE 6.0") != -1) \{
+    browser = "Internet Explorer 6";
+\}
+else if (browserName == "Microsoft Internet Explorer" && 
+         browserVersion == 4 && 
+         navigator.appVersion.indexOf("MSIE 5.5") != -1) \{
+    browser = "Internet Explorer 5.5";
+\}
+else if (browserName == "Microsoft Internet Explorer" && 
+         browserVersion == 4 && 
+         navigator.appVersion.indexOf("MSIE 5.0") != -1) \{
+    browser = "Internet Explorer 5";
+\}
+document.write('<input type="hidden" name="browser" value="'+ browser + ' ('+ navigator.appMinorVersion +')">');
+document.write('<input type="hidden" name="operating_system" value="'+ navigator.platform +'">');
+document.write('<input type="hidden" name="screen_resolution" value="'+ screen.width +'x'+ screen.height +' ('+ window.screen.availWidth +'x'+ window.screen.availHeight +')">');
+</script>
+
+
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+
+<font color="red"><b>{$c{params}->{status}}</b></font><br><br>
+<div class="panelouter" style="width:500px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+<b>If you require help or if a problem occurs while using this system you can contact us in the following ways:</b>
+<br><br>
+Telephone Support (Monday to Friday 9am-5pm GMT): 0117 9047876<br><br>
+Email Support Form (24 hours)<br><br>
+ 
+
+<!--User: {$c{user}->get_fullname}<br>
+Application: {$c{app_title}}<br>
+Date: {$c{date_title}}<br>-->
+
+<fieldset>
+<legend>Email Support Form</legend>
+<div class="seccontent" align="left">
+
+<table cellpadding="0" celspacing="0" border="0">
+<tr style="padding-bottom:5px;">
+<td align="right" class="label">Contact&nbsp;Me&nbsp;Via:&nbsp;</td>
+<td align="left" class="field" width="50%"><select name="contact_via" class="text_field" style="width:100%;">{$c{contact_options}}</select></td>
+<td class="space"></td>
+<td align="right" class="label">Contact&nbsp;Details:&nbsp;</td>
+<td align="left" class="field" width="50%"><input type="text" name="contact_details" style="width:100%;" value="{$c{params}->{contact_details}}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field"></td>
+</tr>
+<tr>
+<td align="right" class="label" valign="top" style="padding-top:4px;">Problem:&nbsp;</td>
+<td colspan="4" width="100%"><textarea name="query" style="width:100%;height:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field">{$c{params}->{query}}</textarea></td>
+</tr>
+</table>
+
+</div>
+</fieldset>
+
+<div align="right" style="padding-top:8px;"><input type="submit" value="Send" style="width:75px;" class="button"></div>
+
+</div></div></div>
+<br><br>
+
+</TD></TR></TABLE> 
+
+</form>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var previewMode = false;
+var pupilIds = new Object();
+
+var pupilMode = false;
+
+function togglePupilNames()
+\{
+	pupilMode = !pupilMode;
+	
+	var title = 'Hide Pupil Names';
+	var display = 'inline';
+	
+	if(!pupilMode)
+	\{
+		title = 'Show Pupil Names';
+		display = 'none';
+	\}
+	
+	setPupilNames(display);
+	document.getElementById('namesButton').value = title;
+\}
+
+function setPupilNames(dis)
+\{
+	for (var pupil_id in pupilIds)
+	\{
+		document.getElementById(pupil_id).style.display = dis;
+	\}
+\}
+
+function togglePreview()
+\{
+	previewMode = !previewMode;
+	
+	var rows = '60,*';
+	var buttonTitle = 'Show Question Preview';
+	
+	if(previewMode)
+	\{
+		rows = '350,*';
+		buttonTitle = 'Hide Question Preview';
+	\}
+	
+	parent.auto_marks_frameset.rows = rows;
+	document.getElementById('previewButton').value = buttonTitle;
+\}
+
+{
+	if(($c{params}->{sub_question_id}>0)&&(!$c{params}->{frameset}))
+	{
+		$OUT.=<<"+++";
+parent.preview.document.location = href + '&method=tests_sub_question_preview&auto_marking=1';
++++
+	}
+}
+</script>
+<form method="GET" action="{$c{script}}">
+<input type="hidden" name="method" value="analysis_auto_marking">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<table border="0" cellspacing="1" cellpadding="5">
+  <tr>
+    <td colspan="2" width=400><b>Marking Analysis for {$c{exam}->get_fullname}</b></td>
+  </tr>
+  <tr>
+    <td>Question Preview: </td>
+    <td align="left"><input type="button" id="previewButton" value="Show Question Preview" class="button" onClick="togglePreview();"></td>
+  </tr>
+  <tr>
+    <td>Pupil Names: </td>
+    <td align="left"><input type="button" id="namesButton" value="Show Pupil Names" class="button" onClick="togglePupilNames();"></td>
+  </tr>  
+  <tr>
+    <td>Filter:</td>
+{
+	my $options = [
+		{	key => 'all',
+			title => 'All Pupils' },
+		{	key => 'correct',
+			title => 'Correct Pupils' },
+		{	key => 'incorrect',
+			title => 'Incorrect Pupils' } ];
+			
+	my $options = Webkit::AppTools->get_select_options($options, {
+		key_field => 'key',
+		value_field => 'title',
+		selected => $c{params}->{filter} });
+
+	$OUT.=<<"+++";
+    <td><select name="filter" class="text_field" style="width:100%;">
+	$options
+	</select></td>
++++
+}  </tr>
+   <tr>
+    <td>Order By :</td>
+{
+	my $options = [
+		{	key => 'name',
+			title => 'Pupil Name' },
+		{	key => 'score',
+			title => 'Score' } ];
+			
+	my $options = Webkit::AppTools->get_select_options($options, {
+		key_field => 'key',
+		value_field => 'title',
+		selected => $c{params}->{orderby} });
+
+	$OUT.=<<"+++";
+    <td><select name="orderby" class="text_field" style="width:100%;">
+	$options
+	</select></td>
++++
+}
+  </tr>
+   <tr>
+    <td>Order:</td>
+{
+	my $options = [
+		{	key => 'asc',
+			title => 'Ascending' },
+		{	key => 'desc',
+			title => 'Descending' } ];
+			
+	my $options = Webkit::AppTools->get_select_options($options, {
+		key_field => 'key',
+		value_field => 'title',
+		selected => $c{params}->{order} });
+
+	$OUT.=<<"+++";
+    <td><select name="order" class="text_field" style="width:100%;">
+	$options
+	</select></td>
++++
+}
+  </tr>
+  <tr align="right">
+    <td colspan=2>
+
+      <input type="button" class="button" onClick="self.print();" value="Print">
+&nbsp;
+      <input type="submit" value="View" class="button"></td>
+  </tr>
+</table>
+</form>
+
+<table border=0>
+
+{
+	foreach my $input (@{$c{sub_question}->ensure_child_array('question_input')})
+	{
+		my $type = $input->type;
+		my $real_answer = $input->answer;
+		my $qmarks = $input->marks;
+		my $id = $input->get_id;
+		my $format = $input->answer_format_key;
+		my $data = $input->data;
+		
+		$OUT.=<<"+++";
+		<tr>
+		<td>
+<TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+<tr>
+<td colspan=3 class="t">Input Details</td>
+</tr>
+<tr>
+<td colspan=3 class="c3">
+<form method="GET" action="$c{script}">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="analysis_auto_marking_save_input">
+<input type="hidden" name="question_input_id" value="$id">
+<table width="100%" border=0 cellpadding=5 cellspacing=0>
+<tr><td width="50">Type:</td>
+<td width="300">  <input name="type" type="text" class="text_field" value="$type" style="width:100%;"></td></tr>
+<tr><td>Format:</td><td><input name="answer_format_key" type="text" class="text_field" id="answer_format_key" style="width:100%;" value="$format"></td></tr>
+<tr><td>Answer:</td><td><input name="answer" type="text" class="text_field" value="$real_answer" style="width:100%;"></td></tr>
+<tr><td>Marks:</td><td><input name="marks" type="text" class="text_field" value="$qmarks" style="width:100%;"></td></tr>
+<tr><td valign="top">Data:</td>
+<td><textarea name="data" style="width:100%;height:80px;" class="text_field">$data</textarea></td></tr>
+<tr>
+  <td valign="top">&nbsp;</td>
+  <td align="right"><input name="Submit" type="submit" class="button" value="Save Input Details"></td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
+  <tr>
+   <td colspan="3" class="s"></td>
+  </tr>
+  <tr>
+    <td class="t" nowrap><b>Pupil</b></td>
+    <td class="t" nowrap><b>Answer</b></td>
+    <td class="t" nowrap><b>Marks</b></td>
+  </tr>
++++
+
+		foreach my $answer (@{$input->ensure_child_array('answer')})
+		{
+			my $given_answer = $answer->answer;
+			my $marks = $answer->marks;
+			my $pupil = $answer->{data}->{pupil_name};
+			my $id = $answer->get_id;
+			
+			my $bg = '#f0fff0';
+			
+			if($marks<=0){ $bg = '#fff0f0'; }
+			
+			$bg = ' bgcolor="'.$bg.'"';
+			
+			my $display = 'none';
+			
+			if($c{org}->is_generic_nctest)
+			{
+				$display = 'inline';
+			}
+			
+			$OUT.=<<"+++";
+<script>
+pupilIds.pupil$id = 1;
+</script>			
+  <tr$bg>
+    <tr><td class="c1"><span id="pupil$id" style="display:$display;">$pupil</span>&nbsp;</td>
+    <td class="c3">$given_answer&nbsp;</td>
+    <td class="c3">$marks&nbsp;</td>
+    </tr>
++++
+		}
+		
+		$OUT.=<<"+++";
+</table>
+<br></td>
+</tr></td>
++++
+	}
+}
+</table>
+<script>
+
+//// THE SUB QUESTION ID IS {$c{session}->{nctest_edit_sub_question_id}}
+</script>

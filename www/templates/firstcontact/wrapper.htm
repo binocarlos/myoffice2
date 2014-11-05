@@ -1,0 +1,47 @@
+<html>
+<head>
+<script src="/lib/kit.js"></script>
+<script src="/lib/myoffice2/lib.js"></script>
+<style type="text/css">
+a \{color:#0000aa;\}
+a:hover \{color:#CCCC99; text-decoration:none;\}
+</style>
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+{
+if(!$c{session_id})
+{
+		$OUT.=<<"+++";
+var appname = 'login';
++++
+}
+else
+{
+		$OUT.=<<"+++";
+var appname = '$c{app_name}';
++++
+}
+}
+</script>
+
+{
+	my $browser = Webkit::Browser->new;
+	
+	my $css_file = '/lib/app.css';
+	
+	if($browser->{os} eq 'mac')
+	{
+		$css_file = '/lib/app_mac.css';
+	}
+	
+	$OUT.=<<"+++";
+<link rel="stylesheet" href="$css_file" type="text/css"/>
++++
+}
+
+</head>
+{$c{body}}
+</html>

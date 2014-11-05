@@ -1,0 +1,102 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function goBack()
+	\{
+		var new_loc = href + '&method=analysis_target_report&{$c{report}->get_query_string}';
+		document.location = new_loc;
+	\}
+</script>
+
+<table  border="0" cellspacing="1" cellpadding="0">
+  <tr valign="top">
+    <td>
+        <table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+          <tr bgcolor="#FFFFFF">
+            <td width="200"><b>Skill Statement Summary - {$c{report}->{topic_id}}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td><b>{$c{report}->{title}}</b><br>{$c{report}->{params_st}}</td>
+          </tr>		    
+
+        </table>
+    </form></td>
+  </tr>
+</table>
+<br>
+<input type="button" value="Back" class="button" onClick="goBack();">
+<br>
+<br>
+Please note that the scores shown below will not always line up with the scores shown for the topic on the previous page.<br>
+<br>
+This is because some questions may not have a skill statement assigned to them, in which case their scores are not shown on this page whereas they are shown on the target analysis. <br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td><strong>Score</strong></td>
+    <td><strong>Marks</strong></td>
+    <td><strong>Percent</strong></td>	
+    <td><strong>Section</strong></td>
+    <td><strong>Level</strong></td>
+    <td><strong>Statement</strong></td>
+    <td><strong>Exams / Questions</strong></td>	
+  </tr>
+{
+	foreach my $ref (@{$c{report}->{data_refs}})
+	{
+		my $sid = $ref->{statement_id};
+		
+		my $statement_ref = $c{report}->{skill_statements}->{$sid};
+		
+		my $section = $statement_ref->{section};
+		my $level = $statement_ref->{level};
+		my $statement = $statement_ref->{statement};
+		
+		my $score = sprintf("%.0f", $ref->{marks});
+		my $marks = sprintf("%.0f", $ref->{total_marks});
+		my $p = 0;
+
+		if($marks>0)
+		{
+			$p = sprintf("%.0f", ($score / $marks)*100);
+		}
+		
+		$OUT.=<<"+++";
+  <tr align="right" valign="top" bgcolor="#FFFFFF">
+    <td bgcolor=#e5e5e5><b>$score</b></td>  
+    <td bgcolor=#e5e5e5><b>$marks</b></td>
+    <td bgcolor=#e5e5e5><b>$p</b></td>	
+    <td bgcolor=#e5e5e5>$section</td>
+    <td bgcolor=#e5e5e5>$level</td>
+    <td>$statement</td>
+	<td align="left"><table width="100%" border=0 cellpadding=5 cellspacing=0>
++++
+
+		foreach my $exam_id (keys %{$ref->{exams}})
+		{
+			my $exam_title = $c{report}->{exam_names}->{$exam_id};
+			my $q_arr = $ref->{exams}->{$exam_id};
+			
+			$OUT.=<<"+++";
+			<tr><td style="color:red;">$exam_title</td></tr>
+			<tr><td style="color:blue;">
++++
+
+			foreach my $q (@$q_arr)
+			{
+				$OUT.=<<"+++";
+				Question $q<br>
++++
+			}
+			
+			$OUT.=<<"+++";
+			</td></tr><tr><td height=5</td></tr>
++++
+		}
+		
+		$OUT.=<<"+++";
+  </table></td></tr>
++++
+	}
+}
+</table>

@@ -1,0 +1,70 @@
+<!--#include file="temp_include.htm" -->
+<script>
+
+</script>
+<body>
+<form method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="marking_manual_form_submit">
+<input type="hidden" name="exam_id" value="{$c{exam}->get_id}">
+<table border="0" cellpadding="2" cellspacing="1" bgcolor="#d5d5d5">
+<tr bgcolor="#FFFFFF">
+  <td><b>Mark Quiz </b></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td><input type="submit" class="button" value="Save Levels"></td>
+</tr>
+<tr bgcolor="#FFFFFF">
+  <td><table border=0 cellpadding="8" cellspacing="1" bgcolor="#CCCCCC">
+  <tr>
+  	<td bgcolor="#FFFFFF"></td>
+{
+	foreach my $assessment_group (@{$c{exam}->ensure_child_array('assessment_group')})
+	{
+		my $topic = $assessment_group->topic_id;
+		
+		$OUT.=<<"+++";
+	<td bgcolor="#CCCCCC" width=100><b style="color:#666666">$topic</b></td>
++++
+	}
+}
+  </tr>
+{
+	foreach my $pupil (@{$c{exam}->ensure_child_array('pupil')})
+	{
+		my $name = $pupil->get_fullname;
+		
+		$OUT.=<<"+++";
+  <tr>
+  <td bgcolor="#999999"><b style="color:#FFFFFF">$name</b></td>
++++
+
+		foreach my $assessment_group (@{$c{exam}->ensure_child_array('assessment_group')})
+		{
+			my $pa = $c{exam}->get_pupil_use_level($pupil->get_id, $assessment_group->topic_id);
+			
+			my $id = 'assessment_'.$pupil->get_id.'_'.$assessment_group->topic_id;
+			
+			my $value = '';
+			
+			if($pa)
+			{
+				$value = $pa->level;
+			}
+			
+			$OUT.=<<"+++";
+			<td bgcolor="#FFFFFF"><input type="text" class="text_field" style="width:100%;text-align:right;" name="$id" value="$value"></td>
++++
+		}
+		
+		$OUT.=<<"+++";
+		</tr>
++++
+	}
+}
+  </table></td>
+</tr>
+</table>
+</form>
+</body>
+

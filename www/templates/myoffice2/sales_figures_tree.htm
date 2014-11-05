@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<img src="/images/tools/16px/open.gif" width=16 height=16 align="absmiddle"> = <u>Jump To Week </u><br>
+<br>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		top.appContent.page.frames[1].location = loc;
+	\}
+	
+	function viewWeek(epoch)
+	\{
+		var currentHref = top.appContent.page.frames[1].document.location.href;
+		
+		var hrefParts = currentHref.split('#');
+
+		top.appContent.page.frames[1].document.location.href = hrefParts[0] + '#' + epoch;
+		
+		//alert(linkElem);
+		//linkElem.click();
+	\}
+	
+	function viewStart()
+	\{
+		top.appContent.page.frames[1].document.getElementById('start_link').click();
+	\}
+
+var tree = new WebFXTree('{$c{tour}->name} Sales Figures Weeks');
+tree.action = "javascript: viewStart();";
+
+{			
+	foreach my $week (@{$c{tour}->get_sales_figures_date_array})
+	{
+		my $title = $week->get_full_string;
+		my $epoch = $week->epoch_days;
+		
+		$OUT.=<<"+++";
+var week$epoch = new WebFXTreeItem('$title');
+week$epoch.icon = '/images/tools/16px/open.gif';
+week$epoch.openIcon = '/images/tools/16px/open.gif';
+week$epoch.action = "javascript: viewWeek($epoch);";
+
+tree.add(week$epoch)
++++
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

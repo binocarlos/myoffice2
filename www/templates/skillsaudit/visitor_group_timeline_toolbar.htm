@@ -1,0 +1,111 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<link rel="stylesheet" type="text/css" href="/templates/skillsaudit/toolbar.css">
+<script src="/templates/skillsaudit/toolbar.js">
+</script>
+<script>			
+function closeClicked()
+\{			
+	parent.goHome();
+\}
+
+function openDateWizard()
+\{
+	parent.content.document.location = href + '&method=date_wizard';
+\}
+
+function submitFilterForm()
+\{	
+	var form = document.date_form;
+	
+	var query_st = 'from_date=' + form.from_date.value + '&to_date=' + form.to_date.value + '&subject=' + form.subject.value;
+	query_st += '&keystage=' + form.keystage.value + '&school_type=' + form.school_type.value + '&postcode=' + form.postcode.value;
+	query_st += '&slice=' + form.slice.value;
+	
+	var loc = href + '&method=visitors_group_timeline_home&' + query_st;
+	
+	parent.content.document.location = loc;
+\}
+
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="top" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="top" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">	
+      <table border="0" align="left" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+		  <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+<TR>
+<TD>
+<fieldset>
+<legend><b style="color:blue;">LA</b> Timeline Analysis Filter</legend>
+<form name="date_form" style="margin:0px;padding:0px;">
+<div class="seccontent" align="left">  						
+                            <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                              <TR>
+                                <TD ALIGN="right" VALIGN="MIDDLE"> From:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">
+				<table border=0 cellpadding="0" cellspacing="0">
+				<tr>
+				<td><INPUT CLASS="text_field" TYPE="TEXT" NAME="from_date" STYLE="width:100px;" VALUE="{$c{org}->{from_date}}"></td>
+				<td><IMG src="/images/holiday/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A style="cursor:hand;" ONCLICK="parent.content.calendar_click(document.date_form.from_date);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
+                       	</tr>
+                                </table>
+                                </TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                                <TD ALIGN="right" VALIGN="MIDDLE">To:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">
+				<table border=0 cellpadding="0" cellspacing="0">
+				<tr>
+				<td><input class="text_field" type="TEXT" name="to_date" style="width:100px;" value="{$c{org}->{to_date}}"></td>
+				<td><img src="/images/holiday/clear.gif" width="5" height="1" border="0" align="ABSMIDDLE"><a style="cursor:hand;" onClick="parent.content.calendar_click(document.date_form.to_date);"><img src="/images/holiday/but_date.gif" width="26" height="20" border="0" align="ABSMIDDLE"></a></td>
+				</tr>
+				</table>
+				</TD>
+				                <TD ALIGN="LEFT" VALIGN="MIDDLE"><a style="cursor:hand;" onClick="openDateWizard();"><img src="/images/nav/qmark.gif" width="16" height="16" border=0></a></TD>
+				                <TD ALIGN="LEFT" VALIGN="MIDDLE"><img src="/images/tools/16px/search.gif" width=16 height=16 border=0 style="cursor:hand;" onClick="submitFilterForm();" alt="Set Filter"></TD>
+				                <TD ALIGN="right" VALIGN="MIDDLE"><a href="#" onClick="parent.content.focus();parent.content.print();"><img src="/images/skillsaudit/window_print.gif" width="55" height"23" border="0"></a></TD>
+				                <!--#### LA ONLY START ####-->
+                                <!--#### LA ONLY END ####-->
+                              </TR>
+							  <tr>
+							  <TD ALIGN="right" VALIGN="MIDDLE">Timeframe:</TD>	
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><select name="slice" class="text_field" style="width:100%;">{$c{org}->get_slice_options('MONTH')}</select></TD>
+</tr>
+                              <TR>						
+                                <TD ALIGN="right" VALIGN="MIDDLE">Keystage:</TD>	
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE"><select name="keystage" class="text_field" style="width:100%;">{$c{org}->get_keystage_options($c{params}->{keystage})}</select>	</TD>	
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                                <TD ALIGN="right" VALIGN="MIDDLE">Subject:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE"><select name="subject" class="text_field" id="subject" style="width:100%;">{$c{org}->get_subject_options($c{params}->{subject})}</select>	</TD>
+				                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+				                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                              </TR>
+							  <tr><TD ALIGN="right" VALIGN="MIDDLE">School:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE"><select name="school_type" class="text_field" id="school_type" style="width:100%;">{$c{org}->get_school_type_options($c{params}->{school_type})}
+                                </select></TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                                <TD ALIGN="right" VALIGN="MIDDLE">Postcode:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE"><INPUT NAME="postcode" TYPE="TEXT" CLASS="text_field" id="postcode" STYLE="width:100%;" VALUE="{$c{params}->{postcode}}"></TD>
+							  </tr>
+                          </TABLE>
+ </div>
+</fieldset>
+</form>
+</td></tr></table>		  </td>  
+       </tr>
+      </table>
+      </TD>
+		</TR>
+</TABLE>
+      </TD>
+		</TR>
+</TABLE>
+</BODY>
+</HTML>

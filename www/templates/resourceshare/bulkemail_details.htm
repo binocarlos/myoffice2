@@ -1,0 +1,707 @@
+<!--#include virtual="temp_include.htm" -->
+{
+	sub get_extra_field_html
+	{
+		my ($field) = @_;
+		
+		my $html = '';
+		
+		my $title = $field->name;
+		my $id = $field->id;
+		my $value = $field->value;
+
+		my $fieldname = lc($title);
+		$fieldname =~ s/\W//g;
+		
+		$fieldname .= '_section';
+
+		$html.=<<"+++";
+<span id="extra_field_$fieldname" style="display:none;">
+	<b>Extra Info -&gt; $title</b><br><br>
+	<fieldset>
+<legend>$title</legend>
+<table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
++++
+			
+		if($field->is_text)
+		{
+			$html.=<<"+++";
+<tr style="padding-bottom:5px;">
+<td align="LEFT" width="100%"><input onFocus="this.className='text_field2';" value="$value" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="$id" style="width:100%;"></td>
+</tr>
++++
+		}
+		elsif($field->is_choice)
+		{
+			my $list_options = $field->get_list_options($value);
+			
+			$html.=<<"+++";
+<tr style="padding-bottom:5px;">
+<td align="LEFT" width="100%">
+<select name="$id" size="1" style="width:100%;" class="text_field">$list_options</select>
+</td>
+</tr>
++++
+		}
+		elsif($field->is_multichoice)
+		{
+			my $select_id = $id;
+			my $list_options = $field->get_parts;
+			my $col_count = 0;
+			
+			$html.=<<"+++";
+<tr style="padding-bottom:5px;">
+<td align="LEFT" width="100%">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
++++
+
+			my $count = 1;
+
+			foreach my $option (@$list_options)
+			{
+				my $keyword = $field->{_multiple_keywords}->{$option};
+				
+				my $checked = '';
+				
+				my $input_id = $id.':'.$count;
+				$count++;
+				
+				if(($keyword)&&($keyword->value=~/\w/)) { $checked = ' CHECKED'; }
+				
+				$html.=<<"+++";
+<td> <input type="checkbox" name="$input_id" id="$input_id" value="$option" $checked><label for="$input_id">$option</label></td>
++++
+
+				$col_count++;
+				
+				if($col_count>1)
+				{
+					$html.=<<"+++";
+</tr><tr>		
++++
+
+					$col_count=0;
+				}
+			}
+			
+			$html.=<<"+++";
+</tr>
+</table>
+</td>
+</tr>
++++
+		}
+		elsif($field->is_textorchoice)
+		{
+			my $select_id = $id.'_select';
+			my $list_options = $field->get_list_options($value, 1);
+			
+			$html.=<<"+++";
+<tr style="padding-bottom:5px;">
+<td align="LEFT" width="100%">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width=50%><select name="$select_id" size="1" onChange="extra_option_changed(this, '$id');" style="width:100%;" class="text_field">$list_options
+                    </select></td>
+                  <td width=50%><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="$id" value="$value" style="width:100%;"></td>
+                </tr>
+</table>
+</td>
+</tr>			
++++
+		}		
+		
+		$html.=<<"+++";
+</table>
+</div></fieldset>
+</span>		
++++
+
+		return $html;
+	}
+}
+<body style="background-color:#D4D0C8;">
+<script>
+	var helptext = new Object();
+	var session_id = '<wk>$session_id</wk>';
+	var keyword_hash = new Object();
+	var new_keyword_id = 1;
+	var currentSection = 'general_info';
+	var event_color_hash = new Object();
+	
+	function addNewEvent(id, color)
+	\{		
+		event_color_hash[id] = color;
+	\}
+{
+	foreach my $event_obj (@{$c{calendar_events}})
+	{
+		my $id = $event_obj->{id};
+		my $color = $event_obj->{color};
+		
+		$OUT.=<<"+++";
+	addNewEvent($id, '$color');	
++++
+	}
+}
+	function multiday_clicked()
+	\{
+		var gui = document.getElementById('multiday');
+		
+		if(gui.checked)
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';		
+			document.getElementById('start_time_table').style.display = 'none';
+			document.getElementById('end_time_table').style.display = 'none';
+			document.getElementById('end_date_table').style.display = 'inline';
+			document.getElementById('all_day_tr').style.display = 'none';
+		\}
+		else
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';		
+			document.getElementById('end_date_table').style.display = 'none';
+			document.getElementById('all_day_tr').style.display = 'inline';			
+			
+			if(document.getElementById('all_day').checked)
+			\{
+				document.getElementById('start_time_table').style.display = 'none';			
+				document.getElementById('end_time_table').style.display = 'none';
+			\}
+			else
+			\{
+				document.getElementById('start_time_table').style.display = 'inline';			
+				document.getElementById('end_time_table').style.display = 'inline';			
+			\}
+
+		\}		
+	\}
+	
+	function all_day_clicked()
+	\{
+		var gui = document.getElementById('all_day');
+		
+		if(gui.checked)
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';		
+			document.getElementById('start_time_table').style.display = 'none';
+			document.getElementById('end_time_table').style.display = 'none';
+			document.getElementById('end_date_table').style.display = 'none';
+		\}
+		else
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';
+			document.getElementById('start_time_table').style.display = 'inline';
+			document.getElementById('end_time_table').style.display = 'inline';
+			document.getElementById('end_date_table').style.display = 'none';
+		\}
+	\}
+
+
+	function event_type_changed(gui)
+	\{
+		var gui = document.getElementById('event_type');
+		var color = event_color_hash[gui.value];
+		
+		if(color==null) \{ color = '#cccccc'; \}
+		
+		document.getElementById('event_bg').bgColor = color;
+	\}
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}
+	
+	function uploadedOk()
+	\{
+
+	\}
+
+	function new_keyword(id, word, value)
+	\{
+		if(!id)
+		\{
+			id = 'new' + new_keyword_id;
+			new_keyword_id++;
+		\}
+
+		var keyword = new Object();
+		keyword.id = id;
+		keyword.word = word;
+		keyword.value = value;
+
+		keyword_hash[keyword.id] = keyword;
+	\}
+{
+	foreach my $keyword (@{$c{keyword_array}})
+	{
+		my $id = $keyword->get_id;
+		my $word = $keyword->word;
+		my $value = $keyword->value;
+
+		$OUT.=<<"+++";
+new_keyword($id, '$word', '$value');
++++
+	}
+}
+
+	function get_keywords_packet()
+	\{
+		var packet = "<keywords>\n";
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			packet += "<keyword id=\"" + keyword.id + "\" word=\"" + keyword.word + "\" value=\"" + keyword.value + "\"";
+
+			if(keyword.deleted)
+			\{
+				packet += " deleted=\"true\"";
+			\}
+
+			packet += "/>\n";
+		\}
+
+		packet += "</keywords>";
+
+		return packet;
+	\}
+
+	function create_keyword()
+	\{
+		var new_word = document.getElementById('new_word');
+		var existing_word = document.getElementById('existing_word');
+		var value = document.getElementById('keyword_value');
+
+		var word = '';
+
+		if(new_word.value!='')
+		\{
+			word = new_word.value;
+		\}
+		else
+		\{
+			word = existing_word.value;
+		\}
+
+		if(word=='')
+		\{
+			form_error('Please enter a keyword');
+			return;
+		\}
+
+		if(value.value=='')
+		\{
+			form_error('Please enter a value');
+			return;
+		\}
+
+		new_keyword(null, word, value.value);
+
+		apply_keyword_table();
+
+		new_word.value = '';
+		value.value = '';
+	\}
+
+	function apply_keyword_table()
+	\{
+		var html = get_keyword_table();
+
+		document.getElementById('keywords_td').innerHTML = html;
+	\}
+
+	function delete_keyword(id)
+	\{
+		var keyword = keyword_hash[id];
+
+		keyword.deleted = true;
+
+		apply_keyword_table();
+	\}
+
+	function get_keyword_table()
+	\{
+		var table = '<table width=100% border=0 cellspacing=0 cellpadding=0>';
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				var keyword_row = 	'<tr><td align=left valign=bottom class="dottedline">'
+								+ '<font class="keyword">' + keyword.word + ' = '
+								+	keyword.value + '&nbsp;</font></td>'
+								+	'<td align=right width=16>'
+								+	'<a style="cursor:hand;" onClick="delete_keyword(\'' + keyword.id + '\');">'
+								+	'<img alt="Delete Keyword" src="/images/icons/16/recyclebin.gif" width=16 height=16 border=0>'
+								+	'</a></td></tr>';
+
+				table += keyword_row;
+			\}
+		\}
+
+		table += '</table>';
+
+		return table;
+	\}
+
+	function author_changed(select)
+	\{
+		var sel = select.selectedIndex;
+
+		if(sel>0)
+		\{
+			var author_text = select.options[sel].text;
+
+			document.resourceform.author.value = author_text;
+		\}
+	\}
+
+	function calendar_person_changed(select)
+	\{
+		var sel = select.selectedIndex;
+
+		if(sel>0)
+		\{
+			var cal_text = select.options[sel].text;
+
+			document.resourceform.calendar_person.value = cal_text;
+		\}
+	\}
+
+	function validate_resourceform()
+	\{
+		var ret = true;
+		var form = document.resourceform;
+		var required_texts = new Array('title');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+
+			if(form[field])
+			\{
+				var value = form[field].value;
+
+				if((value=='')&&(form.type.value!='file'))
+				\{
+					form_error('You must supply a ' + field + ' value.');
+					form[field].className = 'text_field2';
+					ret = false;
+				\}
+			\}
+		\}
+
+		if(ret)
+		\{
+			//form.keywords_packet.value = get_keywords_packet();
+			//submit_security_form();
+			form_error('Saving {$c{resource}->get_item_title} Details ........');
+		\}
+
+		//document.getElementById('tabPane1').style.display = 'none';
+		//document.getElementById('save_button').style.display = 'none';
+
+		return ret;
+	\}
+
+	function do_cancel()
+	\{
+		top.close();
+	\}
+
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+		setTimeout("clear_form_error();", 10000);
+	\}
+
+	function clear_form_error()
+	\{
+		document.all('error_span').innerText = '';
+	\}
+
+	function existing_value_changed(select)
+	\{
+		var value = select.value;
+
+		if(value!="-1")
+		\{
+			document.getElementById('keyword_value').value = value;
+		\}
+	\}
+
+	function existing_keyword_changed(select)
+	\{
+		var value = select.value;
+
+		var option_text = '<select onChange="existing_value_changed(this);" size="1" style="width:140px;" class="text_field" name="existing_value" id="existing_value">';
+		option_text += '<option value="-1">&#151;&#151;&#151;&#151;&#151;</option>';
+
+		if(value!="-1")
+		\{
+			var arr = keyword_values[value];
+
+			if(arr)
+			\{
+				for(var i=0; i<arr.length; i++)
+				\{
+					var value = arr[i];
+
+					option_text += '<option value="' + value + '">' + value + '</option>';
+				\}
+			\}
+		\}
+
+		option_text += '</select>';
+
+		document.getElementById('existing_value_span').innerHTML = option_text;
+	\}
+	
+	function extra_option_changed(gui, text_id)
+	\{
+		var value = gui.value;
+		
+		if((value!='')&&(value!='-1'))
+		\{
+			document.getElementById(text_id).value = value;
+		\}
+	\}
+	
+	function show_calendar_clicked(gui)
+	\{
+		var gui = document.getElementById('show_calendar');
+		
+		var displaySt = 'none';
+		
+		if(gui.checked)
+		\{
+			displaySt = 'inline';
+		\}
+		
+		document.getElementById('date_table').style.display = displaySt;
+	\}
+
+</script>
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="resourceform" onSubmit="return validate_resourceform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_resource_form_submit">
+<input type="hidden" name="type" value="{$c{resource}->get_type}">
+<input type="hidden" name="keywords_packet" value="">
+<input type="hidden" name="resource_id" value="{$c{resource}->get_id}">
+<input type="hidden" name="access_code" id="access_code" value="{$c{resource}->access_code}">
+<input type="hidden" name="from_website" value="{$c{params}->{from_website}}">
+<input type="hidden" name="auto_folder_value" value="{$c{params}->{auto_folder_value}}">
+<input type="hidden" name="privilage_packet" id="privilage_packet" value="">
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="email">Email To</option>
+</select></td>
+<td align="left" valign=top>
+<!--
+
+
+	RESOURCE DETAILS
+	
+	
+	-->
+	<span id="email_section" style="display:inline;">
+	<b>Email To</b><br><br>
+            <table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+
+              <tr style="padding-bottom:5px;">
+                <td width="15%" align="RIGHT">Subject:&nbsp;</td>
+<td align="LEFT" width="100%">
+<input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="title" value="{$c{resource}->title}" style="width:100%;"></td>
+</tr>
+<tr><td width="15%" height=20></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT" valign="top" width="15%">Message:&nbsp;</td>
+<td align="LEFT"><textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="notes" style="width:100%; height:100px;">{$c{resource}->notes}</textarea></td>
+</tr>
+<tr><td width="15%" height=20></td>
+</tr>
+              <tr style="padding-bottom:5px;">
+                <td width="15%" align="RIGHT" valign="top">Email To:&nbsp;</td>
+<td align="LEFT" width="100%">
+<div style="width:100%;height:300px;overflow-y:scroll;border: 1px solid #000000;padding:10px;">
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<script>
+	var boxes = new Object();
+	
+	function addBox(parent_id, child_id)
+	\{
+		var arr = boxes[parent_id];
+		
+		if(arr==null)
+		\{
+			arr = new Array();
+		\}
+		
+		arr.push(child_id);
+		
+		boxes[parent_id] = arr;
+	\}
+	
+	function boxClicked(gui)
+	\{		
+		var arr = boxes[gui.name];
+		
+		if(arr==null) \{ return; \}
+		
+		for(var i=0; i<arr.length; i++)
+		\{
+			var id = arr[i];
+			
+			document.getElementById(id).checked = gui.checked;
+		\}
+	\}
+</script>
+{
+	sub process_org
+	{
+		my ($org) = @_;
+		
+		my $org_id = $org->get_id;
+		my $org_name = $org->name;
+		my $org_printed = undef;
+		
+		my $org_text=<<"+++";
+<tr>
+<td><input onClick="boxClicked(this);" type="checkbox" value="y" name="org$org_id" id="org$org_id"> <label for="org$org_id"> <img src="/images/icons/16x16/folder.gif" width=16 height=16 align="absmiddle"> <b>$org_name</b></label></td>
+<td>&nbsp;</td>
+</tr>				
++++
+		
+		foreach my $department (@{$org->ensure_child_array('department')})
+		{
+			my $user_arr = $department->ensure_child_array('users');
+			my $include_user_arr;
+			
+			foreach my $user (@$user_arr)
+			{
+				if(!$user->{_include_on_email}) { next; }
+				
+				push(@$include_user_arr, $user);
+			}
+			
+			if(!$include_user_arr) { next; }
+			
+			if(!$org_printed)
+			{
+				$OUT.=$org_text;
+				$org_printed = 1;
+			}
+			
+			my $dept_name = $department->name;
+			my $dept_id = 'dept'.$department->get_id;
+		
+			if($department->org_id!=$org->get_id)
+			{
+				if($department->{data}->{id}!=0) { next; }
+			}
+			if($department->{data}->{id}==0)
+			{
+				$dept_id = 'nodept'.$org_id;
+			}
+		
+			$OUT.=<<"+++";
+<script>
+	addBox('org$org_id', '$dept_id');
+</script>
+<tr>
+<td><img src="/images/clear.gif" width=20 height=8> <input onClick="boxClicked(this);" type="checkbox" value="y" name="$dept_id" id="$dept_id"> <label for="$dept_id"><img src="/images/icons/16x16/windows.gif" width=16 height=16 align="absmiddle"> $dept_name</label></td>
+<td>&nbsp;</td>
+</tr>		
++++
+
+			foreach my $user (@$include_user_arr)
+			{
+				my $users_name = $user->get_fullname;
+				my $users_id = $user->get_id;
+			
+				$OUT.=<<"+++";
+<script>
+	addBox('org$org_id', 'emailuser$users_id');
+	addBox('$dept_id', 'emailuser$users_id');	
+</script>
+<tr>
+<td><img src="/images/clear.gif" width=40 height=8> <input onClick="boxClicked(this);" type="checkbox" value="y" name="emailuser$users_id" id="emailuser$users_id"> <label for="emailuser$users_id"><img src="/images/resourceshare/user.gif" width=16 height=16 align="absmiddle"> $users_name</label></td>
+<td>&nbsp;</td>
+</tr>		
++++
+			}
+		}
+	}
+	
+	&process_org($c{org});
+	
+	foreach my $org (@{$c{org}->ensure_child_array('org')})
+	{
+		&process_org($org);
+	}
+}
+</table>
+</div>
+</td>
+</tr>
+</table>
+</span>
+
+
+</td>
+</tr>
+<tr>
+<td colspan=2>
+
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="100%">
+<tr>
+<td align="LEFT" valign="TOP" style="padding-top:12px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{resource}->{error_text}}</span></font></td>
+<td align="RIGHT" valign="TOP">
+<input type="submit" value="Save" class="button" name="submit" style="width:75px;" id="save_button"><input type="button" value="Cancel" class="button2" name="Button" onClick="do_cancel();" style="width:75px;">
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</form>
+
+<script>
+
+
+</script>
+{$c{calendar}}
+</body>

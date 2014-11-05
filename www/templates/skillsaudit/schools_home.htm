@@ -1,0 +1,82 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function dateUpdated()
+	\{
+
+	\}
+	
+	function validateTemplateForm()
+	\{
+		var form = document.template_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the template');
+			return false;
+		\}
+		
+		return true;
+	\}
+</script>
+<body>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width=1 align="left" valign="top">
+<form action="{$c{script}}" method="POST" name="template_form" onSubmit="return validateTemplateForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="schools_home">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Show Schools </legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Search:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%" colspan=2> 
+      <input name="search" type="text" class="text_field" id="search" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{search}}">
+    </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Show Only:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="limit" type="text" class="text_field" id="limit" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{limit}}">
+    </TD>
+	<td>Schools</td>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Start From:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="start" type="text" class="text_field" id="start" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{start}}">
+    </TD>
+	<td>&nbsp;</td>
+  </TR>          
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="right" VALIGN="MIDDLE"><input type="submit" value="View" CLASS="button2" style="width:75px;"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form></td>
+<td width="100%" align="center" valign="top">{$c{school_table}}</td>
+</tr>
+</table>
+</body>
+</html>

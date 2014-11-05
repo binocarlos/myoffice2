@@ -1,0 +1,67 @@
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td width="100%">
+<ul>
+{
+	my $arr = $c{faq_array};
+	
+	foreach my $faq (@$arr)
+	{
+		my $id = $faq->get_id;
+		my $question = $faq->get_value('question');
+		my $order = $faq->get_value('field_order');
+		
+		$OUT.=<<"+++";
+<li><b><a href="#$id">$question</a></b></li>
++++
+
+		if((!$c{org}->is_client)&&(!$c{no_gui}))
+		{
+			$OUT.=<<"+++";
++++
+		}
+		
+		$OUT.="";
+	}
+}
+</ul></td></tr>
+{
+	my $arr = $c{faq_array};
+	
+	foreach my $faq (@$arr)
+	{
+		my $id = $faq->get_id;
+		my $question = $faq->get_value('question');
+		my $answer = $faq->get_value('answer');
+		my $order = $faq->get_value('field_order');
+		
+		$answer =~ s/\n/<br>/g;
+		
+		$OUT.=<<"+++";
+<tr valign="top">
+<td><a name="$id"></a><b>$question</b><br>
+$answer
+</td>
++++
+
+		if((!$c{org}->is_client)&&(!$c{no_gui}))
+		{
+			$OUT.=<<"+++";
+<td nowrap valign="top"><img src="/images/clear.gif" width="20" height="1" border="0"
+><input type="BUTTON" name="clients_edit_users" value="Edit" class="button" style="width:75px;" onClick="document.location='$c{href}&method=faq_edit_faq&object_id=$id'"
+><img src="/images/clear.gif" width="8" height="1" border="0"
+><input type="BUTTON" name="edit2" value="Delete"	class="button" style="width:75px;" onClick="document.location='$c{href}&method=faq_delete_faq&object_id=$id'"></td>
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
+<tr height=10>
+<td></td>
+<td></td>
+</tr>
++++
+	}
+}
+</table>

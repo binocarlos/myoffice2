@@ -1,0 +1,223 @@
+<HTML>
+ <HEAD>
+	<TITLE>{$c{window_title}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TITLE>
+	<STYLE>
+TD \{cursor:default; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.fileouter \{border-left:#404040 1px solid; border-right:#FFFFFF 1px solid; border-top:#404040 1px solid; border-bottom:#FFFFFF 1px solid;\}
+.fileinner \{border-left:#808080 1px solid; border-right:#D4D0C8 1px solid; border-top:#808080 1px solid; border-bottom:#D4D0C8 1px solid;\}
+.button \{height:23px; width:75px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{width:100%; height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px;\}
+</STYLE>
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var selected_id = null;
+
+	var save_mode = false;
+
+	var selected_mode = false;
+
+	{$c{save_mode}}
+
+	function filename_change()
+	\{
+		if(!save_mode)
+		\{
+			return;
+		\}
+
+		if(selected_mode)
+		\{
+			selected_mode = false;
+		\}
+
+		selected_id = null;
+	\}
+
+	function select_budget(title, budget_id, doubleclick)
+	\{
+		if(budget_id==selected_id)
+		\{
+			do_confirm();
+		\}
+		else
+		\{
+			if(selected_id>0)
+			\{
+				document.getElementById('budgetname' + selected_id).style.backgroundColor='';
+				document.getElementById('budgetname' + selected_id).style.color='';
+			\}
+					
+			selected_mode = true;
+			selected_id = budget_id;
+			
+			document.getElementById('budgetname' + selected_id).style.backgroundColor='#0A246A';
+			document.getElementById('budgetname' + selected_id).style.color='#FFFFFF';			
+					
+			document.getElementById('filename').value = title;
+			
+			if(doubleclick)
+			\{
+				do_confirm();
+			\}
+		\}
+	\}
+
+	function do_confirm()
+	\{
+		if(save_mode)
+		\{
+			if(selected_id)
+			\{
+					var budgetName = document.all('budgetname' + selected_id).innerText;
+
+					var conf = window.confirm("Overwrite " + budgetName + "?");
+
+					if(conf)
+					\{
+						var file_type = null;
+						
+						if(document.all('file_type'))
+						\{
+							file_type = document.all('file_type').value;
+						\}
+						
+						var ret = new Array(selected_id, '', file_type);
+
+						window.returnValue = ret;
+						window.close();
+					\}
+			\}
+			else
+			\{
+				var newName = document.all('filename').value;
+
+				if(newName=="")
+				\{
+					alert('Please Enter a Name');
+
+					return;
+				\}
+				
+				var file_type = null;
+						
+				if(document.all('file_type'))
+				\{
+					file_type = document.all('file_type').value;
+				\}				
+
+				var ret = new Array('', newName, file_type);
+
+				window.returnValue = ret;
+				window.close();
+			\}
+		\}
+		else
+		\{
+			if(selected_id)
+			\{
+				if(document.all('file_type'))
+				\{
+					var type = document.all('file_type').value;
+					var id = selected_id;
+
+					var arr = new Array(id, type);
+
+					window.returnValue=arr;
+					window.close();
+				\}
+				else
+				\{
+					var budgetName = document.all('budgetname' + selected_id).innerText;
+
+					var conf = window.confirm("Delete " + budgetName + "?");
+
+					if(conf)
+					\{
+						var id = selected_id;
+					
+						window.returnValue = id;
+						window.close();
+					\}
+				\}
+			\}
+		\}
+	\}
+</script>
+ </HEAD>
+ <BODY BGCOLOR="#FFFFFF" TEXT="#000000"
+	STYLE="background:#D4D0C8; border:0px; margin:10px;">
+	<FORM>
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR>
+		 <TD HEIGHT="100%" WIDTH="100%" BGCOLOR="#FFFFFF" ALIGN="LEFT" VALIGN="TOP"
+			CLASS="fileouter">
+			<DIV STYLE="overflow:auto; width:100%; height:100%;"
+			 CLASS="fileinner">
+
+				 <!-- Files Here -->
+<table border="0" cellspacing="5" cellpadding="0" width="100%">
+<tr>
+{
+	my $count = 0;
+
+	foreach my $budget (@{$c{budgets}})
+	{
+		$count++;
+		
+		my $name = $budget->get_value('name');
+		my $id = $budget->get_id;
+
+		$OUT.=<<"+++";
+<td align="left" valign=top class="foldertext" width="25%">
+<a onDblClick="select_budget('$name', $id, true);" onClick="select_budget('$name', $id);"><img src="/images/nav/budget_icon_small.gif" width="17" height="13" align="absmiddle"><span id="budgetname$id" STYLE="padding-left:2px; padding-right:2px;">$name</span></a>
+</td>
+<td width=10></td>
++++
+
+		if($count>=4)
+		{
+			$OUT.=<<"+++";
+</tr>
+<tr>
++++
+
+			$count = 0;
+		}
+	}
+}
+
+</tr>
+</table>
+
+</DIV></TD>
+		</TR>
+		<TR>
+		 <TD><IMG SRC="/images/clear.gif" BORDER="0" HEIGHT="8" WIDTH="1"><BR>
+			<TABLE WIDTH="100%" BORDER="0" CELLSPACING="0" CELLPADDING="0">
+			 <TR>
+				<TD NOWRAP="NOWRAP">Budget name: </TD>
+				<TD NOWRAP="NOWRAP" WIDTH="10"><IMG SRC="/images/clear.gif" BORDER="0" HEIGHT="1" WIDTH="10"></TD>
+				<TD ALIGN="right" WIDTH="100%"><INPUT TYPE="TEXT" ONCHANGE="filename_change();" ID="filename" CLASS="text_field"{$c{readonly}}></TD>
+				<TD WIDTH="10"><IMG SRC="/images/clear.gif" BORDER="0" HEIGHT="1" WIDTH="10"></TD>
+				<TD ALIGN="RIGHT" WIDTH="80"><INPUT TYPE="BUTTON" value="{$c{confirm_title}}" name="button" onClick="do_confirm();"	CLASS="button"></TD>
+			 </TR>
+			 <TR>
+				<TD NOWRAP="NOWRAP" COLSPAN="5" HEIGHT="5"><IMG SRC="/images/clear.gif"
+				 BORDER="0" HEIGHT="5" WIDTH="1"></TD>
+			 </TR>
+			 <TR>
+				<TD NOWRAP="NOWRAP">{$c{other_title}}</TD>
+				<TD NOWRAP="NOWRAP"></TD>
+				<TD ALIGN="right" WIDTH="100%">
+				<select id="file_type" class="text_field">
+				 {$c{file_type_options}}
+				 </select>
+				 </TD>
+				<TD></TD>
+				<TD ALIGN="right"><INPUT TYPE="button" VALUE="Cancel" ONCLICK="window.close();" CLASS="button"></TD>
+			 </TR>
+			</TABLE></TD>
+		</TR>
+	 </TABLE></FORM></BODY>
+</HTML>

@@ -1,0 +1,129 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+var questionLevel = '{$c{qassessment_group}->level}';
+
+	function levelChanged()
+	\{
+		var form = document.input_form;
+		var newLevel = form.level.value;
+
+		if(newLevel!=questionLevel)
+		\{
+			alert('The question is set to level ' + questionLevel + ' - this input will be inside a different level group');
+		\}
+	\}
+
+	function cancel()
+	\{
+		top.returnValue = null;
+		top.close();
+	\}
+
+	function save()
+	\{
+		document.input_form.submit();
+	\}
+
+	function changeType()
+	\{
+		document.location = href + '&method=tests_question_choose_component_type';
+	\}
+
+	function submitTextLineForm()
+	\{
+		var form = document.input_form;
+
+		if(form.answer_format.value=='-1')
+		\{
+			if(form.answer.value!='')
+			\{
+				alert('You dont need an answer for a manually marked question - are you sure its manually marked?');
+
+				return false;
+			\}
+		\}
+		else
+		\{
+			if(form.answer.value=="")
+			\{
+				alert('Please enter the answer for this question');
+				return false;
+			\}
+		\}
+
+		form.submit();
+	\}
+
+</script>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<body style="background-color:#D4D0C8;">
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="input_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tests_question_input_form_submit">
+<input type="hidden" name="question_input_id" value="{$c{input}->get_form_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="100%" height="100%">
+<tr>
+<td colspan="2" width="100%" height="100%" valign="top">
+
+<fieldset style="height:100%;">
+<legend>Edit Text (Single Line)</legend>
+<div class="seccontent" align="left">
+
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="503">
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Answer Type:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="answer_format" size="1" style="width:100%;" class="text_field">{$c{input}->get_answer_format_options}</select></TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Answer:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><input name="answer" type="text" class="text_field" id="caption" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{input}->get_value('answer')}"></TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Marks:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="marks" size="1" class="text_field" id="marks" style="width:100%;">{$c{input}->get_marks_options}</select></TD>
+  </TR>
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Use Fuzzy
+      Spelling:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="fuzzy" size="1" class="text_field" id="fuzzy" style="width:100%;">{$c{input}->get_fuzzy_options}</select></TD>
+  </TR>     
+{
+if($c{assessment_group}->has_level)
+{
+my $options = $c{input}->get_level_options($c{assessment_group}->get_value('level'));
+
+$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Level:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="level" size="1" style="width:100%;" class="text_field" onChange="levelChanged(this);">$options</select></TD>
+  </TR>
++++
+}
+}
+</TABLE>
+
+
+</div>
+</fieldset>
+
+</td>
+</tr>
+<tr>
+<td><span style="color:#ff0000;" id="error_span">{$c{input}->{error_text}}</span></td>
+<td align="right">
+<input type="button" value="Save" CLASS="button2" style="width:75px;" onClick="submitTextLineForm();">
+<input type="button"  value="Change Type" CLASS="button2" style="width:75px;" onClick="changeType();">
+<input type="button"  value="Close" CLASS="button2" style="width:75px;" onClick="cancel();">
+</td>
+</tr>
+</table>
+
+</form>
+</body>
+</html>
+
+
+

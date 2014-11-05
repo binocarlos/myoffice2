@@ -1,0 +1,68 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+ <TR>
+	
+<TD HEIGHT="100%" WIDTH="100%" ALIGN="left" VALIGN="top">
+<table border="0" cellspacing="10" cellpadding="0">
+<tr>
+{
+	my $page_count = 0;
+
+	foreach my $folder (@{$c{folder_array}})
+	{
+		my $title = $folder->{title};
+		my $key = $folder->{key};
+		my $id = $c{website}->get_id;
+
+		if($key!~/\w/)
+		{
+			$key = 'none';
+		}
+
+		$OUT.=<<"+++";
+<td width=120 align="center">
+<a href="$c{href}&method=siteeditor_site_index&website_id=$id&group_key=$key" style="text-decoration:none; color:#000000;">
+<img src="/images/icons/32/folder_open.gif" width="32" height="32" border=0><br>
+$title</a>
+</td>
++++
+	}
+	
+	foreach my $page (@{$c{page_array}})
+	{
+		my $title = $page->get_value('title');
+		my $id = $page->get_id;
+		
+		$OUT.=<<"+++";
+<td width=120 align="center">
+<a href="$c{href}&method=siteeditor_edit_page&page_id=$id" style="text-decoration:none; color:#000000;">
+<img src="/images/mime/html2.gif" width="31" height="32" border=0><br>
+$title</a>
+</td>
++++
+
+		$page_count++;
+	
+		if($page_count>4)
+		{
+			$page_count = 0;
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+}
+</tr>
+</table>
+
+	 </TD>
+ </TR>
+</TABLE>
+<script>
+if(parent.topbar.reset_page)
+\{
+	parent.topbar.reset_page();
+\}
+</script>
+</body>

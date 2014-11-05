@@ -1,0 +1,389 @@
+<!--#include virtual="temp_include.htm" -->
+{
+	my $button_texts = undef;
+	
+	my $button_refs = $c{button_refs};
+	
+	foreach my $button_ref (@$button_refs)
+	{
+		my $title = $button_ref->{title};
+		my $method = $button_ref->{method};
+		my $key = $button_ref->{key};
+		my $jsfunc = 'object_method';
+		my $appname = $button_ref->{appname};
+		my $width = 75;
+		
+		if($key!~/\w/)
+		{
+			$key = $title;
+			$key =~ s/\W//g;
+		}
+			
+		if($button_ref->{normal_method}=~/\w/)
+		{
+			$method = $button_ref->{normal_method};
+			$jsfunc = 'normal_method';
+		}
+		
+		if($button_ref->{js_func}=~/\w/)
+		{
+			$jsfunc = $button_ref->{js_func};
+		}		
+		
+		if($button_ref->{width}=~/\d/)
+		{
+			$width = $button_ref->{width};
+		}
+		
+		if($width!~/px$/)
+		{
+			$width.='px';
+		}
+		
+		$key = 'object_button_'.$key;
+		
+		my $on_click = "$jsfunc('$method', '$appname');";
+		
+		if($button_ref->{confirm_message}=~/\w/)
+		{
+			$button_ref->{confirm_message} =~ s/'/\\'/g;
+			
+			$on_click = "if(window.confirm('$button_ref->{confirm_message}')){$on_click}";
+		}		
+		
+		my $button_text=<<"+++";
+<input type="BUTTON" name="$key" id="$key" value="$title" class="button2" style="width:$width;" onClick="$on_click">
++++
+
+		push(@$button_texts, $button_text);
+	}
+	
+	my $join=<<"+++";
++++
+
+	$c{all_button_text} = join($join, @$button_texts);
+	
+	$OUT.="";	
+}
+<script>
+
+{
+	my $first = $c{objects}->[0];
+	
+	my $id = 0;
+	
+	if($first) { $id = $first->get_id; }
+	
+	$OUT.=<<"+++";
+	var selected_id = $id;
++++
+}
+	
+	function changeSelectedId(id)
+	\{
+		selected_id = id;
+	\}
+	
+	function normal_method(method, appname)
+	\{
+		var new_loc = href + '&method=' + method;
+		
+		if(appname!='') \{ new_loc += '&appname=' + appname; \}		
+		
+		document.location = new_loc;
+	\}
+	
+	function object_list_get_selected_id()
+	\{
+		return selected_id;
+		
+		var selectedRadio = document.getElementById('selected_id');
+		
+		if(selectedRadio.value>0)
+		\{
+			return selectedRadio.value;
+		\}
+		else
+		\{
+			return null;
+		\}
+	\}
+
+	function object_method(method, appname)
+	\{
+		var selectedId = object_list_get_selected_id();
+		
+		if(selectedId>0)
+		\{
+			var object_tag = 'object';
+			
+{
+	if($c{object_tag}=~/\w/)
+	{
+		$OUT.=<<"+++";
+			object_tag = '$c{object_tag}';
++++
+	}
+}
+			var new_loc = href + '&method=' + method + '&' + object_tag + '_id=' + selectedId;
+			
+			if(appname!='') \{ new_loc += '&appname=' + appname; \}			
+
+			document.location = new_loc;
+		\}
+	\}
+
+</script>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+
+<body style="cursor:default;">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%">
+  <TR>
+	 <TD WIDTH="100%">
+		<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+		  <TR>
+			 <TD ALIGN="RIGHT" VALIGN="TOP" CLASS="panelbody" WIDTH="100%">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+{
+	if($c{title})
+	{
+		$OUT.=<<"+++";
+<tr><td class="page_title">$c{title}</td></tr>
+<tr><td height="5"></td></tr>
+
++++
+	}
+	
+	if($c{filter_submit_method})
+	{
+		$OUT.=<<"+++";
+<tr>
+<td height="30" valign="top" align="left">
+<form method="GET" action="$c{script}" style="margin:0;" name="list_users_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="$c{filter_submit_method}">
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td>View: &nbsp;</td>
+<td>
+<select name="object_list_filter" class="text_field">
+$c{filter_options}
+</select> &nbsp;</td>
+<td>
+<input type="submit" value="Change" class="button" style="width:75px;">
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}
+	
+	if($c{view_page_method})
+	{
+		$OUT.=<<"+++";
+<tr>
+<td height=30 valign="top" align="left">
+<script>
+	function resetAndSubmitPageForm()
+	\{
+		var form = document.page_form;
+		form.search.value = '';
+		form.object_list_filter.value = '';
+		form.limit.value = '';
+		
+		form.submit();
+	\}
+</script>
+<form method="GET" action="$c{script}" style="margin:0;" name="page_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="$c{view_page_method}">
+<input type="hidden" name="search" value="$c{params}->{search}">
+<input type="hidden" name="object_list_filter" value="$c{params}->{object_list_filter}">
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td width=100>Viewing: &nbsp;</td>
+<td width=120>
+<select name="limit" class="text_field" style="width:90%;">
+$c{view_page_options}
+</select> &nbsp;</td>
+<td width=150>
+of $c{view_page_total} $c{view_page_title}
+</td>
+<td width=10></td>
+<td>
+<input type="submit" value="Change" class="button" style="width:75px;">
+</td>
+<td>
+<input type="button" value="Reset" class="button" style="width:75px;height:19px;" onClick="resetAndSubmitPageForm();">
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}		
+	
+	if($c{search_submit_method})
+	{
+		my $ignore_params = {
+			search => 1,
+			session_id => 1,
+			method => 1 };
+			
+		my $param_st;
+		
+		foreach my $key (keys %{$c{params}})
+		{
+			if($ignore_params->{$key}) { next; }
+			
+			my $value = $c{params}->{$key};
+			
+			$param_st.=<<"+++";
+<input type="hidden" name="$key" value="$value">			
++++
+		}
+		
+		my $search = $c{params}->{search};
+		
+		$OUT.=<<"+++";
+<tr>
+<td valign="top" align="left">
+<form method="GET" action="$c{script}" style="margin:0;" name="search_form">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="$c{search_submit_method}">
+$param_st
+<table border="0" cellspacing="0" cellpadding="0">
+<tr valign="middle">
+<td width="100">Search: &nbsp;</td>
+<td width=270>
+    <input name="search" class="text_field" style="width:100%;" value="$search"></td>
+	<td width=10></td>
+<td>
+<input type="submit" value="Search" class="button" style="width:75px;">
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}
+	
+	if($c{extra_table})
+	{	
+		$OUT.=<<"+++";
+		<tr><td height=10></td></tr>
+	<TR>
+ <TD>
+ $c{extra_table}
+ </TD></TR>	
++++
+	}	
+}
+<tr>
+<td style="padding-bottom:10px;">
+{$c{all_button_text}}
+</td></tr>
+<TR>
+ <TD><TABLE ID="tableheader" CELLPADDING="5" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<THEAD id="tablesort_thead">
+ <TR>
+ 	<td class="panel" width="30"></td>
+{
+	foreach my $def (@{$c{defs}})
+	{
+		$OUT.=<<"+++";
+	<TD CLASS="panel" WIDTH="$def->{width}">&nbsp;$def->{title}</TD>
++++
+	}
+}
+	<TD WIDTH="13"></TD>
+ </TR>
+
+{
+	my $count = 0;
+	foreach my $object (@{$c{objects}})
+	{	
+		$count++;
+		my $id = $object->get_id;
+		
+		my $selected = '';
+		
+		if($count<=1)
+		{
+			$selected = ' CHECKED';
+		}
+
+		$OUT.=<<"+++";
+<TR id="$id" BORDER="1" bordercolor="#e5e5e5" BGCOLOR="#FFFFFF">
+<TD nowrap valign=top WIDTH="30" align=center style="overflow:hidden; border:1px solid #e5e5e5; text-overflow:ellipsis; white-space:nowrap;width:$width px; padding-left:3px;">
+<input type="radio" name="selected_id" id="selected_id" value="$id"$selected onClick="changeSelectedId($id);">
+</td>
++++
+
+		foreach my $def (@{$c{defs}})
+		{
+			my $value;
+			
+			if($def->{prop}=~/\w/)
+			{
+				$value = $object->get_value($def->{prop});
+			}
+			elsif($def->{method}=~/\w/)
+			{
+				my $method = $def->{method};
+				
+				my $args = $def->{args};
+				
+				$value = $object->$method(@$args);
+			}
+			elsif($def->{value}=~/\w/)
+			{
+				$value = $def->{value};
+			}
+			
+			my $align;
+			
+			if($def->{align}=~/\w/)
+			{
+				$align = ' align="'.$def->{align}.'"';
+			}
+		
+			my $width = $def->{width};
+			my $width_px = $width.'px';
+			
+			my $title = $value;
+
+			$title =~ s/<.*?>//g;
+			
+			my $overflow = 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+			
+			if($def->{no_overflow})
+			{
+				$overflow = '';
+			}
+
+			$OUT.=<<"+++";		 
+<TD nowrap valign=top WIDTH="$width"$align style="overflow:hidden; border:1px solid #e5e5e5; text-overflow:ellipsis; white-space:nowrap;width:$width px; padding-left:3px;">$value</TD>
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+}
+				</TABLE></DIV></TD>
+</TR>
+</TABLE>
+				</TD>
+		  </TR>
+		</TABLE></TD>
+  </TR>
+</TABLE>
+
+</body>

@@ -1,0 +1,170 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function printPage()
+	\{
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+	self.print();
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	alert("To print this page on a Mac, please follow these instructions...\\n\\n1. Hold down control and right click on the page.\\n\\n2.Click on -Open Frame in New Window- from the menu.\\n\\n3.Once the new window has opened, use the File -> Print menu option.");
++++
+}
+	\}	
+	
+	function monthClick(key)
+	\{
+		document.getElementById(key).click();
+	\}
+	
+	function chooseDate(showing_id, booking_id, venue_id, venue_name)
+	\{
+		parent.parent.page.content.document.location = href + '&method=venue_status_sheet&venue_id=' + venue_id + '&showing_id=' + showing_id + '&booking_id=' + booking_id + '#marketing' + showing_id;
+		parent.parent.page.title.setVenue(venue_id, venue_name);
+	\}
+	
+	function changeDates()
+	\{
+		var from = '{$c{params}->{from}}';
+		var to = '{$c{params}->{to}}';
+		
+		var ret = get_modal_window_return('&method=editors_daterange&from=' + from + '&to=' + to, 500, 400);
+
+		if(ret)
+		\{
+			top.get_double_frameset('myoffice2_timeline&from=' + ret.from + '&to=' + ret.to);		
+		\}		
+	\}
+</script>
+<body>
+<span class="welcome">Timeline for {$c{tour}->name}</span>
+<br>{$c{params}->{from}} -&gt; {$c{params}->{to}}<br>
+<br>
+<input type="submit" class="button" value="Change Dates" onClick="changeDates();">		
+<input type="button" value="Print" class="button" onClick="printPage();">
+<br><br>
+<table  border="0" cellspacing="0" cellpadding="0">
+{
+	my $from_date = $c{tour}->{_timeline_from_date};
+	my $to_date = $c{tour}->{_timeline_to_date};
+	
+	my $current_month;
+	my $current_date = $from_date->clone;
+	
+	while($current_date->epoch_days<=$to_date->epoch_days)
+	{
+		my $month = $current_date->Month;
+		my $date_title = $current_date->get_string;
+		
+		if($month!=$current_month)
+		{
+			$current_month = $month;
+			my $month_name = Webkit::Date->get_monthname($month);
+			my $year = $current_date->Year;
+			my $link_name = $month.'_'.$year;
+			
+			$OUT.=<<"+++";
+<script>
+if(parent.isModal) { parent.addMonth('$link_name', '$month_name $year'); }
+</script>			
+  <tr>
+    <td colspan=3 style="color:red;font-weight:bold;padding:5px;font-size:11pt;">$month_name $year<a href="#$link_name" id="$link_name"></a><a name="$link_name"></a></td>
+  </tr>
++++
+		}
+		
+		my $tourdates = $c{tour}->{_timeline_map}->{$current_date->epoch_days};
+		
+		if(!$tourdates)
+		{		
+			$OUT.=<<"+++";
+  <tr>
+    <td width=19><img src="/images/xtree/T.gif" width="19" height="16" align="absmiddle"></td>
+	<td width=19><img src="/images/xtree/horiz.gif" width="19" height="16" align="absmiddle"></td>
+    <td style="color:#888888;">&nbsp;$date_title</td>
+  </tr>		
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+<tr>
+<td width=19><img src="/images/xtree/I.gif" width="19" height="16"></td>
+</tr>
+  <tr>
+    <td><img src="/images/xtree/T.gif" width="19" height="16" align="absmiddle"></td>
+	<td width=19><img src="/images/xtree/default.16.png" width="16" height="16"></td>	
+    <td>&nbsp;$date_title</td>
+  </tr>	
++++
+			foreach my $tourdate (@$tourdates)
+			{
+				my $tour = $c{org}->get_child('tour', $tourdate->tour_id);
+				my $venue = $c{tour}->get_child('venue', $tourdate->{data}->{venue_id});
+				
+				my $venue_name = $venue->get_city_title;
+				my $tour_name = $tour->name;
+				my $date_title = $tourdate->get_datetime_title;
+				
+				my $venue_js_name = $venue_name;
+				$venue_js_name =~ s/'/\\'/g;
+				
+				my $showing_id = $tourdate->showing_id;
+				my $booking_id = $tourdate->booking_id;
+				my $venue_id = $venue->get_id;
+				
+				my $icon;
+				my $date_style;
+				
+				if($tourdate->showing_id>0)
+				{
+					$booking_id = 0;
+					$icon = '/images/holiday/tick.gif';
+					$date_style = 'color:green;';
+				}
+				else
+				{
+					$icon = '/images/holiday/cross.gif';
+					$date_style = 'color:red;';
+				}
+				
+				$OUT.=<<"+++";
+<tr>
+<td width=19 height="32" background="/images/xtree/I.gif"></td>
+<td width=19 align="center" valign="middle">&nbsp;</td>
+<td valign="middle">
+  <table border=0 cellpadding=3 cellspacing=1 bgcolor="#e5e5e5">
+<tr valign="top" bgcolor="#FFFFFF"><td width="200" style="color:blue;">$tour_name</td>
+  <td width="16" style="color:blue;cursor:hand;"><a href="javascript:chooseDate($showing_id, $booking_id, $venue_id, '$venue_js_name');"><img src="/images/xtree/infomark.16.png" width="16" height="16" border=0></a></td>
+</tr>
+<tr valign="top" bgcolor="#FFFFFF"><td colspan="2">$venue_name</td>
+  </tr>
+<tr valign="top" bgcolor="#FFFFFF"><td colspan="2" style="$date_style">$date_title</td>
+  </tr>
+
+</table>
+</td>
+</tr>
++++
+			}
+			
+			$OUT.=<<"+++";
+<tr>
+<td width=19><img src="/images/xtree/I.gif" width="19" height="16"></td>
+</tr>
++++
+		}
+		
+		$current_date->epoch_days(1);
+	}
+}
+</table>
+<script>
+if(parent.isModal) \{ parent.writeMonthSelect(); \}
+</script>
+</body>
+</html>
+
+
+

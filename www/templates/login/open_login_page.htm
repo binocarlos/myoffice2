@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad Software//DTD HoTMetaL PRO 6.0::19990601::extensions to HTML 4.0//EN" "hmpro6.dtd">
+<HTML> 
+ <HEAD> 
+	<TITLE>Webkit :: Application Log In</TITLE>
+{
+	my $browser = Webkit::Browser->new;
+	
+	my $css_file = '/lib/app.css';
+	
+	if($browser->{os} eq 'mac')
+	{
+		$css_file = '/lib/app_mac.css';
+	}
+	
+	$OUT.=<<"+++";
+<link rel="stylesheet" href="$css_file" type="text/css"/>
++++
+}
+
+<script>
+	function openLoginWindow()
+	\{
+		var wwidth = 800;
+		var wheight = 580;
+
+		var new_url = href + '&method=login';
+
+		openWindow(new_url, wwidth, wheight{$c{status}});
+	\}
+
+</script>	
+ </HEAD> 
+ <BODY BGCOLOR="#FFFFFF" STYLE="border:2px inset;cursor:default;"> 
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 
+	 <TR> 
+		<TD HEIGHT="100%" WIDTH="100%" VALIGN="MIDDLE" ALIGN="CENTER"> 
+			
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="1"
+			 CLASS="panelouter" ID="window1" WIDTH="300"> 
+			 <TR> 
+				<TD ALIGN="LEFT" VALIGN="TOP" CLASS="pannelinner"> 
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+					HEIGHT="100%" CLASS="panelinner"> 
+					<TR> 
+					 <TD WIDTH="100%" HEIGHT="100%" ALIGN="LEFT" VALIGN="TOP"> 
+						<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="1"
+						 HEIGHT="18" ALIGN="LEFT"> 
+						 <TR> 
+							<TD HEIGHT="18" BGCOLOR="#0A246A" BACKGROUND="/images/login/windowtop.jpg">
+							 <B
+								STYLE="font-family:tahoma,verdana; font-size:11px; color:#FFFFFF; padding-left:5px">Webkit
+							 :: Application Log In</B></TD> 
+						 </TR> 
+						 <TR> 
+							<TD BGCOLOR="#FFFFFF"><IMG SRC="/images/logos/wk_login.gif" WIDTH="294"
+							 HEIGHT="52" BORDER="0"></TD> 
+						 </TR> 
+						 <TR> 
+							<TD ALIGN="RIGHT"> 
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"> 
+								<TR> 
+								 <TD> Please	click	the	button below to open the application login page.<br>
+							      <br>
+							      If this button does not open a new window then you may have installed a 'Pop Up Blocker' that is preventing it from opening.<br>
+							      <br>
+							      Please disable any Pop Up Blockers (which should notify you when they 'block' a new window) before clicking the button below once more.</TD> 
+								</TR> 
+							 </TABLE> 
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+								<TR> 
+								 <TD HEIGHT="2" BACKGROUND="/images/login/divider.gif"></TD> 
+								</TR> 
+							 </TABLE><IMG SRC="/images/clear.gif"
+							 WIDTH="1" HEIGHT="8" BORDER="0"><BR><INPUT TYPE="button" VALUE="Open Login Window"
+							 CLASS="button" STYLE="width:150px" onClick="openLoginWindow();">
+							 <IMG
+							 SRC="/images/layout/clear.gif" WIDTH="8" HEIGHT="1"
+							 BORDER="0"><BR><IMG SRC="/images/clear.gif" WIDTH="1"
+							 HEIGHT="8" BORDER="0"></TD> 
+						 </TR> 
+						</TABLE> </TD> 
+					</TR> 
+				 </TABLE> </TD> 
+			 </TR> 
+			</TABLE> </TD> 
+	 </TR> 
+	</TABLE> </BODY>
+</HTML>

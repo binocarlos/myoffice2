@@ -1,0 +1,164 @@
+<!--#include virtual="temp_include.htm" -->
+<script src="/lib/formhelp.js">
+</script>
+<script>
+	var currentSection = 'general_info';
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}
+	
+
+	function validate_resourceform()
+	\{
+		var form = document.resourceform;
+
+		if(form.title.value=='')
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a Title';
+
+			return false;
+		\}
+		
+		submit_security_form();
+		//applyRichTextValue();
+		
+		return true;
+	\}
+		
+	
+</script>
+
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="top">
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="resourceform" onSubmit="return validate_resourceform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_resource_form_submit">
+<input type="hidden" name="type" value="{$c{resource}->get_type}">
+<input type="hidden" name="keywords_packet" value="">
+<input type="hidden" name="resource_id" value="{$c{resource}->get_id}">
+<input type="hidden" name="access_code" id="access_code" value="{$c{resource}->access_code}">
+<input type="hidden" name="from_website" value="{$c{params}->{from_website}}">
+<input type="hidden" name="auto_folder_value" value="{$c{params}->{auto_folder_value}}">
+<input type="hidden" name="notes" id="notes" value="">
+<input type="hidden" name="privilage_packet" id="privilage_packet" value="">
+<input type="hidden" name="edit_mode" id="edit_mode" value="yes">
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">		
+
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="general_info" selected>Main Details</option>
+{
+		if($c{user}->admin)
+		{
+			$OUT.=<<"+++";
+<option value="access_control">Access Control</option>
++++
+		}
+}
+</select>
+</td>
+<td align="left" valign=top>
+<!--
+
+
+	FOLDER DETAILS
+	
+	
+	-->
+<span id="general_info_section" style="display:inline;">	
+<b>Contact Form  Info</b><br>
+<br>
+<table width="96%" border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Name  :&nbsp;</td>
+<td align="LEFT">
+<input name="title" type="text" class="text_field" id="title" style="width:300px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{resource}->title}"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Submitted By    :&nbsp;</td>
+<td align="LEFT">
+<input name="author" type="text" class="text_field" id="author" style="width:300px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{resource}->author}">
+</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT" valign="top">Notes : </td>
+<td align="LEFT" valign="top">
+<textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="notes" style="width:300px; height:100px;">{$c{resource}->get_value('notes')}</textarea></td>
+</tr>
+</table>
+</span>
+
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+<span id="access_control_section" style="display:none;">		
+<b>Access Control</b><br><br>
+$c{security_tab}
+</span>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">				
++++
+	}
+}
+</div>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{resource}->{error_text}}</span></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+
+</form>
+
+</body>
+</html>
+
+
+

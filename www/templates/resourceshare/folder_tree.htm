@@ -1,0 +1,388 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<style>
+body \{margin:5px\}
+</style>
+<a href="javascript:document.location.reload();"><img src="/images/icons/16x16/refresh.gif" width="16" height="16" border="0" align="absmiddle"> refresh this tree...</a><br>
+<br>
+
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+folderTree = true;
+	function nF(folder_id, id, title, icon, open_icon)
+	\{
+		var folderItem = new WebFXTreeItem(title);
+		folderItem.action = "javascript: select_folder('" + id + "');";
+		folderItem.icon = icon;
+		folderItem.openIcon = open_icon;
+		folder_tree_nodes[folder_id] = folderItem;
+		
+		return folderItem;
+	\}
+
+	function viewSchool(id)
+	\{
+		top.set_current_folder_from_tree('rootfolder&subdomain_org_id=' + id);
+	\}
+	
+	function viewRoot()
+	\{
+		top.set_current_folder_from_tree('rootfolder');
+	\}
+	
+	function viewUserFolder(id)
+	\{
+
+		
+		var new_loc = href + '&method=resources_view_user_folder&users_id=' + id;
+		
+		top.content.page.content.location = new_loc;
+	\}
+
+	function editOrg(id)
+	\{
+		var new_loc = href + '&method=clients_edit_client&appname=resourceshare_clientms&object_id=' + id;
+		
+		top.content.page.content.location = new_loc;
+	\}
+		
+	function editOrgUsers(id)
+	\{
+		var new_loc = href + '&method=clients_edit_users&appname=resourceshare_clientms&object_id=' + id;
+		
+		top.content.page.content.location = new_loc;
+	\}
+
+	function select_folder(id, org_id)
+	\{
+		top.set_current_folder_from_tree(id, org_id);
+	\}
+	
+	function view_recycle_bin(view_org_id)
+	\{
+		var new_loc = href + '&method=resources_recycle_bin';
+		
+		if(view_org_id)
+		\{
+			new_loc += '&view_org_id=' + view_org_id;
+		\}
+		
+		top.content.page.content.location = new_loc;
+	\}
+
+	function click_folder(id, org_id)
+	\{
+		var node_id = id;
+
+		if(node_id!='rootfolder')
+		\{
+			node_id = 'folder' + node_id;
+		\}
+
+		var node = folder_tree_nodes[node_id];
+		var current_node = node;
+		
+		var to_expand_array = new Array();
+		
+		while(current_node)
+		\{
+			if(current_node.parentNode)
+			\{
+				to_expand_array[to_expand_array.length] = current_node;
+			\}
+			
+			current_node = current_node.parentNode;
+		\}
+		
+		for(var i=to_expand_array.length-1; i>=0; i--)
+		\{
+			var pnode = to_expand_array[i];
+			
+			pnode.expand();
+		\}
+		
+		if(node)
+		\{
+			node.focus();
+		\}
+				
+		select_folder(id, org_id);		
+	\}
+
+	function expand_folder(id)
+	\{
+		var node = folder_tree_nodes['folder' + id];
+
+		if(node)
+		\{
+			if(node.childNodes.length>0)
+			\{
+				node.expand();
+			\}
+		\}
+	\}
+	
+var folder_tree_nodes = new Object();	
+
+{
+	sub do_user_array
+	{
+		my ($user_array, $add_id) = @_;
+		
+		foreach my $user (@$user_array)
+		{
+			my $users_name = Webkit::AppTools->js_quote($user->get_fullname);
+			my $users_id = $user->get_id;
+				
+			$OUT.=<<"+++";
+var users$users_id = new WebFXTreeItem('$users_name');
+users$users_id.action = "javascript: viewUserFolder($users_id);";
+users$users_id.icon = '/images/resourceshare/user.gif';
+users$users_id.openIcon = '/images/resourceshare/user.gif';
+
+$add_id.add(users$users_id);				
++++
+		}
+	}		
+	
+	sub get_folder_tree
+	{
+		my ($folder, $parent) = @_;
+		
+		if($folder->is_users_folder) { next; }
+
+		my $id = $folder->get_id;
+		my $folderid = $folder->js_folder_id;
+		my $title = $folder->get_js_value('title');
+		my $parent_id = $parent->js_folder_id;
+
+		my $icon = $folder->get_tree_icon;
+		my $open_icon = $folder->get_tree_open_icon;
+
+		my $txt=<<"+++";
+var $folderid = nF('$folderid', $id, '$title', '$icon', '$open_icon');
++++
+
+		foreach my $child (@{$folder->ensure_child_array('folder')})
+		{
+			$txt.=&get_folder_tree($child, $folder);
+		}
+
+		$txt.=<<"+++";
+$parent_id.add($folderid);
++++
+
+		return $txt;		
+	}
+	
+		my $org_name = $c{org}->name;
+		my $org = $c{org};
+		my $id = $org->get_id;
+	
+		$OUT.=<<"+++";
+var userstree = new WebFXTree('$org_name Users');
+userstree.setBehavior('explorer');
+//schoolfolder.action = "javascript: viewSchoolFolders();";
+userstree.icon = '/images/icons/16/networkdrive.gif';
+userstree.openIcon = '/images/icons/16/networkdrive.gif';		
+
+var editOrgNode = new WebFXTreeItem('Edit $org_name Details');
+editOrgNode.action = "javascript: editOrg($id);";
+editOrgNode.icon = '/images/icons/16x16/document_edit.gif';
+editOrgNode.openIcon = '/images/icons/16x16/document_edit.gif';	
+
+userstree.add(editOrgNode);
+
+var editOrgUsersNode = new WebFXTreeItem('Edit $org_name Users');
+editOrgUsersNode.action = "javascript: editOrgUsers($id);";
+editOrgUsersNode.icon = '/images/icons/16x16/photo_portrait.gif';
+editOrgUsersNode.openIcon = '/images/icons/16x16/photo_portrait.gif';	
+
+userstree.add(editOrgUsersNode);
++++
+
+		my $department_array = $org->get_child_array('department');
+		
+		if($department_array)
+		{
+			foreach my $department (@$department_array)
+			{
+				my $dept_id = $department->get_id;
+				my $dept_name = $department->name;
+				
+				if($department->org_id!=$org->get_id)
+				{
+					if($department->{data}->{id}!=0) { next; }
+				}
+				
+				$OUT.=<<"+++";
+	var dept$dept_id = new WebFXTreeItem('$dept_name');
+dept$dept_id.action = "javascript: void(0);";
+dept$dept_id.icon = '/images/icons/16x16/windows.gif';
+dept$dept_id.openIcon = '/images/icons/16x16/windows.gif';
+userstree.add(dept$dept_id);		
++++
+
+				my $deptuserarr = $department->ensure_child_array('users');
+		
+				&do_user_array($deptuserarr, "dept$dept_id");
+			}
+		}
+
+		$OUT.=<<"+++";
+var usersString = userstree.toString();
+
+document.write(usersString + '<br>');		
++++
+	
+	if($c{org}->get_child_count('org')>0)
+	{
+		$OUT.=<<"+++";
+var schoolfolder = new WebFXTree('Other Users');
+schoolfolder.setBehavior('explorer');
+//schoolfolder.action = "javascript: viewSchoolFolders();";
+schoolfolder.icon = '/images/icons/16/networkdrive.gif';
+schoolfolder.openIcon = '/images/icons/16/networkdrive.gif';		
++++
+
+		foreach my $school (@{$c{org}->ensure_child_array('org')})
+		{
+			my $name = $school->get_js_value('name');
+			my $id = $school->get_id;
+			
+			my $root_folder = $c{org}->get_school_root_folder($school->get_id);
+			my $root_id = $root_folder->js_folder_id;
+			
+			$OUT.=<<"+++";
+var $root_id = new WebFXTreeItem('$name');
+$root_id.action = "javascript: viewSchool($id);";
+$root_id.icon = '/images/skillsaudit/adminmenu/home.gif';
+$root_id.openIcon = '/images/skillsaudit/adminmenu/home.gif';
+
+var editOrgNode$id = new WebFXTreeItem('Edit $name Details');
+editOrgNode$id.action = "javascript: editOrg($id);";
+editOrgNode$id.icon = '/images/icons/16x16/document_edit.gif';
+editOrgNode$id.openIcon = '/images/icons/16x16/document_edit.gif';	
+
+$root_id.add(editOrgNode$id);
+
+var editOrgUsersNode$id = new WebFXTreeItem('Edit $name Users');
+editOrgUsersNode$id.action = "javascript: editOrgUsers($id);";
+editOrgUsersNode$id.icon = '/images/icons/16x16/photo_portrait.gif';
+editOrgUsersNode$id.openIcon = '/images/icons/16x16/photo_portrait.gif';	
+
+$root_id.add(editOrgUsersNode$id);
+
+schoolfolder.add($root_id);
+//$school->{_no_group}
++++
+
+			my $no_dept_array = $school->{_no_group};
+		
+			if($no_dept_array)
+			{
+				$OUT.=<<"+++";
+var nodept$id = new WebFXTreeItem('No Group');
+nodept$id.action = "javascript: alert('department edit');";
+$root_id.add(nodept$id);	
++++
+
+				&do_user_array($no_dept_array, "nodept$id");
+			}
+
+			my $department_array = $school->get_child_array('department');
+		
+			if($department_array)
+			{
+				foreach my $department (@$department_array)
+				{
+					my $dept_id = $department->get_id;
+					my $dept_name = $department->name;
+				
+					$OUT.=<<"+++";
+	var dept$dept_id = new WebFXTreeItem('$dept_name');
+dept$dept_id.action = "javascript: alert('dept edit');";
+dept$dept_id.icon = '/images/icons/16x16/windows.gif';
+dept$dept_id.openIcon = '/images/icons/16x16/windows.gif';
+$root_id.add(dept$dept_id);		
++++
+
+					my $deptuserarr = $department->ensure_child_array('users');
+		
+					&do_user_array($deptuserarr, "dept$dept_id");
+				}
+			}
+
+			my $folder_arr = $root_folder->get_child_array('folder');
+
+			foreach my $folder (@$folder_arr)
+			{
+				$OUT.=&get_folder_tree($folder, $root_folder);
+			}
+			
+			$OUT.=<<"+++";
+var recycle_bin$root_id = new WebFXTreeItem('Recycle Bin');
+recycle_bin$root_id.action = "javascript: view_recycle_bin($id);";
+recycle_bin$root_id.icon = '/images/icons/16/recyclebin.gif';
+
+$root_id.add(recycle_bin$root_id);
++++
+		}
+		
+		$OUT.=<<"+++";
+var schoolString = schoolfolder.toString();
+
+
+document.write(schoolString + '<br>');		
+
+schoolfolder.expand();
++++
+	}
+	
+	my $root_folder = $c{org}->{root_folder};
+	my $root_folder_id = $root_folder->js_folder_id;
+
+	my $title = $root_folder->title;
+
+	$OUT.=<<"+++";
+
+var $root_folder_id = new WebFXTree('$title');
+$root_folder_id.setBehavior('explorer');
+$root_folder_id.action = "javascript: viewRoot();";
+$root_folder_id.icon = '/images/icons/16/networkdrive.gif';
+$root_folder_id.openIcon = '/images/icons/16/networkdrive.gif';
+
+
+folder_tree_nodes.rootfolder = $root_folder_id;
++++
+
+	my $folder_arr = $root_folder->get_child_array('folder');
+
+	foreach my $folder (@$folder_arr)
+	{
+		$OUT.=&get_folder_tree($folder, $root_folder);
+	}
+
+	$OUT.=<<"+++";
+var recycle_bin = new WebFXTreeItem('Recycle Bin');
+recycle_bin.action = "javascript: view_recycle_bin();";
+recycle_bin.icon = '/images/icons/16/recyclebin.gif';
+
+$root_folder_id.add(recycle_bin);
+
+var tree_string = $root_folder_id.toString();
+
+document.write(tree_string);
+
+//rootfolder.expandAll();
+
+loaded = true;
+
+top.register_resource_tree();
++++
+}
+
+</script>
+
+
+

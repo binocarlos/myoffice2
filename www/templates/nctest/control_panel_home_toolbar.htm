@@ -1,0 +1,114 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script>
+{Webkit::Date->get_js_month_map(1)}
+
+	function showTimeline()
+	\{
+		var loc = href + '&method=control_panel_sidemenu';
+		
+		top.content.sidebar.location = loc;
+	\}
+
+	function setPhase(val)
+	\{
+		document.getElementById('phase').value = val;
+		setPhaseTitle();
+	\}
+	
+	function setPhaseTitle()
+	\{
+		var val = document.getElementById('phase').value;
+		
+		if(val=='') \{ return; \}
+		
+		var valParts = val.split(/-/);
+		
+		var monthSt = valParts[1];
+		
+		monthSt = monthSt.replace(/^0/, '');
+		
+		var monthNum = parseInt(monthSt);
+		
+		var monthTitle = monthNames[monthNum-1];
+		
+		var title = monthTitle + ' ' + valParts[0];
+		
+		document.getElementById('phaseTitle').innerText = title;
+	\}
+	
+	function showGrid()
+	\{
+		phaseChanged();
+	\}
+	
+	function phaseChanged()
+	\{
+		var val = document.getElementById('phase').value;
+		
+		var loc = href + '&method=control_panel_home&period_date=' + val;
+		
+		parent.content.location = loc;
+		setPhaseTitle();
+	\}
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" cellspacing="0" cellpadding="0" align="center">
+				<tr>
+					<td align="center" valign="middle">
+{
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";					
+	<table border="0" cellpadding="5" cellspacing="0">
+	<tr><td height=5></td></tr>
+      <tr>
+        <td width="150" align="right"><b class="welcome" id="phaseTitle"></b></td>
+        <td width="150"><select name="phase" id="phase" class="text_field" style="width:100%;" onChange="phaseChanged();">         
+	{$c{phase_options}}
+        </select> </td>
+    <td>
+<input name="timelineButton" id="timelineButton" type="button" class="button" onClick="showTimeline();" value="Show Timeline"></td>
+    <td>
+<input name="gridButton" id="gridButton" type="button" class="button" onClick="showGrid();" value="Show Grid"></td>
+      </tr>
+    </table>		
++++
+	}
+}
+					</td>
+				</tr>
+      </table>
+    </TD>
+		</TR>
+</TABLE>
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+<script>
+setPhaseTitle();
+</script>
++++
+	}
+}
+</BODY>
+</HTML>

@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE>RBGC Administration</TITLE>
+<style type="text/css">
+<!--
+.statustext \{  font-family: Tahoma, Verdana, Arial; font-size: 12px; color: #990000\}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="/lib/app.css">
+<script>
+			var href = '{$c{href}}';
+			var session_id = '{$c{session_id}}';
+			var script = '{$c{script}}';
+			
+			function get_menu_query(query)
+			\{
+				rbgc_get_main_query(query);
+			\}
+			
+			function application_logout()
+			\{
+				get_menu_query('&method=iframe_title_frame&title=Log Out&frame_method=log_out');
+			\}			
+			
+			function rbgc_get_main_query(query)
+			\{
+				var new_loc = href + query;
+				
+				document.content.location = new_loc;
+				
+			\}
+			
+			function rbgc_logout()
+			\{
+				self.close();
+			\}
+			
+</script>
+</HEAD>
+<body topmargin=0 rightmargin=0 leftmargin=0 bottommargin=0 marginwidth=0 marginheight=0 STYLE="background:#D4D0C8; border:0px; margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px;">
+<font class="statustext"></font>
+<script src="/lib/menu_code.js"></script>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD><DIV ID="menuhl" STYLE="display:none; width:100%; height:23px; background:#FFFF00; position:absolute; z-index:-2000;"></DIV>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="1" BORDER="0"><IMG SRC="/images/menus/menu_left.gif" WIDTH="3" HEIGHT="18" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">
+{$c{menu}}
+</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+
+				 <TR>
+					<TD>
+					 
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="application_logout();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A>
+						 </TD>
+<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/logos/rbgc_window.gif" BORDER="0"></TD>
+</TR>
+
+					 
+</TABLE>
+</TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%">
+		<IFRAME SRC="{$c{href}}&method=home_page" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="auto" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME></TD></TR></TABLE></TD>
+	 </TR>
+	</TABLE>
+</body>
+</HTML>

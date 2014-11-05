@@ -1,0 +1,46 @@
+<html>
+<head>
+<title></title>
+<script>
+	var	log_url = '';
+
+	function set_log_url(url)
+	{
+		log_url = url;
+	}
+
+	function jump_stats(part)
+	{
+		parent.parent.page.stats_content.location.href = log_url + '#' + part;
+	}
+</script>
+<style>
+a {color:#000000; text-decoration:none;}
+a:hover {color:#0000FF; text-decoration:underline;}
+BODY {cursor:default;background:#FFFFFF; margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;}
+TD {font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+</style>
+</head>
+<body>
+<ul style="margin-left:15px; margin-top:0px; margin-bottom:0px;">
+<li><a href="javascript:jump_stats('GENERAL');">General Summary</a></li>
+<li><a href="javascript:jump_stats('DAILYSUM');">Daily Summary</a></li>
+<li><a href="javascript:jump_stats('WEEKLY');">Weekly Report</a></li>
+<li><a href="javascript:jump_stats('MONTHLY');">Monthly Report</a></li>
+<li><a href="javascript:jump_stats('YEARLY');">Yearly Report</a></li>
+<li><a href="javascript:jump_stats('REFERRER');">Referring URL Report</a></li>
+<li><a href="javascript:jump_stats('REFSITE');">Referring Site Report</a></li>
+<li><a href="javascript:jump_stats('SEARCHQUERY');">Search Query Report</a></li>
+<li><a href="javascript:jump_stats('SEARCHWORD');">Search Word Report</a></li>
+<li><a href="javascript:jump_stats('REQUEST');">Request Report</a></li>
+<li><a href="javascript:jump_stats('DIRECTORY');">Directory Report</a></li>
+<li><a href="javascript:jump_stats('DOMAIN');">Domain Report</a></li>
+<li><a href="javascript:jump_stats('BROWSERSUM');">Browser Summary</a></li>
+<li><a href="javascript:jump_stats('OSREP');">OS Report</a></li>
+<li><a href="javascript:jump_stats('GENERAL');">General Summary</a></li>
+<li><a href="javascript:jump_stats('REDIR');">Redirection Report</a></li>
+</ul>
+</body></html>
+
+
+

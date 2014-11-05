@@ -1,0 +1,7 @@
+<HTML>
+  <HEAD><TITLE>{$c{org}->name} Testing Tool</TITLE></HEAD>
+  <FRAMESET COLS="170,*" ID="vertical_frameset" FRAMEBORDER="yes" BORDER="5">
+  <FRAME NAME="tree" SRC="{$c{href}}&method=test_tree" SCROLLING="auto" FRAMEBORDER="yes">
+  <FRAME NAME="questions" SRC="{$c{href}}&method=sub_question_form&sub_question_id={$c{sub_question}->get_id}&initial_question=1" FRAMEBORDER="yes" SCROLLING="auto">
+  </FRAMESET>
+</HTML>

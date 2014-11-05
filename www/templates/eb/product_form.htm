@@ -1,0 +1,171 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	var topicBankCheckboxes = new Array();
+	
+	function validateProductForm()
+	\{
+		var form = document.product_form;
+		
+		if(form.name.value=="")
+		\{
+			alert('Please enter a name for the product');
+			return false;
+		\}
+		
+		if(form.type.value=="-1")
+		\{
+			alert('Please choose a type for this product');
+			return false;
+		\}
+		else if(form.type.value=="cd")
+		\{
+			if(form.product_code.value=="")
+			\{
+				alert('Please enter a product code for this CD');
+				return false;
+			\}
+		\}
+		else if(form.type.value=="web")
+		\{
+			var checked = false;
+			
+			for(var i=0; i<topicBankCheckboxes.length; i++)
+			\{
+				var checkBox = topicBankCheckboxes[i];
+				
+				if(checkBox.checked)
+				\{
+					checked = checkBox.checked;
+				\}
+			\}
+			
+			if(!checked)
+			\{
+				alert('Please choose some topic banks for this web product');
+				return false;
+			\}
+		\}
+
+		return true;
+	\}
+	
+	function showHideRows()
+	\{
+		var productCode = 'none';
+		var topicBanks = 'none';
+		
+		if(document.product_form.type.value=="cd")
+		\{
+			productCode = 'inline';
+		\}
+		else if(document.product_form.type.value=="web")
+		\{
+			topicBanks = 'inline';
+		\}
+		
+		document.getElementById('productCodeTR').style.display = productCode;
+		document.getElementById('topicBankTR').style.display = topicBanks;		
+	\}
+	
+</script>
+<body>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td height="100%" align="center" valign="middle">
+
+<form action="{$c{script}}" method="POST" name="product_form" onSubmit="return validateProductForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="product_form_submit">
+<input type="hidden" name="product_id" value="{$c{product}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Product Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE width="400" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="name" type="text" class="text_field" id="name" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{product}->name}">
+  </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Type:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><select name="type" size="1" class="text_field" id="type" style="width:100%;" onChange="showHideRows();">
+{$c{product}->get_type_options}
+</select> 
+  </TD>
+  </TR>    
+  <TR style="padding-bottom:5px;display:none;" id="productCodeTR">
+    <TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Product Code:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="product_code" type="text" class="text_field" id="product_code" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{product}->product_code}">
+  </TD>
+  </TR>      
+  <TR style="padding-bottom:5px;display:none;" id="topicBankTR">
+    <TD width="80" ALIGN="LEFT" VALIGN="middle" nowrap style="padding-right:5px;"> Topic Banks:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+	<table width=100% border=0 cellpadding="5" cellspacing="0">
+{
+	my $sets = $c{product}->load_thread_sets;
+	
+	foreach my $set (@$sets)
+	{
+		my $name = $set->name;
+		my $id = $set->get_id;
+		
+		my $checked = '';
+		
+		if($c{product}->can_access_set($id))
+		{
+			$checked = ' CHECKED';
+		}
+		
+		$OUT.=<<"+++";
+	<tr valign="middle"><td width=50% align=right>$name</td>
+<td><input type="checkbox" id="set_access_$id" name="set_access_$id" value="y" $checked></td></tr>
+<script>
+topicBankCheckboxes.push(document.getElementById('set_access_$id'));
+</script>
++++
+	}
+}
+	</table>
+</TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{product}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+<script>
+showHideRows();
+</script>
+</body>
+</html>
+
+
+

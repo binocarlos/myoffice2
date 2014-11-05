@@ -1,0 +1,272 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:1px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{ font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script src="/lib/kit.js"></script>
+<script src="/lib/myoffice2/lib.js"></script>
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+var appname = '{$c{app_name}}';
+
+	var showings = new Object();
+	var bookings = new Object();
+	var tourdates = new Object();		
+	
+	var from = '{$c{from}}';
+	var to = '{$c{to}}';
+{
+	my $now = Webkit::Date->now;
+	my $from = $now->clone;
+	my $to = $now->clone;
+	
+	$from->epoch_days(-30);
+	$to->epoch_days(30);
+	
+	my $from_st = $from->get_string;
+	my $to_st = $to->get_string;
+	
+	$OUT.=<<"+++";
+	var todayFrom = '$from_st';
+	var todayTo = '$to_st';
++++
+}
+
+	function resetDates()
+	\{
+		document.getElementById('dateTd').innerHTML = todayFrom + ' to ' + todayTo;
+		
+		parent.content.document.location = href + '&method=tourlist_sheet&from=' + todayFrom + '&to=' + todayTo;
+		top.appContent.sidebar.frames[1].document.location = href + '&method=tourlist_tree&from=' + todayFrom + '&to=' + todayTo;
+		from = todayFrom;
+		to = todayTo;
+	\}
+	
+	function editDates()
+	\{
+		var ret = get_modal_window_return('&method=editors_daterange&from=' + from + '&to=' + to, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		from = ret.from;
+		to = ret.to;
+		
+		document.getElementById('dateTd').innerHTML = ret.from + ' to ' + ret.to;
+		
+		parent.content.document.location = href + '&method=tourlist_sheet&from=' + from + '&to=' + to;
+		top.appContent.sidebar.frames[1].document.location = href + '&method=tourlist_tree&from=' + from + '&to=' + to;
+	\}
+	
+	var saveSpanMode = false;
+	var timeoutId = null;
+	
+	function clearSwitchSaveSpan()
+	\{
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = '';
+		button.style.color = '';
+		button.style.fontWeight = '';
+		span.style.backgroundColor = '';
+		span.style.color = '';
+		span.style.fontWeight = '';
+		
+		clearTimeout(timeoutId);
+		
+		timeoutId = null;	
+	\}
+	
+	function switchSaveSpan()
+	\{
+		saveSpanMode =! saveSpanMode;
+		
+		var buttonBg = '';
+		var buttonFg = '';
+		
+		var spanBg = '';
+		var spanFg = '';
+		
+		var buttonWeight = '';
+		var spanWeight = '';
+		
+		if(saveSpanMode)
+		\{
+			buttonBg = '#ffffff';
+			buttonFg = '#ff0000';
+			spanBg = '#ffffff';
+			spanFg = '#ff0000';
+			buttonWeight = 'bold';
+			spanWeight = 'bold';
+		\}
+		
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = buttonBg;
+		button.style.color = buttonFg;
+		button.style.fontWeight = buttonWeight;
+		span.style.backgroundColor = spanBg;
+		span.style.color = spanFg;
+		span.style.fontWeight = spanWeight;
+		
+		timeoutId = setTimeout("switchSaveSpan();", 1000);
+	\}					
+	
+	function showSaveSpan()
+	\{
+		document.getElementById('saveSpan').style.display = 'inline';
+		document.getElementById('saveButton').disabled = false;
+		
+		if(timeoutId==null)
+		\{		
+			switchSaveSpan();		
+		\}
+	\}
+	
+	function resetForm()
+	\{
+		clearSwitchSaveSpan();			
+		document.getElementById('hiddenInputSpan').innerText = '';
+		document.getElementById('saveSpan').style.display = 'none';
+		document.getElementById('saveButton').disabled = true;
+		showings = new Object();
+		bookings = new Object();
+		tourdates = new Object();				
+	\}	
+	
+	function addBookingField(booking_id, field, value)
+	\{
+		var booking = bookings[booking_id];
+		
+		if(!booking)
+		\{
+			booking = new Object();
+			booking.id = booking_id;
+			bookings[booking.id] = booking;
+		\}
+		
+		booking[field] = value;
+		
+		showSaveSpan();
+	\}
+	
+	function addShowingField(showing_id, field, value)
+	\{
+		var showing = showings[showing_id];
+		
+		if(!showing)
+		\{
+			showing = new Object();
+			showing.id = showing_id;
+			showings[showing.id] = showing;
+		\}
+		
+		showing[field] = value;
+		
+		showSaveSpan();
+	\}	
+	
+	function addTourdateField(tourdate_id, field, value)
+	\{
+		var tourdate = tourdates[tourdate_id];
+		
+		if(!tourdate)
+		\{
+			tourdate = new Object();
+			tourdate.id = tourdate_id;
+			tourdates[tourdate.id] = tourdate;
+		\}
+		
+		tourdate[field] = value;
+		
+		showSaveSpan();
+	\}		
+	
+	function applyObjectInputs(hash, tag)
+	\{
+		if(!hash) \{ return; \}
+		
+		var st = '';
+		
+		for(var id in hash)
+		\{
+			var obj = hash[id];
+			
+			for(var field in obj)
+			\{
+				if(field!='id')
+				\{
+					//var elem = document.createElement('INPUT');
+					//elem.type = 'hidden';
+					//elem.name = tag + '_' + id + '_' + field;
+					//elem.value = obj[field];
+				
+					//span.appendChild(elem);
+					
+					st += '<field name="' + tag + '_' + id + '_' + field + '">' + obj[field] + '</field>';
+				\}
+			\}
+		\}		
+		
+		return st;
+	\}
+	
+	function sumbitTourlistSheet()
+	\{
+		var form = document.tourlistSheetForm;
+		
+		var data = applyObjectInputs(bookings, 'booking');
+		data += applyObjectInputs(showings, 'showing');
+		data += applyObjectInputs(tourdates, 'tourdate');
+		
+		form.data.value = data;
+		
+		form.submit();
+	\}
+	
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" align="left" cellpadding="5" cellspacing="0">
+        <tr>
+          <td></td>
+          <td colspan="4"><strong>Tour &amp; Tick   Sheet for the {$c{tour}->name} Tour</strong></td>
+		  <td colspan="4"><span style="color:red;display:none;font-weight:bold;font-size:15pt;" id="saveSpan">YOU HAVE DATA TO SAVE...</span></td>
+        </tr>	  
+        <tr>
+          <td width="10"></td>
+          <td>View:</td>
+          <td width="240" id="dateTd" style="color:green;" nowrap>
+		  {$c{from}} to {$c{to}}
+		  </td>
+          <td><input type="button" class="button" id="datesButton" onClick="editDates();" value="Edit Dates"></td>
+          <td width="50">&nbsp;</td>
+          <td><input type="button" class="button" id="datesButton" onClick="resetDates();" value="Reset Dates"></td>
+          <td width="50">&nbsp;</td>		  
+          <td align="right"><form method="POST" action="{$c{script}}" name="tourlistSheetForm" style="margin:0px;padding:0px;" target="_self">
+              <input type="hidden" name="session_id" value="{$c{session_id}}">
+              <input type="hidden" name="method" value="tourlist_toolbar_save"> 
+			  <input type="hidden" name="data" value=""> 
+              <span id="hiddenInputSpan"></span>
+              <input type="button" value="Save Sheet" class="button" onClick="sumbitTourlistSheet();" id="saveButton" disabled>
+          </form></td>
+          <td width="400"></td>
+        </tr>
+      </table>
+      </TD>
+		</TR>
+</TABLE>
+</BODY>
+</HTML>

@@ -1,0 +1,35 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+	function monthClick(key)
+	\{
+		document.getElementById(key).click();
+	\}
+</script>
+<body>
+<span class="welcome">Find Venues</span><br>
+{$c{params}->{search}}<br><br>
+<table width="400" border="0" cellpadding="5" cellspacing="1" bgcolor="#e5e5e5">
+{
+	foreach my $venue (@{$c{org}->ensure_child_array('venue')})
+	{
+		my $title = $venue->get_city_title;
+		my $id = $venue->get_id;
+		
+		my $js_title = $title;
+		$js_title =~ s/'/\\'/g;
+		
+		$OUT.=<<"+++";
+	  <tr>
+    <td bgcolor="#FFFFFF">$title</td>
+    <td width="1" bgcolor="#FFFFFF"><input type="button" class="button" value="Select" onClick="parent.selectVenue($id, '$js_title');"></td>
+  </tr>	
++++
+	}
+}
+</table>
+
+</body>
+</html>
+
+
+

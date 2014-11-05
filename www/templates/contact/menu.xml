@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Contacts" width="150">
+			<menuitem title="Add" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add Contact&amp;frame_method=contacts_add_contact');"/>
+			<menuitem title="View/Edit" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Contacts&amp;frame_method=contacts_home');"/>	
+	</menublock>
+</menu_config>
+

@@ -1,0 +1,264 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<script>
+	function websiteIdChange(gui)
+	\{
+		var id = gui.value;
+		
+		document.location = '{$c{href}}&method=change_website_id&website_id=' + id;
+	\}
+</script>
+Which website:
+<select name="website_id" size="1" class="text_field" id="website_id" style="width:100%;" onChange="websiteIdChange(this);">
+{$c{org}->get_website_options($c{session}->{eb_website_id}, 'Default')}
+</select> 
+<br>
+<a href="javascript:viewAllSchools();">View All Schools</a><br>
+<br>
+<a href="javascript:addSchool();">Add School</a><br>
+<br>
+<a href="javascript:tree.expandAll();">Expand All</a><br>
+<br>
+<a href="javascript:collapseAll();">Collapse All</a><br>
+<br>
+<span id="menutree"></span>
+<script>
+	var letterArray = new Array();
+	
+	function collapseAll()
+	\{
+		for(var i=0; i<letterArray.length; i++)
+		\{
+			var letterObj = letterArray[i];
+			
+			letterObj.collapseAll();
+		\}
+	\}
+	
+	function viewAllSchools()
+	\{
+		get_xTree_query('&method=schools_home');
+	\}	
+	
+	function viewAllInvoices()
+	\{
+		get_xTree_query('&method=invoices_home');
+	\}
+	
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		top.content.page.location = loc;
+	\}	
+	
+	function addSchool()
+	\{
+		get_xTree_query('&method=schools_view_school');
+	\}	
+	
+	function viewType(type)
+	\{
+		get_xTree_query('&method=schools_home&accounttype=' + type);
+	\}
+	
+	function viewSchool(id)
+	\{
+		get_xTree_query('&method=schools_view_school&school_id=' + id);
+	\}
+	
+	function viewInvoice(id)
+	\{
+		alert('still to do...');
+	\}
+	
+
+var tree = new WebFXTree('Registered Schools');
+tree.action = "javascript: get_xTree_query('&method=schools_home');";
+
+var typeTree = new WebFXTree('Account Types');
+typeTree.action = "javascript: get_xTree_query('&method=schools_home&accounttype=notnormal');";
+
+{
+	my $current_letter;
+	my $current_city;
+	
+	my $account_map;
+	
+	foreach my $school (@{$c{org}->ensure_child_array('school')})
+	{		
+		$school->name =~ /^(.)/;
+		my $letter = uc($1);
+		
+		if($school->accounttype eq 'normal')
+		{
+			my $full_access = undef;
+			my $total_price = 0;
+			
+			foreach my $invoice (@{$school->ensure_child_array('product_invoice')})
+			{
+				$total_price += $invoice->discounted_amount;
+				
+				$full_access = 1;
+			}
+			
+			if($total_price<=0)
+			{
+				$full_access = undef;
+			}
+			
+			if($full_access)
+			{
+				push(@{$account_map->{'normal_paid'}}, $school);
+			}
+			else
+			{
+				push(@{$account_map->{'normal_unpaid'}}, $school);			
+			}
+		}
+		else
+		{
+			push(@{$account_map->{$school->accounttype}}, $school);
+		}
+		
+		if($letter ne $current_letter)
+		{			
+			$current_letter = $letter;
+			
+			if($current_letter!~/^\w/)
+			{
+				$current_letter = 'nonalpha';
+			}
+			
+			$OUT.=<<"+++";
+var letter$current_letter = new WebFXTreeItem('$current_letter');
+
+tree.add(letter$current_letter);
+
+letterArray[letterArray.length] = letter$current_letter;
++++
+		}
+		
+		my $id = $school->get_id;
+		my $name = $school->get_js_value('name');
+		
+		$OUT.=<<"+++";
+var school$id = new WebFXTreeItem('$name');
+school$id.action = "javascript: viewSchool($id);";
+school$id.icon = '/images/icons/24x24/home_blue.gif';
+school$id.openIcon = '/images/icons/24x24/home_blue.gif';
+
+letter$current_letter.add(school$id);
++++
+
+#		foreach my $invoice (@{$school->ensure_child_array('invoice')})
+#		{
+#			my $invoice_id = $invoice->get_id;
+#			my $color = $invoice->get_color_tag;
+#			my $title = $color;
+#			
+#			###if($color eq 'blue') { next; }
+#		
+#			$title =~ s/^(\w)/uc($1)/e;
+#			
+#			$OUT.=<<"+++";
+#var invoice$invoice_id = new WebFXTreeItem('$title Set');
+#invoice$invoice_id.action = "javascript: viewInvoice($invoice_id);";
+#invoice$invoice_id.icon = '/images/icons/24x24/home_$color.gif';
+#
+#school$id.add(invoice$invoice_id);		
+#+++
+#		}
+	}
+	
+	my $tree_id = 1;
+	
+	sub get_school_tree_entry
+	{
+		my ($school, $parent_id) = @_;
+		
+		$tree_id++;
+		
+		my $id = $school->get_id;
+		my $name = $school->get_js_value('name');			
+		
+		$OUT.=<<"+++";
+var treeschool$tree_id = new WebFXTreeItem('$name');
+treeschool$tree_id.action = "javascript: viewSchool($id);";
+treeschool$tree_id.icon = '/images/icons/24x24/home_blue.gif';
+treeschool$tree_id.openIcon = '/images/icons/24x24/home_blue.gif';
+
+$parent_id.add(treeschool$tree_id);
++++
+
+		my $sub_parent_id = "treeschool$tree_id";
+		
+		foreach my $child (@{$school->ensure_child_array('school')})
+		{
+			&get_school_tree_entry($child, $sub_parent_id);
+		}
+	}
+	
+	foreach my $type (@{$c{school_types}})
+	{
+		$OUT.=<<"+++";
+var type$type = new WebFXTreeItem('$type');
+type$type.action = "javascript: viewType('$type');";
+
+typeTree.add(type$type);
++++
+
+		my $addId = "type$type";
+
+		if($type eq 'normal')
+		{
+			my @types = qw(paid unpaid);
+			
+			foreach my $paidstatus (@types)
+			{
+				$OUT.=<<"+++";
+var typenormal_$paidstatus = new WebFXTreeItem('$paidstatus');
+typenormal_$paidstatus.action = "javascript: viewType('normal_$paidstatus');";
+
+type$type.add(typenormal_$paidstatus);			
++++
+
+				foreach my $school (@{$account_map->{'normal_'.$paidstatus}})
+				{
+					my $id = $school->get_id;
+					my $name = $school->get_js_value('name');
+								
+					$OUT.=<<"+++";
+var typedschool$id = new WebFXTreeItem('$name');
+typedschool$id.action = "javascript: viewSchool($id);";
+typedschool$id.icon = '/images/icons/24x24/home_blue.gif';
+typedschool$id.openIcon = '/images/icons/24x24/home_blue.gif';
+
+typenormal_$paidstatus.add(school$id);					
++++
+				}
+			}
+		}
+		else
+		{
+			foreach my $school (@{$account_map->{$type}})
+			{				
+				$OUT.=&get_school_tree_entry($school, "type$type");
+			}
+		}
+	}
+}
+
+var type_tree_string = typeTree.toString();
+document.write(type_tree_string);
+typeTree.expand();
+
+document.write('<br>');
+
+var tree_string = tree.toString();
+document.write(tree_string);
+
+</script>
+
+
+

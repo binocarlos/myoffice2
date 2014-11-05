@@ -1,0 +1,31 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+ <TR>
+	<TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+
+	 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+		<TR>
+		 <TD>
+			<TABLE WIDTH="100%" BORDER="0" CELLPADDING="10" CELLSPACING="0" CLASS="panelinner" HEIGHT="100%">
+			 <TR>
+				<TD CLASS="panelbody" HEIGHT="100%" WIDTH="100%" ALIGN="RIGHT" VALIGN="TOP">
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR>
+				  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="40"><IMG
+					 src="/images/holiday/trashcan.gif" WIDTH="29" HEIGHT="32" BORDER="0"></TD><TD COLSPAN="2" ALIGN="LEFT" VALIGN="TOP"><B>Are you
+					 sure you want to delete '{$c{deluser}->get_fullname}'?</B><BR>
+<IMG src="/images/holiday/clear.gif"
+					 WIDTH="1" HEIGHT="10" BORDER="0"></TD>
+				  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="25"></TD>
+				</TR>
+			 </TABLE><IMG src="/images/holiday/clear.gif" WIDTH="1"
+			 HEIGHT="10" BORDER="0"><BR><button style="height:23px; width:75px; font-family:tahoma; font-size:11px;" onclick="document.location='{$c{href}}&method={$c{confirm_method}}&object_id={$c{object_id}}';"><img src="/images/holiday/tick.gif" width="14" height="14" border="0" align="absmiddle"><IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0">Yes</button><IMG
+			 src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><button style="height:23px; width:75px; font-family:tahoma; font-size:11px;" onclick="document.location='{$c{href}}&method={$c{cancel_method}}';"><img src="/images/holiday/cross.gif" width="14" height="14" border="0" align="absmiddle"><IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0">No</button></TD>
+			 </TR>
+			</TABLE></TD>
+		</TR>
+	 </TABLE> </TD>
+ </TR>
+</TABLE>
+</body>

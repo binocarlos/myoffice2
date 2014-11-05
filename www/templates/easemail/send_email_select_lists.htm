@@ -1,0 +1,190 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var current_lists = new Object();
+	
+	function add_list()
+	\{
+		var list_array = top.get_list_id_array('Choose Lists to Email');
+		
+		if(!list_array)
+		\{
+			return;
+		\}
+		
+		for(var i=0; i<list_array.length; i++)
+		\{
+			var list_obj = list_array[i];
+			
+			if(!current_lists[list_obj.id])
+			\{
+				current_lists[list_obj.id] = list_obj;
+			\}
+		\}
+		
+		apply_list_table();
+	\}
+	
+	function delete_list(id)
+	\{
+		delete(current_lists[id]);
+		apply_list_table();
+	\}
+	
+	function apply_list_table()
+	\{
+		var content = get_list_table();
+		
+		document.getElementById('list_td').innerHTML = content;
+	\}
+	
+	function get_list_packet()
+	\{
+		var packet = "<lists>\n";
+		
+		for(var list_id in current_lists)
+		\{
+			var list_obj = current_lists[list_id];
+			
+			packet += "		<list id=\"" + list_obj.id + "\"/>\n";
+		\}
+		
+		packet += "</lists>";
+		
+		return packet;
+	\}	
+
+	function get_list_table()
+	\{
+		var table = '<table width=100% border=0>';
+		
+		for(var list_id in current_lists)
+		\{
+			var list_obj = current_lists[list_id];
+			
+			var normal_sel = ' selected';
+			var inherited_sel = '';
+			
+			if(list_obj.mode=='inherited')
+			\{
+				normal_sel = '';
+				inherited_sel = ' selected';
+			\}
+			
+			table += '<tr><td width=100%>' + list_obj.name + '</td>';
+			table += '<td><a href="javascript: delete_list(\'' + list_id + '\');"><img src="/images/icons/16/recyclebin.gif" border=0 width=16 height=16></a></td></tr>';
+		\}
+		
+		table += '</table>';
+		
+		return table;
+	\}	
+	
+	function all_members()
+	\{
+		document.email_list_form.list_packet.value = 'all';
+		document.email_list_form.submit();
+	\}
+	
+	function submit_form()
+	\{
+		var count = 0;
+		
+		for(var list_id in current_lists)
+		\{
+			count++;
+		\}
+		
+		if(count==0)
+		\{
+			alert('please choose some lists');
+			return false;
+		\}
+		else
+		\{
+			document.email_list_form.list_packet.value = get_list_packet();
+			return true;
+		\}
+	\}
+	
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="email_list_form" method="POST" action="{$c{script}}" onSubmit="return submit_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="easemail_send_email_select_lists_submit">
+<input type="hidden" name="email_id" value="{$c{email}->get_id}">
+<input type="hidden" name="list_packet" value="">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD width="446">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD align="center" CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Select Lists to Email &nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                                <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Lists to 
+                                      email:</TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD id="list_td" ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                                  </TR>
+                                </TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+                    <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+                      <TR> 
+                        <TD ALIGN="center" VALIGN="MIDDLE"> 
+                          <input type="button"  value="Cancel" CLASS="button" style="width:75px;" onClick="history.back();">
+                          &nbsp; 
+                          <input type="button"  value="Add List" CLASS="button" style="width:75px;" onClick="add_list();">
+&nbsp;                          <input type="button"  value="Send To All Members" CLASS="button" style="width:125px;" onClick="all_members();">
+                          &nbsp; 
+                          <input type="submit" name="Submit" value="Save Details" CLASS="button" style="width:75px;">
+                        </TD>
+                      </TR>
+                    </TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+<script>
+{
+	foreach my $list_obj (@{$c{list_objs}})
+	{
+		my $id = $list_obj->get_id;
+		my $name = $list_obj->get_value('name');
+		
+		$OUT.=<<"+++";
+var list = new Object();
+list.id = $id;
+list.name = '$name';
+current_lists[list.id] = list;
+
++++
+	}
+}
+apply_list_table();
+</script>
+</body>
+</html>
+
+
+

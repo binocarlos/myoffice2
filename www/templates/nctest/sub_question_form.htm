@@ -1,0 +1,156 @@
+<html>
+<head>
+<title></title>
+{$c{test}->get_style_sheet_include}
+<script src="/lib/nctest/sub_question_editor.js"></script>
+<script src="/lib/nctest/mainTableRow.js"></script>
+<script src="/lib/nctest/contentCell.js"></script>
+<script src="/lib/nctest/questionComponent.js"></script>
+<script src="/lib/nctest/questionInput.js"></script>
+<script>
+// The following loops through each mainTableRow and contentCell
+// and calls their constructors
+//
+// IMPORTANT - the mainTableRow definitions MUST come before the contentCell ones
+// as the contentCell constructor relies on the mainTableRow object being there
+
+var nextLayoutId = {$c{sub_question}->get_next_layout_id};
+var session_id = '{$c{session_id}}';
+
+var soundImgSrc = '{$c{test}->get_image_src('sound_off.gif')}';
+
+var loopRow;
+var loopCell;
+
+{
+	my $mainTableRowElems = $c{sub_question}->{_mainTableRows};
+	my $contentCellElems = $c{sub_question}->{_contentCells};
+	my $questionComponents = $c{sub_question}->get_child_array('question_component');
+	my $questionInputs = $c{sub_question}->get_child_array('question_input');
+
+	foreach my $questionComponent (@$questionComponents)
+	{
+		my $constructor = $questionComponent->get_js_constructor;
+
+		$OUT.=<<"+++";
+$constructor
++++
+	}
+	
+	foreach my $questionInput (@$questionInputs)
+	{
+		my $constructor = $questionInput->get_js_constructor();
+		
+		$OUT.=<<"+++";
+$constructor
++++
+	}
+
+	foreach my $tableRow (@$mainTableRowElems)
+	{
+		my $id = $tableRow->getAttribute('id');
+		my $height = $tableRow->getAttribute('height');
+		
+		if(!$height>0) { $height = 'null'; }		
+
+		$OUT.=<<"+++";
+loopRow = new mainTableRow($id, $height);
++++
+	}
+
+	foreach my $contentCell (@$contentCellElems)
+	{
+		my $id = $contentCell->getAttribute('id');
+		my $rowId = $contentCell->getAttribute('row_id');
+		my $align = $contentCell->getAttribute('align');
+		my $valign = $contentCell->getAttribute('valign');
+		my $component_id = $contentCell->getAttribute('component_id');
+		my $input_id = $contentCell->getAttribute('input_id');
+		my $width = $contentCell->getAttribute('width');
+
+		if(!$component_id) { $component_id = 'null'; }
+		if(!$input_id) { $input_id = 'null'; }
+
+		if($align!~/\w/) { $align = 'left'; }
+		if($valign!~/\w/) { $valign = 'middle'; }
+		
+		if(!$width>0) { $width = 'null'; }
+
+		$OUT.=<<"+++";
+loopCell = new contentCell($id, $rowId, $component_id, $input_id, '$align', '$valign', $width);
+loopCell.addToTableRow();
++++
+	}
+}
+
+
+</script>
+</head>
+<body bgcolor="#FFFFFF" style="margin:15px;">
+<form name="sub_question_form" method="POST" action="{$c{script}}" style="margin:0px;">
+	<input type="hidden" name="session_id" value="{$c{session_id}}">
+	<input type="hidden" name="method" value="tests_sub_question_form_submit">
+	<input type="hidden" name="sub_question_id" value="{$c{sub_question}->get_id}">
+	<input type="hidden" name="layout_packet" value="">
+</form>
+<!-- Outer Table Start -->
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+	<td><div class="editor_number">{$c{sub_question}->get_question_order_title}</div></td>
+	<td valign="middle" align="left" class="editor_title" width="100%">{$c{sub_question}->get_part_title}</td>
+	<td align="right"><div nowrap>
+{
+	if($c{sub_question}->has_previous_part)
+	{
+		my $src = $c{test}->get_image_src('prev_off.gif');
+
+		$OUT.=<<"+++";	
+	<img src="$src" border="0" title="Previous Question" class="editor_prevbut">
++++
+	}
+	
+	if($c{sub_question}->has_next_part)
+	{
+		my $src = $c{test}->get_image_src('next_off.gif');
+
+		$OUT.=<<"+++";
+	<img src="$src" title="Next Question" border="0" class="editor_nextbut">
++++
+	}
+}
+	</div></td>
+</tr>
+<tr>
+	<td colspan="3" align="left" valign="top" height="100%">
+		<div id="mainEditArea" class="editor_div" style="margin-top:10px;"></div>
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="right" style="padding-top:20px;">
+{
+	if($c{sub_question}->has_previous_part)
+	{
+		my $src = $c{test}->get_image_src('prev_off.gif');
+
+		$OUT.=<<"+++";	
+	<img src="$src" border="0" title="Previous Question" class="editor_prevbut">
++++
+	}
+	
+	if($c{sub_question}->has_next_part)
+	{
+		my $src = $c{test}->get_image_src('next_off.gif');
+
+		$OUT.=<<"+++";
+	<img src="$src" title="Next Question" border="0" class="editor_nextbut">
++++
+	}
+}
+</td>
+</tr>
+</table>
+<script>
+initialiseGUI({$c{sub_question}->get_id});
+</script>
+</body>
+</html>

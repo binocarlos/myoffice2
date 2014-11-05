@@ -1,0 +1,51 @@
+<!--#include virtual="temp_include.htm" -->
+<p>
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		my $href = $c{href};
+		
+		$OUT.=<<"+++";
+  <input type="button" class="button" value="Edit Quiz Instructions" onClick="document.location='$href&method=tests_instructions_form';">
+  <input type="button" class="button" value="Edit Assessment Groups" onClick="document.location='$href&method=tests_assessment_groups_form';">
+  <br>
+  <br>
++++
+	}
+}
+
+  Welcome to the quiz editor - edit questions and parts using the tree on the left.<br>
+  <br>
+To add a question, select an existing question and click 'add' -&gt; enter the information
+into the window and the new question will be added.<br>
+<br>
+To edit a question - double click on its name in the tree or select it and click
+'edit' -&gt; edit the information in the window and click save.<br>
+<br>
+To delete a question - select it and click 'delete'.<br>
+<br>
+To add a part - select an existing part and click 'add' - the new part will be
+added just after.<br>
+<br>
+To edit a part - double click on its name in the tree or select it and click
+'edit' -&gt; edit the part in this window.<br>
+<br>
+To delete a part - select it and click 'delete'.<br>
+<br>
+To 
+edit level groups -&gt; double click ' level groups' on the tree, select it and
+click 'edit' or click the
+button
+above.<br>
+<br>
+To 
+  edit the quiz instructions s -&gt; double click 'instructions' on the tree,
+  select it and click 'edit' or click the
+  button
+  above.<br>
+  <br>
+  To view the default instructions that will accompany the quiz -&gt; click the
+button above.</p>
+<script>
+parent.loadHomeToolbar();
+</script>

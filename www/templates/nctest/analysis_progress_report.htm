@@ -1,0 +1,498 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var graphMode = false;
+var selectedCellId = null;
+
+var origBgColors = new Object();
+
+function viewExamSummary(exam_id)
+\{
+	var loc = '&method=analysis_pupil_question_report&exam_id=' + exam_id + '&pupil_id={$c{report}->{pupil_id}}';
+	
+	var ret = top.get_modal_window_return(loc, 600, 500);
+\}
+
+function showSubjectBreakdown(td, sql_date, subject)
+\{
+	td.bgColor = '#ccccff';
+	origBgColors[td.id] = '#ccccff';
+	
+	var query = '&method=analysis_progress_subject_period_report&{$c{report}->get_page_query_string}&subject=' + subject + '&period_date=' + sql_date;
+	
+	var ret = top.get_modal_window_return(query, 500, 600);
+//	openWindow(href + query, 500, 600);
+	td.bgColor = '';
+\}
+
+function showTopicBreakdown(td, sql_date, topic)
+\{
+	td.bgColor = '#ccccff';
+	origBgColors[td.id] = '#ccccff';
+	
+	var query = '&method=analysis_progress_topic_period_report&{$c{report}->get_page_query_string}&topic_id=' + topic + '&period_date=' + sql_date;
+	
+	var ret = top.get_modal_window_return(query, 500, 600);
+//	openWindow(href + query, 500, 600);
+	td.bgColor = '';
+\}
+
+function rollOverTd(td)
+\{
+	origBgColors[td.id] = td.bgColor;
+	
+	td.bgColor = '#ffe5e5';
+\}
+
+function rollOutTd(td)
+\{
+	td.bgColor = origBgColors[td.id];
+\}
+
+function toggleGraph()
+\{
+	graphMode = !graphMode;
+	
+	var buttonTitle = 'Hide Graph';
+	var display = 'inline';
+	
+	if(!graphMode)
+	\{
+		buttonTitle = 'Show Graph';
+		display = 'none';
+	\}
+	
+	document.getElementById('graphP').style.display = display;
+	document.getElementById('graphButton').value = buttonTitle;
+\}
+</script>
+
+<table  border="0" cellspacing="1" cellpadding="0">
+  <tr valign="top">
+    <td>
+        <table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+          <tr bgcolor="#FFFFFF">
+            <td width="200"><b>Progress Summary </b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td><b>{$c{report}->{title}}</b><br>{$c{report}->{params_st}}</td>
+          </tr>		    
+{
+	if($c{report}->{pupil_id}!~/\w/)
+	{
+		my $highest_count = $c{report}->{highest_pupil_count};
+	
+		$OUT.=<<"+++";		    
+          <tr bgcolor="#FFFFFF">
+            <td>Maximum of <b style="color:red;">$highest_count</b> pupils in result set</td>
+          </tr>	
++++
+	}
+}
+
+        </table>
+    </form></td>
+  </tr>
+</table>
+<span id="graphP" style="display:none;">
+<br>
+<table border=0 cellpadding=3 cellspacing=0>
+<tr>
+<td align=center><b class="welcome" style="color:#666666;">Progress Graph</b></td></tr>
+<tr><td><img id="graphImg" src="{$c{href}}&method=analysis_progress_report_graph&{$c{report}->get_page_query_string}"></td></tr>
+</table>
+<br>
+</span><br>
+Click on each cell to get a breakdown...<br><br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td>&nbsp;</td>
+{	
+	$c{dates} = $c{report}->get_period_date_array;
+	
+	foreach my $period_date (@{$c{dates}})
+	{
+		my $month = Webkit::Date->get_monthname($period_date->Month);
+		my $year = $period_date->Year;
+		
+		$OUT.=<<"+++";
+    <td><b class="welcome">$month $year</b></td>
++++
+	}
+}  </tr>
+{
+	foreach my $subject (@{$c{report}->get_subjects})
+	{
+		my $subject_title = $c{report}->get_subject_title($subject);
+		
+		$OUT.=<<"+++";
+  <tr bgcolor="#f5f5f5">
+    <td><b>$subject_title</b></td>
++++
+
+		foreach my $period_date (@{$c{dates}})
+		{
+			my $subject_level = $c{report}->get_subject_level($subject, $period_date);
+			my $avg = $c{report}->get_subject_avg($subject, $period_date);
+			
+			my $sql_date = Webkit::Date->parse_to_sql($period_date);			
+			
+			my $tdId = $subject.$period_date->Epoch;
+			
+			my $mouseOver = '';
+			
+			if($subject_level=~/\w/)
+			{
+				$mouseOver = ' onMouseOver="rollOverTd(this);" onMouseOut="rollOutTd(this);" onClick="showSubjectBreakdown(this, \''.$sql_date.'\', \''.$subject.'\');"';
+			}
+			
+			$OUT.=<<"+++";
+    <td align=center id="$tdId" $mouseOver>$subject_level</td>	
++++
+		}
+		
+  $OUT.=<<"+++";  
+  </tr>
++++
+
+		foreach my $topic_id (@{$c{report}->get_subject_topics($subject)})
+		{
+			$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF">
+    <td>&nbsp;&nbsp;$topic_id</td>
++++
+
+			foreach my $period_date (@{$c{dates}})
+			{
+				my $ref = $c{report}->get_period_topic_ref($period_date, $topic_id);
+				
+				my $sql_date = Webkit::Date->parse_to_sql($period_date);
+				
+				my $level = $ref->{score_level};
+				my $avg = $ref->{avg};
+				
+				my $tdId = $topic_id.$period_date->Epoch;
+				
+				my $mouseOver = '';
+			
+				if(($level=~/\w/)&&($ref->{carried}!~/\w/))
+				{
+					$mouseOver = ' onMouseOver="rollOverTd(this);" onMouseOut="rollOutTd(this);" onClick="showTopicBreakdown(this, \''.$sql_date.'\', \''.$topic_id.'\');"';
+				}
+				
+				my $style;
+				
+				if($ref->{carried}=~/\w/)
+				{
+					$style = ' style="color:#959595;"';
+				}
+
+				$OUT.=<<"+++";
+    <td align=center id="$tdId" $mouseOver$style>$level</td>	
++++
+			}
+			
+  $OUT.=<<"+++";  </tr>
++++
+		}
+	}
+}
+</table>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	if($c{report}->{show_pupils}=~/\w/)
+	{
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff><td><strong>Pupils in result set</strong></td>
++++
+
+		foreach my $period_date (@{$c{dates}})
+		{
+			my $month = Webkit::Date->get_monthname($period_date->Month);
+			my $year = $period_date->Year;
+		
+			$OUT.=<<"+++";
+	    <td colspan=3><u>$month $year</u></td>
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
+<tr bgcolor=#ffffff><td></td>
++++
+
+		foreach my $period_date (@{$c{dates}})
+		{		
+			$OUT.=<<"+++";
+	    <td>Maths</td><td>Science</td><td>English</td>
++++
+		}
+		
+		$OUT.=<<"+++";
+		</tr>
++++
+
+		foreach my $ref (@{$c{report}->{_pupil_refs}})
+		{
+			my $name = $ref->{name};
+			my $id = $ref->{id};
+			
+			$OUT.=<<"+++";
+<tr bgcolor=#ffffff><td>$name</td>
++++
+
+			foreach my $period_date (@{$c{dates}})
+			{		
+				my $month = $period_date->Month;
+				my $year = $period_date->Year;			
+				my $period_st = $year.'-'.$month;
+				
+				foreach my $subject (qw(maths science english))
+				{
+					my $arr = $c{report}->{_pupil_subject_map}->{$id}->{$period_st}->{$subject};
+					
+					my $count = @$arr;
+					my $avg = '';
+					
+					if($count>0)
+					{
+						my $total = 0;
+						
+						foreach my $pa (@$arr)
+						{
+							$total += $pa->{nc_score};
+						}
+						
+						$avg = $total / $count;
+					}
+					
+					my $level = &Webkit::NcTest::NCHub::get_score_level($avg);
+					
+					my $bg = ' bgcolor=#ffffff';
+					
+					if($level!~/\w/) { $bg = ' bgcolor=#e5e5e5'; }
+					
+					$OUT.=<<"+++";
+			<td $bg>$level</td>		
++++
+					
+				}
+			}
+		}
+	}
+}
+</table>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	if($c{pupil_report})
+	{
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+  <td colspan=6><strong>Quiz Summary </strong></td>
+</tr>
+<tr bgcolor=#ffffff>
+  <td><strong>Date</strong></td>
+  <td><strong>Quiz</strong></td>  
+  <td><strong>Score</strong></td>  
+  <td><strong>Marks</strong></td>    
+  <td><strong>Percent</strong></td>  
+  <td></td>
+</tr>
++++
+
+		my $exam_data = $c{pupil_report}->{_exam_data};
+		
+		foreach my $exam_ref (@$exam_data)
+		{
+			my $date = Webkit::Date->parse_from_sql($exam_ref->{logged_in});
+			my $date_st = '';
+			
+			if($date) { $date_st = $date->get_string; }
+			
+			my $exam = $exam_ref->{exam_name};
+			my $score = $exam_ref->{total_score};
+			my $marks = $exam_ref->{total_marks};
+			my $exam_id = $exam_ref->{exam_id};
+
+			my $percent_st = '0';
+			
+			if($marks>0) { $percent_st = sprintf("%.0f", ($score/$marks)*100); }
+			
+			$OUT.=<<"+++";
+<tr bgcolor=#ffffff><td>$date_st</td>
+<td>$exam</td>
+<td align="right">$score</td>
+<td align="right">$marks</td>
+<td align="right">$percent_st%</td>
+<td><a href="javascript:viewExamSummary($exam_id);" style="cursor:hand;">View</a></td>
+</tr>		
++++
+		}
+	}
+}
+</table><br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	if($c{pupil_report})
+	{
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+  <td colspan=6><strong>Target Summary </strong></td>
+</tr>
++++
+
+		my $subject_order = Webkit::NcTest::Reports::ParentReportRTF->get_subject_order;
+		my $annual_target_subjects = Webkit::NcTest::Reports::ParentReportRTF->get_annual_target_subjects;
+		my $pupil = $c{pupil_report}->load_pupil;
+		my $pupil_name = $pupil->get_fullname;
+		
+		foreach my $subject (@$subject_order)
+		{
+			my $is_core = &Webkit::NcTest::NCHub::get_subject_field($subject, 'core');
+
+			if(!$is_core) { next; }
+			
+			my $title = &Webkit::NcTest::NCHub::get_subject_field($subject, 'title');			
+			
+			my $refs = $c{pupil_report}->{_core_target_refs}->{$subject};			
+				
+			$OUT.=<<"+++";
+<tr bgcolor=#cccccc>
+<td colspan=2><b>$title</b></td></tr>
++++
+
+			foreach my $ref (@$refs)
+			{
+				my $topic_id = $ref->{topic_id};
+				my $statement = $ref->{statement};
+				
+				$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+<td>$topic_id</td>
+  <td>$statement</td>  
+</tr>
++++
+			}
+		}
+		
+		foreach my $target_subject (@$annual_target_subjects)
+		{
+			my $title = $target_subject->{title};		
+			
+			$OUT.=<<"+++";
+<tr bgcolor=#cccccc>
+<td colspan=2><b>$title</b></td></tr>
++++
+
+			foreach my $subject (@{$target_subject->{subjects}})
+			{
+				my $statement_refs = $c{pupil_report}->get_target_subject_statements($subject);
+
+				foreach my $statement (@$statement_refs)
+				{
+					my $text = $statement->{statement};
+					
+					$text =~ s/^\W*i /$pupil_name /i;	
+					
+					$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+<td colspan=2>$text</td>
+</tr>
++++
+				}
+			}
+		}
+	}
+}
+</table><br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	if($c{pupil_report})
+	{
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+  <td colspan=6><strong>Statement of Ability  Summary </strong></td>
+</tr>
++++
+
+		my $statement_data = $c{pupil_report}->{_statement_data};
+		my $subject_id;
+		
+		foreach my $ref (@$statement_data)
+		{
+			if($ref->{subject_id} ne $subject_id)
+			{
+				$subject_id = $ref->{subject_id};
+				my $subject_title = &Webkit::NcTest::NCHub::get_subject_field($subject_id, 'title');
+				
+				$OUT.=<<"+++";
+<tr bgcolor=#cccccc>
+<td colspan=2><b>$subject_title</b></td></tr>
++++
+			}
+
+			my $period_date = $ref->{period_date};
+			my $code = $ref->{code};
+			my $statement = $ref->{statement};			
+			
+			my $pupil = $c{report}->{_pupil};
+			my $pname = $pupil->get_fullname;
+			
+			$statement =~ s/^\s*i /$pname /i;
+
+			$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+<td>$code</td>
+  <td>$statement</td>  
+</tr>
++++
+		}
+	}
+}
+</table><br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	if($c{pupil_report})
+	{
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+  <td colspan=6><strong>Reception Statement Summary</strong></td>
+</tr>
++++
+
+		my $statement_data = $c{pupil_report}->{_reception_data};
+		my $topic;
+		
+		foreach my $ref (@$statement_data)
+		{
+			if($ref->{topic} ne $topic)
+			{
+				$topic = $ref->{topic};
+				
+				$OUT.=<<"+++";
+<tr bgcolor=#cccccc>
+<td colspan=3><b>$topic</b></td></tr>
++++
+			}
+
+			my $sub_topic = $ref->{sub_topic};
+			my $statement = $ref->{statement};		
+			my $level = Webkit::NcTest::ReceptionStatement->get_level_color($ref->{level});
+			
+			my $pupil = $c{report}->{_pupil};
+			my $pname = $pupil->get_fullname;
+			
+			$statement = "$pname $statement";
+
+			$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+<td bgcolor=$level width=10></td>
+	<td>$sub_topic</td>
+  <td>$statement</td>  
+</tr>
++++
+		}
+	}
+}
+</table>

@@ -1,0 +1,41 @@
+<!--#include virtual="temp_include.htm" -->
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+<TD WIDTH="180" ALIGN="LEFT" VALIGN="TOP" NOWRAP>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td><img src="/images/icons/48/mydocuments.gif" width="48" height="48"></td>
+</tr>
+<tr>
+<td style="font-size:12px;font-weight:bold; padding-top:10px;" height="40" valign="top" align="left">
+{
+	if($c{current_folder})
+	{
+		$OUT.=$c{current_folder}->title;
+	}
+	else
+	{
+		$OUT.="";
+	}
+}
+</td>
+</tr>
+<tr>
+<td id="description" align=left valign=top>&nbsp;</td>
+</tr>
+</table>
+
+</TD>
+<td width="10"></td>
+    <TD ALIGN="center" VALIGN="middle"><strong style="color:red;">Access Error</strong><br>
+      <br>
+      There was an error accessing this folder,<br>
+      perhaps your security setting does not allow you<br>
+      to view this folder or the folder no longer exists.<br>
+      <br>
+      If you require any help regarding this,<br>
+      please email support@wk1.net<br>
+      or use the Support page (in the Help menu).</td>
+  </tr></table>

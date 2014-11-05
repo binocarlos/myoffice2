@@ -1,0 +1,137 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+{
+	my $now_date = Webkit::Date->now;
+	my $sql_date = Webkit::Date->parse_to_sql($now_date);
+	
+	$OUT.=<<"+++";
+var now_date = '$sql_date';
++++
+}
+
+function checkEmailForm()
+\{
+	if(emailForm.from.value=="")
+	\{
+		alert('Please enter the email address this email is from');
+		return false;
+	\}
+	
+	if(emailForm.subject.value=="")
+	\{
+		alert('Please enter the subject');
+		return false;
+	\}	
+	
+	if(emailForm.message.value=="")
+	\{
+		alert('Please enter the message');
+		return false;
+	\}		
+	
+	document.getElementById('mainTable').style.display = 'none';
+	document.getElementById('messageTable').style.display = 'block';
+	
+	return true;	
+\}
+</script>
+<body>
+<form action="{$c{href}}" method="POST" enctype="multipart/form-data" name="emailForm" onSubmit="return checkEmailForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="emailer_submit">
+<table border="0" align="center" cellpadding="20" cellspacing="0" style="display:inline;" id="mainTable">
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">From Address:</TD>
+<TD width="500" ALIGN="LEFT" VALIGN="MIDDLE"><input name="from" type="text" class="text_field" id="from" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{from}}">
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Subject:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="subject" type="text" class="text_field" id="subject" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{subject}}">
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">Message Body:</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">
+<textarea name="message" class="text_field" id="message" style="width:100%;height:320px;" wrap="off">Dear [contact_name],
+
+your onlineclub url is www.[person_url].iboard.co.uk
+
+replace this text with the message and [variable_name] tags to replace the fields shown on the right
+</textarea></TD>
+</TR>
+<TR align="right" style="padding-bottom:5px;">
+<TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;"><input name="Submit" type="submit" class="button" value="Send Email!"></TD>
+</TR>
+</TABLE>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+<td align="left"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody"><fieldset style="height:100%;">
+<strong style="color:#CC0000;font-size:14pt;">{$c{rc}}</strong> <br>
+addresses found in upload <br>
+<br> 
+Email Field: <span style="color:#CC0000;">{$c{csv_info}->{email_field}}</span>
+<br>
+<br>
+<strong>Tags you can use in the email :</strong>
+<br>
+<br>
+{
+	foreach my $field (@{$c{csv_info}->{fields}})
+	{
+		$OUT.="[$field]<br>";
+	}
+}
+</fieldset></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></td></tr>
+</table>
+<table border=0 cellpadding="0" cellspacing="0" id="messageTable" style="display:none;">
+<tr>
+<td style="color:#CC0000;">
+Uploading, please wait...
+</td>
+</tr>
+</table>
+</form>
+</body>
+</html>
+
+
+

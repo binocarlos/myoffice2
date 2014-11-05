@@ -1,0 +1,152 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+<script>
+
+	var giMinYear = {$c{holiday}->get_value('start_datetime')->Year};
+
+	var giMaxYear = {$c{holiday}->get_value('start_datetime')->Year + 2};
+
+
+</script>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="holidayform">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="holiday_id" value="{$c{holiday}->get_id}">
+<input type="hidden" name="multi" value="{$c{multi}}">
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+		HEIGHT="100%">
+		<TR id="form_tr" style="display: inline;">
+		 <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+			 <TR>
+				<TD>
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"
+					CLASS="panelinner">
+					<TR>
+<TD CLASS="panelbody">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						 <TR>
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/holiday/panelt.gif" HEIGHT="13">
+<IMG src="/images/holiday/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13"
+							 ALIGN="ABSMIDDLE"><FONT CLASS="section_title">&nbsp;Attendance Information&nbsp;</FONT></TD>
+							<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG
+							 src="/images/holiday/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+						 </TR>
+						 <TR>
+							<TD WIDTH="2" BACKGROUND="/images/holiday/panell.gif"><IMG
+							 src="/images/holiday/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+							<TD WIDTH="100%">
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+								<TR>
+								 <TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="4"
+									 CELLSPACING="0">
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE">Employee:</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">
+<select name="users_id" size="1" style="width:180px;" class="text_field">
+	{$c{user_options}}
+</select>
+</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="100">Reason:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+<select name="reason" size="1" style="width:180px;" class="text_field">
+											{$c{reason_options}}
+</select>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE">{$c{start_title}}:</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">
+<INPUT CLASS="text_field"
+										 TYPE="TEXT" NAME="startdate" STYLE="width:149px;" READONLY="READONLY"
+										 VALUE="{$c{holiday}->get_calendar_value('start_datetime')}"><IMG src="/images/holiday/clear.gif" WIDTH="5" HEIGHT="1"
+										 BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="calendar_click(document.holidayform.startdate);"><IMG
+										 src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0"
+										 ALIGN="ABSMIDDLE"></A></TD>
+{
+	if($c{end_date_mode})
+	{
+		my $cal_st = $c{holiday}->get_calendar_value('end_datetime');
+		
+		$OUT.=<<"+++";
+<td align="RIGHT" valign="MIDDLE">End Date:</td>
+<td align="LEFT" valign="TOP">
+<input class="text_field"
+										 type="TEXT" name="enddate" style="width:149px;" readonly="READONLY"
+										 value="$cal_st"><img src="/images/holiday/clear.gif" width="5" height="1"
+										 border="0" align="ABSMIDDLE"><a onClick="calendar_click(document.holidayform.enddate);"><img
+										 src="/images/holiday/but_date.gif" width="26" height="20" border="0"
+										 align="ABSMIDDLE"></a></td>
++++
+	}
+	else
+	{
+		my $wholec;
+		my $halfc;
+
+		if($c{holiday}->is_half_day)
+		{
+			$halfc = " checked";
+		}
+		else
+		{
+			$wholec = " checked";
+		}		
+		
+		$OUT.=<<"+++";
+<TD ALIGN="RIGHT" VALIGN="MIDDLE">Whole / Half Day:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">
+<input type="radio" name="wholehalf" value="n"$wholec>
+Whole
+<input type="radio" name="wholehalf" value="y"$halfc>
+ Half</TD>
++++
+	}
+}
+</TR>
+<TR>
+<TD ALIGN="RIGHT"
+										 VALIGN="top">Notes:</TD>
+<TD ALIGN="LEFT" VALIGN="top" colspan="3">
+<textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="notes" style="width:100%; height:130px;">{$c{holiday}->get_value('notes')}</textarea>
+</TD>
+</TR>
+</TABLE>
+</TD>
+								</TR>
+							 </TABLE></TD>
+							<TD WIDTH="2" BACKGROUND="/images/holiday/panelr.gif"><IMG
+							 src="/images/holiday/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+						 </TR>
+						 <TR>
+							<TD HEIGHT="2" COLSPAN="3"
+							 BACKGROUND="/images/holiday/panelb.gif" ALIGN="RIGHT"><IMG
+							 src="/images/holiday/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+						 </TR>
+						</TABLE><IMG src="/images/holiday/clear.gif" BORDER="0" WIDTH="1" HEIGHT="8"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP"><font color="red"><b>{$c{holiday}->{error_text}}</b></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP">
+<INPUT TYPE="submit" VALUE="{$c{submit_title}}" CLASS="button" STYLE="width:75px;"><IMG src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="1" BORDER="0"><input type="button" value="Cancel" class="button" name="Button" onClick="document.location='{$c{href}}&method={$c{session}->{view_method}}';" STYLE="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</TD>
+					</TR>
+				 </TABLE></TD>
+			 </TR>
+			</TABLE>
+</TD>
+		</TR>
+
+	 </TABLE>
+</form>
+{$c{calendar_table}}
+<SCRIPT LANGUAGE="JavaScript">
+//parent.pagetop.location = '/templates/holiday/holidaytop.htm';
+
+
+</SCRIPT>
+

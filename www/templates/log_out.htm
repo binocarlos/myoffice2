@@ -1,0 +1,51 @@
+<script>
+function confirm_logout()
+\{
+	if(window.top.opener)
+	\{
+		window.top.opener.focus();
+	\}
+	
+	window.top.close();
+\}
+</script>
+
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<body>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+<div class="panelouter" style="width:350px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+
+<fieldset>
+<legend>Logging Out</legend>
+<div class="seccontent" align="left">
+
+<table cellpadding="0" celspacing="0" border="0">
+<tr style="padding-bottom:15px;">
+<td colspan="2">You are about to log out, this will exit the application.</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="right">Logged&nbsp;In:&nbsp;</td>
+<td align="left" width="100%">{$c{logged_in_title}}</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="right">Logging&nbsp;Out:&nbsp;</td>
+<td align="left" width="100%">{$c{logging_out_title}}</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="right" valign="top">Duration:&nbsp;</td>
+<td align="left" width="100%">{$c{duration_title}}</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan="2" align="center"><br><A ONCLICK="confirm_logout();" onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" style="padding:4px;cursor:default;"><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A></td>
+</tr>
+</table>
+
+</div>
+</fieldset>
+
+</div></div></div>
+
+</TD></TR></TABLE> 
+
+</body>
+</html>

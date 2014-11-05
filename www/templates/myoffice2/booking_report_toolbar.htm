@@ -1,0 +1,298 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:1px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{ font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script src="/lib/kit.js"></script>
+<script src="/lib/myoffice2/lib.js"></script>
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+var appname = '{$c{app_name}}';
+
+	var bookings = new Object();
+	var venues = new Object();
+	
+	var saveSpanMode = false;
+	var timeoutId = null;
+	
+	function clearSwitchSaveSpan()
+	\{
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = '';
+		button.style.color = '';
+		button.style.fontWeight = '';
+		span.style.backgroundColor = '';
+		span.style.color = '';
+		span.style.fontWeight = '';
+		
+		clearTimeout(timeoutId);
+		
+		timeoutId = null;	
+	\}
+	
+	function switchSaveSpan()
+	\{
+		saveSpanMode =! saveSpanMode;
+		
+		var buttonBg = '';
+		var buttonFg = '';
+		
+		var spanBg = '';
+		var spanFg = '';
+		
+		var buttonWeight = '';
+		var spanWeight = '';
+		
+		if(saveSpanMode)
+		\{
+			buttonBg = '#ffffff';
+			buttonFg = '#ff0000';
+			spanBg = '#ffffff';
+			spanFg = '#ff0000';
+			buttonWeight = 'bold';
+			spanWeight = 'bold';
+		\}
+		
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = buttonBg;
+		button.style.color = buttonFg;
+		button.style.fontWeight = buttonWeight;
+		span.style.backgroundColor = spanBg;
+		span.style.color = spanFg;
+		span.style.fontWeight = spanWeight;
+		
+		timeoutId = setTimeout("switchSaveSpan();", 1000);
+	\}		
+	
+	function showSaveSpan()
+	\{
+		document.getElementById('saveSpan').style.display = 'inline';
+		document.getElementById('saveButton').disabled = false;
+		
+		if(timeoutId==null)
+		\{		
+			switchSaveSpan();		
+		\}
+	\}
+	
+	function resetForm()
+	\{
+		clearSwitchSaveSpan();	
+		document.getElementById('hiddenInputSpan').innerText = '';
+		document.getElementById('saveSpan').style.display = 'none';
+		document.getElementById('saveButton').disabled = true;
+		bookings = new Object();
+	\}	
+	
+	function addVenueField(venue_id, field, value)
+	\{
+		var venue = venues[venue_id];
+		
+		if(!venue)
+		\{
+			venue = new Object();
+			venue.id = venue_id;
+			venues[venue.id] = venue;
+		\}
+		
+		venue[field] = value;
+		
+		showSaveSpan();
+	\}	
+	
+	function addBookingField(booking_id, field, value)
+	\{
+		var booking = bookings[booking_id];
+		
+		if(!booking)
+		\{
+			booking = new Object();
+			booking.id = booking_id;
+			bookings[booking.id] = booking;
+		\}
+		
+		booking[field] = value;
+		
+		showSaveSpan();
+	\}
+	
+	function setFilterValue(value)
+	\{
+		if(value)
+		\{
+			document.getElementById('filter').value = value;
+		\}
+	\}
+	
+	function filterSheet()
+	\{
+		var value = document.getElementById('filter').value;
+		
+		parent.content.viewFilter(value);
+	\}
+	
+	function applyObjectInputs(hash, tag)
+	\{
+		if(!hash) \{ return; \}
+		
+		var span = document.getElementById('hiddenInputSpan');
+		var st = '';	
+		
+		for(var id in hash)
+		\{
+			var obj = hash[id];
+			
+			for(var field in obj)
+			\{
+				if(field!='id')
+				\{
+					//var elem = document.createElement('INPUT');
+					//elem.type = 'hidden';
+					//elem.name = tag + '_' + id + '_' + field;
+					//elem.value = obj[field];
+				
+					//span.appendChild(elem);
+					
+					st += '<field name="' + tag + '_' + id + '_' + field + '">' + obj[field] + '</field>';					
+				\}
+			\}
+		\}		
+		
+		return st;
+	\}
+	
+	function viewReport()
+	\{
+		var search = document.getElementById('search').value;
+		var start_letter = document.getElementById('start_letter').value;
+		var end_letter = document.getElementById('end_letter').value;
+		
+		top.appContent.sidebar.frames[1].document.location = href + '&method=booking_report_tree&search=' + search + '&start_letter=' + start_letter + '&end_letter=' + end_letter;
+		top.appContent.page.frames[1].document.location = href + '&method=booking_report_sheet&search=' + search + '&start_letter=' + start_letter + '&end_letter=' + end_letter;
+	\}
+	
+	function sumbitBookingSheet()
+	\{
+		var form = document.bookingReportForm;
+		
+		var data = applyObjectInputs(bookings, 'booking');
+		data += applyObjectInputs(venues, 'venue');
+		
+		form.data.value = data;
+	
+		form.submit();
+	\}
+	
+	function viewPencilSheet()
+	\{
+		var venue_id = parent.content.document.filterForm.venue_id.value;
+		var booking_id = parent.content.document.filterForm.booking_id.value;
+		
+		top.get_double_frameset('myoffice2_booking_penciled&venue_id=' + venue_id + '&booking_id=' + booking_id);
+	\}	
+	
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" align="left" cellpadding="5" cellspacing="0">
+        <tr>
+          <td></td>
+          <td height="40" colspan="6"><strong>Booking Report  for the {$c{tour}->name} Tour</strong></td>
+		  <td colspan=4><span style="color:red;display:none;font-weight:bold;font-size:15pt;" id="saveSpan">YOU HAVE DATA TO SAVE...</span></td>
+        </tr>	  
+        <tr>
+          <td width="10"></td>
+          <td>Search Venues </td>
+          <td><input type="text" name="search" id="search" class="text_field" style="width:100px;"></td>
+          <td><select name="start_letter" id="start_letter" class="text_field" style="width:60px;">
+		  <option value="">-</option>		  
+		  <option value="a">A</option>
+		  <option value="b">B</option>
+		  <option value="c">C</option>
+		  <option value="d">D</option>
+		  <option value="e">E</option>
+		  <option value="f">F</option>
+		  <option value="g">G</option>  
+		  <option value="h">H</option> 
+		  <option value="i">I</option> 
+		  <option value="j">J</option>
+		  <option value="k">K</option>  
+		  <option value="l">L</option> 
+		  <option value="m">M</option> 
+		  <option value="n">N</option> 
+		  <option value="o">O</option> 
+		  <option value="p">P</option> 
+		  <option value="q">Q</option> 
+		  <option value="r">R</option> 
+		  <option value="s">S</option>
+		  <option value="t">T</option>  
+		  <option value="u">U</option> 
+		  <option value="v">V</option> 
+		  <option value="w">W</option> 
+		  <option value="x">X</option> 
+		  <option value="y">Y</option> 
+		  <option value="z">Z</option> 
+		  </select></td>
+          <td width="30">-&gt;</td>
+          <td><select name="end_letter" id="end_letter" class="text_field" style="width:60px;">
+            <option value="">-</option>
+            <option value="a">A</option>
+            <option value="b">B</option>
+            <option value="c">C</option>
+            <option value="d">D</option>
+            <option value="e">E</option>
+            <option value="f">F</option>
+            <option value="g">G</option>
+            <option value="h">H</option>
+            <option value="i">I</option>
+            <option value="j">J</option>
+            <option value="k">K</option>
+            <option value="l">L</option>
+            <option value="m">M</option>
+            <option value="n">N</option>
+            <option value="o">O</option>
+            <option value="p">P</option>
+            <option value="q">Q</option>
+            <option value="r">R</option>
+            <option value="s">S</option>
+            <option value="t">T</option>
+            <option value="u">U</option>
+            <option value="v">V</option>
+            <option value="w">W</option>
+            <option value="x">X</option>
+            <option value="y">Y</option>
+            <option value="z">Z</option>
+          </select></td>		  		  		  
+          <td><input type="button" value="Go" class="button" onClick="viewReport();" id="filterButton"></td>
+          <td width=50>&nbsp;</td>
+		  <td align="left"><form method="POST" action="{$c{script}}" name="bookingReportForm" style="margin:0px;padding:0px;">
+              <input type="hidden" name="session_id" value="{$c{session_id}}">
+              <input type="hidden" name="method" value="booking_report_toolbar_save">
+              <input type="hidden" name="redirect" value="booking_report_toolbar">
+              <input type="hidden" name="data" value="">			  						  
+              <span id="hiddenInputSpan"></span>
+              <input type="button" value="Save Sheet" class="button" onClick="sumbitBookingSheet();" id="saveButton" disabled>
+          </form></td>
+          <td width="400">&nbsp;</td>
+        </tr>
+      </table>
+      </TD>
+		</TR>
+</TABLE>
+</BODY>
+</HTML>

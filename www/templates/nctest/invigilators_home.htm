@@ -1,0 +1,71 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function viewLoginCodes(id)
+	\{
+		var query = '&method=inivigilators_list_login_codes&exam_id=' + id + '&title=Log In Codes';
+		
+		var ret = top.get_modal_window_return(query, 420, 520);
+	\}
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Currently Active Quizzes</legend>
+<div class="seccontent" align="left">
+<table border="0" cellspacing="0" cellpadding="5">
+{
+	foreach my $exam (@{$c{org}->ensure_child_array('exam')})
+	{
+		my $id = $exam->get_id;
+		my $name = $exam->name;
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td><strong>$name</strong></td>
++++
+
+		my $sitting = $exam->get_active_exam_sitting;
+		
+		if($sitting)
+		{
+			my $sitting_id = $sitting->get_id;
+			
+			$OUT.=<<"+++";
+    <td><input style="width:125px;" type="button" class="button" value="View Current Sitting" onClick="document.location = href + '&method=invigilators_form&exam_sitting_id=$sitting_id';"></td>			
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+    <td><input style="width:125px;" type="button" class="button" value="Create New Sitting" onClick="document.location = href + '&method=exams_exam_sitting_form&exam_id=$id';"></td>			
++++
+		}
+		
+		$OUT.=<<"+++";
+    <td><input style="width:125px;" type="button" class="button" value="View Log In Codes" onClick="viewLoginCodes($id);"></td>		
+</tr>
++++
+  	}
+}
+</table>
+</div>
+</fieldset>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>

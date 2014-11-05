@@ -1,0 +1,63 @@
+<tr>
+<td colspan=4><hr></td>
+</tr>
+<tr valign="middle">
+<td align="RIGHT"
+										 width="95">Add To Website:</td>
+<td align="LEFT">
+<select class="text_field" name="website_id" id="website_id" style="width:160px;">
+<option value="">None</option>
+{$c{website_options}}
+</select>
+</td>
+<td align="RIGHT" width="95">Subdomain:</td>
+<td align="LEFT">
+<input name="resourceshare_url" type="TEXT"
+										 class="text_field" id="resourceshare_url" style="width:160px;"
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 value="{$c{editorg}->resourceshare_url}">
+</td>
+</tr>
+{
+	if($c{editorg}->exists)
+	{
+		$OUT.=<<"+++";
+<tr valign="middle">
+<td align="RIGHT" width="95">Force Folder Creation? $test</td>
+<td align="LEFT">
+<input type="checkbox" value="y" name="force_folder_creation">
+</td>
+</tr>
++++
+	}
+}
+<tr valign="top">
+<td align="RIGHT"
+										 width="95">Initial Folder XML:</td>
+<td align="LEFT" colspan="3">
+{
+	$initial_xml=<<"+++";
+<top_folders access_code="hidden" access_control="blpdefault">
+	<folder title="BLP Lesson Plan" access_code="inherit"/>
+	<folder title="BLP Activity" access_code="inherit"/>
+	<folder title="General" access_code="inherit"/>
+	<folder title="Students' Work" access_code="inherit"/>
+	<folder title="Learning Enquiries" access_code="hidden"/>
+	<folder title="Wall Displays" access_code="inherit"/>
+	<folder title="Videos of BLP Lessons" access_code="inherit"/>
+	<folder title="Private: Investigations" access_code="hidden"/>
+	<folder title="Private: Other" access_code="hidden"/>
+</top_folders>
++++
+
+	if($c{params}->{folder_xml}=~/\w/)
+	{
+		$initial_xml = $c{params}->{folder_xml};
+	}
+	
+	$OUT.=<<"+++";
+	<textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="folder_xml" style="width:100%; height:80px;">$initial_xml</textarea>
++++
+}
+</td>
+</tr>

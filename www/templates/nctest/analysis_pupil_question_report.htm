@@ -1,0 +1,78 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+</script>
+<table border="0" cellspacing="1" cellpadding="5">
+  <tr>
+    <td width=400><b>Marking Analysis for {$c{exam}->get_fullname}<br>
+      <br>
+      {$c{pupil}->get_fullname}</b>
+      <br>
+      <br>
+      <input type="button" class="button" onClick="self.print();" value="Print">
+</td>
+  </tr>
+</table>
+
+<br>
+<table border=0>
+		<tr>
+		<td>
+<table border="0" cellpadding="3" cellspacing="1" bgcolor="#CCCCCC">
+  <tr align="right">
+    <td><strong>Question</strong></td>
+    <td><strong>Type</strong></td>
+    <td><strong>Real Answer</strong></td>
+    <td><strong>Given Answer</strong></td>
+    <td><strong>Marks</strong></td>
+  </tr>
+{
+	foreach my $question (@{$c{test}->ensure_child_array('question')})
+	{		
+		foreach my $sub_question (@{$question->ensure_child_array('sub_question')})
+		{
+			my $order = $question->numberorder.$sub_question->get_order_title;
+			
+			foreach my $input (@{$sub_question->ensure_child_array('question_input')})
+			{
+				my $answer = $input->ensure_child_array('answer')->[0];
+				
+				my $type = $input->answer_format_key;
+				my $real_answer = $input->answer;
+				my $qmarks = $input->marks;
+				
+				my $given_answer = '';
+				my $marks = 0;
+				
+				if($answer)
+				{
+					$given_answer = $answer->answer;
+					$marks = $answer->marks;
+				}
+				
+				my $bg = '#f0fff0';
+			
+				if($marks<=0) { $bg = '#fff0f0'; }
+			
+				$bg = ' bgcolor="'.$bg.'"';
+				
+				$marks = $marks.' / '.$qmarks;
+			
+				$OUT.=<<"+++";
+  <tr align="right"$bg>
+  	<td>$order</td>
+	<td>$type</td>
+     <td>$real_answer</td>
+    <td>$given_answer</td>
+    <td>$marks</td>
+  </tr>
++++
+			}
+		}
+	}
+}
+</table>
+<script>
+
+//// THE SUB QUESTION ID IS {$c{session}->{nctest_edit_sub_question_id}}
+</script>

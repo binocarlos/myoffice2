@@ -1,0 +1,296 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+var selected_id = null;
+var selected_mode = null;
+
+	function do_cancel()
+	\{
+		var cancel_method = '{$c{cancel_method}}';
+		
+		if(cancel_method!='')
+		\{
+			var new_loc = href + '&method=' + cancel_method;
+			
+			document.location = new_loc;
+		\}
+	\}
+
+	function select_user(users_id, tname, privmode)
+	\{
+		selected_id = users_id;
+		selected_mode = 'user';
+		
+		show_details_form(tname, privmode);
+	\}
+	
+	function select_client(org_id, tname)
+	\{
+		selected_id = org_id;
+		selected_mode = 'client';
+		
+		show_details_form(tname);
+		
+	\}
+	
+	function select_all_clients()
+	\{
+		selected_mode = 'all';
+		
+		show_details_form('All users from all clients');
+	\}
+	
+	function show_details_form(tname, selected)
+	\{
+		document.getElementById('privilage_name').innerText = tname;
+		
+		if(selected)
+		\{
+			document.getElementById('privilage_setting').value = selected;
+		\}
+		
+		document.getElementById('privilage_table').style.display = 'inline';
+	\}
+	
+	function cancel_details_form()
+	\{
+		document.getElementById('privilage_name').innerText = '';
+		document.getElementById('privilage_table').style.display = 'none';		
+	\}
+	
+	function apply_details_form()
+	\{
+		if(selected_mode=='all')
+		\{
+			apply_global_privilage_mode();
+		\}
+		else
+		\{
+			document.privilage_iframe.apply_details(selected_id, selected_mode, document.getElementById('privilage_setting').value);
+			document.getElementById('privilage_name').innerText = '';
+			document.getElementById('privilage_table').style.display = 'none';		
+		\}
+	\}
+	
+	function apply_global_privilage_mode()
+	\{
+		var newMode = document.getElementById('privilage_setting').value;
+		
+		document.privilage_iframe.apply_global_details(newMode);
+		
+		document.getElementById('privilage_name').innerText = '';
+		document.getElementById('privilage_table').style.display = 'none';		
+		
+	\}
+	
+	function validate_documentform()
+	\{
+		var ret = true;
+		var form = document.documentform;
+		var required_texts = new Array('title');
+		
+		if(document.privilage_iframe)
+		\{
+			form.privilage_map.value = document.privilage_iframe.getXmlPacket();
+		\}
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			\{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			\}
+		\}
+		
+		if(form.document_id.value=='')
+		\{
+			if(form.file.value=='')
+			\{
+				form_error('You must choose a file to upload');
+				ret = false;
+			\}
+		\}
+
+		if(ret)
+		\{
+			form_error('Uploading File...');
+		\}
+
+		return ret;
+	\}
+	
+	function showPrivTab()
+	\{
+		document.getElementById('mainhidetr').style.display = 'inline';
+	\}
+	
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+	\}
+
+</script>
+<style>
+.tab-page \{height:300px;width:540px;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="documentform" onSubmit="return validate_documentform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="privilage_map" value="">
+<input type="hidden" name="document_id" value="{$c{document}->get_id}">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+<TR id="form_tr" style="display: inline;">
+<TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+<table border="0" cellpadding="0" cellspacing="0" class="panelouter">
+<tr>
+<td>
+<table border="0" cellpadding="8" cellspacing="0" class="panelinner">
+<tr id="mainhidetr" style="display:none;">
+<td class="panelbody">
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">File Details</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Upload</legend>
+<div class="seccontent">
+<table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Title:&nbsp;</td>
+<td align="LEFT" width="100%"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="title" value="{$c{document}->get_value('title')}" style="width:100%;"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Upload&nbsp;File:&nbsp;</td>
+<td align="LEFT"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="file" name="file" value="{$c{params}->{file}}" style="width:100%;"></td>
+</tr>
+<tr valign="top">
+<td align="RIGHT" style="padding-top:4px;">Notes:&nbsp;</td>
+<td align="LEFT" colspan="3">
+<textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="textarea" style="width:100%; height:160px;">{$c{document}->get_value('notes')}</textarea>
+</td>
+</tr>
+</table>
+</div>
+</fieldset>
+</div>
+{
+	if($c{show_access_control})
+	{
+		my $doc_id = $c{document}->get_id;
+		
+		$OUT.=<<"+++";
+<div class="tab-page" id="tabPage2">
+<h2 class="tab"  id="tabShow2">Access Control</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage2" ) );</script>
+<fieldset>
+<legend>Privileges</legend>
+<div class="seccontent">
+<table border="0" cellpadding="0" cellspacing="0" width="96%" align="center">
+<tr>
+<td colspan=2>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr valign="top">
+<td align="left" width="200">
+<iframe name="privilage_iframe" id="privilage_iframe" width="200" height="100%" scrolling="auto" FRAMEBORDER="1" src="$c{href}&method=documents_privilage_tree&document_id=$doc_id"></iframe>
+</td>
+<td width="20"></td>
+<td>
+<table id="privilage_table" style="display:none;" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr style="padding-bottom:5px;">
+<td align="right">Apply&nbsp;to:&nbsp;</td>
+<td width="100%"><span id="privilage_name"></span></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="right">Access:&nbsp;</td>
+<td><select name="privilage_setting" id="privilage_setting" size="1" style="width:100%;" class="text_field">
+<option value="rw">Read/Write</option>
+<option value="ro" selected>Read Only</option>
+<option value="none">No Access</option>
+</select></td>
+</tr>
+<tr align="right">
+<td colspan="2"><input type="button" value="Apply" class="button" style="width:75px" name="Button2" onClick="apply_details_form();"><img src="/images/holiday/clear.gif" width="8" height="1" border="0"><input type="button" value="Cancel" class="button" style="width:75px" onClick="cancel_details_form();">
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td></tr>
+</table>
+</div></fieldset>
+<br>
+<fieldset>
+<legend>Key</legend>
+<div class="seccontent">
+<table border="0" cellpadding="4" cellspacing="0" width="95%" align="center">
+<tr>
+<td colspan=2>
+<table width="100%" border="0" cellspacing="0" cellpadding="2">
+<tr align="center" valign="middle">
+<td width="33%"><img src="/images/fileshare/user_none.gif" width="16" height="16" align="absmiddle"> - No Access</td>
+<td width="33%"><img src="/images/fileshare/user_ro.gif" width="16" height="16" align="absmiddle"> - Read Only</td>
+<td width="33%"><img src="/images/fileshare/user_rw.gif" width="16" height="16" align="absmiddle"> - Read/Write</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+</fieldset>
+</div>
+
++++
+	}
+}
+</div>
+<img src="/images/holiday/clear.gif" width="1" height="8" border="0"><br>
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="100%">
+<tr>
+<td align="LEFT" valign="TOP"><font color="red"><b id="error_span">{$c{document}->{error_text}}</b></font></td>
+<td align="RIGHT" valign="TOP">
+<input type="submit" value="{$c{submit_title}}" class="button" name="submit"><img src="/images/holiday/clear.gif" width="8" height="1" border="0"><input type="button" value="Cancel" class="button" name="Button" onClick="do_cancel();" style="width:75px;">
+</td>
+</tr>
+</table>
+</td>
+</tr>
+				 
+</table>
+</td>
+</tr>
+			
+</table>
+</TD>
+		</TR>
+	 </TABLE>
+</form>
+
+<script>
+		setupAllTabs();
+		
+{
+	if(!$c{show_access_control})
+	{
+		$OUT.=<<"+++";
+document.getElementById('mainhidetr').style.display = 'inline';
++++
+	}
+}
+</script>
+
+

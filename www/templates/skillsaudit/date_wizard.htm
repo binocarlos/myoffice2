@@ -1,0 +1,38 @@
+
+<script>
+	var giMinYear = 2004;
+	var giMaxYear = 2010;
+</script>
+
+
+ The following table shows when audits were taken:<br>
+<br>     
+<input type="button" class="htmlbutton" value="Back" onClick="parent.title.submitFilterForm();">
+<br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#CCCCCC">
+  <tr>
+    <td width="120"><strong>Date</strong></td>
+    <td><strong>Audits Taken </strong></td>
+  </tr>
+{
+	foreach my $ref (@{$c{refs}})
+	{
+		my $date_string = $ref->{date_string};
+		my $count = $ref->{count};
+		
+		$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF">
+    <td>$date_string</td>
+    <td align="right"><b style="color:red;">$count</b></td>
+  </tr>
++++
+	}
+}
+</table>
+{$c{calendar}}
+</body>
+</html>
+
+
+

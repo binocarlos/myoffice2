@@ -1,0 +1,66 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+{$c{wddx}}
+
+var currentBudgetId = null;
+
+function showBudget(budget_id)
+\{
+	currentBudgetId = budget_id;
+	
+	var budget_obj = budget[budget_id];
+	
+	document.getElementById('budget_name').innerText = budget_obj.name;
+	document.getElementById('budget_table').style.display = 'inline';
+\}
+
+function hideBudget()
+\{
+	document.getElementById('budget_table').style.display = 'none';
+\}
+
+</script>
+	
+<body bgcolor="#FFFFFF" text="#000000">
+<table border="0" cellspacing="1" cellpadding="0">
+<tr>
+<td class="tiny8">
+<a onClick="parent.parent.budgetHub_get_query('&method=create_new_budget');">
+<img src="/images/nav/plus.gif" width="9" height="9" align="absmiddle"> <b>Create New Budget
+</b></a>
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<table id="budget_table" style="display:none;" width="100%" border="0" cellspacing="0" cellpadding="1">
+<tr>
+<td colspan="2">Selected Budget</td>
+</tr>
+<tr>
+<td width="39%">Name</td>
+<td width="61%"><span id="budget_name"></span></td>
+</tr>
+<tr>
+<td width="39%">&nbsp;</td>
+<td width="61%">&nbsp;</td>
+</tr>
+<tr>
+<td width="39%">&nbsp;</td>
+<td width="61%">&nbsp;</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<script>
+var new_loc = href + '&method=home_page';
+
+parent.page.location = new_loc;
+
+</script>
+
+</body>

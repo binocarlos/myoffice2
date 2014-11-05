@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+
+function select_list(id, name)
+\{
+	parent.list_selected(id, name);
+\}
+
+{
+	my $tree_title = $c{org}->get_value('name').' Email Lists';
+	
+	$OUT.=<<"+++";
+	
+var list_array = new Array();
+
+function add_list(id, name)
+\{
+	var list = new Object();
+	list.id = id;
+	list.name = name;
+	
+	list_array[list_array.length] = list;
+\}
+
+function get_list_array()
+\{
+	return list_array;
+\}
+
+var rootfolder = new WebFXTree('$tree_title');
+
+rootfolder.setBehavior('explorer');
++++
+
+	my $list_arr = $c{list_array};
+
+	foreach my $list (@$list_arr)
+	{
+		$OUT.=$list->get_xtree_js('rootfolder', 1);
+	}
+}
+
+var tree_string = rootfolder.toString();
+
+document.write(tree_string);
+
+rootfolder.collapseAll();
+rootfolder.expand();
+
+</script>
+
+
+

@@ -1,0 +1,288 @@
+<body>
+	 <script>
+	 	function link_to_day(day, month, year)
+		\{
+			var href = '{$c{href}}&method=view_day&view_day_date=' + day + '&view_day_month=' + month + '&view_day_year=' + year;
+
+			document.location = href;
+		\}
+
+		function add_owed_days()
+		\{
+			openWindow('{$c{href}}&method=add_owed_days&user_id={$c{viewuser}->{id}}', 400, 250);
+		\}
+	</script>
+	 <FORM>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%"><TR><TD WIDTH="100%" ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+<TD COLSPAN="7" HEIGHT="7">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP" HEIGHT="100%" WIDTH="100%">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"
+ CLASS="panelouter" HEIGHT="100%" WIDTH="100%">
+<TR>
+<TD HEIGHT="100%">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0"
+ CELLSPACING="0" CLASS="panelinner" HEIGHT="100%">
+<TR>
+<TD CLASS="panelbody" HEIGHT="100%">
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0"
+ HEIGHT="100%" WIDTH="100%">
+<TR>
+<TD ALIGN="CENTER" VALIGN="TOP"
+  HEIGHT="100%">
+<TABLE BORDER="0" CELLPADDING="0"
+ CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD COLSPAN="2"
+  ALIGN="LEFT" BACKGROUND="/images/holiday/panelt.gif" HEIGHT="13"><IMG
+src="/images/holiday/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13"
+ALIGN="ABSMIDDLE"><FONT CLASS="section_title">&nbsp;Employee
+Details&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13"
+  VALIGN="TOP"><IMG src="/images/holiday/paneltr.gif" BORDER="0"
+WIDTH="2" HEIGHT="13"></TD>
+</TR>
+<TR>
+<TD WIDTH="2"
+  BACKGROUND="/images/holiday/panell.gif"><IMG src="/images/holiday/clear.gif"
+WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+<TD WIDTH="100%" HEIGHT="100%"
+  ALIGN="LEFT" VALIGN="TOP">
+<TABLE BORDER="0" CELLPADDING="8" CELLSPACING="0">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">Name:&nbsp; &nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">{$c{usertitle}}</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">Department:&nbsp; &nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">{$c{depttitle}}</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">Employee Number:&nbsp; &nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">{$c{number}}</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">Type:&nbsp; &nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">{$c{typetitle}}</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">Work Weekends:&nbsp; &nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">{$c{weekends}}</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP">Holiday Allowance:&nbsp; &nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP">{$c{allow}} Days</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+<TD WIDTH="2"
+  BACKGROUND="/images/holiday/panelr.gif"><IMG src="/images/holiday/clear.gif"
+WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+</TR>
+<TR>
+<TD HEIGHT="2" COLSPAN="3"
+  BACKGROUND="/images/holiday/panelb.gif" ALIGN="RIGHT"><IMG
+src="/images/holiday/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+{
+	my $owed_dis = 'inline';
+	my $edit_dis = 'inline';
+
+	if(!$c{user}->admin)
+	{
+		if($c{viewuser}->get_id!=$c{user}->get_id)
+		{
+			$edit_dis = 'none';
+		}		
+		
+		$owed_dis = 'none';		
+	}
+	
+	my $user_id = $c{viewuser}->get_id;
+
+	$OUT.=<<"+++";
+<TR>
+<TD ALIGN="RIGHT">
+<INPUT TYPE="BUTTON"
+NAME="button1" VALUE="Add Owed Days" CLASS="button" style="display:$owed_dis;" onClick="document.location='$c{href}&method=edit_user&object_id=$user_id&owed_focus=1';">
+<IMG
+src="/images/holiday/clear.gif" WIDTH="8" HEIGHT="8" BORDER="0"
+ALIGN="ABSMIDDLE">
+<INPUT TYPE="BUTTON" NAME="button1" VALUE="Edit Employee"
+CLASS="button" onClick="document.location='$c{href}&method=edit_user&object_id=$user_id';" style="display:$edit_dis;">
+</TD>
+</TR>
++++
+}
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+<TD WIDTH="10"><IMG src="/images/holiday/clear.gif" WIDTH="10"
+HEIGHT="1" BORDER="0"></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" HEIGHT="100%">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"
+ CLASS="panelouter" HEIGHT="100%">
+<TR>
+<TD HEIGHT="100%" valign="top">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0"
+ CELLSPACING="0" CLASS="panelinner" HEIGHT="100%">
+<TR>
+<TD CLASS="panelbody" HEIGHT="100%" valign="top">
+<table border="0" cellpadding="5" cellspacing="0"
+ height="100%" width="100%">
+<tr>
+<td align="CENTER" valign="TOP"
+  height="100%">
+<table border="0" cellpadding="0"
+ cellspacing="0" width="200">
+<tr>
+<td colspan="2"
+  align="LEFT" background="/images/holiday/panelt.gif" height="13"><img
+src="/images/holiday/paneltl.gif" border="0" width="7" height="13"
+align="ABSMIDDLE"><font class="section_title">&nbsp;Summary&nbsp;</font></td>
+<td width="2" height="13"
+  valign="TOP"><img src="/images/holiday/paneltr.gif" border="0"
+width="2" height="13"></td>
+</tr>
+<tr>
+<td width="2" background="/images/holiday/panell.gif"><img src="/images/holiday/clear.gif" width="2" height="1" border="0"></td>
+<td width="100%" height="100%" align="LEFT" valign="TOP">
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tr>
+<td align="LEFT" valign="TOP">
+<table width="100%" border="0" cellpadding="0" cellspacing="2">
+{
+	foreach my $reason (keys %{$c{reason_hash}})
+	{
+		my $tl = $c{reason_hash}->{$reason};
+		my $bg = $c{color_hash}->{$reason};
+		my $ct = $c{viewuser}->get_holiday_count($reason);
+
+		$OUT.=<<"+++";
+<tr>
+<td width="13" bgcolor="$bg"></td>
+<td width="1"></td>
+<td align="left" valign="TOP">$tl</td>
+<td width="50" align="RIGHT" valign="TOP">$ct Days</td>
+</tr>
++++
+
+
+
+	}
+}
+</table>
+<img src="/images/holiday/clear.gif" width="1" height="5" border="0"><br>
+<table width="100%" border="0"
+		 cellpadding="0" cellspacing="2">
+<tr>
+<td align="LEFT"
+			  valign="TOP" width="113">Currently Owed</td>
+<td width="50"
+			  align="RIGHT" valign="TOP">{$c{owed}} Days</td>
+</tr>
+<tr>
+<td align="LEFT"
+			  valign="TOP" width="113">Holidays Remaining</td>
+<td width="50"
+			  align="RIGHT" valign="TOP">{$c{left}} Days</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+<td width="2"
+  background="/images/holiday/panelr.gif"><img src="/images/holiday/clear.gif"
+width="2" height="1" border="0"></td>
+</tr>
+<tr>
+<td height="2" colspan="3"
+  background="/images/holiday/panelb.gif" align="RIGHT"><img
+src="/images/holiday/panelbr.gif" border="0" width="2" height="2"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD COLSPAN="7" HEIGHT="10"></TD>
+</TR>
+<TR>
+
+{
+	for(my $i=1; $i<=12; $i++)
+	{
+		my $cal = $c{org}->get_month_calendar($i, $c{year}, 1);
+		my $html = $cal->as_HTML;
+		$OUT.=<<"+++";
+<TD ALIGN="LEFT" VALIGN="TOP" HEIGHT="100%">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" HEIGHT="100%">
+<TR>
+<TD HEIGHT="100%" VALIGN="TOP"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelinner" HEIGHT="100%">
+<TR>
+<TD CLASS="panelbody" HEIGHT="100%" VALIGN="TOP">$html</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE></TD>
++++
+		if(($i==4)||($i==8))
+		{
+			$OUT.=<<"+++";
+</tr>
+
+<tr>
+<TD COLSPAN="7" HEIGHT="7"></TD>
+</tr>
+<tr>
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+<td width=7></td>
++++
+		}
+	}
+}
+
+
+
+</TR>
+</TABLE>
+</TD></TR></TABLE>
+<script>
+{$c{top_js}}
+</script>
+</FORM> </BODY>
+</HTML>

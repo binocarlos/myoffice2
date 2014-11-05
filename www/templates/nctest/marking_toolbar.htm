@@ -1,0 +1,359 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<script>
+	var examLogins = new Object();
+	var examLoginArray = new Array();
+	var totalTogo = 0;
+	
+	var loaded = true;
+	
+	var statements = new Object();
+	var answerFormats = new Object();
+	var users = new Object();
+	
+	answerFormats['_manual'] = 'Manually Marked';
+	
+	var currentInput = null;
+	
+	var topic;
+	var level;
+	var type;
+	var marked;
+	var marksSpan;
+	var markedBy;
+	
+	function newStatement(id, subject, code)
+	\{
+		var statement = new Object();
+		statement.id = id;
+		statement.subject = subject;
+		statement.code = code;
+		
+		statements[statement.id] = statement;
+	\}
+	
+	function newAnswerFormat(key, title)
+	\{
+		answerFormats[key] = title;
+	\}
+	
+	function newUser(id, name)
+	\{
+		users[id] = name;
+	\}
+	
+	function newExamLogin(loginId, pupilId, pupilName, togo)
+	\{
+		var login = new Object();
+		login.id = loginId;
+		login.pupilId = pupilId;
+		login.pupilName = pupilName;
+		login.togo = togo;
+		
+		totalTogo += login.togo;
+		
+		examLogins[login.id] = login;
+		examLoginArray[examLoginArray.length] = login;
+	\}
+	
+	function markedExamLoginAnswer(loginId)
+	\{
+		var login = examLogins[loginId];
+		
+		login.togo -= 1;
+		
+		var sel = document.getElementById('exam_login_id');
+		
+		var opt = sel.options.item(login.optionIndex);
+		
+		opt.text = 'Pupil ' + (login.optionIndex+1) + ' - (' + login.togo + ' togo)';		
+	\}
+	
+	function createLoginOptions()
+	\{
+		var sel = document.getElementById('exam_login_id');
+		
+		for(var i=0; i<examLoginArray.length; i++)
+		\{
+			var login = examLoginArray[i];
+			
+			login.optionIndex = i;
+			
+			var optionText = 'Pupil ' + (i+1) + ' - (' + login.togo + ' togo)';
+			
+{
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+			optionText = login.pupilName;
++++
+	}
+}
+
+			var elem = document.createElement("OPTION");
+			elem.text = optionText;
+			elem.value = login.id;
+			
+			sel.options.add(elem);
+		\}
+	\}
+	
+	function setInput(markingInput)
+	\{
+		if(currentInput)
+		\{
+			if(currentInput.id==markingInput.id) \{ return; \}
+		\}
+		
+		currentInput = markingInput;
+		
+		if(currentInput.statementId>0)
+		\{
+			var statement = statements[currentInput.statementId];
+			
+			topic.innerText = statement.subject;
+			level.innerHTML = statement.code
+			+ ' - <a style="cursor:hand;text-decoration:underline; color:#0000FF" onClick="viewStatement(' + statement.id + ');">'
+			+ 'View</a>';
+		\}
+		else
+		\{
+			topic.innerText = currentInput.topic;
+			level.innerText = currentInput.level;
+		\}
+		
+		type.innerText = answerFormats[currentInput.answerFormat];
+		
+		if(currentInput.markedDate)
+		\{
+			marked.innerText = currentInput.markedDate;
+			var users_id = currentInput.markedBy;
+			
+			if(users_id)
+			\{
+				var name = users[users_id];
+				
+				markedBy.innerText = name;
+			\}
+			else
+			\{
+				markedBy.innerText = 'Auto';
+			\}
+		\}
+		else
+		\{
+			marked.innerHTML = '<b style="color:red;">No</b>';
+			markedBy.innerText = '';
+		\}
+		
+		var optionsSt = '<option value="n">Select Mark</option>';
+		
+		for(var m=0; m<=currentInput.totalMarks; m+=0.5)
+		\{
+			var sel = '';
+			
+			if(currentInput.markedDate)
+			\{
+				if(m==currentInput.marks)
+				\{
+					sel = ' SELECTED';
+				\}
+			\}
+			
+			optionsSt += '<option value="' + m + '"' + sel + '>' + m + '</option>';
+		\}
+		
+		var marksSel = '<select id="marksSelect" name="marksSelect" class="text_field" style="width:80px; height:16px;" onChange="applyMarks();">';
+		marksSel += optionsSt + '</select>';
+		
+		marksSpan.innerHTML = marksSel;
+	\}
+	
+	function resetInput()
+	\{
+		topic.innerText = '';
+		level.innerText = '';
+		type.innerText = '';
+		marked.innerText = '';
+		markedBy.innerText = '';
+		marksSpan.innerText = '';
+		changed = false;
+		
+		currentInput = null;
+	\}
+	
+	function viewStatement(id)
+	\{
+		var loc = '{$c{href}}&method=view_statement_of_ability&statement_id=' + id;
+		var width = 500;
+		var height = 350;
+		
+		var props = 'center:yes;status:no;resizable:no;dialogWidth:' + width + 'px;dialogHeight:' + height + 'px;help:no;scroll:no;status:no;';
+
+		window.showModalDialog(loc, '', props);
+	\}
+	
+	function applyMarks()
+	\{
+		if(!currentInput) \{ return; \}
+		
+		var marksVar = document.getElementById('marksSelect').value;
+		
+		if(marksVar!='n')
+		\{
+			parent.content.applyMarkingInput(currentInput.id, marksVar);
+		\}
+	\}
+	
+	function setLoaded(val)
+	\{
+		loaded = val;		
+	\}
+
+	function loginChanged()
+	\{
+		if(!loaded) \{ return; \}
+		
+		var elem = document.getElementById('exam_login_id');
+
+		top.content.page.content.gotoExamLogin(elem.value);
+	\}
+	
+	function prevLogin()
+	\{
+		if(!loaded) \{ return; \}
+			
+		var elem = document.getElementById('exam_login_id');
+		
+		if(elem.selectedIndex==0) \{ return; \}
+		
+		elem.selectedIndex--;
+		
+		loginChanged();	
+	\}
+	
+	function nextLogin()
+	\{
+		if(!loaded) \{ return; \}
+			
+		var elem = document.getElementById('exam_login_id');
+		
+		if(elem.selectedIndex>=elem.options.length-1) \{ return; \}
+		
+		elem.selectedIndex++;
+		
+		loginChanged();
+	\}
+		
+	function initInputs()
+	\{
+		topic = document.getElementById('topic');
+		level = document.getElementById('level');
+		type = document.getElementById('type');
+		marked = document.getElementById('marked');
+		marksSpan = document.getElementById('marksSpan');
+		markedBy = document.getElementById('marked_by');
+	\}
+
+{	
+	foreach my $exam_login (@{$c{exam}->ensure_child_array('exam_login')})
+	{
+		my $togo = $exam_login->unmarked_manual_answers;
+		my $pupil_id = $exam_login->pupil_id;
+		my $id = $exam_login->get_id;
+		
+		my $pupil = $c{exam}->get_child('pupil', $exam_login->pupil_id);
+		my $pupil_name = $pupil->get_fullname;
+		
+		$OUT.=<<"+++";
+newExamLogin($id, $pupil_id, '$pupil_name', $togo);
++++
+	}
+	
+	my $format_hash = Webkit::NcTest::AnswerFormat->get_all_format_title_hash;
+	
+	foreach my $key (keys %$format_hash)
+	{
+		my $title = $format_hash->{$key};
+		
+		$OUT.=<<"+++";
+newAnswerFormat('$key', '$title');		
++++
+	}
+	
+	foreach my $statement (@{$c{statements}})
+	{
+		my $id = $statement->get_id;
+		my $subject = $statement->subject_id;
+		my $code = $statement->code;
+		
+		$OUT.=<<"+++";
+	newStatement($id, '$subject', '$code');	
++++
+	}
+	
+	foreach my $user (@{$c{org}->ensure_child_array('users')})
+	{
+		my $id = $user->get_id;
+		my $name = $user->get_fullname;
+		
+		$OUT.=<<"+++";
+	newUser($id, '$name');	
++++
+	}
+}
+</script>
+  <link href="/lib/nctest/marking_toolbar.css" rel="stylesheet" type="text/css">
+</HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+  <TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="top" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+  <tr>
+  <td align="center" style="border-bottom:1px #808080 solid; height:31px;"><table cellpadding="0" cellspacing="0" border="0">
+	<tr>
+	<td width="250" nowrap><b>{$c{exam}->name}</b> - <b style="color:red;">{$c{total_pupils}}</b> Pupils - <b style="color:red;" id="totalTogo"><script>document.write(totalTogo);</script></b> Answers Left</td>
+	<td><a style="cursor:hand;" onClick="prevLogin();"><img src="/images/nctest/marking/prev_but.gif" border="0"></a></td>
+	<td><select id="exam_login_id" name="exam_login_id" class="text_field" style="height:20px;width:130px;" onChange="loginChanged();"></select></td>
+	<td><a style="cursor:hand;" onClick="nextLogin();"><img src="/images/nctest/marking/next_but.gif" border="0"></a></td>
+	</tr>
+      </table></td>
+  </tr>
+  <tr>
+  <td align="center" style="border-top:1px #FFFFFF solid;"><table border="0" cellspacing="0" cellpadding="2" id="inputTable">
+      <tr height="21">
+        <td nowrap>Topic:</td>
+        <td id="topic" width="130" nowrap>&nbsp;</td>
+        <td nowrap>Type:</td>
+        <td id="type" width="130" nowrap>&nbsp;</td>
+      </tr>
+      <tr height="21">
+        <td nowrap>Level/Statement:</td>
+        <td id="level" width="130" nowrap>&nbsp;</td>
+        <td nowrap>Marked:</td>
+        <td id="marked" width="130" nowrap>&nbsp;</td>
+      </tr>
+      <tr height="23">
+        <td nowrap>Marks:</td>
+        <td width="130" nowrap><span id="marksSpan"></span></td>
+        <td nowrap>Marked By:</td>
+        <td id="marked_by" width="130" nowrap>&nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+  </table>
+      
+      
+      
+     
+ 
+      </TD>
+  </TR>
+</TABLE>
+<script>
+createLoginOptions();
+initInputs();
+</script>
+</BODY>
+</HTML>

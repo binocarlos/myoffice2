@@ -1,0 +1,27 @@
+<style type="text/css">
+body \{background:#FFFFFF; margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+</style>
+<span id="loading_table">
+<TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+<TABLE WIDTH="110" HEIGHT="55" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="BACKGROUND-COLOR:#D4D0C8; BORDER-BOTTOM:#404040 solid 1px; BORDER-LEFT:#D4D0C8 solid 1px; BORDER-RIGHT:#404040 solid 1px; BORDER-TOP: #D4D0C8 solid 1px;">
+<TR>
+<TD ALIGN="CENTER" VALIGN="MIDDLE" STYLE="BORDER-BOTTOM: #808080 solid 1px; BORDER-LEFT: #FFFFFF solid 1px; BORDER-RIGHT: #808080 solid 1px; BORDER-TOP:  #FFFFFF solid 1px; font-family:tahoma,verdana,arial; font-size:11px;"><B>Loading...</B></TD>
+</TR>
+</TABLE>
+</TD></TR></TABLE>
+</span>
+<script>
+if(document.all('loading_table'))
+\{
+	document.all('loading_table').style.width = document.body.clientWidth - 20;
+	document.all('loading_table').style.height = document.body.clientHeight - 30;
+\}
+
+function hide_loading_table()
+\{
+	if(document.all('loading_table'))
+	\{
+		document.all('loading_table').style.display = 'none';
+	\}
+\}
+</script>

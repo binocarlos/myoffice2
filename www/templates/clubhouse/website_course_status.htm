@@ -1,0 +1,80 @@
+{
+	my $src = '/wk/images/clubhouse/sign_open.gif';
+
+	my $status = $c{org}->get_course_status;
+	my $modified_title = $c{org}->get_course_status_modified_title;
+
+	if($status ne 'open')
+	{
+		$src = '/wk/images/clubhouse/sign_closed.gif';
+	}
+
+	$OUT.=<<"+++";
+<IMG SRC="/wk/images/clubhouse/title_thecourseis.gif" WIDTH="107" HEIGHT="12" BORDER="0"><BR><IMG SRC="$src" WIDTH="149" HEIGHT="74" BORDER="0"><BR>
++++
+
+
+	if($status ne 'open')
+	{
+		my $reason = $c{org}->get_closed_reason;
+
+		$OUT.=<<"+++";
+<table border="0" cellspacing="2" cellpadding="0" id="openTable" align="center">
+  <tr>
+  <tr>
+		<td>Reason:<br>
+$reason</td>
+</tr>
+  <tr>
+		<td style="padding-top:10px" align="center" nowrap>$modified_title</td>
+	</tr>
+</table>
++++
+	}
+	else
+	{
+		my $trolleys = $c{org}->get_course_status_checkbox('trolleys', 1);
+		my $power_caddies = $c{org}->get_course_status_checkbox('power_caddies', 1);
+		my $buggies = $c{org}->get_course_status_checkbox('buggies', 1);
+		my $exemption = $c{org}->get_course_status_checkbox('exemption', 1);
+		my $temp_greens = $c{org}->get_course_status_input('temp_greens', 1);
+		my $temp_tees = $c{org}->get_course_status_input('temp_tees', 1);
+		my $reason = $c{org}->get_closed_reason;		
+
+		$OUT.=<<"+++";
+<table border="0" cellspacing="2" cellpadding="0" id="openTable" align="center">
+  <tr>
+    <td>$trolleys</td>
+    <td>&nbsp;Trolleys</td>
+  </tr>
+  <tr>
+    <td>$power_caddies</td>
+    <td>&nbsp;Power&nbsp;Caddies</td>
+  </tr>
+  <tr>
+    <td>$buggies</td>
+    <td>&nbsp;Buggies</td>
+  </tr>
+  <tr>
+    <td>$exemption</td>
+    <td>&nbsp;Exemption&nbsp;(Medical&nbsp;Cert.)</td>
+  </tr>
+  <tr>
+    <td>$temp_greens</td>
+    <td>&nbsp;Temporary&nbsp;Greens</td>
+  </tr>
+  <tr>
+    <td>$temp_tees</td>
+    <td>&nbsp;Temporary&nbsp;Tees</td>
+  </tr>
+  <tr align="left">
+		<td colspan="2" style="padding-top:10px">$reason</td>
+</tr>  
+  <tr>
+		<td colspan="2" style="padding-top:10px" align="center" nowrap>$modified_title</td>
+</tr>
+</table>
+
++++
+	}
+}

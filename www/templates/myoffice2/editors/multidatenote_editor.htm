@@ -1,0 +1,186 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var giMinYear = 2000;
+
+	var giMaxYear = 2020;
+	
+	var dateArray = new Array();
+	
+	if(top.dialogArguments!=null)
+	\{
+		for(var i=0; i<top.dialogArguments.length; i++)
+		\{
+			dateArray[i] = top.dialogArguments[i];
+		\}
+	\}
+
+	function addDate()
+	\{
+		var value = document.getElementById('date').value;
+		var note = document.getElementById('notes').value;
+		
+		if(value=='') \{ value = 'n/a'; \}	
+		
+		var newObj = new Object();
+		newObj.date = value;
+		newObj.note = note;
+		
+		dateArray[dateArray.length] = newObj;
+		writeDateTable();
+		
+		document.getElementById('notes').value = '';
+	\}
+	
+	function deleteDate(index)
+	\{
+		var newArr = new Array();
+		
+		for(var i=0; i<dateArray.length; i++)
+		\{
+			if(i!=index)
+			\{
+				newArr[newArr.length] = dateArray[i];
+			\}		
+		\}
+
+		dateArray = newArr;
+		writeDateTable();		
+	\}
+
+	function writeDateTable()
+	\{
+		var html = '<table border=0 cellpadding=3 cellspacing=0 width=96%>';
+		
+		for(var i=0; i<dateArray.length; i++)
+		\{
+			var ref = dateArray[i];
+			
+			html += '<tr><td width=100 valign=top>' + ref.date + '</td><td width=60 valign=top><a href="javascript:deleteDate(' + i + ');"><img src="/images/icons/16/recyclebin.gif" width="16" height="16" border=0></a></td><td>' + ref.note + '</td></tr>';
+		\}
+		
+		html += '</table>';
+		
+		document.getElementById('dateSpan').innerHTML = html;
+	\}
+	
+	function returnValue()
+	\{
+		top.returnValue = dateArray;
+		top.close();
+	\}
+</script>
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}>
+<tr>
+<td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} align="center" valign="top">
+<style>
+.tab-page \{height:100%;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+{Webkit::Browser->if_not_mac('<script type="text/javascript" src="/lib/tabpane.js"></script>')}
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}><tr><td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Edit Dates</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Add Date</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Add Date</u><br><br>
++++
+}
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT">Add Date:&nbsp;</td>
+<td align="LEFT"><input name="date" type="TEXT" class="text_field" id="date" style="width:100px;" value="{Webkit::Date->now->get_string}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+<td align="LEFT" width=30></td>
+<td align="LEFT"><input type="button" name="Button" value="Add" class="button" onClick="addDate();"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+  <td colspan="5" align="RIGHT" height=10></td>
+  </tr>
+<tr style="padding-bottom:5px;">
+  <td colspan="5" align="RIGHT"><textarea name="notes" id="notes" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:260px; height:80px;"></textarea></td>
+</tr>
+</table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
++++
+}
+
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Current Dates</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Current Dates</u><br><br>
++++
+}
+
+<span id="dateSpan"></span>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+</div>
+</div>
++++
+}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="button" value="OK" CLASS="button2" style="width:75px;" onClick="returnValue();">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</table>
+
+
+
+
+</td>
+</tr>
+</table>
+<script>	
+		{Webkit::Browser->if_not_mac('setupAllTabs();')}
+		writeDateTable();
+</script>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

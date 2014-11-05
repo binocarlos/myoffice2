@@ -1,0 +1,283 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	var tourdateCount = {$c{showing}->get_child_count('tourdate')};
+	
+	function tourChanged()
+	\{
+		alert('Warning - if you change the tour for this visit, it will be removed from any print runs it is assigned to.');
+	\}
+	
+	function tourTypeChange()
+	\{
+		var type = document.tour_form.type.value;
+		
+		var display = 'none';
+		var countryDisplay = 'inline';
+		
+		if(type=='combined')
+		\{
+			display = 'inline';
+			countryDisplay = 'none';
+		\}
+		
+		document.getElementById('combinedSpan').style.display = display;
+		document.getElementById('countryTr').style.display = countryDisplay;
+	\}
+	
+	function deleteTourdate(id)
+	\{
+		if(tourdateCount==1)
+		\{
+			deleteVisit();
+			return;
+		\}
+		
+		if(window.confirm('Are you sure that you want to remove this one show from the visit?'))
+		\{
+			document.location = href + '&method=showing_delete_tourdate_submit&tourdate_id=' + id;
+		\}
+	\}
+	
+	function failBooking()
+	\{
+		if(window.confirm('Are you sure that you want to fail this booking?'))
+		\{
+			document.location = href + '&method=showing_fail_showing_submit&showing_id={$c{showing}->get_id}';
+		\}
+	\}	
+	
+	function deleteVisit()
+	\{
+		if(window.confirm('Are you sure that you want to remove this visit and all of it\'s data?'))
+		\{
+			document.location = href + '&method=showing_delete_showing_submit&showing_id={$c{showing}->get_id}';
+		\}
+	\}
+</script>
+<body>
+<form action="{$c{script}}" method="POST" name="tour_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="showing_form_submit">
+<input type="hidden" name="showing_id" value="{$c{showing}->get_id}">
+<table cellpadding="10" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="50%" height="100%" align="center" valign="top">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Visit Details</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Visit Details</u><br>
+<br>
++++
+}
+
+<TABLE width="96%" BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Venue:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+{$c{venue}->get_city_title}    </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;display:inline;" id="countryTr">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Tour:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="tour_id" class="text_field" id="tour_id" style="width:100%;" onChange="tourChanged();">{$c{org}->get_normal_tour_options($c{showing}->tour_id)}</select>
+    </TD>
+  </TR>
+</TABLE>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+<br>
+<fieldset style="height:100%;">
+<legend>Dates and times </legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<br>
+<u>Dates and times</u><br>
+<br>
++++
+}
+
+
+<TABLE width="96%" BORDER="0" CELLPADDING="3" CELLSPACING="0">
+{
+	foreach my $tourdate (@{$c{showing}->ensure_child_array('tourdate')})
+	{
+		my $date = $tourdate->date->get_string;
+		my $hour = $tourdate->time->Hour;
+		my $min = $tourdate->time->Min;
+		my $id = $tourdate->get_id;
+		
+		$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;"> 
+        <td align="RIGHT"> Date:&nbsp;</td>
+        <td align="LEFT"><input name="date$id" type="TEXT" class="text_field" id="date$id" style="width:100px;" value="$date"></td>
++++
+	
+		$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+        <td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('date$id'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+
+		$OUT.=<<"+++";
+        <td align="LEFT" width=30></td>
+        <td align="LEFT">Time:</td>
+        <td align="LEFT"><input name="hour$id" type="TEXT" class="text_field" id="hour$id" style="width:25px;text-align:right;" value="$hour"></td>
+        <td width=10 align=center><b>:</b></td>
+        <td align="LEFT"><input name="min$id" type="TEXT" class="text_field" id="min$id" style="width:25px;text-align:right;" value="$min"></td>
+      <td align="LEFT"><a href="javascript:deleteTourdate($id);"><img src="/images/icons/24x24/delete2.gif" width="24" height="24" border=0></a></td>
+</tr> 
++++
+	}
+}
+</TABLE>
+
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset><br>
+<fieldset style="height:100%;">
+<legend>Website Info</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<br>
+<u>Website Info</u><br>
+<br>
++++
+}
+
+<TABLE width="96%" BORDER="0" CELLPADDING="3" CELLSPACING="0">
+<TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>On Sale:
+    	<input name="onsale" type="CHECKBOX" id="onsale" value="y" {$OUT.=$c{showing}->radio_checked('onsale', 'y')}>
+    	(this activates the link to the URL - otherwise enter an on sale date)
+    	</TD>
+    </TR> 
+    <TR style="padding-bottom:5px;"> 
+<td align="LEFT">On Sale Date: <input name="onsale_date" type="TEXT" class="text_field" id="onsale_date" style="width:100px;" value="{$c{showing}->ensure_onsale_date_string}">
+	
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<A ONCLICK="calendar_click(document.getElementById('onsale_date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A>
++++
+}
+	
+	</td>
+    </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Tickets URL:</TD>
+    </TR> 
+  <TR style="padding-bottom:5px;display:inline;">
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>
+    	<input name="tickets_url" type="TEXT" class="text_field" id="tickets_url" style="width:100%;text-align:left;" value="{$OUT.=$c{showing}->parse_tickets_url}">
+    	</TD>
+    </TR>
+</TABLE>
+
+
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset><br>
+<fieldset style="height:100%;">
+<legend>Fail Booking</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<br>
+<u>Fail Booking</u><br>
+<br>
++++
+}
+
+<TABLE width="96%" BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Click the button below to fail the booking (and move it to booking progress -> failed).... </TD>
+    </TR> 
+  <TR style="padding-bottom:5px;display:inline;" id="countryTr">
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><input type="button" class="button" value="FAIL BOOKING" style="background-color:#aa8800;color:#ffffff;" onClick="failBooking();"></TD>
+    </TR>
+</TABLE>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset><br>
+<fieldset style="height:100%;">
+<legend>Delete Visit</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<br>
+<u>Delete Visit</u><br>
+<br>
++++
+}
+
+<TABLE width="96%" BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Click the button below to remove the visit (and all of its data) completely.... </TD>
+    </TR> 
+  <TR style="padding-bottom:5px;display:inline;" id="countryTr">
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><input type="button" class="button" value="DELETE VISIT" style="background-color:#880000;color:#ffffff;" onClick="deleteVisit();"></TD>
+    </TR>
+</TABLE>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
++++
+}
+
+
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="96%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{showing}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button" onclick="window.history.back();" name="back" value="Back" CLASS="button2" style="width:75px; margin-right:10px;"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE></td>
+</tr>
+</table>
+</form>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+}
+</body>
+</html>
+
+
+

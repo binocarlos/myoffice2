@@ -1,0 +1,14 @@
+<!--#include virtual="holiday/temp_include.htm" -->
+<p><font style="font-family:tahoma; font-size:11px;">Launching Application...</font>
+<script>
+	var wwidth = 800;
+	var wheight = 580;
+
+	var new_url = href + '&method=generate_window';
+
+
+	openWindow(new_url, wwidth, wheight{$c{status}});
+	document.location = '{$c{script}}?page_org={$c{params}->{page_org}}';
+
+</script>
+</p>

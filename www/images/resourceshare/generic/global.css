@@ -1,0 +1,42 @@
+body {background-color:#82A9D3; margin:0px; background-image:url('/wk/images/resourceshare/generic/bg.gif'); background-repeat:repeat-x;}
+.main {padding:0px 15px 15px 15px;}
+.topbar {padding:0px 0px 0px 0px; background-image:url('/wk/images/resourceshare/generic/topbarbg.gif'); background-repeat:repeat-x;}
+.location {font:11px tahoma,verdana,arial; color:#ffffff; font-weight:bold;}
+.searchtext {font:11px tahoma,verdana,arial; color:#ffffff; font-weight:bold;}
+.searchbut {font:11px tahoma,verdana,arial;  height:21px;}
+.searchfield {padding-left:3px; margin:0px 5px 0px 5px; color:#000000; width:100px; font:11px tahoma,verdana,arial; height:15px; border:1px #7F9DB9 solid;}
+.tree {padding:10px; background-color:#e6eef6; background-image:url('/wk/images/resourceshare/generic/treebg.gif'); background-repeat:repeat-x;}
+.main_sep {background-color:#1F377D;}
+.resources {padding:10px; background-color:#ffffff; background-image:url('/wk/images/resourceshare/generic/resourcesbg.gif'); background-repeat:repeat-x;}
+.resources2 {padding:10px; background-color:#ffffff; background-image:url('/wk/images/resourceshare/generic/resourcesbg.gif'); background-repeat:repeat-x;}
+.copyright {padding-left:10px; font:11px tahoma,verdana,arial; color:#FFFFFF; background-color:#1F377D;}
+.webkit {padding-right:7px; font:11px tahoma,verdana,arial; color:#FFFFFF; background-color:#1F377D;}
+form {margin:0px;}
+a.locationlink {text-decoration:none; color:#ffffff;}
+a:hover.locationlink {text-decoration:underline; color:#ff0000;}
+a.footer {text-decoration:none; color:#ffffff;}
+a:hover.footer {text-decoration:underline; color:#ff0000;}
+
+
+
+.panelBg { background-color:#EFEFF9; }
+.leftmenu {font:11px tahoma,verdana,arial; color:#000063; padding:10px;  background-position:top left; background-repeat:no-repeat;}
+a.leftmenulink {color:#0000FF; text-decoration:none;}
+a:hover.leftmenulink {color:#FF0000; text-decoration:underline;}
+a.controllink {color:#000000; text-decoration:none;  font-weight:bold;}
+a:hover.controllink {color:#FF0000; text-decoration:underline; font-weight:bold;}
+.leftmenulink_selected {color:#000063; font-weight:bold; text-decoration:none;}
+.folder_title {font:13px tahoma,verdana,arial; font-weight:bold; color:#000063;}
+.maincontent {font:11px tahoma,verdana,arial; color:#000000; padding:10px;}
+td {font:11px tahoma,verdana,arial; color:#000000;}
+.dropdown {font:11px tahoma,verdana,arial; border:1px #000063 solid;}
+a {color:#0000FF; text-decoration:none;}
+a:hover {color:#FF6D00; text-decoration:underline;}
+.custom_title {font:15px tahoma,verdana,arial; color:#ffffff; font-weight:bold;}
+.button {font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;}
+a.icon_button {color:#000000; text-decoration:none;}
+a:hover.icon_button {color:#ff0000; text-decoration:none;}
+.text_field {font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;}
+.selectlist {font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000;}
+a {color:#0000ff; text-decoration:none;}
+a:hover {color:#ff0000; text-decoration:underline;}

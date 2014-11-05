@@ -1,0 +1,43 @@
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<script language="JavaScript" src='https://secure.comodo.net/trustlogo/javascript/trustlogo.js'></script>
+<body>
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+<div class="panelouter" style="width:300px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+
+<fieldset>
+<legend>About {$c{app_title}}</legend>
+<div class="seccontent" align="left">
+
+<table cellpadding="0" celspacing="0" border="0">
+<tr style="padding-bottom:5px;">
+<td align="right">Application:&nbsp;</td>
+<td align="left" width="100%">{$c{app_title}}</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="right">Version:&nbsp;</td>
+<td align="left" width="100%">{$c{version_title}}</td>
+</tr>
+<tr>
+<td align="right" valign="top">Description:&nbsp;</td>
+<td align="left" width="100%">{$c{description_title}}</td>
+</tr>
+<tr align="center">
+<td valign="top" colspan="2"><br><script type="text/javascript">TrustLogo("/images/secure_site.gif", "SC", "none");</script><br></td>
+</tr>
+<tr>
+<td colspan="2"><br>
+This system is provided by Webkit for {$c{org}->get_value('name')}.<br>
+<br>
+Copyright &copy; 2003 Webkit Ltd</td>
+</tr>
+</table>
+
+</div>
+</fieldset>
+
+</div></div></div>
+</TD></TR></TABLE>
+
+</body>
+</html>

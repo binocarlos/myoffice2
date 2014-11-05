@@ -1,0 +1,98 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.b \{border-style:solid; border-color:#000099;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script>
+	function viewMuseums()
+	\{
+		top.viewMuseums();
+	\}
+	
+	function viewMuseumUpdates()
+	\{
+		top.get_menu_iframe_query('museum_update_home','Museum Updates');
+	\}
+	
+	function viewMuseumLogins()
+	\{
+		top.get_menu_iframe_query('museum_login_home','Current Museum User Accounts');
+	\}
+</script>
+<body>
+Welcome {$c{user}->get_fullname} of {$c{org}->name}...
+<br>
+<br>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><img src="/images/icons/24x24/windows.gif" width="24" height="24" align="absmiddle"> MUSEUMs</b></td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;">&nbsp;</td>
+  </tr></table>
+  </td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">There are <b style="color:#ff9900; font-size:10px; font-variant:small-caps;">{$c{museum_count}}</b> museums on the system... </td>
+  </tr>	
+		<tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/nav_down_blue.gif" width="24" height="24" align="absmiddle"> <a href="javascript:viewMuseums();">click here to view the museums </a></td>
+</tr>  
+{
+	if($c{has_museum_updates})
+	{
+		$OUT.=<<"+++";  
+<tr>
+<td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;;"><img src="/images/icons/24x24/document_warning.gif" width="24" height="24" align="absmiddle"> There are museum updates that need confirming! </td>
+</tr>
+<tr>
+<td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/nav_down_blue.gif" width="24" height="24" align="absmiddle"> <a href="javascript:viewMuseumUpdates();">click here to view the museum updates </a></td>
+</tr>
++++
+	}
+}
+
+<tr>
+<td colspan=3 height=20></td>
+</tr>
+</tr> 
+<tr>
+<td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#6600aa; background-color:#f5e5ff;"><b style="color:#6600aa; font-size:13px; font-variant:small-caps;">
+      <table width=100% border=0 cellpadding=0 cellspacing=0>
+        <tr>
+          <td> <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/icons/24x24/photo_portrait.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"></b><b style="color:#6600aa; font-size:13px; font-variant:small-caps;"> museum users </b></td>
+          <td width=100 align="right" onClick="toggleGroup('graph');" style="cursor:hand;color:blue;">&nbsp;</td>
+        </tr>
+      </table>
+    </b></td>
+  </tr>
+<tr id="trhelp">
+<td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">There are <b style="color:#6600aa; font-size:10px; font-variant:small-caps;">{$c{museum_login_count}}</b> museum user accounts in the system... </td>
+</tr>
+{
+	if($c{has_museum_logins})
+	{
+		$OUT.=<<"+++";  
+<tr>
+<td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;;"><img src="/images/icons/24x24/document_warning.gif" width="24" height="24" align="absmiddle"> There are museum user accounts that need confirming! </td>
+</tr>
++++
+	}
+}
+<tr>
+<td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/nav_down_blue.gif" width="24" height="24" align="absmiddle"> <a href="javascript:viewMuseumLogins();">click here to view the museum users </a></td>
+</tr>		  
+
+</table>
+<br><br>
+
+</body>
+</html>
+
+
+

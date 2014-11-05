@@ -1,0 +1,75 @@
+<HTML>
+ <HEAD>
+	<TITLE>Royal Blackheath Golf Club :: Log In</TITLE>
+	<LINK REL="stylesheet" TYPE="text/css" HREF="/lib/app.css">
+ </HEAD>
+ <BODY BGCOLOR="#FFFFFF" STYLE="border:2px inset;cursor:default;">
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+
+	 <TR>
+		<TD HEIGHT="100%" WIDTH="100%" VALIGN="MIDDLE" ALIGN="CENTER">
+		 <FORM METHOD="POST" ACTION="{$c{script}}"
+			STYLE="margin:0;">
+{$c{hidden_string}}
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="1"
+			 CLASS="panelouter" ID="window1" WIDTH="300">
+			 <TR>
+				<TD ALIGN="LEFT" VALIGN="TOP" CLASS="pannelinner">
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+					HEIGHT="100%" CLASS="panelinner">
+					<TR>
+					 <TD WIDTH="100%" HEIGHT="100%" ALIGN="LEFT" VALIGN="TOP">
+						<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="1"
+						 HEIGHT="18" ALIGN="LEFT">
+						 <TR>
+							<TD HEIGHT="18" BGCOLOR="#0A246A" BACKGROUND="/images/login/windowtop.jpg">
+							 <B
+								STYLE="font-family:tahoma,verdana; font-size:11px; color:#FFFFFF; padding-left:5px">Royal Blackheath Golf Club :: Log In</B></TD>
+						 </TR>
+						 <TR>
+							<TD BGCOLOR="#FFFFFF"><IMG SRC="/images/logos/rbgc_login.gif" WIDTH="294" HEIGHT="52" BORDER="0"></TD>
+						 </TR>
+						 <TR>
+							<TD ALIGN="RIGHT">
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+								<TR>
+								 <TD>
+									<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0"
+									 CELLSPACING="0">
+									 <TR>
+										<TD WIDTH="1">Email&nbsp;Address:&nbsp;&nbsp;</TD>
+										<TD><INPUT TYPE="TEXT" NAME="username" value="{$c{username}}"
+										 ONFOCUS="this.className='text_field2';" ONBLUR="this.className='text_field';"
+										 CLASS="text_field" STYLE="width:100%;"></TD>
+									 </TR>
+									 <TR>
+										<TD HEIGHT="8" COLSPAN="2"></TD>
+									 </TR>
+									 <TR>
+										<TD WIDTH="1">Password:&nbsp;&nbsp;</TD>
+										<TD><INPUT TYPE="password" NAME="password"
+										 ONFOCUS="this.className='text_field2';" ONBLUR="this.className='text_field';"
+										 CLASS="text_field" STYLE="width:100%;"></TD>
+									 </TR>
+									</TABLE></TD>
+								</TR>
+							 </TABLE>
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+								<TR>
+								 <TD HEIGHT="2" BACKGROUND="/images/login/divider.gif"></TD>
+								</TR>
+							 </TABLE><IMG SRC="/images/clear.gif"
+							 WIDTH="1" HEIGHT="8" BORDER="0"><BR><INPUT TYPE="SUBMIT" VALUE="Log In"
+							 CLASS="button" STYLE="width:75px"><IMG
+							 SRC="/images/clear.gif" WIDTH="8" HEIGHT="1"
+							 BORDER="0"><BR><IMG SRC="/images/clear.gif" WIDTH="1"
+							 HEIGHT="8" BORDER="0"></TD>
+						 </TR>
+						</TABLE> </TD>
+					</TR>
+				 </TABLE> </TD>
+			 </TR>
+			</TABLE> </FORM> </TD>
+	 </TR>
+	</TABLE> </BODY>
+</HTML>

@@ -1,0 +1,117 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+var exam_sitting_id = {$c{exam_sitting}->get_id};
+
+function back()
+\{
+	var new_loc = href + '&method=control_panel_home&phase=invigilate&exam_id={$c{exam_sitting}->exam_id}';
+	
+	document.location = new_loc;
+\}
+
+function viewLoginCodes()
+\{
+	var query = '&method=inivigilators_list_login_codes&exam_id={$c{exam_sitting}->exam_id}&title=Log In Codes';
+		
+	var ret = top.get_modal_window_return(query, 420, 520);
+\}
+
+
+function refreshPage()
+\{
+	document.location = href + '&method=invigilators_form&exam_sitting_id=' + exam_sitting_id;
+\}
+
+function openSitting()
+\{
+	if(top.confirm('Are you sure you want to open this sitting?'))
+	\{
+		document.location = href + '&method=invigilators_open_exam_sitting&exam_sitting_id=' + exam_sitting_id;	
+	\}
+\}
+
+function startSitting()
+\{
+	if(top.confirm('Are you sure you want to start this sitting?'))
+	\{
+		document.location = href + '&method=invigilators_start_exam_sitting&exam_sitting_id=' + exam_sitting_id;
+	\}
+\}
+
+function closeSitting()
+\{
+	if(top.confirm('Are you sure you want to close this sitting?'))
+	\{
+		document.location = href + '&method=invigilators_close_exam_sitting&exam_sitting_id=' + exam_sitting_id;
+	\}
+\}
+
+</script>
+
+<table width="600" border="0" align="center" cellpadding="10" cellspacing="0">
+  <tr>
+    <td>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Sitting Controls</legend>
+<div class="seccontent" align="left">
+      <table border="0" cellspacing="0" cellpadding="5">
+        <tr>
+          <td>
+            <input style="width:75px;" type="button" class="button" value="Back" onClick="back();">
+          </td>		
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		if($c{exam_sitting}->status eq 'created')
+		{
+			$OUT.=<<"+++";
+          <td>
+            <input style="width:125px;" type="button" class="button" value="Open Sitting" onClick="openSitting();">
+          </td>
++++
+		}
+	
+		if($c{exam_sitting}->status eq 'opened')
+		{
+			$OUT.=<<"+++";
+          <td>
+            <input style="width:125px;" type="button" class="button" value="Start Sitting" onClick="startSitting();">
+          </td>
++++
+		}
+	
+		if($c{exam_sitting}->status eq 'started')
+		{
+			$OUT.=<<"+++";	
+          <td>
+            <input style="width:125px;" type="button" class="button" value="Close Sitting" onClick="closeSitting();">
+          </td>
++++
+		}
+	}
+}	
+          <td>
+            <input style="width:75px;" type="button" class="button" onClick="refreshPage();" value="Refresh">
+          </td>
+          <td>
+            <input style="width:125px;" type="button" class="button" onClick="viewLoginCodes();" value="View Log In Codes">
+          </td>		  
+        </tr>
+      </table>
+      </div>
+</fieldset>
+</td></tr></table>
+</td></tr></table>    
+    </td>
+  </tr>
+  <tr>
+    <td height="300" valign="top">{$c{pupil_table}} </td>
+  </tr>
+</table>

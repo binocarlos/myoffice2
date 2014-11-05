@@ -1,0 +1,249 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var graphMode = false;
+	
+	function toggleGraph()
+	\{
+		var title = 'Show Graph';
+		var display = 'none';
+		
+		graphMode = !graphMode;
+		
+		if(graphMode)
+		\{
+			title = 'Hide Graph';
+			display = 'inline';
+		\}
+		
+		document.getElementById('graphSpan').style.display = display;
+		document.getElementById('graphButton').value = title;
+	\}
+	
+	function goBack()
+	\{
+		var newLoc = href + '&method=visitors_school_home&school_id={$c{school}->get_id}';
+		
+		document.location = newLoc;
+	\}
+	
+	function visitorHome()
+	\{
+		var newLoc = href + '&method=visitors_timeline_home&visitor_id={$c{visitor}->get_id}';
+		
+		document.location = newLoc;
+	\}
+</script>
+
+<body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0">
+<tr>
+<td height="1" align="left" valign="top"><table width="100%"  border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="50%" valign="top"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+      <TR>
+        <TD width="45%">
+          <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+            <TR>
+              <TD CLASS="panelbody">
+                <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width=100%>
+                  <TR>
+                    <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title">&nbsp;Visitor / Audit Details&nbsp;</FONT></TD>
+                    <TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+                  </TR>
+                  <TR>
+                    <TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                    <TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+                        <TR>
+                          <TD>
+                            <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                              <TR>
+                                <TD ALIGN="right" VALIGN="MIDDLE">Name:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{visitor}->name} </TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                                <TD ALIGN="right" VALIGN="MIDDLE">School: </TD>
+                                <TD width="200" ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->name}</TD>
+                              </TR>
+                              <TR>
+                                <TD ALIGN="right" VALIGN="MIDDLE"> Taken:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{audit}->taken_date} </TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+                                <TD ALIGN="right" VALIGN="MIDDLE">City:</TD>
+                                <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->city}</TD>
+                              </TR>
+                          </TABLE></TD>
+                        </TR>
+                    </TABLE></TD>
+                    <TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                  </TR>
+                  <TR>
+                    <TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+                  </TR>
+              </TABLE></TD>
+            </TR>
+        </TABLE></TD>
+      </TR>
+    </TABLE></td>
+	<td width=10></td>
+    <td width="45%" valign="top"><input type="submit" class="button" value="School Home" onClick="goBack();">
+	&nbsp;&nbsp;
+      <input type="submit" class="button" value="Visitor Home" onClick="visitorHome();"></td>
+  </tr>
+</table>  </form></td>
+</tr>
+<tr>
+<td align=center height=10></td>
+</tr>
+<tr>
+<td><b style="color:#000099;font-size:12pt;">&#8226;&nbsp;Specific Targets</b><br>
+  &nbsp;&nbsp;&nbsp;The following list shows the individual questions to concentrate on. <br> 
+  &nbsp;&nbsp;&nbsp;You can use this to plan specific ICT training based on these items.<br></td>
+</tr>
+<tr>
+<td><table width="100%"  border="0" cellpadding="0" cellspacing="1" bgcolor="#000099">
+<tr bgcolor=#ffffff><td>
+<table width="100%"  border="0" cellpadding="3">
+	
+{
+	foreach my $answer (@{$c{audit}->get_lowest_answer_array})
+	{
+		my $question_group = $c{audit}->get_child('question_group', $answer->question_group_id);
+		my $group_title = $question_group->title;
+		my $question = $answer->get_question_text;
+		my $score = $answer->get_priority_score;
+		
+		$OUT.=<<"+++";
+<tr valign="top" bgcolor="#FFFFFF">
+    <td width="160">&#8226;&nbsp;<b>$group_title</b></td>
+	<td>$question</td>
+	<td width="1" align=right>$score</td>
+	</tr>
++++
+	}
+}
+</table>
+</td></tr>
+</table></td>
+</tr>
+<tr>
+<td align=center height=10></td>
+</tr>
+<tr>
+<td><b style="color:#000099;font-size:12pt;">&#8226;&nbsp;Graph - </b><input type="button" class="button" value="Show Graph" id="graphButton" onClick="toggleGraph();">
+  <br>
+  <span id="graphSpan" style="display:none;">
+ &nbsp;&nbsp;&nbsp;This graph shows you the scores for each group in the audit:<br><br>
+ <img src="{$c{href}}&method=visitors_audit_graph&audit_id={$c{audit}->get_id}">
+ </span>
+ </td>
+</tr>
+<tr>
+<td align=center height=10></td>
+</tr>
+<tr>
+<td><b style="color:#000099;font-size:12pt;">&#8226;&nbsp;Overall Summary </b><br>
+  &nbsp;&nbsp;&nbsp;The following displays each of the overall groups in the red or green section depending on its rating.<br>  
+  &nbsp;&nbsp;&nbsp;You can use this as an indication of the areas of work to concentrate on. <br></td>
+</tr>
+<tr>
+<td align="left" valign="top">
+<table width="100%"  border="0" cellspacing="0" cellpadding="10">
+  <tr>
+    <td width="50%" bgcolor="#ffe5e5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#990000;"><b style="color:#990000; font-size:13px; font-variant:small-caps;">Need to improve</b></td>
+    <td></td>
+    <td width="50%" bgcolor="#e5ffe5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#339900;"><b style="color:#339900; font-size:13px; font-variant:small-caps;">Doing well</b></td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#990000; background-color:#FFF2F2;">
+  
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+        
+{
+	my $count = 0;
+	foreach my $question_group (@{$c{audit}->{_notok_array}})
+	{
+		$count++;
+		
+		if($count>Webkit::SkillsAudit::Audit->summary_group_count) { last; }
+		
+		my $title = $question_group->title;
+		my $average = $question_group->average_score;
+		my $priority = $question_group->average_priority_score;
+		
+		my $leading_answer = $question_group->leading_answer;
+		my $text = $question_group->leading_question_text;
+		
+		my $leading_priority = $leading_answer->get_priority_score($question_group->is_good);
+		my $l_p = $leading_answer->get_priority;
+		my $l_s = $leading_answer->answer;
+		
+		$OUT.=<<"+++";	
+	
+          <tr bgcolor="#ffffff">
+            <td colspan=3 width="100%" bgcolor="#ffe5e5" style="border-width:1px 1px 1px 1px;" class="r"><b>$title</b></td>
+          </tr>
+          <tr bgcolor="#ffffff">
+            <td style="border-width:0px 1px 1px 1px;" class="r">$text</td>
+			<td style="border-width:0px 1px 1px 1px;" class="r">$average</td>
+			<td style="border-width:0px 1px 1px 1px;" class="r">$priority</td>			
+          </tr>
+                <tr>
+       <td height="10" colspan=3></td>
+      </tr>	 					
++++
+	}
+}
+</table>
+
+    </td>
+    <td></td>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#339900; background-color:#F2FFF2;">
+
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+
+{
+	my $count = 0;
+	
+	foreach my $question_group (@{$c{audit}->{_ok_array}})
+	{
+		$count++;
+		
+		if($count>Webkit::SkillsAudit::Audit->summary_group_count) { last; }
+			
+		my $title = $question_group->title;
+		my $average = $question_group->average_score;
+		my $priority = $question_group->average_priority_score;
+		
+		my $leading_answer = $question_group->leading_answer;
+		my $text = $question_group->leading_question_text;
+		
+		my $leading_priority = $leading_answer->get_priority_score($question_group->is_good);
+		my $l_p = $leading_answer->get_priority;
+		my $l_s = $leading_answer->answer;
+		
+		$OUT.=<<"+++";	
+          <tr bgcolor="#ffffff">
+            <td colspan=3 width="100%" bgcolor="#e5ffe5" style="border-width:1px 1px 1px 1px;" class="g"><b>$title</b></td>
+          </tr>
+          <tr bgcolor="#ffffff">
+            <td style="border-width:0px 1px 1px 1px;" class="g">$text</td>
+            <td width="1" class="g" style="border-width:0px 1px 1px 1px;">$average</td>
+            <td width="1" class="g" style="border-width:0px 1px 1px 1px;">$priority</td>						
+          </tr>	
+          <tr>
+       <td height="10" colspan=3></td>
+      </tr>	
++++
+	}
+}
+</table>
+
+    </td>
+  </tr>
+</table></td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

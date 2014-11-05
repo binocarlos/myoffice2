@@ -1,0 +1,70 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+<script>
+	function link_to_day(day, month, year)
+	\{
+		var new_loc = href + '&method=view_day&view_day_date=' + day + '&view_day_month=' + month + '&view_day_year=' + year;		self.location = new_loc;
+	\}
+</script>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%"> 
+<TR> 
+<TD WIDTH="100%"> 
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0" CLASS="panelinner" WIDTH="100%"> 
+<TR> 
+<TD CLASS="panelbody" WIDTH="100%"> 
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%"> 
+<TR> 
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/holiday/panelt.gif" HEIGHT="13"><IMG src="/images/holiday/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title">&nbsp;Key&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/holiday/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+</TR> 
+<TR> 
+<TD WIDTH="2" BACKGROUND="/images/holiday/panell.gif"><IMG src="/images/holiday/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+<TD WIDTH="100%" HEIGHT="100%" ALIGN="LEFT" VALIGN="TOP"> 
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="5" CELLSPACING="0"> 
+<TR> 
+<TD ALIGN="LEFT" VALIGN="TOP"> 
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="2"> 
+<TR>
+{
+	foreach my $type_hash (@{$c{type_hashes}})
+	{
+		$OUT.=<<"+++";
+<TD WIDTH="13" BGCOLOR="$type_hash->{color}" CLASS="keycolors"><IMG src="/images/holiday/clear.gif" WIDTH="1" HEIGHT="1" BORDER="0"></TD>
+<TD WIDTH="1"></TD>
+<TD ALIGN="LEFT" VALIGN="TOP">$type_hash->{title}</TD>
+<TD WIDTH="5"></TD>
++++
+	}
+}
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></TD>
+<TD WIDTH="2" BACKGROUND="/images/holiday/panelr.gif"><IMG src="/images/holiday/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+</TR> 
+<TR> 
+<TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/holiday/panelb.gif" ALIGN="RIGHT"><IMG src="/images/holiday/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+</TR> 
+</TABLE></TD> 
+</TR> 
+</TABLE></TD> 
+</TR> 
+</TABLE>
+<IMG src="/images/holiday/clear.gif" WIDTH="1" HEIGHT="10" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%">				  
+<TR>  
+<TD HEIGHT="100%" VALIGN="TOP"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelinner" HEIGHT="100%">						  
+<TR>  
+<TD CLASS="panelbody" HEIGHT="100%" VALIGN="TOP">
+{$c{cal}}
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>				
+</TABLE>
+
+<script>
+{$c{top_js}}
+</script>

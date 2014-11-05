@@ -1,0 +1,86 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function refresh_page()
+	\{
+		var loc = href + '&method=easemail_email_summary&email_id={$c{email}->get_id}';
+		
+		document.location = loc;
+	\}
+	
+	function validate_list_form()
+	\{
+		var form = document.list_form;
+
+		if(form.name.value=="")
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a name for the list';
+
+			return false;
+		\}
+
+		return true;
+	\}
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        
+                      <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Email Send Details&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                              <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">Subject:</TD>
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{email}->get_value('subject')} 
+                                  </TD>
+                                </TR>
+                                <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">From:</TD>
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{email}->get_value('from_address')}</TD>
+                                </TR>
+                                <TR> 
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">Time:</TD>
+                                  <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{time_string}}</TD>
+                                </TR>								
+                                <TR> 
+                                  <TD colspan="2" ALIGN="LEFT" VALIGN="MIDDLE" height=15></TD>
+                                </TR>
+                                <TR align="right"> 
+                                  <TD colspan="2" VALIGN="MIDDLE">
+                                    <input type="button" class="button" value="Close" onClick="top.close();">&nbsp;
+                                    <input type="button" class="button" value="Refresh" onClick="refresh_page();">
+                                  </TD>
+                                </TR>
+                              </TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+                </TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+</table>
+<script>
+setTimeout("refresh_page();", 3000);
+</script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,27 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	var new_loc = href + '&method=budget_export_excel_submit&budget_id=' + {$c{budget}->get_id};
+
+	function download_excel()
+	\{
+		document.location = new_loc;
+	\}
+
+
+</script>
+<body style="background-color:#D4D0C8; margin:8px;" onload="download_excel();">
+<table border="0" cellpadding="0" cellspacing="0" width="375" height="100%">
+<tr>
+    <td align="left" valign="middle" style="padding-bottom:8px;"><img src="/images/icons/32/excel.gif" width=32 height=32 align="absmiddle">&nbsp;&nbsp;<strong> 
+      Downloading {$c{budget}->get_value('name')}</strong></td>
+</tr>
+<tr align="right">
+<td height="100%" valign="bottom"><input type="button" class="button2" onClick="top.close();" value="Close" style="width:75px;"></td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

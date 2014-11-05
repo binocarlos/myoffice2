@@ -1,0 +1,493 @@
+<?xml version="1.0"?>
+<field_schema>
+<department name="PRE PRODUCTION">
+	<department name="RECCE">
+			<field type="time_cost" title="Location Manager"/>
+			<field type="time_cost" title="Location Finder"/>
+			<field type="nic"/>
+			<field type="time_cost" title="Stills  Polaroid"/>
+			<field type="sub_total"/>			
+			<field type="simple_cost" title="Video"/>
+			<field type="time_cost" title="Car Hire"/>
+			<field type="time_cost" title="Mileage"/>
+			<field type="sub_total"/>
+			<field type="time_cost" title="Ag. and Prod Co. accom"/>
+			<field type="time_cost" title="Ag. and Prod.Co subsist"/>
+			<field type="time_cost" title="Ag. and Prod.Co.travel"/>	
+			<field type="nic"/>
+			<field type="time_cost" title="Telephone"/>
+	</department>
+	<department name="CASTING">
+			<field type="simple_cost" title="Casting Director"/>
+			<field type="nic"/>
+			<field type="simple_cost" title="Recalls"/>
+			<field type="simple_cost" title="Polaroid  Stills"/>
+			<field type="simple_cost" title="Video  Studio  Tapes"/>
+			<field type="simple_cost" title="Video Edit"/>
+			<field type="simple_cost" title="Casting Accom."/>
+			<field type="simple_cost" title="Casting Subsistence"/>
+			<field type="simple_cost" title="Voice-over casting"/>
+			<field type="nic"/>
+	</department>
+	<department name="PRE-PRODUCTION EXPENSES">
+			<field type="simple_cost" title="TelephoneFax"/>
+			<field type="simple_cost" title="CouriersBikesTaxis"/>
+			<field type="simple_cost" title="Pre Prod Travel"/>
+			<field type="simple_cost" title="Researh materialsScanning"/>
+			<field type="simple_cost" title="Storyboards"/>
+	</department>
+</department>
+<department name="CAST">
+			<field type="simple_cost" title="Principals"/>
+			<field type="simple_cost" title="Models"/>
+			<field type="simple_cost" title="Principals Wardrobe Call"/>
+			<field type="simple_cost" title="Extras"/>
+			<field type="simple_cost" title="Extras Wardrobe Call"/>
+			<field type="simple_cost" title="Children"/>
+			<field type="simple_cost" title="Chaparones"/>
+			<field type="simple_cost" title="Stand-Ins"/>
+			<field type="simple_cost" title="Stunts"/>
+			<field type="simple_cost" title="Hand Artist"/>
+			<field type="simple_cost" title="Dancer"/>
+			<field type="simple_cost" title="Dogs,Handler,Transport"/>
+			<field type="simple_cost" title="Animals Handler Assistant"/>
+			<field type="simple_cost" title="Stunts"/>
+			<field type="simple_cost" title="Agent"/>
+			<field type="nic"/>
+			<field type="simple_cost" title="PrincipalsModels Travels"/>
+			<field type="simple_cost" title="Childrens Travel"/>
+			<field type="simple_cost" title="Other Travels"/>
+			<field type="nic"/>
+			<field type="simple_cost" title="Choreographer"/>
+			<field type="simple_cost" title="Choreographers Assistant"/>
+			<field type="simple_cost" title="Language Coach"/>
+			<field type="nic"/>
+			<field type="simple_cost" title="Voice Over Artistes"/>
+			<field type="nic"/>
+</department>
+<department name="SALARIES">
+	<department name="PRODUCTION">
+			<field type="simple_cost" title="Director"/>
+			<field type="simple_cost" title="Producer"/>
+			<field type="nic"/>
+	</department>
+	<department name="UNIT">
+			<field type="simple_cost" title="Production Manager"/>
+			<field type="simple_cost" title="Production Assistant"/>
+			<field type="simple_cost" title="Assistant Director 1"/>
+			<field type="simple_cost" title="Assistant Director 2"/>
+			<field type="simple_cost" title="Runner"/>
+			<field type="simple_cost" title="Location Manager"/>
+			<field type="simple_cost" title="Asst. Location Manager"/>
+			<field type="simple_cost" title="Continuity"/>
+			<field type="nic"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Lighting Cameraman"/>
+			<field type="simple_cost" title="Camera Operator"/>
+			<field type="simple_cost" title="Focus Puller 1"/>
+			<field type="simple_cost" title="Clapper Loader"/>
+			<field type="simple_cost" title="C.C.T.V. Operator"/>
+			<field type="nic"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Sound Mixer"/>
+			<field type="simple_cost" title="Sound Assistant"/>
+			<field type="nic"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Make-up"/>
+			<field type="simple_cost" title="Make-up Assistant"/>
+			<field type="simple_cost" title="Hairdresser"/>
+			<field type="simple_cost" title="Hairdresser Assistant"/>
+			<field type="simple_cost" title="Home Economist"/>
+			<field type="simple_cost" title="Home Economist Assistant"/>
+			<field type="simple_cost" title="Special Effects"/>
+			<field type="simple_cost" title="Special Effects Assistant"/>
+			<field type="nic"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Key Grip"/>
+			<field type="simple_cost" title="Dolly Grip"/>
+			<field type="simple_cost" title="Crane Grip"/>
+			<field type="simple_cost" title="Camera Car Driver"/>
+			<field type="nic"/>
+	</department>
+	<department name="ELECTRICAL">
+			<field type="simple_cost" title="Gaffer"/>
+			<field type="simple_cost" title="Electricians"/>
+			<field type="simple_cost" title="Generator Operator"/>
+			<field type="simple_cost" title="Allowances"/>
+			<field type="nic"/>
+	</department>
+	<department name="MISCELLANEOUS">
+			<field type="simple_cost" title="Helicopter Engineer"/>
+			<field type="simple_cost" title="Helicopter Pilot"/>
+			<field type="simple_cost" title="Helicopter Rigging Tech"/>
+			<field type="nic"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Stills Photographer"/>
+			<field type="simple_cost" title="Nurse"/>
+			<field type="simple_cost" title="Security"/>
+			<field type="nic"/>
+	</department>
+</department>
+<department name="EQUIPMENT">
+	<department name="CAMERA EQUIPMENT">
+			<field type="simple_cost" title="Camera Hire MuteSync"/>
+			<field type="simple_cost" title="Motors"/>
+			<field type="simple_cost" title="Zoom Lens"/>
+			<field type="simple_cost" title="Lens"/>
+			<field type="simple_cost" title="Filters"/>
+			<field type="simple_cost" title="Head  Legs"/>
+			<field type="simple_cost" title="Dolly"/>
+			<field type="simple_cost" title="Crane and Mileage"/>
+			<field type="simple_cost" title="Kostymassistent"/>
+			<field type="simple_cost" title="Special Equipment"/>
+			<field type="simple_cost" title="CCTV and Tapes"/>
+			<field type="simple_cost" title="Radio Telephones"/>
+			<field type="simple_cost" title="Rigs  Mounts"/>
+			<field type="simple_cost" title="Moviola"/>
+			<field type="simple_cost" title="Projection Equipment"/>
+			<field type="simple_cost" title="Underwater Equipment"/>
+			<field type="simple_cost" title="Grip  Unit Box"/>
+			<field type="simple_cost" title="Camera Car and Mileage"/>
+			<field type="simple_cost" title="Camera Car"/>
+			<field type="simple_cost" title="Delivery  Collection"/>
+			<field type="simple_cost" title="Helicopter"/>
+			<field type="simple_cost" title="Ground Back-up"/>
+			<field type="simple_cost" title="Heli-Rigs"/>
+	</department>
+	<department name="SOUND EQUIPMENT">
+			<field type="simple_cost" title="Sound Recorder"/>
+			<field type="simple_cost" title="Play Back"/>
+	</department>
+	<department name="ELECTRICAL EQUIPMENT">
+			<field type="simple_cost" title="Generator and Mileage"/>
+			<field type="simple_cost" title="Generator Fuel"/>
+			<field type="simple_cost" title="Lights - studio"/>
+			<field type="simple_cost" title="Lights - location"/>
+			<field type="simple_cost" title="Consumables"/>
+			<field type="simple_cost" title="Consumables"/>
+			<field type="simple_cost" title="Wind Machine etc"/>
+			<field type="simple_cost" title="Transport and Mileage"/>
+	</department>
+</department>
+<department name="ART DEPARTMENT">
+	<department name="PERSONNEL">
+			<field type="simple_cost" title="Production Designer"/>
+			<field type="simple_cost" title="Art Director"/>
+			<field type="simple_cost" title="Prop Buyer"/>
+			<field type="simple_cost" title="Set Dresser"/>
+			<field type="simple_cost" title="Props 1"/>
+			<field type="simple_cost" title="Props 2"/>
+			<field type="simple_cost" title="Model Maker"/>
+			<field type="simple_cost" title="Stylist"/>
+			<field type="simple_cost" title="Costume Designer"/>
+			<field type="simple_cost" title="Wardrobe Mistress"/>
+			<field type="simple_cost" title="Wardrobe Assistant"/>
+			<field type="nic"/>
+	</department>
+	<department name="COSTS">
+			<field type="simple_cost" title="Props Purchase"/>
+			<field type="simple_cost" title="Props Hire"/>
+			<field type="simple_cost" title="Props Specials"/>
+			<field type="simple_cost" title="Props Food"/>
+			<field type="simple_cost" title="Props Transport"/>
+			<field type="simple_cost" title="Rigs"/>
+			<field type="simple_cost" title="Models"/>
+			<field type="simple_cost" title="Artwork"/>
+			<field type="simple_cost" title="Special Packs  labels"/>
+			<field type="simple_cost" title="Special Effects"/>
+			<field type="simple_cost" title="Wardrobe  Principals"/>
+			<field type="simple_cost" title="Wardrobe - Children"/>
+			<field type="simple_cost" title="Wardrobe - Extras"/>
+			<field type="simple_cost" title="Accessories"/>
+			<field type="simple_cost" title="Cleaning and Alterations"/>
+			<field type="simple_cost" title="Wigs  Beards"/>
+			<field type="simple_cost" title="Wardrobe Transport"/>
+			<field type="simple_cost" title="Props Car"/>
+			<field type="simple_cost" title="Stylists Car"/>
+			<field type="simple_cost" title="Costume Designer Car"/>
+	</department>
+</department>
+<department name="STUDIO">
+	<department name="PERSONNEL">
+			<field type="simple_cost" title="Construction Manager"/>
+			<field type="simple_cost" title="Carpenters"/>
+			<field type="simple_cost" title="Painters"/>
+			<field type="simple_cost" title="Plasterers"/>
+			<field type="simple_cost" title="Plumbers"/>
+			<field type="simple_cost" title="Riggers"/>
+			<field type="simple_cost" title="Stagehands"/>
+			<field type="simple_cost" title="Transport"/>
+			<field type="simple_cost" title="Studio Surcharge %"/>
+			<field type="nic"/>
+	</department>
+	<department name="STUDIO COSTS">
+			<field type="simple_cost" title="Studio Rent - Build"/>
+			<field type="simple_cost" title="Studio Rent - Pre Light"/>
+			<field type="simple_cost" title="Studio Rent - Shoot"/>
+			<field type="simple_cost" title="Studio Rent - Strike"/>
+			<field type="simple_cost" title="Production Office"/>
+			<field type="simple_cost" title="Art Dept. Room"/>
+			<field type="simple_cost" title="Make-up  Hair Room"/>
+			<field type="simple_cost" title="Wardrobe Room"/>
+			<field type="simple_cost" title="Dressing Room"/>
+			<field type="simple_cost" title="Cycs  Cove"/>
+			<field type="simple_cost" title="Timber"/>
+			<field type="simple_cost" title="Paint"/>
+			<field type="simple_cost" title="Drapes"/>
+			<field type="simple_cost" title="Flats"/>
+			<field type="simple_cost" title="Backdrops"/>
+			<field type="simple_cost" title="Stock Hire"/>
+			<field type="simple_cost" title="Power"/>
+			<field type="simple_cost" title="Telephone - Production"/>
+			<field type="simple_cost" title="Telephone - clientagency"/>
+			<field type="simple_cost" title="Cleaning"/>
+			<field type="simple_cost" title="Container Hire"/>
+			<field type="simple_cost" title="Catering"/>
+			<field type="simple_cost" title="Heating"/>
+	</department>
+</department>
+<department name="LOCATION COSTS">
+	<department name="PERSONNEL">
+			<field type="simple_cost" title="Construction Manager"/>
+			<field type="simple_cost" title="Carpenters"/>
+			<field type="simple_cost" title="Painters"/>
+			<field type="simple_cost" title="Plasterers"/>
+			<field type="simple_cost" title="Plumbers"/>
+			<field type="simple_cost" title="Riggers"/>
+			<field type="simple_cost" title="Stagehands"/>
+			<field type="simple_cost" title="Transport"/>
+			<field type="simple_cost" title="Studio Surcharge %"/>
+			<field type="nic"/>
+	</department>
+	<department name="COSTS">
+			<field type="simple_cost" title="Location Rent - Build"/>
+			<field type="simple_cost" title="Location Rent - Pre Light"/>
+			<field type="simple_cost" title="Location Rent - Shoot"/>
+			<field type="simple_cost" title="Location Rent - Strike"/>
+			<field type="simple_cost" title="Production Office"/>
+			<field type="simple_cost" title="Art Dept. Van"/>
+			<field type="simple_cost" title="Make-up  Hair Van"/>
+			<field type="simple_cost" title="Wardrobe Van"/>
+			<field type="simple_cost" title="Dressing Van"/>
+			<field type="simple_cost" title="Timber"/>
+			<field type="simple_cost" title="Paint"/>
+			<field type="simple_cost" title="Drapes"/>
+			<field type="simple_cost" title="Flats"/>
+			<field type="simple_cost" title="Backdrops"/>
+			<field type="simple_cost" title="Stock Hire"/>
+			<field type="simple_cost" title="Power"/>
+			<field type="simple_cost" title="Cleaning"/>
+			<field type="simple_cost" title="Container Hire"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Hotel Agency"/>
+			<field type="simple_cost" title="Hotel Client"/>
+			<field type="simple_cost" title="Hotel Crew"/>
+			<field type="simple_cost" title="Hotel Artists"/>
+			<field type="simple_cost" title="Subsist. Agency"/>
+			<field type="simple_cost" title="Subsist. Client"/>
+			<field type="simple_cost" title="Subsist. Crew"/>
+			<field type="simple_cost" title="Subsist. Artists"/>
+			<field type="simple_cost" title="Travel Agency and Client"/>
+			<field type="simple_cost" title="Travel Crew"/>
+			<field type="nic"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Telephone  Telex  Fax"/>
+			<field type="simple_cost" title="Misc. Expenses"/>
+			<field type="simple_cost" title="Gratuities"/>
+			<field type="simple_cost" title="Coach  Minibus and Mileage"/>
+			<field type="simple_cost" title="Unit Van and Mileage"/>
+			<field type="simple_cost" title="Unit Car and Mileage"/>
+			<field type="simple_cost" title="Car Hire and Mileage"/>
+			<field type="simple_cost" title="Taxis"/>
+			<field type="simple_cost" title="Mileage"/>
+			<field type="simple_cost" title="Catering Van and Mileage"/>
+			<field type="simple_cost" title="Rushes Transport"/>
+			<field type="sub_total"/>
+			<field type="simple_cost" title="Carnets"/>
+			<field type="simple_cost" title="Customs Broker"/>
+			<field type="simple_cost" title="Custom Duties"/>
+			<field type="simple_cost" title="Permits  Visas"/>
+			<field type="simple_cost" title="Airport Transfer"/>
+			<field type="simple_cost" title="Excess Baggage"/>
+			<field type="simple_cost" title="Freight"/>
+			<field type="simple_cost" title="American Budget"/>
+	</department>
+</department>
+<department name="STOCK, NEGATIVE and PROCESSING">
+			<field type="simple_cost" title="Negative Stock"/>
+			<field type="simple_cost" title="35mm"/>
+			<field type="simple_cost" title="16mm"/>
+			<field type="simple_cost" title="Develop"/>
+			<field type="simple_cost" title="Print"/>
+			<field type="simple_cost" title="Beta SP Band"/>
+			<field type="simple_cost" title="14 Mag tape"/>
+			<field type="simple_cost" title="14 Mag Tape transfer to"/>
+			<field type="simple_cost" title="35mm Magnetic transfer"/>
+			<field type="simple_cost" title="Mag Master and transfer"/>
+			<field type="simple_cost" title="Stills Stock"/>
+			<field type="simple_cost" title="Video tapes 1"/>
+			<field type="simple_cost" title="Transport"/>
+</department>
+<department name="POST PRODUCTION">
+	<department name="LABORATORY">
+			<field type="simple_cost" title="Negative develop only"/>
+			<field type="simple_cost" title="Negative develop and print"/>
+			<field type="simple_cost" title="Negative develop and TK"/>
+			<field type="simple_cost" title="Negative develop, TK and sync"/>
+			<field type="simple_cost" title="Rushes log disk"/>
+			<field type="simple_cost" title="Section reprints"/>
+			<field type="simple_cost" title="Positive cutting"/>
+			<field type="simple_cost" title="Registration step prints"/>
+			<field type="simple_cost" title="Edit decision list"/>
+			<field type="simple_cost" title="Negative section assembly"/>
+			<field type="simple_cost" title="Section lpos, lneg and print"/>
+			<field type="simple_cost" title="Negative cutting"/>
+			<field type="simple_cost" title="35mm answer print"/>
+			<field type="simple_cost" title="16mm answer print"/>
+			<field type="simple_cost" title="Bulk prints"/>
+			<field type="simple_cost" title="Insurance master lpos, lneg and print"/>
+			<field type="simple_cost" title="Storage"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+	<department name="OPTICAL and SPECIAL EFX">
+			<field type="simple_cost" title="Rostrum camera"/>
+			<field type="simple_cost" title="Animation"/>
+			<field type="simple_cost" title="Model making"/>
+			<field type="simple_cost" title="Model shoot"/>
+			<field type="simple_cost" title="Motion control shoot"/>
+			<field type="simple_cost" title="Artwork"/>
+			<field type="simple_cost" title="Optical neg. list (EDL)"/>
+			<field type="simple_cost" title="Optical lpos."/>
+			<field type="simple_cost" title="Optical shoot"/>
+			<field type="simple_cost" title="Digital transfer to film"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+	<department name="RECORDING and DUBBING">
+			<field type="simple_cost" title="Rushes sound transfer"/>
+			<field type="simple_cost" title="Digital track laying"/>
+			<field type="simple_cost" title="Audiofile load time"/>
+			<field type="simple_cost" title="Digital audio studio"/>
+			<field type="simple_cost" title="Film dubbing studio"/>
+			<field type="simple_cost" title="Special effects machine hire"/>
+			<field type="simple_cost" title="Magnetic transfer"/>
+			<field type="simple_cost" title="DAT  14 transfer"/>
+			<field type="simple_cost" title="Cinema re-pitch"/>
+			<field type="simple_cost" title="Optical sound transfer"/>
+			<field type="simple_cost" title="Track neg. develop"/>
+			<field type="simple_cost" title="Studio master storage"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+	<department name="OFFLINE PREP/SUPPLY">
+			<field type="simple_cost" title="Rushes telecine Xfr"/>
+			<field type="simple_cost" title="Rushes telecine Xfr and sync"/>
+			<field type="simple_cost" title="Encoding keycode"/>
+			<field type="simple_cost" title="Master tape to video cassette"/>
+			<field type="simple_cost" title="Time coded dubbing U-matic"/>
+			<field type="simple_cost" title="Time coded edit master"/>
+			<field type="simple_cost" title="Video cassettes (tape stock)"/>
+			<field type="simple_cost" title="Video cassettes (machine time)"/>
+			<field type="simple_cost" title="Audio transfer (tape stock)"/>
+			<field type="simple_cost" title="Audio transfer (machine time)"/>
+			<field type="simple_cost" title="Computer match"/>
+			<field type="simple_cost" title="VCR edit suite hire"/>
+			<field type="simple_cost" title="Non-linear edit suite hire"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+	<department name="ONLINE EDIT">
+			<field type="simple_cost" title="Telecine grading time"/>
+			<field type="simple_cost" title="Ultrasonic clean"/>
+			<field type="simple_cost" title="Telecine recording time"/>
+			<field type="simple_cost" title="Telecine to analoguedigital master"/>
+			<field type="simple_cost" title="HenryInferno Suite hire"/>
+			<field type="simple_cost" title="Caption generator"/>
+			<field type="simple_cost" title="Digital edit suite hire"/>
+			<field type="simple_cost" title="Up and down-load"/>
+			<field type="simple_cost" title="Special effects machine hire"/>
+			<field type="simple_cost" title="Media disk storage"/>
+			<field type="simple_cost" title="Digital colour processing (DCP)"/>
+			<field type="simple_cost" title="Tape sale and hire"/>
+			<field type="simple_cost" title="Sound relay and clock"/>
+			<field type="simple_cost" title="14  DAT audio transfers"/>
+			<field type="simple_cost" title="Cassette copies"/>
+			<field type="simple_cost" title="Broadcast dubs"/>
+			<field type="simple_cost" title="Delivery"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+	<department name="MISCELLANEOUS">
+			<field type="simple_cost" title="Viewing theatre"/>
+			<field type="simple_cost" title="Rubber numbering"/>
+			<field type="simple_cost" title="Equipment hire"/>
+			<field type="simple_cost" title="Picture library search fee  royalty"/>
+			<field type="simple_cost" title="Pic. library mat. NandP  tape transfer"/>
+			<field type="simple_cost" title="Sound effects search fee  royalty"/>
+			<field type="simple_cost" title="Music library search fee  royalty"/>
+			<field type="simple_cost" title="Original music"/>
+			<field type="simple_cost" title="Censor fee"/>
+			<field type="simple_cost" title="Red star  air freight"/>
+			<field type="simple_cost" title="Courier"/>
+			<field type="simple_cost" title="Transport"/>
+			<field type="simple_cost" title="Storage  material return"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+	<department name="EDITING CHARGES">
+			<field type="simple_cost" title="Edit fee - original version"/>
+			<field type="simple_cost" title="Overtime"/>
+			<field type="simple_cost" title="Digitising, machine time"/>
+			<field type="simple_cost" title="Rushes synching video"/>
+			<field type="simple_cost" title="Rushes synching film"/>
+			<field type="simple_cost" title="Picture  music  SFX search fee"/>
+			<field type="simple_cost" title="Non-linear edit suite"/>
+			<field type="simple_cost" title="VCR edit suite"/>
+			<field type="simple_cost" title="Graphics  special effects"/>
+			<field type="simple_cost" title="Non-linear tracklaying"/>
+			<field type="simple_cost" title="Non-linear pre-mixing"/>
+			<field type="simple_cost" title="Video copies"/>
+			<field type="simple_cost" title="Auto edit disk (EDL)"/>
+			<field type="simple_cost" title="Media disk storage"/>
+			<field type="simple_cost" title="Film stock and spacing"/>
+			<field type="simple_cost" title="Computamatch"/>
+			<field type="simple_cost" title="Telecine video supervision"/>
+			<field type="simple_cost" title="Video supervision"/>
+			<field type="simple_cost" title="Stock"/>
+			<field type="simple_cost" title="Sundries"/>
+	</department>
+</department>
+<department name="INSURANCE">
+			<field type="simple_cost" title="Artists"/>
+			<field type="simple_cost" title="Crew Location"/>
+			<field type="simple_cost" title="PublicEmployers Liability"/>
+			<field type="simple_cost" title="Props"/>
+			<field type="simple_cost" title="Weather"/>
+			<field type="simple_cost" title="Negatives"/>
+			<field type="simple_cost" title="Car"/>
+			<field type="simple_cost" title="Production Insurance"/>
+</department>
+<department name="SUNDRIES">
+			<field type="simple_cost" title="Sundries"/>
+			<field type="simple_cost" title="Extra footage charge"/>
+</department>
+<department name="MUSIC (ORIGINAL)">
+			<field type="simple_cost" title="Composer"/>
+			<field type="simple_cost" title="Music Author"/>
+			<field type="simple_cost" title="Arranger"/>
+			<field type="simple_cost" title="Adapter"/>
+			<field type="simple_cost" title="Musicians"/>
+			<field type="simple_cost" title="Singers Audition Call"/>
+			<field type="simple_cost" title="Singers"/>
+			<field type="simple_cost" title="Choir Audition call"/>
+			<field type="simple_cost" title="Choir"/>
+			<field type="simple_cost" title="Instruments Rental"/>
+			<field type="simple_cost" title="Musicians and Singers subst."/>
+			<field type="simple_cost" title="24 Track Tapes"/>
+			<field type="simple_cost" title="Sound Engineer"/>
+			<field type="simple_cost" title="Assistant"/>
+			<field type="simple_cost" title="Recording Studio"/>
+			<field type="simple_cost" title="Mixing Studio"/>
+			<field type="simple_cost" title="Art Director"/>
+			<field type="simple_cost" title="D.A.T."/>
+			<field type="simple_cost" title="6.25mm Tapes"/>
+			<field type="simple_cost" title="Audio tapes"/>
+			<field type="simple_cost" title="Overtime"/>
+			<field type="nic"/>
+</department>
+</field_schema>

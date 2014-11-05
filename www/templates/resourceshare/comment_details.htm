@@ -1,0 +1,405 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#D4D0C8;">
+
+<script>
+	var currentSection = 'general_info';
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}
+	
+	var helptext = new Object();
+	
+	var session_id = '<wk>$session_id</wk>';
+
+	var keyword_hash = new Object();
+
+	var new_keyword_id = 1;
+	
+	function uploadedOk()
+	\{
+
+	\}
+
+	function new_keyword(id, word, value)
+	\{
+		if(!id)
+		\{
+			id = 'new' + new_keyword_id;
+			new_keyword_id++;
+		\}
+
+		var keyword = new Object();
+		keyword.id = id;
+		keyword.word = word;
+		keyword.value = value;
+
+		keyword_hash[keyword.id] = keyword;
+	\}
+{
+	foreach my $keyword (@{$c{keyword_array}})
+	{
+		my $id = $keyword->get_id;
+		my $word = $keyword->word;
+		my $value = $keyword->value;
+
+		$OUT.=<<"+++";
+new_keyword($id, '$word', '$value');
++++
+	}
+}
+
+	function get_keywords_packet()
+	\{
+		var packet = "<keywords>\n";
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			packet += "<keyword id=\"" + keyword.id + "\" word=\"" + keyword.word + "\" value=\"" + keyword.value + "\"";
+
+			if(keyword.deleted)
+			\{
+				packet += " deleted=\"true\"";
+			\}
+
+			packet += "/>\n";
+		\}
+
+		packet += "</keywords>";
+
+		return packet;
+	\}
+
+	function create_keyword()
+	\{
+		var new_word = document.getElementById('new_word');
+		var existing_word = document.getElementById('existing_word');
+		var value = document.getElementById('keyword_value');
+
+		var word = '';
+
+		if(new_word.value!='')
+		\{
+			word = new_word.value;
+		\}
+		else
+		\{
+			word = existing_word.value;
+		\}
+
+		if(word=='')
+		\{
+			form_error('Please enter a keyword');
+			return;
+		\}
+
+		if(value.value=='')
+		\{
+			form_error('Please enter a value');
+			return;
+		\}
+
+		new_keyword(null, word, value.value);
+
+		apply_keyword_table();
+
+		new_word.value = '';
+		value.value = '';
+	\}
+
+	function apply_keyword_table()
+	\{
+		var html = get_keyword_table();
+
+		document.getElementById('keywords_td').innerHTML = html;
+	\}
+
+	function delete_keyword(id)
+	\{
+		var keyword = keyword_hash[id];
+
+		keyword.deleted = true;
+
+		apply_keyword_table();
+	\}
+
+	function get_keyword_table()
+	\{
+		var table = '<table width=100% border=0 cellspacing=0 cellpadding=0>';
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				var keyword_row = 	'<tr><td align=left valign=bottom class="dottedline">'
+								+ '<font class="keyword">' + keyword.word + ' = '
+								+	keyword.value + '&nbsp;</font></td>'
+								+	'<td align=right width=16>'
+								+	'<a style="cursor:hand;" onClick="delete_keyword(\'' + keyword.id + '\');">'
+								+	'<img alt="Delete Keyword" src="/images/icons/16/recyclebin.gif" width=16 height=16 border=0>'
+								+	'</a></td></tr>';
+
+				table += keyword_row;
+			\}
+		\}
+
+		table += '</table>';
+
+		return table;
+	\}
+
+	function author_changed(select)
+	\{
+		var sel = select.selectedIndex;
+
+		if(sel>0)
+		\{
+			var author_text = select.options[sel].text;
+
+			document.resourceform.author.value = author_text;
+		\}
+	\}
+
+	function validate_resourceform()
+	\{
+		var ret = true;
+		var form = document.resourceform;
+		var required_texts = new Array('title');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+
+			if(form[field])
+			\{
+				var value = form[field].value;
+
+				if((value=='')&&(form.type.value!='file'))
+				\{
+					form_error('You must supply a ' + field + ' value.');
+					form[field].className = 'text_field2';
+					ret = false;
+				\}
+			\}
+		\}
+		
+		applyRichTextValue();
+
+		//document.getElementById('tabPane1').style.display = 'none';
+		//document.getElementById('save_button').style.display = 'none';
+
+		return ret;
+	\}
+
+	function do_cancel()
+	\{
+		top.close();
+	\}
+
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+		setTimeout("clear_form_error();", 10000);
+	\}
+
+	function clear_form_error()
+	\{
+		document.all('error_span').innerText = '';
+	\}
+
+	function existing_value_changed(select)
+	\{
+		var value = select.value;
+
+		if(value!="-1")
+		\{
+			document.getElementById('keyword_value').value = value;
+		\}
+	\}
+
+	function existing_keyword_changed(select)
+	\{
+		var value = select.value;
+
+		var option_text = '<select onChange="existing_value_changed(this);" size="1" style="width:140px;" class="text_field" name="existing_value" id="existing_value">';
+		option_text += '<option value="-1">&#151;&#151;&#151;&#151;&#151;</option>';
+
+		if(value!="-1")
+		\{
+			var arr = keyword_values[value];
+
+			if(arr)
+			\{
+				for(var i=0; i<arr.length; i++)
+				\{
+					var value = arr[i];
+
+					option_text += '<option value="' + value + '">' + value + '</option>';
+				\}
+			\}
+		\}
+
+		option_text += '</select>';
+
+		document.getElementById('existing_value_span').innerHTML = option_text;
+	\}
+	
+	function extra_option_changed(gui, text_id)
+	\{
+		var value = gui.value;
+		
+		if((value!='')&&(value!='-1'))
+		\{
+			document.getElementById(text_id).value = value;
+		\}
+	\}
+
+</script>
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="resourceform" onSubmit="return validate_resourceform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_resource_form_submit">
+<input type="hidden" name="type" value="{$c{resource}->get_type}">
+<input type="hidden" name="author" value="{$c{resource}->author||$c{user}->get_fullname}">
+<input type="hidden" name="keywords_packet" value="">
+<input type="hidden" name="resource_id" value="{$c{resource}->get_id}">
+<input type="hidden" name="access_code" id="access_code" value="{$c{resource}->access_code}">
+<input type="hidden" name="from_website" value="{$c{params}->{from_website}}">
+<input type="hidden" name="auto_folder_value" value="{$c{params}->{auto_folder_value}}">
+<input type="hidden" name="notes" id="notes" value="">
+<input type="hidden" name="privilage_packet" id="privilage_packet" value="">
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">		
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="general_info" selected>Comment Details</option>
+</select>
+</td>
+<td align="left" valign=top>
+<!--
+
+
+	FOLDER DETAILS
+	
+	
+	-->
+<span id="general_info_section" style="display:inline;">	
+<b>Comment Info</b><br>
+<br>
+<table width="96%" border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Heading:</td>
+<td align="LEFT"><input type="text" name="title" value="{$c{resource}->get_value('title')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:300px;"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan=2>Enter your comment below... </td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td  colspan="2" align="LEFT">
+
+
+
+	<script language="JavaScript" type="text/javascript" src="/wk/lib/newRichEdit/html2xhtml.js"></script>
+	<!-- To decrease bandwidth, use richtext_compressed.js instead of richtext.js //-->
+	<script language="JavaScript" type="text/javascript" src="/wk/lib/newRichEdit/richtext.js"></script>
+	
+<script language="JavaScript" type="text/javascript">
+
+function notesChanged(gui)
+\{
+	if(!window.confirm('Do you want to copy the notes into the webpage text?')) \{ return; \}
+	
+	var value = gui.value;
+	
+	if(!currentRTE) \{ currentRTE = 'rte1'; \}
+
+	var oRTE = frames['rte1'];
+	var oBody = oRTE.document.body;
+	
+
+	oBody.innerHTML = value;
+
+
+	return;
+	oRng.collapse(false);
+	oRng.select();
+\}
+
+function applyRichTextValue()
+\{
+	//make sure hidden and iframe values are in sync before submitting form
+	//to sync only 1 rte, use updateRTE(rte)
+	//to sync all rtes, use updateRTEs
+	updateRTE('rte1');
+	//updateRTEs();
+	//alert("rte1 = " + document.RTEDemo.rte1.value);
+	
+	document.resourceform.notes.value = document.resourceform.rte1.value;
+	
+	//change the following line to true to submit form
+	return false;
+\}
+
+//Usage: initRTE(imagesPath, includesPath, cssFile, genXHTML)
+initRTE("/wk/lib/newRichEdit/images/", "/wk/lib/newRichEdit/", "", true);
+
+//Usage: writeRichText(fieldname, html, width, height, buttons, readOnly)
+writeRichText('rte1', '{$c{resource}->get_js_value('notes')}', 540, 300, true, false);
+
+</script>
+</td>
+</tr>
+</table>
+</span>
+
+</div>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{resource}->{error_text}}</span></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+<input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;">
+</TD>
+<TD ALIGN="RIGHT" VALIGN="TOP">&nbsp;</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</form>
+
+</body>

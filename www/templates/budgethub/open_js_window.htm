@@ -1,0 +1,33 @@
+<!--#include virtual="temp_include.htm" -->
+Generating Window ...
+<script>
+	var wwidth = 780;
+	var wheight = 580;
+
+	var new_url = href + '&method=generate_window';
+	
+    openWindow(new_url, wwidth, wheight);
+
+//	var params = "status=yes,width=" + wwidth + ",height=" + wheight;
+//
+//	var scheight = screen.availHeight;
+//	var scwidth = screen.availWidth;
+//
+//	var newwinx = (scwidth/2) - (wwidth/2);
+//	var newwiny = (scheight/2) - (wheight/2) - 30;
+//
+//	var app_window = window.open(new_url, "", params);
+//
+//	app_window.moveTo(newwinx, newwiny);
+</script>
+
+<script>
+	function move_on()
+	\{
+		var move_url = href + '&method=logged_in';
+
+		self.location = move_url;
+	\}
+	
+	setTimeout("move_on();", 1000);
+</script>

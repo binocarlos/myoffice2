@@ -1,0 +1,86 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var graphMode = false;
+var newLevel = '{$c{return_level}}';
+
+top.returnValue = newLevel;
+
+function closeWindow()
+\{
+	top.returnValue = newLevel;
+	top.close();
+\}
+</script>
+
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+-->
+</style>
+<table border="0" cellspacing="0" cellpadding="3">
+  <tr>
+    <td width="400"><b>{$c{exam}->get_fullname} --- {$c{pupil}->get_fullname}</b><br>
+    <br></td>
+  </tr>
+</table>
+  <input name="button" type="button" class="button" onClick="closeWindow();" value="Back">&nbsp;
+  <input name="button" type="button" class="button" onClick="self.print();" value="Print">
+ 
+ <table border=0 cellspacing=5 cellpadding=5>
+{
+	foreach my $topic_id (keys %{$c{pupil}->{assessments}})
+	{
+		my $assessments = $c{pupil}->{assessments}->{$topic_id};
+		
+		$OUT.=<<"+++";
+<tr><td><b style="font-size:12pt;">$topic_id</b></td></tr>
+<tr><td>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#999999">
+<tr bgcolor="#FFFFFF">
+  <td>Level</span></td>
+  <td>Availiable Marks </td>
+  <td>Required Marks </td>
+  <td>Obtained Marks </td>
+  <td>Level Awarded?</td>
+</tr>
++++
+
+		foreach my $pa (@$assessments)
+		{
+			my $level = $pa->level;
+			my $score = $pa->score;
+			my $req = $pa->required;
+			my $total = $pa->marks;
+		
+			my $img = '/images/holiday/cross.gif';
+		
+			if($pa->is_awarded_or_used)
+			{
+				$img = '/images/holiday/tick.gif';
+			}
+		
+			my $bg = ' bgcolor=#ffffff';
+		
+			if($pa->is_use_level)
+			{
+				$bg = ' bgcolor=#f0f0f0';
+			}
+		
+			$OUT.=<<"+++";
+<tr align="right"$bg>
+<td>$level</td>
+<td>$total</td>
+<td>$req</td>
+<td>$score</td>
+<td><img src="$img" width=14 height=14></td>
+</tr>
++++
+		}
+		
+		$OUT.=<<"+++";
+</table>
+</td></tr>
++++
+	}
+}
+</table>

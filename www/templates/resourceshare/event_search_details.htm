@@ -1,0 +1,230 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#D4D0C8;">
+<script>
+	var helptext = new Object();
+	var session_id = '<wk>$session_id</wk>';
+	var keyword_hash = new Object();
+	var new_keyword_id = 1;
+	var currentSection = 'general_info';
+	var event_color_hash = new Object();
+	
+	var checkboxArray = new Array();
+	
+	function registerCheckbox(id)
+	\{
+		checkboxArray.push(id);
+	\}
+	
+	function selectAll()
+	\{
+		setCheckboxmodes(true);
+	\}
+	
+	function selectNone()
+	\{
+		setCheckboxmodes(false);
+	\}	
+	
+	function deleteEvents()
+	\{
+		if(window.confirm('Are you sure you want to delete the selected events?'))
+		\{
+			document.searchForm.method.value = 'resources_search_events_delete';
+			document.searchForm.submit();
+		\}
+	\}
+	
+	function resetDelete()
+	\{
+		document.searchForm.method.value = 'resources_search_events';
+	\}
+	
+	function setCheckboxmodes(mode)
+	\{
+		for(var i=0; i<checkboxArray.length; i++)
+		\{
+			document.getElementById('event' + checkboxArray[i]).checked = mode;
+		\}	
+	\}
+	
+	
+</script>
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<form method="POST" action="{$c{script}}" style="margin:0;" name="searchForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_search_events">
+<input type="hidden" name="do_search" value="y">
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="general_info" selected>Event Search</option>
+</select>
+<br>
+<br>
+<input type="button" value="Select All" class="button" name="Button" style="width:75px;" id="select_all_button" onClick="selectAll();">
+&nbsp;&nbsp;&nbsp;<br>
+<br>
+<input type="button" value="Select None" class="button" name="Button" style="width:75px;" id="select_none_button" onClick="selectNone();">
+<br>
+<br>
+<input type="button" value="Delete Selected Events" class="button" style="width:150px;" id="delete_events_button" onClick="deleteEvents();"></td>
+<td align="left" valign=top>
+<!--
+
+
+	RESOURCE DETAILS
+	
+	
+	-->
+	<span id="general_info_section" style="display:inline;">
+	<b>Search Events</b><br>
+<br>
+            <table width="96%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+              <tr style="padding-bottom:5px;">
+                <td align="RIGHT">Title:&nbsp;</td>
+<td width="100%" align="LEFT">
+<input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="title" value="{$c{params}->{title}}" style="width:100%;"></td>
+</tr>
+<tr><td height=10></td>
+</tr>
+ <tr style="padding-bottom:5px;">
+                <td align="RIGHT">Job.No:&nbsp;</td>
+<td width="100%" align="LEFT">
+<input name="job_number" type="TEXT" class="text_field" id="job_number" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{job_number}}"></td>
+</tr>
+<tr><td height=10></td>
+</tr>
+ <tr style="padding-bottom:5px;">
+                <td align="RIGHT">Person:&nbsp;</td>
+<td width="100%" align="LEFT"><input name="author" type="TEXT" class="text_field" id="author" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{author}}"></td>
+</tr>
+<tr><td height=20></td>
+</tr>
+<tr><td colspan=2>
+<table border="0" cellpadding="0" cellspacing="0" style="display:inline;" id="date_table">
+<tr>
+<td height=10>
+
+</td>
+</tr>
+<tr>
+<td>
+<table  border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" id="start_date_table">
+<tr style="padding-bottom:5px;">
+<td width="80" align="RIGHT"> Start Date:</td>
+<td align="LEFT"><input name="start_date" type="TEXT" class="text_field" id="start_date" style="width:100px;" value="{$c{params}->{start_date}}"></td>
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('start_date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td height=10></td>
+</tr>
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" id="end_date_table">
+<tr style="padding-bottom:5px;">
+<td width="80" align="RIGHT"> End Date:</td>
+<td width="80" align="LEFT"><input name="end_date" type="TEXT" class="text_field" id="end_date" style="width:100px;" value="{$c{params}->{end_date}}"></td>
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('end_date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr><td height=20></td>
+</tr>
+<tr><td colspan=2>
+<div style="width:100%;height:300px;overflow-y:scroll;border: 1px solid #000000;padding:10px;">
+<table width="100%"  border="0" cellspacing="0" cellpadding="3">
+<tr>
+<td>&nbsp;</td>
+<td><strong>Job No. </strong></td>
+<td><strong>Title</strong></td>
+<td><strong>Person</strong></td>
+<td><strong>Dates</strong></td>
+<td>&nbsp;</td>
+</tr>
+{
+	foreach my $event (@{$c{data_org}->ensure_child_array('resource')})
+	{
+		my $id = $event->get_id;
+		my $author = $event->calendar_person || $event->author;
+		my $title = $event->title;
+		my $dates = $event->get_calendar_date_st;
+		my $jobno = $event->jobno;
+		
+		$OUT.=<<"+++";
+<script>
+	registerCheckbox($id);
+</script>
+<tr>
+<td width="10"><input type="checkbox" name="event$id" id="event$id"></td>
+<td>$jobno</td>
+<td>$title</td>
+<td>$author</td>
+<td>$dates</td>
+<td>&nbsp;</td>
+</tr>
++++
+	}
+}
+</table>
+</div>
+</td>
+</tr>
+</table>
+</span>
+
+
+
+</td>
+</tr>
+<tr>
+<td colspan=2>
+
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="100%">
+<tr>
+<td align="LEFT" valign="TOP" style="padding-top:12px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{error_text}}</span></font></td>
+<td align="RIGHT" valign="TOP">
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+<input type="submit" value="Search" class="button" name="save_button" style="width:75px;" id="save_button" onClick="resetDelete();">&nbsp;&nbsp;&nbsp;
+<input type="button" value="Cancel" class="button2" name="Button" onClick="top.close();" style="width:75px;">
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</form>
+
+<script>
+		//setupAllTabs();
+
+
+
+</script>
+{$c{calendar}}
+</body>

@@ -1,0 +1,84 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+</script>
+<body>
+<table cellpadding="20" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td height="100%" align="center" valign="middle">
+
+<form action="{$c{script}}" method="POST" name="options_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="options_home_submit">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Options</legend>
+<div class="seccontent" align="left">
+
+<TABLE width="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">      
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;">
+  <strong>Account Types</strong> <br>
+<br>
+Type variable names (i.e. no spaces) and seperate them by commas - <br>
+this list is used to populate the 'Account Type' list for a school... <br>	</TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;"><textarea name="school_types" class="text_field" id="school_types" style="width:300px; height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{school_types}}</textarea></TD>
+  </TR>
+</TABLE>
+
+<br>
+<br>
+<TABLE width="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR style="padding-bottom:5px;">
+<TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;"><strong>Service Announcement </strong><br> 
+This message will appear on all portal pages<br>
+you can use it to mention service disruptions <br>
+or new topics that have been uploaded... <br>
+<br>
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;">Announcement Title (will be in bold) </TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;"><input type="text" name="service_date" class="text_field" id="service_date" style="width:300px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{service_date}}"></TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;">Announcement Message </TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD ALIGN="left" VALIGN="top" nowrap style="padding-right:5px;"><textarea name="service_message" class="text_field" id="service_message" style="width:300px; height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{service_message}}</textarea></TD>
+</TR>
+</TABLE>
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="96%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

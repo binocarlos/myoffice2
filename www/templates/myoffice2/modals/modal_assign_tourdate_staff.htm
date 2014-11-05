@@ -1,0 +1,168 @@
+<!--#include virtual="../temp_include.htm" -->
+<script>
+	function choosePrintRun(id)
+	\{
+		document.printRunForm.print_run_id.value = id;
+		document.printRunForm.submit();
+	\}
+
+</script>
+
+<style type="text/css">
+.body \{ background-color:#D4D0C8; \}
+</style>
+
+<body style="background-color:#D4D0C8;">
+
+
+<table cellpadding="10" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" align="left" valign="top">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+        <legend>Showing Details </legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Showing Details</u><br><br>
++++
+}
+		 <table  border="0" cellspacing="0" cellpadding="5">
+                        <tr>
+                          <td width="100">Tour:</td>
+                          <td>{$c{pagetour}->name}</td>
+                        </tr>		 
+                        <tr>
+                          <td width="100">Venue:</td>
+                          <td>{$c{venue}->get_city_title}</td>
+                        </tr>
+                        <tr>
+                          <td>Date:</td>
+                          <td>{$c{tourdate}->get_datetime_title}</td>
+                        </tr>
+          </table>  		  
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");		   
+        </div>
+      </fieldset><br>                   
+<fieldset>
+        <legend>Assign Staff </legend>
+        <div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<br>
+<br>
+
+	<u>Assign Staff</u><br>
++++
+}		
+<form method="POST" action="{$c{script}}" name="addStaffForm" style="margin:0px;padding:0px;">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tourlist_add_staff_submit">
+<input type="hidden" name="tourdate_id" value="{$c{tourdate}->get_id}">
+                        <table  border="0" cellpadding="5" cellspacing="0">
+
+                        <tr align="left">	
+						<td><input name="staffname" type="TEXT" class="text_field" id="staffname" style="width:200px;" value="{$c{params}->{staffname}}"></td>
+						<td><input name="Submit" type="submit" class="button2" style="width:125px;" value="Add Staff Member"></td>
+						</tr>
+						</table>
+						
+</form>				
+  
+<form method="POST" action="{$c{script}}" name="staffForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tourlist_assign_staff_submit">
+<input type="hidden" name="tourdate_id" value="{$c{tourdate}->get_id}">
+                        <table  border="0" cellpadding="5" cellspacing="0">
+
+                        <tr align="left">
+                          <td align="right">Role</td>							
+                          <td>Job</td>					  
+                          <td>Person</td>
+                          <td>Confirmed</td>
+                        </tr>
+                        <tr align="left">
+                          <td align="right">Main</td>							
+                          <td width="120">Company Manager </td>
+                          <td><select name="company_manager_id" class="text_field" id="company_manager_id" style="width:200px;">
+                            {$c{tourdate}->get_staff_options('company_manager_id')}
+                          </select></td>
+						  <td align="left">{$c{tourdate}->get_confirmed_checkbox('company_manager_confirmed')}</td>
+                        </tr>
+                        <tr align="left">
+                          <td align="right">Main</td>						
+                          <td>Projectionist</td>
+
+                          <td><select name="projectionist_id" class="text_field" id="projectionist_id" style="width:200px;">
+                            
+                            {$c{tourdate}->get_staff_options('projectionist_id')}
+                          
+                          </select></td>
+                          <td align="left">{$c{tourdate}->get_confirmed_checkbox('projectionist_confirmed')}</td>
+                        </tr>
+                        <tr align="left">
+                          <td align="right">Main</td>
+                          <td>Host</td>
+                          <td><select name="host_id" class="text_field" id="host_id" style="width:200px;">
+                            
+                            {$c{tourdate}->get_staff_options('host_id')}
+                          
+                          </select></td>
+                          <td align="left">{$c{tourdate}->get_confirmed_checkbox('host_confirmed')}</td>
+                        </tr>
+                        <tr align="left">
+                          <td align="right">Backup</td>
+                          <td>Company Manager </td>
+                          <td><select name="backup_company_manager_id" class="text_field" id="backup_company_manager_id" style="width:200px;">
+                            
+                            {$c{tourdate}->get_staff_options('backup_company_manager_id')}
+                          
+                          </select></td>
+                          <td align="left">{$c{tourdate}->get_confirmed_checkbox('backup_company_manager_confirmed')}</td>
+                        </tr>
+                        <tr align="left">
+                          <td align="right">Backup</td>
+                          <td>Projectionist</td>
+                          <td><select name="backup_projectionist_id" class="text_field" id="backup_projectionist_id" style="width:200px;">
+                            
+                            {$c{tourdate}->get_staff_options('backup_projectionist_id')}
+                          
+                          </select></td>
+                          <td align="left">{$c{tourdate}->get_confirmed_checkbox('backup_projectionist_confirmed')}</td>
+                        </tr>
+                        <tr align="left">
+                          <td align="right">Backup</td>
+                          <td>Host</td>
+                          <td><select name="backup_host_id" class="text_field" id="backup_host_id" style="width:200px;">
+                            
+                            {$c{tourdate}->get_staff_options('backup_host_id')}
+                          
+                          </select></td>
+                          <td align="left">{$c{tourdate}->get_confirmed_checkbox('backup_host_confirmed')}</td>
+                        </tr>
+                        <tr align="left">
+                          <td colspan="3" align="left"><input type="button" onClick="top.returnValue=null;top.close();" value="Close" class="button2" style="width:75px;"></td>
+                          <td align="right"><input name="Submit" type="submit" class="button2" style="width:75px;" value="Save"></td>
+                        </tr>
+
+                      </table>
+		</form>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");				
+        </div>
+      </fieldset>
++++
+}
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+
+
+

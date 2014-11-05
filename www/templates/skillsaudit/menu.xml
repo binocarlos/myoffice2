@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="LA Users" width="120">
+		<menuitem title="Add LA User" action="get_menu_iframe_query('add_user','Add User');"/>
+		<menuitem title="View/Edit LA Users" action="get_menu_iframe_query('users_home','Current Users');"/>
+	</menublock>
+	<menublock title="Schools" width="120">
+		<menuitem title="Manage Schools" action="get_menu_iframe_query('schools_home', 'Current Schools');"/>
+	</menublock>
+	<menublock title="Analysis" width="120">
+		<menuitem title="View Analysis" action="get_manage_visitors();"/>
+	</menublock>	
+{
+	if($c{user}->is_webkit)
+	{
+		$OUT.=<<"+++";	
+	<menublock title="Audit Templates" width="120">
+		<menuitem title="Manage Templates" action="get_menu_iframe_query('audit_template_home', 'Current Audit Templates');"/>
+	</menublock>
++++
+	}
+}
+</menu_config>

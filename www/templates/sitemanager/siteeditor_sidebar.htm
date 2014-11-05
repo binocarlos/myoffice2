@@ -1,0 +1,100 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+
+<script>
+	function get_xTree_query(query)
+	\{
+		if(top.content.page.topbar.page_unload_confirm())
+		\{
+			top.content.page.topbar.reset_page();
+			
+			var loc = href + query;
+			parent.parent.page.content.location = loc;
+		\}
+	\}
+	
+{
+	if($c{website_array})
+	{
+		$OUT.=<<"+++";
+var tree = new WebFXTree('Websites');
++++
+
+		my $site_arr = $c{website_array};
+
+		foreach my $site (@$site_arr)
+		{
+			my $site_id = $site->get_id;
+
+			my $site_title = $site->get_value('title');
+
+			$OUT.=<<"+++";
+var site$site_id = new WebFXTreeItem('$site_title');
+site$site_id.action = "javascript: get_xTree_query('&method=siteeditor_site_index&website_id=$site_id');";
+
+tree.add(site$site_id);
++++
+
+			my @group_keys = sort keys %{$site->{_page_groups}};
+
+			foreach my $group_key (@group_keys)
+			{
+				my $group_title = $group_key;
+
+				my $addto = "site$site_id";
+
+				if($group_key=~/\w/)
+				{
+					my $group_id = lc($group_key);
+					$group_id =~ s/\W//g;
+
+					my $group_tree_id = "group_".$site_id."_".$group_id;
+
+					my $url_group_key = $group_key;
+
+					$OUT.=<<"+++";
+var $group_tree_id = new WebFXTreeItem('$group_title');
+$group_tree_id.action = "javascript: get_xTree_query('&method=siteeditor_site_index&website_id=$site_id&group_key=$url_group_key');";
+
+site$site_id.add($group_tree_id);
++++
+
+					$addto = $group_tree_id;
+				}
+
+				my $page_arr = $site->get_group_pages($group_key);
+
+				foreach my $page (@$page_arr)
+				{
+					my $id = $page->get_id;
+					my $title = $page->get_value('title');
+
+					$OUT.=<<"+++";
+var page$id = new WebFXTreeItem('$title');
+page$id.action = "javascript: get_xTree_query('&method=siteeditor_edit_page&page_id=$id');";
+
+$addto.add(page$id);
++++
+				}
+			}
+		}
+	}	
+}
+
+function unload_body()
+\{
+	top.document.getElementById('hide_pages_button').style.display = 'none';
+\}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+top.document.getElementById('hide_pages_button').style.display = 'inline';
+
+document.body.onunload = unload_body;
+
+</script>

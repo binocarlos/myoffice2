@@ -1,0 +1,114 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>	
+	function project_overview(id)
+	\{
+		var loc = href + '&method=project_overview&project_id=' + id;
+		
+		top.content.page.content.location = loc;	
+	\}
+	
+	function edit_all_projects()
+	\{
+		var loc = href + '&method=projects_home';
+		
+		top.content.page.content.location = loc;
+	\}
+	
+	function edit_project(id)
+	\{
+		var loc = href + '&method=project_form&project_id=' + id;
+
+		top.content.page.content.location = loc;
+	\}
+	
+	function show_task(id)
+	\{
+		alert('Task : ' + id);
+		return ;
+		
+		var loc = href + '&method=tasks_for_project_home';
+
+		top.content.page.content.location = loc;
+	\}
+	
+	function edit_job(id)
+	\{
+		var loc = href + '&method=job_form&job_id=' + id;
+
+		top.content.page.content.location = loc;
+	\}
+		
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		parent.parent.page.projects_home.location = loc;
+	\}
+
+var tree = new WebFXTree('Webkit');
+tree.action = "javascript: get_xTree_query('&method=projects_home_list');";
+
+var projects = new WebFXTreeItem('Projects');
+projects.action = "javascript: edit_all_projects();";
+tree.add(projects);
+
+{
+	my $projects_arr = $c{projects};
+	
+	foreach my $project (@$projects_arr)
+	{
+		my $project_id = $project->get_id;
+		my $project_name = $project->get_value('title');
+		
+		$OUT.=<<"+++";
+var project$project_id = new WebFXTreeItem('$project_name');
+
+project$project_id.icon = "/images/xtree/foldericon.png";
+projects.add(project$project_id);
+project$project_id.action = "javascript: project_overview($project_id);";
++++
+
+		my $task_ids_array = $project->get_task_id_array;		
+		
+		foreach my $task_id (@$task_ids_array)
+		{
+			my $task = $c{org}->get_child('task',$task_id);
+			my $task_name = $task->get_value('name');
+		
+			$OUT.=<<"+++";
+var tasks$task_id = new WebFXTreeItem('$task_name');
+tasks$task_id.action = "javascript: show_task($task_id);";
+project$project_id.add(tasks$task_id);
++++
+
+			my $jobs = $project->get_task_jobs($task_id);		
+		
+			foreach my $job (@$jobs)
+			{
+				my $job_id = $job->get_id;
+				my $job_name = $job->get_value('title');
+			
+			$OUT.=<<"+++";
+var jobs$job_id = new WebFXTreeItem('$job_name');
+jobs$job_id.action = "javascript: edit_job($job_id);";
+jobs$job_id.icon = '/images/xtree/file.png';
+
+tasks$task_id.add(jobs$job_id);
++++
+			}
+		}
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

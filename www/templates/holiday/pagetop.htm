@@ -1,0 +1,43 @@
+<HTML> 
+  <HEAD> 
+	 <TITLE></TITLE> <STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px;\}
+</STYLE>
+<SCRIPT>
+var href = '{$c{href}}';
+
+function swap(image,imagefile)
+\{
+  document.images[image].src = imagefile
+\}
+
+function do_last()
+\{
+	var new_loc = href + '&method={$c{view_method}}&nav=last';	parent.pagemain.location = new_loc;
+\}
+
+function do_next()
+\{
+	var new_loc = href + '&method={$c{view_method}}&nav=next';	parent.pagemain.location = new_loc;
+\}
+</SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" src="/lib/holiday/norightclick.js"></SCRIPT> 
+  </HEAD> 
+  <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0"> 
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="2" CELLSPACING="0"
+	  STYLE="border:1px; border-style:outset;" HEIGHT="100%"> 
+		<TR> 
+		  <TD WIDTH="84" HEIGHT="100%"><A ONCLICK="do_last();"
+			 ONMOUSEOVER="swap('last','/images/holiday/but_last{$c{type}}_on.gif');"
+			 ONMOUSEOUT="swap('last','/images/holiday/but_last{$c{type}}_off.gif');"><IMG
+			 src="/images/holiday/but_last{$c{type}}_off.gif" WIDTH="80" HEIGHT="23" BORDER="0"
+			 NAME="last"></A></TD> <TD WIDTH="100%" HEIGHT="100%"
+			STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;" ALIGN="CENTER"><B>{$c{date_st}}</B></TD> 
+		  <TD WIDTH="100%" HEIGHT="100%"><A ONCLICK="do_next();"
+			 ONMOUSEOVER="swap('next','/images/holiday/but_next{$c{type}}_on.gif');"
+			 ONMOUSEOUT="swap('next','/images/holiday/but_next{$c{type}}_off.gif');"><IMG
+			 src="/images/holiday/but_next{$c{type}}_off.gif" WIDTH="84" HEIGHT="23" BORDER="0"
+			 NAME="next"></A></TD> 
+		</TR> 
+	 </TABLE> </BODY>
+</HTML>

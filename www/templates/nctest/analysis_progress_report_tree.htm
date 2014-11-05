@@ -1,0 +1,223 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<table border=0 cellpadding="5" cellspacing="0">
+<tr>
+<td>You are viewing:</td>
+</tr>
+{
+	if($c{params}->{mode} eq 'current')
+	{
+		$OUT.=<<"+++";
+<tr>
+<td><strong style="color:red;">The Current School</strong></td>
+</tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+<tr>
+<td>Results between <strong style="color:red;"><br>
+  $c{params}->{from} -&gt; <br>
+  $c{params}->{to}</strong></td>
+</tr>
++++
+	}
+}
+<tr>
+<td> <input type="button" class="button" value="Change View" onClick="top.progressAnalysis();"></td>
+</tr>
+</table><br>
+<hr><br>
+<span id="menutree"></span>
+<script>
+var mode = '{$c{params}->{mode}}';
+
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		
+		top.content.page.location = loc;
+	\}
+	
+	function get_xTree_full_url(method)
+	\{		
+		var url = '/htmlhub/frames_double_content?session_id={$c{session_id}}&frame_method=' + method + '&title=_analysis_progress_report_toolbar&title_height=122&appname=nctest';
+		top.content.page.location = url;
+	\}	
+	
+	function createPupil(pupil_id, parent, title)
+	\{
+		createItem(parent, title, 'analysis_progress_report&pupil_id=' + pupil_id, '/images/holiday/employee.gif');
+	\}
+	
+	function createItem(parent, title, url, icon)
+	\{
+		var treeItem = new WebFXTreeItem(title);
+		
+		treeItem.action = "javascript: get_xTree_full_url('" + url + "');";
+		
+		if(icon!=null)
+		\{
+			treeItem.icon = icon;
+		\}
+		
+		if(!parent) \{ alert(title); \}		
+
+		parent.add(treeItem);
+		
+		return treeItem;
+	\}
+
+var toExpandArray = new Array();
+var tree = new WebFXTree('{$c{org}->name} Progress Report');
+tree.action = "javascript: get_xTree_full_url('analysis_progress_report');";
+
+{
+	my $mode = $c{params}->{mode};
+	my $from = $c{params}->{from};
+	my $to = $c{params}->{to};
+	
+	my $keystages = [
+		{	title => 'Foundation',
+			var => 'foundation',
+			low => 0,
+			high => 0,
+			year => '0' },
+		{	stage => 1,
+			low => 0,
+			high => 2,
+			year => '0,1,2' },
+		{	stage => 2,
+			low => 3,
+			high => 6,
+			year => '3,4,5,6' },
+		{	title => 'Previous Years',
+			left_school => 1,
+			var => 'previous',
+			year => 7,
+			low => 7,
+			high => 7 },
+		{	title => 'Non-pupils',
+			no_tree_year => 1,
+			year => '1000',
+			var => 'nonpupils',
+			low => 1000,
+			high => 1000 } ];
+			
+	foreach my $keystage (@$keystages)
+	{
+		my $title = 'Keystage '.$keystage->{stage};
+		
+		if($keystage->{title}=~/\w/) { $title = $keystage->{title}; }
+		
+		my $years = $keystage->{year};
+		my $stage = $keystage->{stage};
+		
+		my $high_year = $keystage->{high};
+		my $low_year = $keystage->{low};
+		
+		my $keystage_varname = "keystage$stage";
+	
+		if($keystage->{var}=~/\w/)
+		{
+			$keystage_varname = $keystage->{var};
+		}
+		
+		my $total_classes = 0;
+		
+		for(my $year=$keystage->{low}; $year<=$keystage->{high}; $year++)
+		{
+			if(($year<$low_year)||($year>$high_year)) { next; }
+			
+			my $classes = $c{org}->{_classes_by_year}->{$year};	
+			my $class_count = @$classes;
+			
+			$total_classes += $class_count;
+		}		
+		
+		if($total_classes<=0) { next; }
+		
+		$OUT.=<<"+++";
+var $keystage_varname = createItem(tree, '$title', 'analysis_progress_report&year=$years&mode=$mode&from=$from&to=$to');
+toExpandArray.push($keystage_varname);
++++
+			
+		for(my $year=$keystage->{low}; $year<=$keystage->{high}; $year++)
+		{
+			if(($year<$low_year)||($year>$high_year)) { next; }
+			
+			my $yeartitle = "Year $year";
+			if($year==0) { $yeartitle = 'Reception'; }
+			
+			my $classes = $c{org}->{_classes_by_year}->{$year};	
+			my $class_count = @$classes;
+			
+			my $add_to = $keystage_varname;
+			
+			if(($class_count>1)&&(!$keystage->{no_tree_year}))
+			{
+				$add_to = 'year'.$year;
+						
+				$OUT.=<<"+++";
+var year$year = createItem($keystage_varname, '$yeartitle', 'analysis_progress_report&year=$year&mode=$mode&from=$from&to=$to');
++++
+			}
+
+			foreach my $class (@$classes)
+			{
+				my $class_id = $class->get_id;
+				my $class_name = $class->get_js_value('name');
+				
+				if($class->has_left_school)
+				{
+					if(!$keystage->{left_school})
+					{
+						next;
+					}
+				}
+				else
+				{
+					if($keystage->{left_school})
+					{
+						next;
+					}
+				}
+				
+				$OUT.=<<"+++";
+var class$class_id = createItem($add_to, '$class_name', 'analysis_progress_report&class_id=$class_id&mode=$mode&from=$from&to=$to');
++++
+
+				foreach my $pupil (@{$class->ensure_child_array('pupil')})
+				{
+					my $pupil_id = $pupil->get_id;
+					my $pupil_name = $pupil->get_fullname(1);
+				
+					$pupil_name =~ s/'/\\'/g;
+				
+					$OUT.=<<"+++";
+createPupil($pupil_id, class$class_id, '$pupil_name');
++++
+				}
+			}
+		}
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.collapseAll();
+tree.expand();
+
+for(var i=0; i<toExpandArray.length; i++)
+\{
+	var toExpand = toExpandArray[i];
+	toExpand.expand();
+\}
+
+</script>
+
+
+

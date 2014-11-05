@@ -1,0 +1,209 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+
+var threadMap = new Object();
+var threadIdArray = new Array();
+
+function doAll(toMode)
+\{
+	for(var i=0; i<threadIdArray.length; i++)
+	\{
+		document.getElementById('include' + threadIdArray[i]).checked = toMode;
+		threadChanged(threadIdArray[i], toMode);
+	\}
+\}
+
+function threadChangedFromGUI(threadId, guiElem)
+\{
+	threadChanged(threadId, guiElem.checked);
+\}
+
+function threadChanged(threadId, newValue)
+\{
+	var arr = threadMap['thread' + threadId];
+	
+	for(var i=0; i<arr.length; i++)
+	\{
+		var checkboxElem = document.getElementById('include_activity' + arr[i]);
+		
+		checkboxElem.checked = newValue;
+	\}
+\}
+
+function addActivity(threadId, activityId)
+\{
+	var arr = threadMap['thread' + threadId];
+	
+	if(arr==null)
+	\{
+		arr = new Array();
+		
+		threadIdArray.push(threadId);
+	\}
+	
+	arr.push(activityId);
+	
+	threadMap['thread' + threadId] = arr;
+\}
+
+</script>	
+<style type="text/css">
+<!--
+.style1 {
+	color: #990000;
+	font-weight: bold;
+}
+-->
+</style>
+<body>
+<form action="{$c{href}}" method="POST" name="flattenForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="download_custom_cd_submit">
+<table border="0" align="center" cellpadding="20" cellspacing="0" style="display:inline;" id="mainTable">
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+<TR style="padding-bottom:5px;">
+<TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Mode:</TD>
+<TD width="500" ALIGN="LEFT" VALIGN="MIDDLE"><select name="mode" class="text_field" id="mode" style="width:100%;">
+<option value="thread" selected>In Threads</option>
+<option value="activity">Flat Activities</option>
+</select></TD>
+</TR>
+<tr>
+<td colspan=2>
+
+<TABLE BORDER="0" CELLPADDING="1" CELLSPACING="0">
+<TR style="padding-bottom:5px;"> 
+  <TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">For Website: </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="200"><select name="website_id" size="1" class="text_field" id="website_id" style="width:100%;">
+
+{$c{org}->get_website_options(undef, 'Default')}
+
+</select> 
+</TD>
+  </TR>
+</TABLE>	
+
+</td>
+<TR style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">
+<table width="100%"  border="0" cellspacing="1" cellpadding="0">
+<tr>
+<td colspan=2><b style="color:#990000;"> FILTER BY: </b></td>
+</tr>
+{
+	my $id = 0;
+	foreach my $version_comment (@{$c{version_comments}})
+	{
+		$id++;
+		$OUT.=<<"+++";
+<tr>
+<td width="20" align="left" valign="top"><input type="checkbox" name="version_comment_$id" value="$version_comment"></td>
+<td><strong>$version_comment</strong></td>
+</tr>		
++++
+	}
+}
+
+</table>
+</TD>
+</TR>
+<TR>
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">
+
+<table width="100%"  border="0" cellspacing="1" cellpadding="0" id="infoTable" style="display:block;">
+<tr>
+<td><b>Check the activities to include or choose from the groups above:</b><br>
+<br>
+<a href="javascript:doAll(true);">Select All</a><br>
+<br>
+<a href="javascript:doAll(false);">Deselect All</a><br>
+<br>
+
+</td>
+</tr>
+{
+	foreach my $set (@{$c{org}->ensure_child_array('thread_set')})
+	{
+		my $name = $set->name;
+		
+		$OUT.=<<"+++";
+<tr>
+<td><b>$name</b></td>
+</tr>
++++
+
+		foreach my $thread (@{$set->ensure_child_array('thread')})
+		{
+			my $threadname = $thread->name;
+			my $id = $thread->get_id;
+			
+			$OUT.=<<"+++";		
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" onClick="threadChangedFromGUI($id, this);" name="include$id" id="include$id" value="yes"><b>$threadname</b></td>
+</tr>		
++++
+
+			foreach my $activity (@{$thread->ensure_child_array('activity')})
+			{
+				my $activityname = $activity->name;
+				my $activityid = $activity->get_id;
+				
+				$OUT.=<<"+++";
+<tr>
+<td><script>addActivity($id, $activityid);</script>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="include_activity$activityid" id="include_activity$activityid" value="yes">$activityname</td>
+</tr>		
++++
+			}			
+		}
+	}
+}
+</table>
+
+</TD>
+</TR>
+<TR>
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+<TR align="right">
+<TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;"><input type="submit" name="Submit" value="Flatten!"></TD>
+</TR>
+</TABLE>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+</table>
+<table border=0 cellpadding="0" cellspacing="0" id="messageTable" style="display:none;">
+<tr>
+<td style="color:#CC0000;">
+Uploading, please wait...
+</td>
+</tr>
+</table>
+</form>
+</body>
+</html>
+
+
+

@@ -1,0 +1,96 @@
+<HTML>
+ <HEAD>
+	<TITLE>TestingTool :: Log In</TITLE>
+	<LINK REL="stylesheet" TYPE="text/css" HREF="/lib/nctest/styles/default/style.css">
+	<script src="/lib/kit.js"></script>
+	<script>
+	function openLoginWindow()
+	\{
+		var wwidth = 800;
+		var wheight = 580;
+		var code = document.getElementById('logincode').value;
+
+		var new_url = href + '&method=generate_window&fromlogin=1&logincode=' + code;
+
+		if(!fromLogin)
+		\{
+			openWindow(new_url, wwidth, wheight{$c{status}});
+		\}
+		else
+		\{
+			document.location = new_url;
+		\}
+	\}
+	</script>
+ </HEAD>
+ <BODY BGCOLOR="#FFFFFF" STYLE="border:2px inset;cursor:default;">
+ <form method="GET" action="{$c{script}}">
+ <input type="hidden" name="method" value="simple_test_bridge_submit">
+ <input type="hidden" name="exam_sitting_id" value="{$c{params}->{exam_sitting_id}}">
+ <input type="hidden" name="class_id" value="{$c{params}->{class_id}}"> 
+	<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD HEIGHT="100%" WIDTH="100%" VALIGN="MIDDLE" ALIGN="CENTER">
+			<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="1" CLASS="login_outer" ID="window1" WIDTH="300">
+			 <TR>
+				<TD ALIGN="LEFT" VALIGN="TOP">
+				 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%" CLASS="login_inner">
+					<TR>
+					 <TD WIDTH="100%" HEIGHT="100%" ALIGN="LEFT" VALIGN="TOP">
+						<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="1" ALIGN="LEFT">
+						 <TR>
+							<TD BACKGROUND="/lib/nctest/styles/default/login_top.jpg" class="login_title">TestingTool :: Log In</TD>
+						 </TR>
+						 <!--<TR>
+							<TD BGCOLOR="#FFFFFF"><IMG SRC="/images/logos/testingtool_login.gif" WIDTH="294" HEIGHT="52" BORDER="0"></TD>
+						 </TR>-->
+						 <TR>
+							<TD align="right">
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+								<TR>
+								 <TD>
+									<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+									 <tr>
+									 <td width="100%" class="login_instructions" colspan="2">Enter your name below ... </td>
+									 </tr>
+								   </TABLE></TD>
+								</TR>
+							 </TABLE>
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+								<TR>
+								 <TD HEIGHT="2" BACKGROUND="/lib/nctest/styles/default/login_divider.gif"></TD>
+								</TR>
+							 </TABLE>
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+								<TR>
+								 <TD>
+									<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+									 <TR>
+									 <TD WIDTH="1" class="login_fieldname" nowrap>Name:&nbsp;&nbsp;</TD>
+									 <TD width="100%"><INPUT NAME="name" TYPE="TEXT" CLASS="login_field" id="name" STYLE="width:100%;" ONFOCUS="this.className='login_field2';" ONBLUR="this.className='login_field';" value="{$c{params}->{name}}">
+									 </TD>
+									 </TR>
+									</TABLE></TD>
+								</TR>
+							 </TABLE>
+							 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+								<TR>
+								 <TD HEIGHT="2" BACKGROUND="/lib/nctest/styles/default/login_divider.gif"></TD>
+								</TR>
+							 </TABLE>
+							 <INPUT name="Submit" TYPE="submit" CLASS="login_button" STYLE="width:75px" VALUE="Log In"></TD>
+						 </TR>
+						</TABLE> </TD>
+					</TR>
+				 </TABLE> </TD>
+			 </TR>
+			</TABLE>
+			<br>
+			<br>
+			<font class="login_error">{$c{params}->{login_status}}</font>
+		 </TD>
+	 </TR>
+	</TABLE> 
+	</form>
+	</BODY>
+</HTML>

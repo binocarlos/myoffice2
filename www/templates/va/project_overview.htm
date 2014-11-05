@@ -1,0 +1,123 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var job_array = new Array();
+	var job_hash = new Object();
+	var job_by_task_hash = new Object();
+	
+	function insert_job_into_task_hash(job)
+	\{
+		var array = job_by_task_hash[job.task_id];
+		
+		if(!array)
+		\{
+			array = new Array();
+		\}
+		
+		array[array.length] = job;
+		
+		job_by_task_hash[job.task_id] = array;
+	\}
+	
+	function new_job(id, title, task_id)
+	\{
+		var job = new Object();
+		job.id = id;
+		job.title = title
+		job.task_id = task_id;
+		
+		job_array[job_array.length] = job;
+		job_hash[job.id] = job;
+		insert_job_into_task_hash(job);
+	\}
+	
+	function select_task(task_id)
+	\{
+		var job_array = job_by_task_hash[task_id];
+		
+		var table = '<table width=100% border=0>';
+		
+		for(var i=0; i<job_array.length; i++)
+		\{
+			var job = job_array[i];
+
+			table += '<tr><td>' + job.title + '</td></tr>';
+		\}
+		
+		table += '</table>';
+		
+		document.getElementById('job_td').innerHTML = table;
+	\}
+{
+	foreach my $job (@{$c{job_array}})
+	{
+		my $id = $job->get_id;
+		my $title = $job->get_value('title');
+		my $task_id = $job->get_value('task_id');
+		
+		$OUT.=<<"+++";
+new_job($id, '$title', $task_id);
++++
+	}
+}	
+</script>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td colspan="2"><table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td width="25%">Name:</td>
+          <td width="25%">{$c{project}->get_value('title')}</td>
+          <td width="25%">Client:</td>
+          <td width="25%">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Date:</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td width=50% valign="top">
+<table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr>
+          <td>Tasks</td>
+        </tr>
+{
+	foreach my $task (@{$c{task_array}})
+	{
+		my $id = $task->get_id;
+		my $taskname = $task->get_value('name');
+		
+		$OUT.=<<"+++";
+        <tr>
+          <td><a href="javascript: select_task($id);">$taskname</a></td>
+        </tr>
++++
+	}
+}
+      </table>
+    </td>
+    <td valign="top">
+<table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <tr> 
+          <td>Jobs</td>
+        </tr>
+		<tr> 
+          <td id="job_td">&nbsp;</td>
+        </tr>		
+      </table></td>
+  </tr>
+</table>

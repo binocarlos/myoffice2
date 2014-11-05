@@ -1,0 +1,153 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var graphMode = false;
+var selectedCellId = null;
+var origBgs = new Object();
+
+function examLevelBreakdown(pupil_id)
+\{
+	var loc = '&method=analysis_exam_level_breakdown&exam_id={$c{exam}->get_id}&pupil_id=' + pupil_id;
+	
+	var ret = top.get_modal_window_return(loc, 600, 400);
+\}
+
+function viewLevelBreakdown(pupil_id, topic)
+\{
+	selectedCellId = 'paCell' + pupil_id + topic;
+	
+	var cellTd = document.getElementById(selectedCellId);
+	
+	cellTd.bgColor = '#ffcccc';
+	
+	var loc = '&method=analysis_level_breakdown&exam_id={$c{exam}->get_id}&pupil_id=' + pupil_id + '&topic=' + topic;
+	
+	var ret = top.get_modal_window_return(loc, 600, 400);
+	
+	if((ret==null)||(ret==''))
+	\{
+		cellTd.bgColor = '#f5f5f5';
+		ret = '';
+	\}
+	else
+	\{
+		cellTd.bgColor = '#ffffff';
+	\}
+
+	cellTd.innerText = ret;
+\}
+
+function tdOver(td)
+\{
+	origBgs[td.id] = td.bgColor;
+	td.bgColor = '#ffcccc';
+\}
+
+function tdOut(td)
+\{
+	td.bgColor = origBgs[td.id];
+\}
+
+function toggleGraph()
+\{
+	graphMode = !graphMode;
+	
+	var buttonTitle = 'Hide Graph';
+	var display = 'inline';
+	
+	if(!graphMode)
+	\{
+		buttonTitle = 'Show Graph';
+		display = 'none';
+	\}
+	
+	document.getElementById('graphP').style.display = display;
+	document.getElementById('graphButton').value = buttonTitle;
+\}
+</script>
+
+<table  border="0" cellspacing="1" cellpadding="0">
+  <tr valign="top">
+    <td>
+        <table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+          <tr bgcolor="#FFFFFF">
+            <td width="250"><b>{$c{exam}->name}</b> Level Summary<br>
+              {$c{report}->get_report_title}</td>
+          </tr>
+        </table>
+</td>
+  </tr>
+</table>
+<span id="graphP" style="display:none;">
+<br>
+<table border=0 cellpadding=3 cellspacing=0>
+<tr>
+<td align=center><b class="welcome" style="color:#666666;">{$c{exam}->get_fullname} Level Graph</b></td></tr>
+<tr><td><img id="graphImg" src="{$c{href}}&method=analysis_level_report_graph&exam_id={$c{exam}->get_id}"></td></tr>
+</table>
+<br>
+</span><br>
+Click each level to get a breakdown of the pupil for that AT.<br><br>
+Click view to get a breakdown of the pupil.<br><br>
+
+
+<TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+{
+	my @topics = sort keys %{$c{report}->{topics}};
+	my $pupils = $c{exam}->ensure_child_array('pupil');
+	
+	$OUT.=<<"+++";
+  <tr><td class="t">&nbsp;</td>	
++++
+
+	foreach my $topic (@topics)
+	{
+		my $title = uc($topic);
+			
+		$OUT.=<<"+++";
+<td align=center class="t"><b>$title</b></td>
++++
+	}
+	
+	$OUT.=<<"+++";
+</tr>
++++
+
+	foreach my $pupil (@$pupils)
+	{
+		my $pupil_name = $pupil->get_fullname;
+		my $pupil_id = $pupil->get_id;
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td align="left" class="t" nowrap><a href="javascript:examLevelBreakdown($pupil_id);" class="l"><img src="/images/icons/misc/view.gif" align="absmiddle" border="0">&nbsp;&nbsp;$pupil_name</a></td>
++++
+	
+		foreach my $topic (@topics)
+		{
+			my $high = $pupil->get_use_level_assessment($topic);
+			
+			my $bg = '';
+			my $level = '';
+			
+			if(!$high)
+			{
+				$bg = ' bgcolor=#f5f5f5';
+				$level = '&nbsp;';
+			}
+			else
+			{
+				$bg = ' bgcolor=#ffffff';
+				$level = $high->level;
+			}
+			
+			$OUT.=<<"+++";
+<td id="paCell$pupil_id$topic" onMouseOver="tdOver(this);" class="c2" onMouseOut="tdOut(this);" align=center$bg onClick="viewLevelBreakdown($pupil_id, '$topic');">$level</td>
++++
+		}
+		
+		$OUT.=<<"+++";
+  </tr>
++++
+	}
+}
+</table>

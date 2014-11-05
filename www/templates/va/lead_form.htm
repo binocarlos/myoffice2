@@ -1,0 +1,129 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function validate_lead_form()
+	\{
+		var form = document.lead_form;
+
+		if((form.contact_name.value=="")&&(form.company_name.value==""))
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a company or contact name for the Lead';
+
+			return false;
+		\}
+
+		return true;
+	\}
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="lead_form" method="GET" action="{$c{script}}" onSubmit="return validate_lead_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="lead_form_submit">
+<input type="hidden" name="lead_id" value="{$c{lead}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+              <TABLE BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+                <TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Lead Details&nbsp;</FONT></TD>
+                        <TD HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+                      </TR><TR>
+                        <TD BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                        <TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                                <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Company Name:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="company_name" value="{$c{lead}->get_value('company_name')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Address:</TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Contact Name:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="contact_name" value="{$c{lead}->get_value('contact_name')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE" rowspan="3" height="100"> 
+                                      <textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="address" style="width:250px; height:100%;">{$c{lead}->get_value('address')}</textarea>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Active:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <select id="active" size="1" style="width:100%;" class="text_field" name="active">{$c{active_options}} 
+                                      </select>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Email:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="email" value="{$c{lead}->get_value('email')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Phone:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="phone" value="{$c{lead}->get_value('phone')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Notes:</TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Mobile:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="mobile" value="{$c{lead}->get_value('mobile')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE" rowspan="3" height="100"> 
+                                      <textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="notes" style="width:250px; height:100%;">{$c{lead}->get_value('notes')}</textarea>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Fax:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="fax" value="{$c{lead}->get_value('fax')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Industry:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="industry" value="{$c{lead}->get_value('industry')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                  </TR>
+                                </TABLE>
+
+</TD></TR></TABLE></TD>
+                        <TD BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                      </TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{lead}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE">
+                          <input type="submit" name="Submit" value="Save Details" CLASS="button" style="width:75px;">
+                        </TD>
+</TR></TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

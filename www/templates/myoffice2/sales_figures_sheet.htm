@@ -1,0 +1,613 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var weekDates = new Array();
+	var salesEntries = new Object();
+	var salesFiguresObjs = new Object();
+	var deals = new Object();
+	var bookings = new Object();
+	var venues = new Object();
+	
+	var dealsBySalesEntries = new Object();
+	var salesEntriesByDeals = new Object();
+	
+	var originalTableWidth = 1040;
+	var weekWidth = 860;
+	
+	function newEpochWeek(epoch, title)
+	\{
+		var epochRef = new Object();
+		epochRef.epoch = epoch;
+		epochRef.title = title;
+		
+		weekDates[weekDates.length] = epochRef;
+	\}
+	
+	function writeTourdate(hash)
+	\{
+		hash.brochure_mailing_title = getMultiDateNoteText(hash.brochure_mailing_dates);
+
+		newVenueObj(hash.venue_id, hash.box_office_number);
+		newSalesEntryObj(hash.sales_entry_id, hash.deal_id, hash.figures_number, hash.js_notes);
+		newDealObj(hash.deal_id, hash.booking_id, hash.brochure_mailing_dates, hash.tickets_on_sale, hash.tickets_on_sale_reason);
+		newBookingObj(hash.booking_id, hash.js_venue_target);
+
+		document.write(getHTMLBlock('tourdate_row', hash));	
+	\}
+	
+	function writeTitle(linkRow)
+	\{
+		var hash = new Object();
+		hash.start_link = '';
+		
+		if(linkRow)
+		\{
+			hash.start_link = '<a id="start_link" href="#start"></a><a id="start" name="start"></a>';
+		\}
+		
+		document.write(getHTMLBlock('open_title_row'));		
+		document.write(getHTMLBlock('title_row', hash));	
+		
+		for(var i=0; i<weekDates.length; i++)
+		\{
+			var weekDate = weekDates[i];
+			
+			var hash = \{date_title:weekDate.title,date_link:''\};
+			
+			if(linkRow)
+			\{
+				hash.date_link = '<a id="' + weekDate.epoch + '_link" href="#' + weekDate.epoch + '"></a><a id="' + weekDate.epoch + '" name="' + weekDate.epoch + '"></a>';
+			\}
+			
+			document.write(getHTMLBlock('sales_figures_title_row', hash));
+		\}
+		
+		document.write(getHTMLBlock('close_title_row'));			
+	\}	
+	
+	function writeSalesFigures(hash, addOnly)
+	\{
+		newSalesFigures(hash.sales_figures_id, hash.sales_figures_entry_id, hash.tourdate_id, hash.week_epoch_days, hash.sold_seats, hash.sold_gross, hash.reserved_seats, hash.reserved_gross);
+		
+		if(!addOnly)
+		\{
+			document.write(getHTMLBlock('sales_figures_tourdate_row', hash));			
+		\}
+	\}
+	
+	function calculateAllSalesFigures()
+	\{
+		for(var salesEntryId in salesEntries)
+		\{
+			calculateEntrySalesFigures(salesEntryId);
+		\}	
+	\}
+	
+	function calculateEntrySalesFigures(id)
+	\{
+		var salesEntry = salesEntries[id];
+		
+		for(var i=0; i<salesEntry.figuresArray.length; i++)
+		\{
+			var figures = salesEntry.figuresArray[i];
+			
+			calculateSalesFigures(figures.id);
+		\}
+	\}
+	
+	function recalculateSalesFigures(id)
+	\{
+			var salesFigures = salesFiguresObjs[id];
+			var salesEntry = salesEntries[salesFigures.sales_figures_entry_id];
+						
+			calculateSalesFigures(id);
+			
+			for(var i=0; i<salesEntry.figuresArray.length; i++)
+			\{
+				var obj = salesEntry.figuresArray[i];
+				
+				if(obj.id==id)
+				\{
+					var nextObj = salesEntry.figuresArray[i+1];
+					
+					if(nextObj)
+					\{
+						calculateSalesFigures(nextObj.id);
+					\}
+				\}
+			\}
+	\}
+	
+	function calculateSalesFigures(id)
+	\{
+		var salesFigures = salesFiguresObjs[id];
+		var salesEntry = salesEntries[salesFigures.sales_figures_entry_id];
+		var deal_id = dealsBySalesEntries[salesEntry.id];
+		var deal = deals[deal_id];
+		
+		var previous_epoch = salesFigures.week_epoch_days - 7;
+		
+		var previousFigures = salesEntry.weekMap[previous_epoch];
+		var previousSold = 0;
+		
+		if(previousFigures)
+		\{
+			previousSold = previousFigures.sold_seats;
+		\}
+		
+		var sold_in_week = 0;
+		
+		if(salesFigures.sold_seats>0)
+		\{
+			sold_in_week = salesFigures.sold_seats - previousSold;
+		\}
+		
+		var tickets_avail = deal.tickets_on_sale;
+		
+		var percent = 0;
+		
+		if(tickets_avail>0)
+		\{
+			percent = Math.round((salesFigures.sold_seats / tickets_avail) * 100);
+		\}
+		
+		var week_sold_elem = document.getElementById('week_sold_' + id);
+		var percent_sold_elem = document.getElementById('percent_sold_' + id);
+		
+		if(week_sold_elem)
+		\{		
+			week_sold_elem.innerText = sold_in_week;
+		\}
+		
+		if(percent_sold_elem)
+		\{
+			percent_sold_elem.innerText = percent;
+		\}
+	\}
+	
+	function addSalesFigures(hash)
+	\{
+		writeSalesFigures(hash, true);
+	\}
+	
+	function newSalesFigures(id, sales_figures_entry_id, tourdate_id, week_epoch_days, sold_seats, sold_gross, reserved_seats, reserved_gross)
+	\{
+		var salesFigures = new Object();
+		salesFigures.id = id;
+		salesFigures.sales_figures_entry_id = sales_figures_entry_id;
+		salesFigures.tourdate_id = tourdate_id;
+		salesFigures.week_epoch_days = week_epoch_days;
+		salesFigures.sold_seats = sold_seats;
+		salesFigures.sold_gross = sold_gross;
+		salesFigures.reserved_seats = reserved_seats;
+		salesFigures.reserved_gross = reserved_gross;
+		
+		salesFiguresObjs[salesFigures.id] = salesFigures;
+
+		var salesEntry = salesEntries[salesFigures.sales_figures_entry_id];
+		
+		salesEntry.weekMap[salesFigures.week_epoch_days] = salesFigures;
+		salesEntry.figuresArray[salesEntry.figuresArray.length] = salesFigures;
+	\}
+	
+	function newSalesEntryObj(id, deal_id, figures_number, notes)
+	\{
+		var salesEntry = new Object();
+		salesEntry.id = id;
+		salesEntry.deal_id = deal_id;
+		salesEntry.figures_number = figures_number;
+		salesEntry.notes = notes;
+		salesEntry.weekMap = new Object();
+		salesEntry.figuresArray = new Array();
+		
+		salesEntries[salesEntry.id] = salesEntry;
+		dealsBySalesEntries[salesEntry.id] = deal_id;
+		
+		var entries = salesEntriesByDeals[deal_id];
+		if(entries==null)
+		\{
+			entries = new Array();
+			salesEntriesByDeals[deal_id] = entries;
+		\}
+		
+		entries[entries.length] = salesEntry.id;
+	\}
+	
+	function newBookingObj(id, venue_target)
+	\{
+		var booking = new Object();
+		booking.id = id;
+		booking.venue_target = venue_target;
+		
+		bookings[booking.id] = booking;
+	\}
+	
+	function newDealObj(id, booking_id, brochure_mailing_dates, tickets_on_sale, tickets_on_sale_reason)
+	\{
+		var deal = new Object();
+		deal.id = id;
+		deal.booking_id = booking_id;
+		deal.brochure_mailing_dates = brochure_mailing_dates;
+		deal.tickets_on_sale = tickets_on_sale;
+		deal.tickets_on_sale_reason = tickets_on_sale_reason;
+		
+		deals[deal.id] = deal;
+	\}
+		
+	function newVenueObj(id, box_office_number)
+	\{
+		var venue = new Object();
+		venue.id = id;
+		venue.box_office_number = box_office_number;
+		
+		venues[venue.id] = venue;
+	\}
+	
+	function venueChanged(venue_id, field, gui)
+	\{
+		var venue = venues[venue_id];
+
+		parent.title.addVenueField(venue_id, field, gui.value);		
+		venue[field] = gui.value;
+	\}
+	
+	function reflowFiguresNumber(sales_figures_entry_id)
+	\{
+		var salesEntry = salesEntries[sales_figures_entry_id];
+		
+		for(var i=0; i<salesEntry.figuresArray.length; i++)
+		\{
+			var figures = salesEntry.figuresArray[i];
+			
+			var elem = document.getElementById('figures_number_' + figures.id);
+			
+			if(elem)
+			\{
+				elem.innerText = salesEntry.figures_number;
+			\}
+		\}
+	\}
+	
+	function salesFiguresChanged(salesFiguresId, field, gui)
+	\{
+		var salesFigures = salesFiguresObjs[salesFiguresId];
+		
+		//alert(salesFiguresId);
+		
+		salesFigures[field] = parseFloat(gui.value);		
+		
+		parent.title.addSalesFigures(salesFigures);
+		
+		if(field=='sold_seats')
+		\{		
+			//calculateEntrySalesFigures(salesFigures.sales_figures_entry_id);
+			recalculateSalesFigures(salesFigures.id);
+			//calculateSalesFigures(salesFigures.id);
+		\}
+	\}
+	
+	function editTicketsOnSale(deal_id, td)
+	\{
+		var deal = deals[deal_id];
+		
+		var ret = get_modal_window_return('&method=editors_number_text&number=' + deal.tickets_on_sale + '&notes=' + deal.tickets_on_sale_reason, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addDealField(deal_id, 'tickets_on_sale', ret.number);
+		parent.title.addDealField(deal_id, 'tickets_on_sale_reason', ret.notes);
+		parent.title.addBookingField(deal.booking_id, 'tickets_on_sale', ret.number);
+		parent.title.addBookingField(deal.booking_id, 'tickets_on_sale_reason', ret.notes);
+		
+		td.innerHTML = ret.number + '<br><span style="color:blue;font-size:7pt;">' + ret.notes + '</span>';
+		
+		deal.tickets_on_sale = parseInt(ret.number);
+		deal.tickets_on_sale_reason = ret.notes;
+		
+		var entryIdArray = salesEntriesByDeals[deal.id];
+		
+		if(!entryIdArray) \{ return; \}
+		
+		for(var i=0; i<entryIdArray.length; i++)
+		\{
+			var entryId = entryIdArray[i];
+
+			calculateEntrySalesFigures(entryId);
+		\} 
+	\}			
+	
+	function salesEntryChanged(sales_figures_entry_id, field, gui)
+	\{
+		var salesEntry = salesEntries[sales_figures_entry_id];
+		
+		parent.title.addSalesEntryField(sales_figures_entry_id, field, gui.value);
+		
+		salesEntry[field] = gui.value;
+		
+		if(field=='figures_number')
+		\{
+			reflowFiguresNumber(sales_figures_entry_id);
+		\}
+	\}
+	
+	function editBrochureMailingDates(id, td)
+	\{
+		var deal = deals[id];
+		var booking = bookings[deal.booking_id];
+			
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, deal.brochure_mailing_dates);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addDealField(id, 'brochure_mailing_dates', getMultiDateNoteReturn(ret));
+		parent.title.addBookingField(booking.id, 'brochure_mailing_dates', getMultiDateNoteReturn(ret));
+		
+		td.innerHTML = getMultiDateNoteText(ret);
+		deal.brochure_mailing_dates = ret;
+	\}
+	
+	function editVenueTarget(id, td)
+	\{
+		var booking = bookings[id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.venue_target);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addBookingField(id, 'venue_target', ret.value);
+		td.innerHTML = ret.title;
+		booking.venue_target = ret.value;
+	\}	
+	
+	function editNotes(id, td)
+	\{
+		var salesEntry = salesEntries[id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, salesEntry.notes);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addSalesEntryField(id, 'notes', ret.value);
+		td.innerHTML = ret.title;
+		salesEntry.notes = ret.value;
+	\}
+	
+	function resizeMainTable()
+	\{
+		var width = originalTableWidth + (weekDates.length * weekWidth);
+		
+		document.getElementById('mainTable').width = width;
+	\}
+	
+{
+	foreach my $weekdate (@{$c{tour}->get_sales_figures_date_array})
+	{
+		my $title = $weekdate->get_string;
+		my $epoch = $weekdate->epoch_days;
+		
+		$OUT.=<<"+++";
+		newEpochWeek($epoch, '$title');
++++
+	}
+}
+
+</script>
+<body onunload="if(parent.title)\{parent.title.resetForm();\}">
+<table width="100%"  border="0" cellspacing="0" cellpadding="5"> 
+<tr>
+  <td class="welcome">Sales Figures  Sheet For  {$c{tour}->name}</td>
+</tr>  
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td class="welcome"><table width="1900"  border="0" cellpadding="3" cellspacing="1" bgcolor="#e5e5e5" id="mainTable">		
+
+{
+	my $open_title_row=<<"+++";
+	 <tr bgcolor="#f0f0f0">
++++
+
+	my $title_row=<<"+++";
+        <td width="160">__start_link__ Tourdate</td>	
+        <td width="250">Venue</td>
+        <td width="50">Capacity</td>
+        <td width="110">Seats</td>
+        <td width="100">Box Office </td>
+        <td width="100">Figures No. </td>
+        <td width="100">On Sale Date </td>
+        <td width="100">Brochure Hit Dates </td>
+        <td width="100">Our Target</td>		
+        <td width="100">Notes</td>
++++
+
+	my $sales_figures_title_row=<<"+++";
+		<td width=10 bgcolor=#880000></td>
+		<td align="left" width=270 bgcolor="#FFFFFF" style="color:880000;font-weight:bold;" colspan=2>__date_title__</td>
+		<td width="100">Figs Number</td>
+		<td width="60">Our Target </td>		
+		<td width="60">No. Sold</td>
+		<td width="60">£ Sold</td>
+		<td width="60">Wk Sold __date_link__</td>
+		<td width="60">No. Rsvd</td>
+		<td width="60">£ Rsvd</td>
+		<td width="80">% Sold</td>
++++
+
+	my $close_title_row=<<"+++";
+	</tr>
++++
+
+	my $open_tourdate_row=<<"+++";
+	      <tr align="left" valign="top" bgcolor="#FFFFFF">	
++++
+
+	my $tourdate_row=<<"+++";
+        <td align=left width=160 nowrap>
+        	<div style="color:blue;width:160px;">__tour_title__</span><br>
+        	<span style="color:green;">__date_title__</span></td>
+        <td width="250" align="left"><div class="noOverflowX" style="width:250px;"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></div></td>
+        <td width="50" align="right">__capacity__</td>
+        <td width="110" align="right" class="editTd" onClick="editTicketsOnSale(__deal_id__, document.getElementById('__deal_id__tickets_on_sale'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__deal_id__tickets_on_sale">__tickets_on_sale__<br>
+          <span style="color:blue;font-size:7pt;">__tickets_on_sale_reason__</span></span></td>
+        <td width="100" align="center"><input type="text" name="venue_box_office_number___venue_id__" id="venue_box_office_number___venue_id__" value="__box_office_number__" class="text_field" style="width:96px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueChanged(__venue_id__, 'box_office_number', this);"></td>
+        <td width="100" align="center"><input type="text" name="venue_figures_number___venue_id__" id="venue_figures_number___venue_id__" value="__figures_number__" class="text_field" style="width:96px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="venueChanged(__venue_id__, 'figures_number', this);"></td>
+        <td width="100">__on_sale_date__</td>
+		<td width="100" align="left" class="editTd" onClick="editBrochureMailingDates(__deal_id__, document.getElementById('__deal_id__brochure_mailing'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__deal_id__brochure_mailing">__brochure_mailing_title__</span></td>
+        <td width="100" align="right" class="editTd">__som_target__</td>
+        <td width="100" align="left" class="editTd" onClick="editNotes(__sales_entry_id__, document.getElementById('__sales_entry_id__notes'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__sales_entry_id__notes">__notes__</span></td>		
++++
+
+	my $sales_figures_tourdate_row=<<"+++";
+		<td width=10 bgcolor=#880000></td>
+        <td align=left width=160 nowrap><span style="color:blue;">__tour_title__</span><br>
+        	<span style="color:green;">__date_title__</span></td>
+		<td align="left" width=150><span class="noOverflowX"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__city_title__</a></b></span></td>
+		<td width="100" id="figures_number___sales_figures_id__"><div style="width:100px;overflow-x:hidden;">__figures_number__</div></td>
+		<td width="60" align="right">__som_target__</td>		
+		<td width="60" align="center"><input type="text" name="sales_figures_sold_seats___sales_figures_id__" id="sales_figures_sold_seats___sales_figures_id__" value="__sold_seats__" class="text_field" style="width:56px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="salesFiguresChanged(__sales_figures_id__, 'sold_seats', this);"></td>
+		<td width="60" align="center"><input type="text" name="sales_figures_sold_gross___sales_figures_id__" id="sales_figures_sold_gross___sales_figures_id__" value="__sold_gross__" class="text_field" style="width:56px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="salesFiguresChanged(__sales_figures_id__, 'sold_gross', this);"></td>
+		<td width="60" align="right"><span id="week_sold___sales_figures_id__"></span></td>
+		<td width="60" align="center"><input type="text" name="sales_figures_reserved_seats___sales_figures_id__" id="sales_figures_reserved_seats___sales_figures_id__" value="__reserved_seats__" class="text_field" style="width:56px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="salesFiguresChanged(__sales_figures_id__, 'reserved_seats', this);"></td>
+		<td width="60" align="center"><input type="text" name="sales_figures_reserved_gross___sales_figures_id__" id="sales_figures_reserved_gross___sales_figures_id__" value="__reserved_gross__" class="text_field" style="width:56px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="salesFiguresChanged(__sales_figures_id__, 'reserved_gross', this);"></td>
+		<td width="80" align="right" style="color:red;"><span id="percent_sold___sales_figures_id__"></span></td>										
++++
+
+	my $close_tourdate_row=<<"+++";
+        </tr>		
++++
+
+	$open_tourdate_row = Webkit::AppTools->js_quote($open_tourdate_row);
+	$tourdate_row = Webkit::AppTools->js_quote($tourdate_row);
+	$sales_figures_tourdate_row = Webkit::AppTools->js_quote($sales_figures_tourdate_row);
+	$close_tourdate_row = Webkit::AppTools->js_quote($close_tourdate_row);	
+	$open_title_row = Webkit::AppTools->js_quote($open_title_row);
+	$title_row = Webkit::AppTools->js_quote($title_row);
+	$sales_figures_title_row = Webkit::AppTools->js_quote($sales_figures_title_row);
+	$close_title_row = Webkit::AppTools->js_quote($close_title_row);	
+	
+	$OUT.=<<"+++";
+	<script>
+addHTMLBlock('open_tourdate_row', '$open_tourdate_row');	
+addHTMLBlock('tourdate_row', '$tourdate_row');
+addHTMLBlock('sales_figures_tourdate_row', '$sales_figures_tourdate_row');
+addHTMLBlock('close_tourdate_row', '$close_tourdate_row');
+addHTMLBlock('open_title_row', '$open_title_row');
+addHTMLBlock('title_row', '$title_row');
+addHTMLBlock('sales_figures_title_row', '$sales_figures_title_row');
+addHTMLBlock('close_title_row', '$close_title_row');
+
+writeTitle(true);
++++
+
+	my $title_count = 0;
+
+	foreach my $tourdate (@{$c{tour}->ensure_child_array('tourdate')})
+	{
+		$title_count++;
+		
+		if($title_count>=5)
+		{
+			$OUT.=<<"+++";
+writeTitle();			
++++
+
+			$title_count = 0;
+		}
+		
+		my $showing = $c{tour}->get_child('showing', $tourdate->showing_id);
+		my $booking = $c{tour}->get_child('booking', $showing->booking_id);
+		my $venue = $c{tour}->get_child('venue', $showing->venue_id);
+		my $sales_entry = $tourdate->sales_figures_entry;
+		my $deal = $c{tour}->get_child('deal', $showing->deal_id);
+		
+		my $tour = $c{org}->get_child('tour', $showing->tour_id);
+		
+		my $tourdate_js_hash = Webkit::AppTools->js_hash({
+			notes => $sales_entry->get_html_value('notes'),
+			js_notes => $sales_entry->get_js_value('notes'),
+			venue_target => $booking->get_html_value('venue_target'),
+			js_venue_target => $booking->get_js_value('venue_target'),
+			date_title => $tourdate->get_datetime_title,
+			venue_title => $venue->get_city_title,
+			som_target => $showing->{_som_target},
+			on_sale_date => $showing->ensure_onsale_date_string,
+			_sales_entry_id => $sales_entry->get_id,
+			_booking_id => $booking->get_id,
+			_venue_id => $venue->get_id,
+			_deal_id => $deal->get_id,
+			capacity => $venue->capacity,
+			_tickets_on_sale => $deal->tickets_on_sale || 0,
+			tickets_on_sale_reason => $deal->get_js_value('tickets_on_sale_reason'),			
+			box_office_number => $venue->box_office_number,
+			figures_number => $venue->figures_number,
+			tour_title => $tour->name,
+			_brochure_mailing_dates => Webkit::MyOffice2::Admin->editors_multidatenote_js_value($deal->brochure_mailing_dates) });
+		
+		$OUT.=<<"+++";
+document.write(getHTMLBlock('open_tourdate_row'));				
+writeTourdate($tourdate_js_hash);
++++
+		my $week_count = 0;
+
+		foreach my $weekdate (@{$c{tour}->get_sales_figures_include_date_array})
+		{
+			$week_count++;
+			
+			my $epoch = $weekdate->epoch_days;
+			
+			my $sales_figures = $sales_entry->get_sales_figures($epoch);
+			
+			my $sales_figures_js_hash = Webkit::AppTools->js_hash({
+				som_target => $showing->{_som_target},			
+				date_title => $tourdate->get_datetime_title,			
+				tour_title => $tour->name,
+				figures_number => $venue->figures_number,			
+				city_title => $venue->city,
+				_week_epoch_days => $epoch,
+				_previous_figures_id => $previous_figures_id,
+				_previous_seats_sold => $previous_seats_sold,
+				_sold_seats => $sales_figures->sold_seats || 0,
+				_sold_gross => $sales_figures->sold_gross || 0,
+				_reserved_seats => $sales_figures->reserved_seats || 0,
+				_reserved_gross => $sales_figures->reserved_gross || 0,
+				_sales_figures_id => $sales_figures->get_id,
+				_sales_figures_entry_id => $sales_entry->get_id,
+				_venue_id => $venue->get_id,
+				_tourdate_id => $tourdate->get_id });
+				
+			if($week_count<=1)
+			{
+				$OUT.=<<"+++";
+addSalesFigures($sales_figures_js_hash);				
++++
+			}
+			else
+			{
+				$OUT.=<<"+++";
+writeSalesFigures($sales_figures_js_hash);	
++++
+			}
+		}
+
+		$OUT.=<<"+++";
+document.write(getHTMLBlock('close_tourdate_row'));						
++++
+	
+	}
+	
+	$OUT.=<<"+++";
+</script>
++++
+}
+    </table></td>
+  </tr>
+</table>
+<script>
+	resizeMainTable();
+	calculateAllSalesFigures();
+</script>
+</body>
+</html>
+
+
+

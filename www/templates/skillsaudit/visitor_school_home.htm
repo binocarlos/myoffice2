@@ -1,0 +1,164 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function editVisitor(id)
+	\{
+		var newLoc = href + '&method=visitor_form&visitor_id=' + id;
+		
+		document.location = newLoc;
+	\}
+	
+	function viewSchoolTargets()
+	\{
+		var newLoc = href + '&method=visitors_group_targets_home&school_id={$c{school}->get_id}';
+		
+		document.location = newLoc;
+		
+	\}
+	
+	function viewSchoolQuestions()
+	\{
+		var newLoc = href + '&method=visitors_group_questions_home&school_id={$c{school}->get_id}';
+		
+		document.location = newLoc;
+	\}
+	
+	function viewSchoolTimeline()
+	\{
+		var newLoc = href + '&method=visitors_group_timeline_home&school_id={$c{school}->get_id}';
+		
+		document.location = newLoc;
+	\}
+	
+	function viewAudit(id)
+	\{
+		var new_loc = href + '&method=visitors_audit_home&audit_id=' + id;
+		
+		document.location = new_loc;
+	\}
+	
+	function viewTimeline(id)
+	\{
+		var new_loc = href + '&method=visitors_timeline_home&visitor_id=' + id;
+		
+		document.location = new_loc;
+	\}
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td valign="top">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset>
+<legend>School Details</legend>
+<div class="seccontent" align="left">
+<TABLE width="200" BORDER="0" CELLPADDING="4" CELLSPACING="0">
+  <TR> 
+    <TD width="60" ALIGN="LEFT" VALIGN="MIDDLE">Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->name}
+    </TD>
+  </TR>
+				    <TR> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">DfES No:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->dfes_number}
+    </TD>
+  </TR>
+				    <TR> 
+    <TD ALIGN="LEFT" VALIGN="top">Address:</TD>
+    <TD ALIGN="LEFT" VALIGN="top">{$c{school}->address}<br>{$c{school}->city}<br>{$c{school}->postcode}
+    </TD>
+  </TR>
+							  				  								  
+</TABLE>
+</div>
+</fieldset>
+<div align="center" style="padding-top:8px;">
+<table border=0 cellpadding=0 cellspacing=5>
+<tr><td><A href="javascript:viewSchoolTargets();" onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" style="padding:4px; width:100%; margin-top:5px;text-decoration:none; color:#000000;"><IMG SRC="/images/skillsaudit/target_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; View Schools Targets</A></td></tr>
+<tr><td height=8></td></tr>
+<tr><td><A href="javascript:viewSchoolTimeline();" onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" style="padding:4px; width:100%; margin-top:5px; text-decoration:none; color:#000000;"><IMG SRC="/images/skillsaudit/timeline_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; View School Timeline</A></td></tr>
+<tr><td height=8></td></tr>
+<tr><td><A href="javascript:viewSchoolQuestions();" onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" style="padding:4px; width:100%; margin-top:5px; text-decoration:none; color:#000000;"><IMG SRC="/images/skillsaudit/questions_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; View Question Analysis </A></td>
+</tr>
+</table>
+</div>
+</td></tr></table>						  
+</td></tr></table>
+</td>
+<td><img src="/images/clear.gif" width="20" height="1"></td>
+<td valign="top" align="left" width="100%">
+<style>
+.vis_header \{width:100%;height:23px; font-size:13px; font-variant:small-caps; font-weight:bold; color:#FFFFFF; background-color:#1C446C; padding:0px 7px 0px 7px;\}
+.vis_header2 \{width:200px;height:23px; font-size:11px; color:#FFFFFF; background-color:#1C446C; padding:0px 7px 0px 7px;\}
+.vis_header3 \{width:100px; height:23px; font-size:11px; color:#FFFFFF; background-color:#1C446C; padding:0px 7px 0px 7px;\}
+.vis_body \{border:3px #6699CC solid; background-color:#E0EBF5; padding:7px;\}
+.vis_footer \{height:3px; background-color:#FFCC00;\}
+</style>
+
+
+{
+	foreach my $visitor (@{$c{school}->ensure_child_array('visitor')})
+	{
+		my $id = $visitor->get_id;
+		my $name = $visitor->name;
+		my $email = $visitor->email_or_phone;
+		my $pin = $visitor->pin_number;
+		
+		if($visitor->is_admin)
+		{
+			$name .= ' (Administrator)';
+		}
+		
+		$OUT.=<<"+++"; 
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td class="vis_header" nowrap>$name</td>
+<td class="vis_header2" nowrap>Email: $email</td>
+<td class="vis_header3" nowrap>Pin: $pin</td>
+</tr>
+<tr><td height="2" colspan="3"></td></tr>
+<tr><td class="vis_body" colspan="3" width="100%">
+<table cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td valign="top" align="center"><b><a href="#" onClick="editVisitor($id);" class="l2"><img src="/images/skillsaudit/timeline_24.gif" align="absmiddle" border="0" width="24" height="24" style="padding-bottom:5px;"><br>Edit</a></b></td>
+<td width="20"></td>
+<td valign="top" align="center"><b><a href="#" onClick="viewTimeline($id);" class="l2"><img src="/images/skillsaudit/timeline_24.gif" align="absmiddle" border="0" width="24" height="24" style="padding-bottom:5px;"><br>Timeline</a></b></td>
+<td width="20"></td>
+<td>
++++
+
+		foreach my $audit (@{$visitor->ensure_child_array('audit')})
+		{
+			my $date = $audit->taken_date;
+			my $audit_id = $audit->get_id;
+			
+			$OUT.=<<"+++";
+<b><a href="#" onClick="viewAudit($audit_id);" class="l2"><img src="/images/skillsaudit/target_16.gif" align="absmiddle" border="0" width="16" height="16"> $date</a></b><br><img src="/images/clear.gif" width="1" height="2"><br>		
++++
+		}
+		
+		$OUT.=<<"+++";
+
+</td></tr></table>
+</td></tr>
+<tr><td height="2" colspan="3"></td></tr>
+<tr><td class="vis_footer" colspan="3"></td></tr>
+</table>
+<br>					
++++
+	}
+}
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

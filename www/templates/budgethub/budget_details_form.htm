@@ -1,0 +1,167 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+	function validate_budget_form()
+
+	\{
+
+		var form = document.budget_form;
+
+		
+
+		var name = form.name.value;
+
+		var country = form.country_id.value;
+
+		var ro_pass1 = form.ro_pass1.value;
+
+		var ro_pass2 = form.ro_pass2.value;
+
+		
+
+		if(name=="")
+
+		\{
+
+			return budget_form_error("You must enter a name.");
+
+		\}
+
+		
+
+		if(country<=0)
+
+		\{
+
+			return budget_form_error("You must choose a country.");
+
+		\}
+
+		
+
+		if(ro_pass1!=ro_pass2)
+
+		\{
+
+			return budget_form_error("The two passwords must match.");
+
+		\}
+
+		
+
+		return true;
+
+	\}
+
+	
+
+	function budget_form_error(text)
+
+	\{
+
+		document.all('status_td').innerText = text;
+
+		
+
+		return false;
+
+	\}
+
+</script>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<form method="GET" action="{$c{script}}" onSubmit="return validate_budget_form();" name="budget_form">
+
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+
+<input type="hidden" name="method" value="{$c{submit_method}}">
+
+<input type="hidden" name="budget_id" value="{$c{budget_id}}">
+
+<input type="hidden" name="calling_method" value="{$c{calling_method}}">
+
+<table border="0" cellspacing="1" cellpadding="5" bgcolor="#888888">
+
+<tr bgcolor="#cccccc">
+
+<td colspan="2"><b class="tiny8">Budget Details</b></td>
+
+</tr>
+
+<tr bgcolor="#FFFFFF">
+
+<td colspan="2"><a href="{$c{href}}&method=home_page"><b class="small">Back</b></a></td>
+
+</tr>
+
+<tr>
+
+<td class="smallblue" width="150" align="right" bgcolor="#FFFFFF">Name:</td>
+
+<td bgcolor="#dddddd" width="200">
+
+<input type="text" name="name" class="text_input_small" value="{$c{budget}->get_value('name')}">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="smallblue" width="150" align="right" bgcolor="#FFFFFF">Country:</td>
+
+<td bgcolor="#dddddd" width="200">{$c{country_select}}</td>
+
+</tr>
+
+<tr>
+
+<td class="smallblue" width="150" align="right" bgcolor="#FFFFFF">Set Read-Only Password:</td>
+
+<td bgcolor="#dddddd" width="200">
+
+<input type="password" name="ro_pass1" class="text_input_small">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="smallblue" width="150" align="right" bgcolor="#FFFFFF">Type Password Again:</td>
+
+<td bgcolor="#dddddd" width="200">
+
+<input type="password" name="ro_pass2" class="text_input_small">
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="smallred" colspan="2" align="right" bgcolor="#FFFFFF" id="status_td">
+
+{$c{budget}->{error_text}}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="smallblue" colspan="2" align="right" bgcolor="#FFFFFF">
+
+<input type="submit" value="{$c{submit_label}}" class="form_submit_9grey">
+
+</td>
+
+</tr>
+
+</table>
+
+</form>
+
+</body>

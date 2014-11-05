@@ -1,0 +1,7 @@
+body {background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;}
+td {font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+.text_field {height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;}
+.buttonouter {border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;}
+.buttonoff {border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; }
+.button {height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;}
+

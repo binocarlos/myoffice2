@@ -1,0 +1,56 @@
+<!--#include file="temp_include.htm" -->
+<script>
+
+</script>
+<body>
+<p>Please choose the Attainment Targets<br>
+  that the paper based quiz contains.</p>
+<form method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="exams_edit_manual_assessment_groups_submit">
+<input type="hidden" name="exam_id" value="{$c{exam}->get_id}">
+<table border=0>
+{
+	my $subjects = &Webkit::NcTest::NCHub::get_core_subject_codes;
+	
+	foreach my $subject (@$subjects)
+	{
+		my $title = &Webkit::NcTest::NCHub::get_subject_field($subject, 'title');
+		
+		$OUT.=<<"+++";
+<tr><td>
+<table border=0 cellpadding=5 cellspacing="0">
+		<tr><td width=100><b>$title - $subject</b></td>
++++
+
+		my $topics = &Webkit::NcTest::NCHub::get_subject_topic_codes($subject);
+		
+		foreach my $topic (@$topics)
+		{
+			my $group = $c{tree}->get_assessment_group($topic, 'm');
+			
+			my $checked = '';
+			
+			if($group)
+			{
+				$checked = ' CHECKED';
+			}
+			
+			$OUT.=<<"+++";
+		<td>$topic 
+		  <input type="checkbox" name="topic_$topic" value="y"$checked></td>
++++
+		}
+		
+		$OUT.=<<"+++";
+	</tr></table>
+	</td></tr>
++++
+	}
+}
+</table>
+<br>
+<input type="submit" class="button" value="Save">
+</form>
+</body>
+

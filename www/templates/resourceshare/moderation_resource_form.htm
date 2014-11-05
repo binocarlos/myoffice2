@@ -1,0 +1,238 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	var downloadFileURL = '{$c{href}}&method=resources_download_resource&resource_id={$c{resource}->get_id}';
+	var websiteURL = '{$c{resource}->details}';
+	
+	function chooseFolder()
+	\{
+		var modal_loc = "/wkhtml/modal_frameset/?session_id=" + session_id + "&appname=resourceshare";	
+		modal_loc += "&method=moderation_folder_tree&title=Choose Folder&website_id={$c{resource}->website_id}";
+		
+		var ret = top.show_modal_window(modal_loc, 400, screen.availHeight - 200);
+		
+		if(ret)
+		\{
+			document.resource_form.set_linked_folder_id.value = ret.id;
+			document.getElementById('folderTitle').innerText = ret.title;
+		\}		
+	\}
+	
+	function editResource()
+	\{
+		var modal_loc = "/wkhtml/modal_frameset/?session_id=" + session_id + "&appname=resourceshare";	
+		modal_loc += "&method=resources_resource_form&title=Edit Resource&resource_id={$c{resource}->get_id}&set_folder_id={$c{resource}->folder_id}";
+		
+		var status = top.show_modal_window(modal_loc, screen.availWidth - 50, screen.availHeight - 60);
+		
+		if(status)
+		\{
+			location.reload();
+		\}
+		
+		//window.open(modal_loc);
+	\}
+
+	function downloadFile()
+	\{
+		window.open(downloadFileURL);
+	\}
+	
+	function openWebsite()
+	\{
+		window.open(websiteURL);
+	\}
+	
+	function acceptResource()
+	\{
+		if(window.confirm('Are you sure you want to accept this resource?'))
+		\{
+			document.location = href + '&method=moderation_accept_resource&resource_id={$c{resource}->get_id}';
+		\}
+	\}
+	
+	function promoteResource()
+	\{
+		var linked_id = document.resource_form.linked_folder_id.value;
+		
+		if((linked_id=="0")||(linked_id==""))
+		\{
+			linked_id = document.resource_form.set_linked_folder_id.value;
+			
+			if((linked_id=="0")||(linked_id==""))
+			\{
+				alert("You cannot promote this resource until you have choosen a folder it is linked to\n\nClick the 'Choose Folder' button");
+				return;
+			\}
+		\}
+		
+		if(window.confirm('Are you sure you want to promote this resource?'))
+		\{
+			document.location = href + '&method=moderation_promote_resource&resource_id={$c{resource}->get_id}&set_linked_folder_id=' + document.resource_form.set_linked_folder_id.value;
+		\}
+	\}
+	
+	function deleteResource()
+	\{
+		if(window.confirm('Are you sure you want to delete this resource?'))
+		\{
+			document.location = href + '&method=moderation_delete_resource&resource_id={$c{resource}->get_id}';
+		\}
+	\}
+	
+
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="50%" height="100%" align="center" valign="top">
+
+<form name="resource_form" method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="moderation_edit_resource">
+<input type="hidden" name="set_linked_folder_id" value="">
+<input type="hidden" name="linked_folder_id" value="{$c{resource}->linked_folder_id}">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Resource Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Title:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource}->title}
+    </TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>School:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource_org}->name}
+</TD>
+  </TR>  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Author:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource}->author}
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Modified:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource}->get_modified_title}
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Type:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource}->get_mime_title}
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Size:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource}->get_size_title}
+    </TD>
+  </TR>      
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Status:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500" style="color:red;">{$c{resource}->get_moderation_title}
+    </TD>
+  </TR>   
+
+{
+	if($c{resource}->is_file)
+	{
+		$OUT.=<<"+++";  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Download File:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500"><input type="button"  value="Download" CLASS="button" style="width:75px;" onClick="downloadFile();"></TD>
+  </TR>
++++
+	}
+	elsif($c{resource}->is_link)
+	{
+		$OUT.=<<"+++";
+   <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Open Website:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500"><input type="button"  value="Open" CLASS="button" style="width:75px;" onClick="openWebsite();">
+</TD>
++++
+	}
+	elsif($c{resource}->is_peoplebase)
+	{
+		$OUT.=<<"+++";
+   <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>View Person Details:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500"><input type="button"  value="Open" CLASS="button" style="width:75px;" onClick="downloadFile();">
+</TD>
++++
+	}	
+	elsif($c{resource}->is_text)
+	{
+		$OUT.=<<"+++";
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>View Text:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="500">{$c{resource}->get_html_value('notes')}
+</TD>
+  </TR>
++++
+	}
+	
+	if(!$c{resource}->is_peoplebase)
+	{
+		$OUT.=<<"+++";
+
+<TR style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Edit Resource: </TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input type="button"  value="Edit" CLASS="button" style="width:75px;" onClick="editResource();"></TD>
+</TR>  
++++
+	}
+}
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0" WIDTH="100%">
+{
+	if(!$c{resource}->is_moderated)
+	{
+		$OUT.=<<"+++";
+<TR valign="top">
+<TD width="50%" ALIGN="LEFT">&nbsp;</TD>
+<TD width="50%" ALIGN="RIGHT"><input type="button" name="Button" value="Accept This Resource" CLASS="button" style="width:150px;" onClick="acceptResource();"></TD>
+</TR>
++++
+	}
+}
+<TR valign="top">
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="RIGHT"><input type="button" name="Button" value="Delete This Resource" CLASS="button" style="width:150px;" onClick="deleteResource();"></TD>
+</TR>
+<TR valign="top">
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="RIGHT">&nbsp;</TD>
+</TR>
+<TR valign="top">
+<TD ALIGN="LEFT"><input type="button"  value="Go Back" CLASS="button" style="width:75px;" onClick="history.back();"></TD>
+<TD ALIGN="RIGHT">&nbsp;</TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+<td width="50%" align="center" valign="top">The notes about what to look for when promoting a resource will go here... </td>
+</tr>
+</table>
+
+</body>
+</html>

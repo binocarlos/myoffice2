@@ -1,0 +1,513 @@
+<html>
+<head>
+<title></title>
+<link href="/lib/nctest/styles/default/style.css" rel="stylesheet" type="text/css">
+<script>
+	var markingInputs = new Object();
+	var currentMarkingInput = null;
+	var inputIds = new Object();
+	var editedInputs = new Object();
+	var inputCount = 0;
+	var editedInputs = 0;
+	
+	function addMarkingInput(inputId, answerId, answerFormat, totalMarks, marks, markedBy, markedDate, statementId, topic, level)
+	\{
+		var minput = new Object();
+		minput.id = inputId;
+		minput.inputId = inputId;
+		minput.answerId = answerId;
+		minput.answerFormat = answerFormat;
+		minput.totalMarks = totalMarks;
+		minput.marks = marks;
+		minput.markedBy = markedBy;
+		minput.markedDate = markedDate;
+		minput.statementId = statementId;
+		minput.topic = topic;
+		minput.level = level;
+		
+		markingInputs[minput.id] = minput;
+	\}
+	
+	function editMarkingInput(inputId)
+	\{		
+		var minput = markingInputs[inputId];
+		
+		if(minput.answerId)
+		\{
+			parent.toolbar.setInput(minput);
+		\}
+		else
+		\{
+			alert('This pupil did not answer this question');
+		\}
+		
+		event.cancelBubble = true;
+	\}
+	
+	function resetMarkingInput()
+	\{
+		parent.toolbar.resetInput();	
+	\}
+	
+	function applyMarkingInput(id, marks)
+	\{
+		var minput = markingInputs[id];
+		
+		minput.marks = marks;
+		minput.markedDate = 'Just Now';
+		
+		document.getElementById('markingDiv_' + id).style.borderColor = '#00aa00';
+		document.getElementById('marks_' + minput.answerId).value = marks;
+		document.getElementById('been_marked_' + minput.answerId).value = 'y';
+	\}
+	
+	function addInputId(id)
+	\{
+		if(!inputIds[id])
+		\{
+			inputIds[id] = true;
+			inputCount++;
+		\}
+	\}
+	
+	function editInput(id)
+	\{
+		if(!editedInputs[id])
+		\{
+			editedInputs[id] = true;
+			editedInputs++;
+			
+			if(editedInputs>=inputCount)
+			\{
+				partCompleted();
+			\}
+		\}
+	\}
+	
+	function checkboxClick(id, input_id)
+	\{
+		var formElem = document.getElementById(id);
+		var img = document.getElementById(id + '_img');
+		var src = 'checkbox_unselected.gif';
+		
+		if(formElem.value=='n')
+		\{
+			formElem.value = 'y';
+		\}
+		else
+		\{
+			formElem.value = 'n';
+		\}
+		
+		if(formElem.value=='y')
+		\{
+			src = 'checkbox_selected.gif';
+		\}
+		
+		img.src = '/lib/nctest/styles/default/' + src;
+		editInput(input_id);
+	\}
+	
+	function setFramesLoaded(value)
+	\{
+		if(top.content)
+		\{
+			top.content.sidebar.content.setLoaded(value);
+			top.content.page.toolbar.setLoaded(value);			
+		\}
+	\}
+	
+	function gotoSubQuestion(sqid)
+	\{
+		setFramesLoaded(false);
+		parent.toolbar.resetInput();
+		document.markingForm.next_sub_question_id.value = sqid;
+		document.markingForm.submit();
+	\}
+	
+	function gotoExamLogin(loginId)
+	\{
+		setFramesLoaded(false);	
+		parent.toolbar.resetInput();	
+		document.markingForm.next_exam_login_id.value = loginId;
+		document.markingForm.submit();	
+	\}
+	
+	function bodyLoaded()
+	\{
+{
+	if(($c{pupil_mode}&&!$c{marking_mode})&&(!$c{single_page}))
+	{		
+		$OUT.=<<"+++";
+		parent.tree.partLoaded();
++++
+	}
+}
+	\}
+	
+	function movePart(id)
+	\{
+{
+	if($c{pupil_mode})
+	{		
+		$OUT.=<<"+++";
+		parent.tree.load_part(id);
++++
+	}
+}		
+	\}
+	
+	function partCompleted()
+	\{
+{
+	if($c{pupil_mode})
+	{
+		my $id = $c{sub_question}->get_id;
+		
+		$OUT.=<<"+++";
+		parent.tree.complete_part($id);
++++
+	}
+}	
+	\}
+
+
+</script>
+</head>
+<body bgcolor="#FFFFFF" style="margin:15px;">
+{
+	if($c{pupil_mode})
+	{
+		my $sq_id = $c{sub_question}->get_id;
+		
+		$OUT.=<<"+++";
+<script>
+	function submitForm(id)
+	{
+		document.partForm.sub_question_id.value = id;
+		
+		document.partForm.submit();
+	}
+</script>
+
+<form method="POST" action="$c{script}" name="partForm">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="sub_question_form">
+<input type="hidden" name="sub_question_id" value="">
+<input type="hidden" name="save_sub_question_id" value="$sq_id">
++++
+	
+	}
+	
+	if($c{marking_mode})
+	{
+		my $sqid = $c{sub_question}->get_id;
+		my $loginId = $c{nctest_edit_exam_login_id};
+		
+		$OUT.=<<"+++";
+<form method="POST" action="$c{script}" name="markingForm">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="marking_marks_page_submit">
+<input type="hidden" name="sub_question_id" value="$sqid">
+<input type="hidden" name="next_sub_question_id" value="$sqid">
+<input type="hidden" name="next_exam_login_id" value="$loginId">
++++
+	}
+}
+<!-- Outer Table Start -->
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+	<td><div class="number">{$c{sub_question}->get_question_order_title}</div></td>
+	<td valign="middle" align="left" class="title" width="100%">{$c{sub_question}->get_part_title}</td>
+	<td align="right"><div nowrap>
+{
+	if((!$c{marking_mode})&&(!$c{hide_buttons}))
+	{
+		if($c{sub_question}->has_previous_part)
+		{
+			my $prev_id = $c{sub_question}->previous_part_id;
+		
+			my $onclick = '';
+		
+			if($c{pupil_mode})
+			{
+				$onclick = " onClick=\"movePart($prev_id);\"";
+			}
+				
+			$OUT.=<<"+++";	
+	<img src="/lib/nctest/styles/default/prev_off.gif" border="0" title="Previous Question" onMouseOver="this.src='/lib/nctest/styles/default/prev_over.gif';" onMouseOut="this.src='/lib/nctest/styles/default/prev_off.gif';" class="prevbut"$onclick>
++++
+		}
+	
+		if($c{sub_question}->has_next_part)
+		{
+			my $next_id = $c{sub_question}->next_part_id;
+		
+			my $onclick = '';
+		
+			if($c{pupil_mode})
+			{
+				$onclick = " onClick=\"movePart($next_id);\"";
+			}
+			
+			$OUT.=<<"+++";
+	<img src="/lib/nctest/styles/default/next_off.gif" title="Next Question" border="0" onMouseOver="this.src='/lib/nctest/styles/default/next_over.gif';" onMouseOut="this.src='/lib/nctest/styles/default/next_off.gif';" class="nextbut"$onclick>
++++
+		}
+	}
+}
+	</div></td>
+</tr>
+<tr>
+	<td colspan="3" align="left" valign="top" height="100%">
+<!-- Perl Editor Code Starts Here -->
+{
+	my $mainTableRowElems = $c{sub_question}->{_mainTableRows};
+	
+	foreach my $tableRow (@$mainTableRowElems)
+	{
+		my $cellTds = '';
+		my $has_mp3 = undef;
+		my $mp3_embed = '';
+		my $marks = 0;
+		my $containsInput = undef;
+		my $containsComponent = undef;
+		
+		my $id = $tableRow->getAttribute('id');
+		my $height = $tableRow->getAttribute('height');
+		
+		if($height=~/\d/) { $height = "height=\"$height\""; }
+
+		my $content_cell_list = $tableRow->getElementsByTagName('contentCell', 0);
+
+		for(my $index=0; $index<$content_cell_list->getLength; $index++)
+		{
+			my $contentCell = $content_cell_list->item($index);
+			
+			my $cellid = $contentCell->getAttribute('id');
+			my $width = $contentCell->getAttribute('width');			
+			my $align = $contentCell->getAttribute('align');
+			my $valign = $contentCell->getAttribute('valign');
+			my $component_id = $contentCell->getAttribute('component_id');
+			my $input_id = $contentCell->getAttribute('input_id');
+			
+			my $contents = '';
+			my $markingInput = '';
+			my $highlight = undef;
+			
+			if($component_id>0)
+			{
+				my $component = $c{sub_question}->get_child('question_component', $component_id);
+				$contents = $component->get_html;
+				
+				if($component->has_mp3)
+				{
+					$has_mp3 = 1;
+					$mp3_embed = $component->get_mp3_embed;					
+				}
+				
+				$containsComponent = 1;
+			}
+			
+			if($input_id>0)
+			{
+				my $input = $c{sub_question}->get_child('question_input', $input_id);
+				$contents = $input->get_html(undef, $c{marking_mode});
+				
+				$marks += $input->get_value('marks');
+				
+				$containsInput = 1;
+				
+				if($input_id==$c{params}->{highlight_input_id})
+				{
+					$highlight = 1;
+				}
+				
+				if($c{marking_mode})
+				{
+					my $answer = $input->{answer_obj};
+					my $assessment_group = $c{sub_question}->get_child('assessment_group', $input->assessment_group_id);
+					
+					my $answer_id = $answer->get_id;
+					
+					if($answer_id!~/\w/) { $answer_id = 'null'; }
+					my $answerFormat = $input->answer_format_key;
+					my $totalMarks = $input->marks;
+					my $marks = $answer->marks;
+					my $markedBy = $answer->marked_by;
+					if($markedBy!~/\d/) { $markedBy = 'null'; }
+					my $markedDate = 'null';
+					
+					if($answer->marked) { $markedDate = "'".$answer->marked->get_string."'"; }
+					
+					my $level = $assessment_group->level;
+					my $statementId = $assessment_group->statement_of_ability_id;
+					my $topicId = $assessment_group->topic_id;
+					
+					if(($level==0)||($level eq 'none')) { $level = ''; }
+					if(($topic_id==0)||($topic_id eq 'none')) { $topic_id = ''; }
+					
+					my $admin_txt = '';
+					
+					if($c{user}->is_webkit)
+					{
+						$admin_txt = "Input = $input_id";
+					}
+					
+					$markingInput=<<"+++";
+<script>
+addMarkingInput($input_id, $answer_id, '$answerFormat', $totalMarks, $marks, $markedBy, $markedDate, $statementId, '$topicId', '$level');
+</script>
+<input type="hidden" name="marks_$answer_id" id="marks_$answer_id" value="$marks">
+<input type="hidden" name="marked_by_$answer_id" id="marked_by_$answer_id" value="$markedBy">
+<input type="hidden" name="been_marked_$answer_id" id="has_been_marked_$answer_id" value="n">
+$admin_txt
++++
+				}
+			}
+			
+			if($align!~/\w/) { $align = 'left'; }
+			if($valign!~/\w/) { $valign = 'middle'; }
+			if($width=~/\d/) { $width = " width=\"$width\""; }
+			
+			if($contents!~/\w/) { $contents = '&nbsp;'; }
+			
+			if(($highlight)&&(!$c{pupil_mode}))
+			{
+				$contents = '<span style="background-color:#ff4444;">'.$contents.'</span>';
+			}
+			
+			$cellTds.=<<"+++";			
+<!-- Cell Start (Cell - $cellid) -->
+$markingInput
+<td $width align="$align" valign="$valign">$contents</td>
+
+<!-- Cell End -->
++++
+		}
+		
+		my $mp3 = '';
+		my $marks_text = '';
+		
+		if($containsInput)
+		{
+			$marks_text = "($marks marks)";
+		}
+		
+		if($has_mp3)
+		{
+			$mp3=<<"+++";
+<div class="sound">$mp3_embed</div>			
++++
+		}
+		
+		my $margin_code = '';
+		
+		if(($containsComponent)&&(!$containsInput))
+		{
+			$margin_code = ' style="margin-top:20px;"';
+		}
+
+		$OUT.=<<"+++";
+<!-- Row Start (TableRow - $id) -->
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr $height>
+	<td class="leftcol" $margin_code>$mp3</td>
+	<td valign="top" align="left">
+	<table cellpadding="0" cellspacing="0" border="0" width="100%" $margin_code>
+	<tr>
+		$cellTds		
+	</tr>
+	</table>
+	</td>
+	<td class="rightcol"><div class="marks">$marks_text</div></td>	
+</tr>
+</table>
+<!-- Row End -->
+
+
++++
+	}
+}
+<!-- Perl Editor Code Ends Here -->
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="right" style="padding-top:20px;">
+{
+	if((!$c{marking_mode})&&(!$c{hide_buttons}))
+	{
+		if($c{sub_question}->has_previous_part)
+		{
+			my $prev_id = $c{sub_question}->previous_part_id;
+		
+			my $onclick = '';
+		
+			if($c{pupil_mode})
+			{
+				$onclick = " onClick=\"movePart($prev_id);\"";
+			}
+				
+			$OUT.=<<"+++";	
+	<img src="/lib/nctest/styles/default/prev_off.gif" border="0" title="Previous Question" onMouseOver="this.src='/lib/nctest/styles/default/prev_over.gif';" onMouseOut="this.src='/lib/nctest/styles/default/prev_off.gif';" class="prevbut"$onclick>
++++
+		}
+	
+		if($c{sub_question}->has_next_part)
+		{
+			my $next_id = $c{sub_question}->next_part_id;
+		
+			my $onclick = '';
+		
+			if($c{pupil_mode})
+			{
+				$onclick = " onClick=\"movePart($next_id);\"";
+			}
+			
+			$OUT.=<<"+++";
+	<img src="/lib/nctest/styles/default/next_off.gif" title="Next Question" border="0" onMouseOver="this.src='/lib/nctest/styles/default/next_over.gif';" onMouseOut="this.src='/lib/nctest/styles/default/next_off.gif';" class="nextbut"$onclick>
++++
+		}
+	}
+}
+
+	
+	</td>
+</tr>
+</table>
+{
+	if(($c{pupil_mode})&&(!$c{params}->{initial_question}))
+	{
+		$OUT.=<<"+++";
+</form>
++++
+	}
+	
+	$OUT.=<<"+++";
+<script>
++++
+
+	if(($c{pupil_mode})&&(!$c{params}->{initial_question}))
+	{
+		$OUT.=<<"+++";
+	bodyLoaded();
++++
+	}
+
+	if($c{marking_mode})
+	{
+		$OUT.=<<"+++";
+	document.body.onclick = resetMarkingInput;
++++
+	}
+	
+	if((!$c{params}->{from_frameset})&&(!$c{params}->{auto_marking}))
+	{
+		$OUT.=<<"+++";
+	setFramesLoaded(true);		
++++
+	}
+}
+</script>
+</body>
+</html>

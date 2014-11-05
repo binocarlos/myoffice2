@@ -1,0 +1,45 @@
+<script>
+	function cancel()
+	\{
+		top.returnValue = null;
+		top.close();
+	\}
+
+
+	function existing_page_changed(gui)
+	\{
+		var url = gui.value;
+
+		document.getElementById('url').value = url;
+	\}
+
+
+	function accept()
+	\{
+		var ret = new Object();
+
+		ret.url = document.getElementById('url').value;
+		ret.win = document.getElementById('type').value;
+
+		if(ret.url!='')
+		\{
+			top.returnValue = ret;
+			top.close();
+		\}
+		else
+		\{
+			alert('Please enter a url');
+		\}
+	\}
+</script>
+
+<input id="url"><br>
+<select id="existing_page" onChange="existing_page_changed(this);">
+{$c{page_options}}
+</select><br>
+<select id="type">
+<option value="self" SELECTED>Same Window</option>
+<option value="new">New Window</option>
+</select><br>
+<input type="button" value="Cancel" onClick="cancel();">
+<input type="button" value="Accept" onClick="accept();">

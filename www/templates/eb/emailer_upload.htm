@@ -1,0 +1,96 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+{
+	my $now_date = Webkit::Date->now;
+	my $sql_date = Webkit::Date->parse_to_sql($now_date);
+	
+	$OUT.=<<"+++";
+var now_date = '$sql_date';
++++
+}
+
+function checkUploadForm()
+\{
+	if(document.uploadForm.csv.value=="")
+	\{
+		alert('please choose a csv file');
+		return false;
+	\}
+	
+	if(document.uploadForm.email_field.value=="")
+	\{
+		alert('please enter the name of the email field');
+		return false;
+	\}
+	
+	document.getElementById('mainTable').style.display = 'none';
+	document.getElementById('messageTable').style.display = 'block';	
+\}
+</script>
+<body>
+<form action="{$c{href}}" method="POST" enctype="multipart/form-data" name="uploadForm" onSubmit="return checkUploadForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="emailer_upload_submit">
+<table width="400" border="0" align="center" cellpadding="20" cellspacing="0" style="display:inline;" id="mainTable">
+<tr>
+<td>
+Browse for your CSV file containing the field headers (the first line with the names of the fields) and an email field (a column containing only email addresses)...<br>
+<br> 
+Make sure the first line contains the field names otherwise you can't replace them into the email!!! 
+</td>
+</tr>
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<TABLE width="400" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR style="padding-bottom:5px;">
+<TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">CSV File:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="csv" type="file" style="width:100%;" class="text_field" id="csv" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD width="80" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Email Field:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="email_field" type="text" class="text_field" id="email_field" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="email">
+</TD>
+</TR>
+<TR style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+<TR align="right" style="padding-bottom:5px;">
+<TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;"><input name="Submit" type="submit" class="button" value="Upload"></TD>
+</TR>
+</TABLE>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+</tr>
+</table><br>
+
+<table border="0" align="center" cellpadding="0" cellspacing="1" id="messageTable" style="display:none;">
+<tr>
+<td style="font-weight:bold;color:#CC0000;">Uploading, please wait...</td>
+</tr>
+</table>
+</form>
+</body>
+</html>
+
+
+

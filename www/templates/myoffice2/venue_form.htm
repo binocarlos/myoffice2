@@ -1,0 +1,529 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function goBack()
+	\{
+{
+	if($c{modal})
+	{
+		$OUT.=<<"+++";
+	top.close();
++++
+	}
+	else
+	{
+		my $letter = $c{venue}->get_city_first_letter;
+		
+		$OUT.=<<"+++";
+	document.location = href + '&method=venue_home&search=$letter\%';
++++
+	}
+}
+	\}
+	
+	var brochureDate = {Webkit::MyOffice2::Admin->editors_multidatenote_js_value($c{venue}->brochure_date)};
+	
+	function editBrochureDate()
+	\{					
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, brochureDate);
+		
+		if(!ret) \{ return; \}
+		
+		brochureDate = ret;
+		
+		applyBrochureDate();
+	\}
+	
+	function applyBrochureDate()
+	\{
+		document.getElementById('brochure_date_td').innerHTML = getMultiDateNoteText(brochureDate);
+	\}
+	
+	function submitForm()
+	\{
+		var st = getMultiDateNoteReturn(brochureDate);
+		
+		document.venue_form.brochure_date.value = st;
+	\}
+</script>
+<body>
+<form action="{$c{script}}" method="POST" name="venue_form" onSubmit="submitForm();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="venue_form_submit">
+<input type="hidden" name="venue_id" value="{$c{venue}->get_id}">
+<input type="hidden" name="modal" value="{$c{modal}}">
+<table border="0" align="center" cellpadding="5" cellspacing="0">
+<tr align="left"><td><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+  <TR>
+    <TD>
+      <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+        <TR>
+          <TD CLASS="panelbody">
+            <table border=0>
+              <tr align="center">
+                <td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Booking</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Booking<br><br>
++++
+}				
+                    <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>N:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_booking_name" type="text" class="text_field" id="contact_booking_name" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('booking', 'name')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>P:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_booking_phone" type="text" class="text_field" id="contact_booking_phone" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('booking', 'phone')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>E:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_booking_email" type="text" class="text_field" id="contact_booking_email" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('booking', 'email')}">
+                        </TD>
+                      </TR>
+                    </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}</td>
+                <td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Theatre Manager</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Theatre Manager<br><br>
++++
+}				
+                    <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>N:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_main_name" type="text" class="text_field" id="contact_main_name" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('main', 'name')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>P:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_main_phone" type="text" class="text_field" id="contact_main_phone" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('main', 'phone')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>E:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_main_email" type="text" class="text_field" id="contact_main_email" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('main', 'email')}">
+                        </TD>
+                      </TR>
+                    </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}</td>
+                <td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Marketing</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Marketing<br><br>
++++
+}				
+                    <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>N:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_marketing_name" type="text" class="text_field" id="contact_marketing_name" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('marketing', 'name')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>P:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_marketing_phone" type="text" class="text_field" id="contact_marketing_phone" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('marketing', 'phone')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>E:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_marketing_email" type="text" class="text_field" id="contact_marketing_email" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('marketing', 'email')}">
+                        </TD>
+                      </TR>
+                    </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}</td>
+                <td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Box Office</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Box Office<br><br>
++++
+}		
+                    <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>N:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_boxoffice_name" type="text" class="text_field" id="contact_boxoffice_name" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('boxoffice', 'name')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>P:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_boxoffice_phone" type="text" class="text_field" id="contact_boxoffice_phone" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('boxoffice', 'phone')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>E:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_boxoffice_email" type="text" class="text_field" id="contact_boxoffice_email" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('boxoffice', 'email')}">
+                        </TD>
+                      </TR>
+                    </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}</td>
+                <td>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Tech</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Tech<br><br>
++++
+}
+                    <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>N:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_tech_name" type="text" class="text_field" id="contact_tech_name" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('tech', 'name')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>P:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_tech_phone" type="text" class="text_field" id="contact_tech_phone" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('tech', 'phone')}">
+                        </TD>
+                      </TR>
+                      <TR>
+                        <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>E:</TD>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">
+                          <input name="contact_tech_email" type="text" class="text_field" id="contact_tech_email" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->get_contact_field('tech', 'email')}">
+                        </TD>
+                      </TR>
+                    </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}</td>
+              </tr>
+          </table></TD>
+        </TR>
+    </TABLE></TD>
+  </TR>
+</TABLE></td>
+</tr>
+<tr>
+<td align="left" valign="top">
+
+<table width="100%" border=0 cellpadding="5">
+  <tr align="left" valign="top"><td width="240">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" width=240>
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Venue Details</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Venue Details<br><br>
++++
+}
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" nowrap style="padding-right:5px;">City:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="city" type="text" class="text_field" id="city" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->city}">    </TD>
+  </TR>  
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="name" type="text" class="text_field" id="name" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->name}">    </TD>
+  </TR> 
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Capacity:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="capacity" type="text" class="text_field" id="capacity" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->capacity}">    </TD>
+  </TR> 
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Website:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="website" type="text" class="text_field" id="website" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->website}">    </TD>
+  </TR>   
+  <tr><td height=10 colspan=2 align="right"></td></tr>  
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Box Office No:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="box_office_number" type="text" class="text_field" id="box_office_number" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->box_office_number}">    </TD>
+  </TR>    
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Figures No :</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="figures_number" type="text" class="text_field" id="figures_number" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->figures_number}">    </TD>
+  </TR>  
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Admin No :</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="admin_number" type="text" class="text_field" id="admin_number" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->admin_number}">    </TD>
+  </TR>  
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Fax No :</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="fax_number" type="text" class="text_field" id="fax_number" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->fax_number}">    </TD>
+  </TR>      
+  <tr><td height=10 colspan=2 align="right"></td></tr>  
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Address1:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="address1" type="text" class="text_field" id="address1" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->address1}">    </TD>
+  </TR>    
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Address2:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="address2" type="text" class="text_field" id="address2" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->address2}">    </TD>
+  </TR>      
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Postcode:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="postcode" type="text" class="text_field" id="postcode" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->postcode}">    </TD>
+  </TR>    
+  <TR> 
+    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>County:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input name="county" type="text" class="text_field" id="county" style="width:140px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->county}">    </TD>
+  </TR>
+</TABLE>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{venue}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="goBack();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</td>
+<td>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+    <TR>
+      <TD>
+        <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+          <TR>
+            <TD CLASS="panelbody">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Venue Info</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Venue Info<br><br>
++++
+}
+                <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+		
+                  <TR>
+                    <TD ALIGN="right" VALIGN="top" nowrap style="padding-right:5px;">Brochure Date:
+                        <input type="hidden" name="brochure_date" value="{$c{venue}->get_js_value('brochure_date')}"></TD>
+                    <TD ALIGN="LEFT" height=1 VALIGN="MIDDLE" style="cursor:hand;" onClick="editBrochureDate();" onMouseOver="this.bgColor='#e5e5e5';" onMouseOut="this.bgColor='';"><span id="brochure_date_td">&nbsp;</span> </TD>
+                  </TR>
+                  <TR>
+                    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Brochures per Year: </TD>
+                    <TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="brochures_per_year" type="text" class="text_field" id="brochures_per_year" style="width:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->brochures_per_year}"></TD>
+                  </TR>
+                  <TR>
+                    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Brochures Produced:</TD>
+                    <TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="brochures_produced" type="text" class="text_field" id="brochures_produced" style="width:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->brochures_produced}"></TD>
+                  </TR>
+                  <TR>
+                    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Brochures Mailed: </TD>
+                    <TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="brochures_mailed" type="text" class="text_field" id="brochures_mailed" style="width:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->brochures_mailed}"></TD>
+                  </TR>
+                  <TR>
+                    <TD ALIGN="right" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Space Allocated: </TD>
+                    <TD ALIGN="LEFT" VALIGN="MIDDLE"><input name="space_allocated" type="text" class="text_field" id="space_allocated" style="width:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{venue}->space_allocated}"></TD>
+                  </TR>
+                  <TR>
+                    <TD ALIGN="right" VALIGN="top" style="padding-right:5px;" nowrap>Technical Info: </TD>
+                    <TD ALIGN="LEFT" VALIGN="MIDDLE"><textarea name="contra_charges" id="contra_charges" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:120px; height:80px;">{$c{venue}->contra_charges}</textarea></TD>
+                  </TR>
+                 <TR align="left">
+                    <TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;">Booking Notes: </TD>
+                    </TR>
+                  <TR align="left">
+                    <TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;"><table width="100%" border="0" cellpadding="5" cellspacing="1">
+{
+	foreach my $tour_id (sort keys %{$c{venue}->{_booking_notes}})
+	{
+		my $tour = $c{org}->get_child('tour', $tour_id);
+		my $tour_name = $tour->name;
+		my $notesObj = $c{venue}->{_booking_notes}->{$tour_id};
+		my $notes = Webkit::AppTools->html_quote($notesObj->notes);
+		
+		if($notes!~/\w/) { next; }
+		  
+		$OUT.=<<"+++";
+                      <tr>
+                        <td width="80" valign="top" style="color:blue;">$tour_name</td>
+                        <td width="200" style="font-size:7pt;">$notes</td>
+                      </tr>
++++
+	}
+}
+                    </table></TD>
+                    </TR>		
+                 <TR align="left">
+                    <TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;">Date Called: </TD>
+                    </TR>
+                  <TR align="left">
+                    <TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;"><table width="100%" border="0" cellpadding="5" cellspacing="1">
+{
+	foreach my $tour_id (sort keys %{$c{venue}->{_booking_map}})
+	{
+		my $tour = $c{org}->get_child('tour', $tour_id);
+		my $tour_name = $tour->name;
+		my $booking = $c{venue}->{_booking_map}->{$tour_id};
+		my $ref = $booking->get_last_date_called_ref;
+		
+		if(($ref->{date}!~/\w/)&&($ref->{notes}!~/\w/)) { next; }
+		
+		#$ref->{notes}=~s/\n/<br>/g;
+		  
+		my $st = $ref->{date};
+		if($st=~/\w/)
+		{
+			$st .= ' - ';
+		}
+		
+		$st .= '<span style="font-size:7pt;color:blue;">'.$ref->{notes}.'</span>';
+		  
+		$OUT.=<<"+++";
+                      <tr>
+                        <td width="80" valign="top" style="color:blue;">$tour_name</td>
+                        <td width="200">$st</td>
+                      </tr>
++++
+	}
+}
+                 <TR align="left">
+                    <TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;">Previous Visits : </TD>
+                    </TR>
+                  <TR align="left">
+                    <TD colspan="2" VALIGN="top" nowrap style="padding-right:5px;"><table width="100%" border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+{
+	foreach my $tour_id (sort keys %{$c{venue}->{_showing_map}})
+	{
+		my $tour = $c{org}->get_child('tour', $tour_id);
+		my $tour_name = $tour->name;
+		my $dates = '';
+
+		foreach my $showing (@{$c{venue}->{_showing_map}->{$tour_id}})
+		{
+			my $date_st = $showing->get_datetime_title;
+			#$date_st = $showing->get_id.' -- '.$date_st;
+		
+			$dates.=<<"+++";
+<li>$date_st</li>
++++
+		}
+		
+		$OUT.=<<"+++";
+                      <tr bgcolor="#D4D0C8">
+                        <td width="80" valign="top" style="color:blue;">$tour_name</td>
+                        <td width="200" style="font-size:8pt;color:green;"><ul>$dates</ul></td>
+                      </tr>
++++
+	}
+}
+                    </table></TD>
+                    </TR>		
+                    </table></TD>
+                    </TR>							 
+                </TABLE>
+				
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
++++
+}				
+</TD>
+          </TR>
+      </TABLE></TD>
+    </TR>
+</TABLE></td></tr></table>
+</td>
+</tr>
+</table>
+</form>
+<script>
+applyBrochureDate();
+</script>
+</body>
+</html>
+
+
+

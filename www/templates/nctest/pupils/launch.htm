@@ -1,0 +1,60 @@
+<HTML>
+ <HEAD>
+	<TITLE></TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+function openApp()
+\{
+	var loc = href + '&method=generate_window';
+	
+	openWindow(loc, 800, 600);
+	
+	document.location = '/apps/pnctest.app';
+\}
+
+function openWindow(url,width,height)
+\{
+		width -= 10;
+		height -= 29;
+    PopURL=url;
+    if(!PopWin || PopWin.closed)\{
+        PopWin=PopWinOpen(width,height);
+    \}
+    else \{
+        PopWin.close();
+        PopWin=null;
+        PopWin=PopWinOpen(width,height);
+    \}
+\}
+
+var PopURL="";
+var PopWin=null;
+var openpopwin=null;
+function PopWinOpen(width,height)\{
+    var x =(screen.availWidth-width)/2;
+    var y =(screen.availHeight-height)/2;
+	
+	var status = '';
+{
+	if($c{org_id}==1)
+	{
+		$OUT.=<<"+++";
+status = ',status';
++++
+	}
+}
+	var winfeatures="width="+width+",height="+height+",top="+y+",left="+x+",resizable=1,scrollbars=0,menubar=0" + status;
+	openpopwin=null;
+	openpopwin=window.open(PopURL,"wktest",winfeatures);
+	return openpopwin;
+\}
+openApp();
+</SCRIPT>
+ </head>
+ <BODY BGCOLOR="#FFFFFF">
+
+ <table width="100%" height="100%"><tr><td width="100%" height="100%" align="center" valign="center">
+<a href="javascript:openApp();">Launch</a>
+
+ </td></tr></table>
+</BODY>
+</HTML>

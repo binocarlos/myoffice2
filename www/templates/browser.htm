@@ -1,0 +1,79 @@
+<!--#include virtual="temp_include.htm" -->
+<html>
+<head>
+        <title>System Requirements</title>
+<script>
+var browser;
+var browserName = navigator.appName;
+var browserVersion = parseInt(navigator.appVersion);
+
+if (browserName == "Microsoft Internet Explorer" &&
+         browserVersion == 4 &&
+         navigator.appVersion.indexOf("MSIE 6.0") != -1) \{
+    browser = "Microsoft Internet Explorer 6";
+\}
+else if (browserName == "Microsoft Internet Explorer" &&
+         browserVersion == 4 &&
+         navigator.appVersion.indexOf("MSIE 5.5") != -1) \{
+    browser = "Microsoft Internet Explorer 5.5";
+\}
+else if (browserName == "Microsoft Internet Explorer" &&
+         browserVersion == 4 &&
+         navigator.appVersion.indexOf("MSIE 5.0") != -1) \{
+    browser = "Microsoft Internet Explorer 5";
+\}
+else
+\{
+		browser = navigator.appVersion;
+\}
+</script>
+</head>
+<body bgcolor="#FFFFFF">
+
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+	  HEIGHT="100%">
+		<TR>
+		  <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" width=460>
+
+				<TR>
+				  <TD>
+					 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="10" CELLSPACING="0"
+					  CLASS="panelinner" HEIGHT="100%">
+						<TR>
+						  <TD CLASS="panelbody" HEIGHT="100%" WIDTH="100%"
+							ALIGN="RIGHT" VALIGN="TOP">
+							 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+								<TR>
+								  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="35"><IMG
+									 SRC="/images/nav/warning.gif" WIDTH="22" HEIGHT="23" BORDER="0"></TD>
+
+<TD COLSPAN="2" ALIGN="LEFT" VALIGN="TOP">To use your  software, you will need to upgrade your browser to the latest version of Microsoft Internet Explorer.<br>
+<br>
+This is to ensure that your information is kept secure and that you can use all of the functionality within your software.<br>
+<br>
+The current vendor and version of your browser is shown as follows:<br>
+<br>
+<script>
+document.write(browser);
+</script>
+<br>
+<br>
+If you click on the button below, you will be taken to the Microsoft Downloads website.  From here, you can download the latest version of Internet Explorer (currently version 6)  and begin to use your software.<BR>
+<IMG SRC="/images/clear.gif" WIDTH="1"
+							 HEIGHT="5" BORDER="0"></TD>
+								</TR>
+							 </TABLE><IMG SRC="/images/clear.gif" WIDTH="1"
+							 HEIGHT="5" BORDER="0"><BR><INPUT TYPE="BUTTON" NAME="Button1"
+								VALUE="Get It Now" STYLE="width:100px;" CLASS="button"
+								ONCLICK="document.location='http://www.microsoft.com/downloads/';"></TD>
+						</TR>
+					 </TABLE></TD>
+				</TR>
+			 </TABLE> </TD>
+		</TR>
+	 </TABLE>
+
+</body>
+</html>
+

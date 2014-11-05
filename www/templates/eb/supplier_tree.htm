@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<a href="javascript: get_xTree_query('&method=supplier_form');">Add Supplier</a><br><br>
+<a href="javascript: get_xTree_query('&method=supplier_home');">List Suppliers</a><br><br>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+		top.content.page.content.location = loc;
+	\}
+
+var tree = new WebFXTree('Suppliers');
+tree.action = "javascript: get_xTree_query('&method=supplier_home');";
+
+{	
+	foreach my $supplier (@{$c{org}->ensure_child_array('supplier')})
+	{
+		my $id = $supplier->get_id;
+		my $name = $supplier->get_js_value('name');
+		
+		$OUT.=<<"+++";
+var supplier$id = new WebFXTreeItem('$name');
+supplier$id.action = "javascript: get_xTree_query('&method=supplier_form&supplier_id=$id');";		
+
+tree.add(supplier$id);
++++
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

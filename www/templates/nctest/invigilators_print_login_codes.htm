@@ -1,0 +1,46 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#ffffff; margin:8px;">
+<script>
+	function printPage()
+	\{
+		window.print();
+	\}
+</script>
+
+<table border="0" cellspacing="0" cellpadding="3">
+{
+	foreach my $class (@{$c{exam}->ensure_child_array('class')})
+	{
+		my $class_title = $class->get_title;
+
+		$OUT.=<<"+++";
+  <tr>
+    <td colspan=2 style="padding-left:5px;"><b>$class_title</b></td>
+  </tr>
++++
+		foreach my $exam_login (@{$class->ensure_child_array('exam_login')})
+		{
+			my $code = $exam_login->login_code;
+			my $pupil_name = $exam_login->get_pupil_name;
+
+			$OUT.=<<"+++";
+  <tr>
+    <td align=right style="padding-left:20px;"><font size=3><code>$code</code></font></td>
+    <td>&nbsp;&#151;&#151;&#151;&#151;&#151;&#151;&nbsp;</td>
+    <td>$pupil_name</td>
+  </tr>
++++
+		}
+
+		$OUT.=<<"+++";
+  <tr>
+    <td colspan=2 height=20>&nbsp;</td>
+  </tr>
++++
+	}
+}
+</table>
+
+	<script>
+		document.body.onload = printPage;
+	</script>

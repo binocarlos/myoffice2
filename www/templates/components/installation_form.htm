@@ -1,0 +1,114 @@
+<!--#include virtual="temp_include.htm" -->
+<script src="/lib/formhelp.js">
+</script>
+<script>
+	var helptext = new Object();
+	
+	helptext.title = 'Enter the title of the Calendar Installation';
+	helptext.calendar_key = 'Enter the key for the Calendar';
+	
+	function validate_installationform()
+	\{
+		var form = document.installationform;
+
+		if(form.title.value=='')
+		\{
+			document.getElementById('error_span').innerText = 'Please Enter a Title.';
+			
+			return false;
+		\}
+		
+		if(form.calendar_key.value=='')
+		\{
+			document.getElementById('error_span').innerText = 'Please Enter a Key.';
+			
+			return false;
+		\}		
+	
+		return true;
+	\}
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+<form method="POST" action="{$c{script}}" style="margin:0;" name="installationform" onSubmit="return validate_installationform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="calendar_installation_form_submit">
+<input type="hidden" name="installation_id" value="{$c{installation}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width="300">
+<TR>
+<TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Calendar   Details&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+<TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0" width="400">
+<TR>
+  
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="83">Title:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="301">
+	 
+<input type="text" name="title" value="{$c{installation}->get_value('title')}" onFocus="this.className='text_field2';show_help('title');" onBlur="this.className='text_field';hide_help();" class="text_field" style="width:100%;">
+</TD>
+</TR>
+<TR>
+  
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="83">Key:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="301">
+	 
+<input type="text" name="calendar_key" value="{$c{installation}->get_value('calendar_key')}" onFocus="this.className='text_field2';show_help('title');" onBlur="this.className='text_field';hide_help();" class="text_field" style="width:100%;">
+</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="83">Style Sheet:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="301">
+<select name="calendar_style_sheet_id" class="text_field" style="width:150px;">{$c{style_sheet_options}}
+</select>
+</TD>
+</TR>
+
+
+</TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR valign="top" align="center">
+<TD colspan="2"><span id="helpspan"></span> <br>
+<br>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" width="50%"><span style="color:#880000;" id="error_span">{$c{installation}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE" width="50%">
+<input type="button" onClick="document.location=href+'&method=calendar_installations_home';" name="Submit2" value="Cancel" class="button" style="width:75px;">
+<input type="submit" name="Submit" value="Save Details" CLASS="button" style="width:100px;">
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+<script>
+init_help(helptext);
+</script>
+</body>
+</html>
+
+
+

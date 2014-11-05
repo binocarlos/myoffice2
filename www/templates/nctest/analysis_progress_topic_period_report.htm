@@ -1,0 +1,107 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var graphMode = false;
+var selectedCellId = null;
+
+var origBgColors = new Object();
+
+function pupilExamLevelBreakdown(exam_id, pupil_id)
+\{
+	var loc = href + '&method=analysis_level_breakdown&exam_id=' + exam_id + '&pupil_id=' + pupil_id + '&topic={$c{report}->{topic_id}}&show_page_back_button=1&hide_override=1';
+	
+	document.location = loc;
+\}
+
+function trRollOver(tr)
+\{
+	origBgColors[tr.id] = tr.bgColor;
+	
+	tr.bgColor = '#ffe5e5';
+\}
+
+function trRollOut(tr)
+\{
+	tr.bgColor = origBgColors[tr.id];
+\}
+
+
+</script>
+
+<table  border="0" cellspacing="1" cellpadding="0">
+  <tr valign="top">
+    <td>
+        <table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+          <tr bgcolor="#FFFFFF">
+            <td colspan="2"><b> {$c{report}->{title}} </b><br>{$c{report}->{params_st}}</td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Period: </td>
+            <td><b style="color:red;">{$c{report}->get_period_title}</b></td>
+          </tr>		  
+          <tr bgcolor="#FFFFFF">
+            <td>Topic: </td>
+            <td><b style="color:red;">{$c{report}->{topic_id}}</b></td>
+          </tr>				  
+          <tr bgcolor="#FFFFFF">
+            <td>Total Pupils: </td>
+            <td><b style="color:black;">{$c{report}->get_data_count}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Total NC Score: </td>
+            <td><b style="color:black;">{$c{report}->get_total_nc_score}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Avg. NC Score:</td>
+            <td><b style="color:black;">{$c{report}->get_avg_nc_score}</b></td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td>Avg. Level: </td>
+            <td><b style="color:red;">{$c{report}->get_avg_level}</b></td>
+          </tr>
+        </table>
+</td>
+  </tr>
+</table>
+<br>
+<input type="button" class="button" value="Close" onClick="top.close();">&nbsp;
+  <input name="printButton" id="printButton" type="button" class="button" onClick="self.print();" value="Print">
+  <br>
+  <br>
+  Click on each pupil to get a breakdown...<br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td><strong>Exam</strong></td>
+    <td><strong>Pupil</strong></td>	
+    <td><strong>Level</strong></td>
+    <td><strong>NC Score </strong></td>
+  </tr>
+{
+	foreach my $ref (@{$c{report}->{data}})
+	{
+		my $pupil_name = $ref->{pupil_name};
+		my $nc_score = $ref->{nc_score};
+		my $level = &Webkit::NcTest::NCHub::get_score_level($nc_score);		
+		my $id = $ref->{id};
+		my $pupil_id = $ref->{pupil_id};
+		my $exam_id = $ref->{exam_id};
+		my $exam_name = $ref->{exam_name};
+		my $yeargroup = $ref->{yeargroup};		
+		my $exam_date = Webkit::Date->parse_from_sql($ref->{exam_date});
+		
+		my $month_name = Webkit::Date->get_monthname($exam_date->Month);
+		my $year = $exam_date->Year;
+
+		my $exam_date_title = "$month_name $year - Year $yeargroup ($exam_name)";
+	
+		$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF" id="tr$id" onMouseOver="trRollOver(this);" onMouseOut="trRollOut(this);" onClick="pupilExamLevelBreakdown($exam_id, $pupil_id);" style="cursor:hand;">
+    <td>$exam_name - $exam_date_title</td>
+    <td>$pupil_name</td>
+    <td>$level</td>
+    <td>$nc_score</td>
+  </tr>
++++
+	}
+}
+</table>

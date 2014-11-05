@@ -1,0 +1,314 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:1px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{ font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script src="/lib/kit.js"></script>
+<script src="/lib/myoffice2/lib.js"></script>
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+var appname = '{$c{app_name}}';
+
+	var salesEntries = new Object();
+	var salesFigures = new Object();
+	var venues = new Object();
+	var deals = new Object();
+	var bookings = new Object();
+	
+	var saveSpanMode = false;
+	var timeoutId = null;
+	
+	function clearSwitchSaveSpan()
+	\{
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = '';
+		button.style.color = '';
+		button.style.fontWeight = '';
+		span.style.backgroundColor = '';
+		span.style.color = '';
+		span.style.fontWeight = '';
+		
+		clearTimeout(timeoutId);
+		
+		timeoutId = null;	
+	\}
+	
+	function switchSaveSpan()
+	\{
+		saveSpanMode =! saveSpanMode;
+		
+		var buttonBg = '';
+		var buttonFg = '';
+		
+		var spanBg = '';
+		var spanFg = '';
+		
+		var buttonWeight = '';
+		var spanWeight = '';
+		
+		if(saveSpanMode)
+		\{
+			buttonBg = '#ffffff';
+			buttonFg = '#ff0000';
+			spanBg = '#ffffff';
+			spanFg = '#ff0000';
+			buttonWeight = 'bold';
+			spanWeight = 'bold';
+		\}
+		
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = buttonBg;
+		button.style.color = buttonFg;
+		button.style.fontWeight = buttonWeight;
+		span.style.backgroundColor = spanBg;
+		span.style.color = spanFg;
+		span.style.fontWeight = spanWeight;
+		
+		timeoutId = setTimeout("switchSaveSpan();", 1000);
+	\}				
+	
+	function showSaveSpan()
+	\{
+		document.getElementById('saveSpan').style.display = 'inline';
+		document.getElementById('saveButton').disabled = false;
+		
+		if(timeoutId==null)
+		\{
+			switchSaveSpan();			
+		\}
+	\}
+	
+	function resetForm()
+	\{
+		clearSwitchSaveSpan();		
+		document.getElementById('hiddenInputSpan').innerText = '';
+		document.getElementById('saveSpan').style.display = 'none';
+		document.getElementById('saveButton').disabled = true;
+
+		salesEntries = new Object();
+		salesFigures = new Object();
+		venues = new Object();
+		deals = new Object();
+		bookings = new Object();
+	\}
+	
+	function addSalesFigures(obj)
+	\{
+		salesFigures[obj.id] = obj;
+		
+		showSaveSpan();		
+	\}	
+	
+	function addBookingField(id, field, value)
+	\{
+		var booking = bookings[id];
+		
+		if(!booking)
+		\{
+			booking = new Object();
+			booking.id = id;
+			bookings[booking.id] = booking;
+		\}
+		
+		booking[field] = value;
+		
+		showSaveSpan();
+	\}				
+			
+	function addDealField(id, field, value)
+	\{
+		var deal = deals[id];
+		
+		if(!deal)
+		\{
+			deal = new Object();
+			deal.id = id;
+			deals[deal.id] = deal;
+		\}
+		
+		deal[field] = value;
+		
+		showSaveSpan();
+	\}				
+	
+	function addSalesEntryField(id, field, value)
+	\{
+		var salesEntry = salesEntries[id];
+		
+		if(!salesEntry)
+		\{
+			salesEntry = new Object();
+			salesEntry.id = id;
+			salesEntries[salesEntry.id] = salesEntry;
+		\}
+		
+		salesEntry[field] = value;
+		
+		showSaveSpan();
+	\}			
+	
+	function addVenueField(id, field, value)
+	\{
+		var venue = venues[id];
+		
+		if(!venue)
+		\{
+			venue = new Object();
+			venue.id = id;
+			venues[venue.id] = venue;
+		\}
+		
+		venue[field] = value;
+		
+		showSaveSpan();
+	\}	
+	
+	function applySalesFiguresInputs()
+	\{
+		var span = document.getElementById('hiddenInputSpan');	
+		
+		var ret = '';
+			
+		for(var salesFiguresId in salesFigures)
+		\{
+			var salesFigs = salesFigures[salesFiguresId];
+			
+			var dt = new Date();
+			dt.setTime(salesFigs.week_epoch_days * 60 * 60 * 24 * 1000);
+			
+			var date_st = dt.getDate() + '/' + (dt.getMonth()+1) + '/' + dt.getYear();
+			
+			var st = 'tourdate_id=' + salesFigs.tourdate_id
+			+ '&sales_figures_entry_id=' + salesFigs.sales_figures_entry_id
+			+ '&week_start=' + date_st
+			+ '&sold_seats=' + salesFigs.sold_seats
+			+ '&sold_gross=' + salesFigs.sold_gross
+			+ '&reserved_seats=' + salesFigs.reserved_seats
+			+ '&reserved_gross=' + salesFigs.reserved_gross;
+			
+			ret += '<field name="sales_figures_' + salesFigs.id + '">' + st + '</field>';			
+		\}
+		
+		return ret;
+	\}	
+	
+	function applyObjectInputs(hash, tag)
+	\{
+		if(!hash) \{ return; \}
+		
+		var span = document.getElementById('hiddenInputSpan');
+		var st = '';
+		
+		for(var id in hash)
+		\{
+			var obj = hash[id];
+			
+			for(var field in obj)
+			\{
+				if(field!='id')
+				\{
+					//var elem = document.createElement('INPUT');
+					//elem.type = 'hidden';
+					//elem.name = tag + '_' + id + '_' + field;
+					//elem.value = obj[field];
+				
+					//span.appendChild(elem);
+					
+					st += '<field name="' + tag + '_' + id + '_' + field + '">' + obj[field] + '</field>';					
+				\}
+			\}
+		\}		
+		
+		return st;
+	\}
+
+	function sumbitSalesFiguresSheet()
+	\{
+		var form = document.salesFiguresSheetForm;
+		
+		var data = applySalesFiguresInputs();
+		
+		form.data.value = data;
+		
+		form.submit();
+	\}	
+	function viewSheet()
+	\{
+		var month = document.getElementById('month').value;
+		var year = document.getElementById('year').value;
+		var lookahead = document.getElementById('lookahead').value;
+		
+		var loc = href + '&method=sales_figures_sheet&month=' + month + '&year=' + year + '&lookahead=' + lookahead;
+		
+		parent.content.document.location = loc;
+		
+		var tree_loc = href + '&method=sales_figures_tree&month=' + month + '&year=' + year;
+		
+		top.appContent.sidebar.frames[1].document.location = tree_loc;
+	\}
+	
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" align="left" cellpadding="5" cellspacing="0">
+        <tr>
+          <td></td>
+          <td height="40" colspan="5"><strong>Sales Figures    Sheet for the {$c{tour}->name} Tour</strong></td>
+		  <td colspan="5" align="left"><span style="color:red;display:none;font-weight:bold;font-size:15pt;" id="saveSpan">YOU HAVE DATA TO SAVE...</span></td>
+        </tr>	  
+        <tr>
+          <td width="10"></td>
+          <td>Month:</td>
+          <td><select name="month" class="text_field" id="month" style="width:50px;">
+{Webkit::BaseDate->get_month_options($c{month})}
+          </select></td>
+          <td>Year:</td>
+          <td><select name="year" class="text_field" id="year" style="width:60px;">
+{Webkit::AppTools->get_number_select_options({
+		min => 2000,
+		max => 2020,
+		gap => 1,
+		selected => $c{year} })}   
+          
+          </select></td>		  
+<td width="160">Look Ahead:</td>
+<td><select name="lookahead" class="text_field" id="lookahead" style="width:100px;">
+{Webkit::AppTools->get_number_select_options({
+	append => ' Weeks',
+	min => 8,
+	max => 52,
+	gap => 4,
+	selected => $c{lookahead} })}                
+</select></td>
+          <td><input type="button" class="button" id="datesButton" onClick="viewSheet();" value="View"></td>
+          <td width="50">&nbsp;</td>
+          <td align="left"><form method="POST" action="{$c{script}}" name="salesFiguresSheetForm" style="margin:0px;padding:0px;">
+              <input type="hidden" name="session_id" value="{$c{session_id}}">
+              <input type="hidden" name="method" value="sales_figures_toolbar_save"> 
+              <input type="hidden" name="data" value=""> 			   
+              <span id="hiddenInputSpan"></span>
+              <input type="button" value="Save Sheet" class="button" onClick="sumbitSalesFiguresSheet();" id="saveButton" disabled>
+          </form></td>
+          <td width="400">&nbsp;</td>
+        </tr>
+      </table>
+      </TD>
+		</TR>
+</TABLE>
+</BODY>
+</HTML>

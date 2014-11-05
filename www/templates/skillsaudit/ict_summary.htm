@@ -1,0 +1,74 @@
+<!--#include virtual="temp_include.htm" -->
+
+Summary For:<br><br>
+Subject:<span style="color:red;">{$c{params}->{subject}}</span><br>
+Question:<span style="color:red;">{$c{params}->{tag}}</span><br>
+Date:<span style="color:red;">{$c{params}->{date_key}}</span><br>
+Slice:<span style="color:red;">{$c{params}->{slice}}</span><br>
+<br>
+<table border=0 cellpadding=5 cellspacing=1 bgcolor="#CCCCCC">
+{
+	my $count = 0;
+	my $total = 0;
+	my $avg = 0;
+	
+	foreach my $ref (@{$c{org}->{_ict_summary_refs}})
+	{
+		$count += $ref->{_count};
+		$total += $ref->{_total};
+	}
+	
+	if($count>0) { $avg = sprintf("%.2f", $total/$count); }
+	
+	$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+<td colspan=5 align="right">Number of Answers:
+<td><strong style="color:red;">$count</strong></td>
+</tr>	
+<tr bgcolor=#ffffff>
+<td colspan=5 align="right">Total Score:
+<td><strong style="color:red;">$total</strong></td>
+</tr>	
+<tr bgcolor=#ffffff>
+<td colspan=5 align="right">Average:
+<td><strong style="color:red;">$avg</strong></td>
+</tr>	
+<tr bgcolor=#ffffff>
+<td><strong> Name
+</strong></td>
+<td><strong>School</strong></td>
+<td><strong>Audit</strong></td>
+<td><strong>Total</strong></td>
+<td><strong>Count</strong></td>
+<td><strong>Avg</strong></td>
+</tr>
++++
+	
+	foreach my $ref (@{$c{org}->{_ict_summary_refs}})
+	{
+		my $name = $ref->{visitor_name};
+		my $school = $ref->{school_name};
+		my $dateobj = Webkit::Date->parse_from_sql($ref->{audit_taken});
+		my $date_st = $dateobj->get_string;
+		
+		my $count = $ref->{_count};
+		my $score = $ref->{_total};
+		
+		my $avg = 0;
+		
+		if($count>0) { $avg = sprintf("%.2f", $score/$count); }
+		
+		$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
+<td> $name
+</td>
+<td>$school</td>
+<td>$date_st</td>
+<td>$score</td>
+<td>$count</td>
+<td>$avg</td>
+</tr>		
++++
+	}
+}
+</table>

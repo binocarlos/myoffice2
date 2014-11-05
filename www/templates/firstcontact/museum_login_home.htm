@@ -1,0 +1,144 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.b \{border-style:solid; border-color:#000099;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script>
+	function closeWindow()
+	\{
+		if(window.confirm('Are you sure you want to close this window and logout?'))
+		\{
+			top.close();
+		\}
+	\}
+	
+	function addChange()
+	\{
+		var museum_id = '{$c{museum_login}->get_last_museum_id}';
+			
+		document.location = '{$c{href}}&method=website_proxy_museum_form&museum_id=' + museum_id;
+	\}
+	
+	function editChange()
+	\{
+		var museum_id = '{$c{museum_login}->get_last_museum_id}';
+		
+		document.location = '{$c{href}}&method=website_proxy_museum_form&museum_id=' + museum_id;
+	\}
+</script>
+<body>
+<span style="font-size:14pt;">Welcome {$c{museum_login}->name} of <b>{$c{museum}->name}...</b></span>
+<br>
+<br>
+
+<a href="{$c{href}}&method=website_proxy_homepage"><img src="/images/icons/24x24/arrow_left_green.gif" width="24" height="24" border="0" align="absmiddle"> Click here to change museum</a>	<br>
+<br>
+
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/icons/24x24/documents.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> Add / Edit museum information </b></td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;">&nbsp;</td>
+  </tr></table>
+</td>
+</tr>
+  <tr id="trhelp">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">Below are the options that you have for adding and editing your museum's record on the database: </td>
+  </tr>	
+{
+	if($c{museum_login}->get_child_count('museum')<=0)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;;"><img src="/images/icons/24x24/document_warning.gif" width="24" height="24" align="absmiddle"> You have not yet added a museum record to the database... </td>
+</tr>
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/add2.gif" width="24" height="24" align="absmiddle"> <a href="javascript:addChange();">click here to create your museum's record in the database </a></td>
+</tr>		  
++++
+	}
+	else
+	{
+		if($c{museum_login}->has_outstanding_changes)
+		{
+			$OUT.=<<"+++";
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;"><img src="/images/icons/24x24/document_warning.gif" width="24" height="24" align="absmiddle"> You have submitted a change that has not been checked yet</td>
+</tr>	
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/desktop.gif" width="24" height="24" align="absmiddle"> <a href="javascript:editChange();">click here to edit the change already submitted</a> </td>
+</tr>	
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/desktop.gif" width="24" height="24" align="absmiddle"> <a href="javascript:addChange();">click here to submit a new change to your museum's info</a> </td>
+</tr>	  
++++
+		}
+	}
+}
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><img src="/images/icons/24x24/delete2.gif" width="24" height="24" align="absmiddle"> <a href="javascript:closeWindow();">click here to logout and close this window </a></td>
+</tr>	  
+  <tr><td colspan=3 height=20></td>
+</tr> 
+<tr>
+<td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#6600aa; background-color:#f5e5ff;"><b style="color:#6600aa; font-size:13px; font-variant:small-caps;">
+      <table width=100% border=0 cellpadding=0 cellspacing=0>
+        <tr>
+          <td> <b style="color:#6600aa; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/icons/24x24/window_time.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> Information update log </b> </td>
+          <td width=100 align="right" onClick="toggleGroup('graph');" style="cursor:hand;color:blue;">&nbsp;</td>
+        </tr>
+      </table>
+    </b></td>
+</tr>
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">The following is a list of all changes that have been made to your museum's record: </td>
+  </tr>	  
+  <tr>
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><table width="100%"  border="0" cellpadding="3" cellspacing="1" bgcolor="#e5e5e5">
+<tr>
+<td>Date</td>
+<td>Submitted By </td>
+<td>Status</td>
+</tr>
+{
+	foreach my $museum (@{$c{museum_login}->ensure_child_array('museum')})
+	{
+		my $date_title = $museum->created->get_string;
+		my $user_name = 'Website Administrator';
+		
+		if($museum->museum_login_id>0)
+		{
+			$user_name = $museum->get_data('user_name');
+		}
+		
+		my $status_title = $museum->get_status_title;
+		my $status_img = $museum->get_status_img;
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#ffffff">
+<td width="140">$date_title</td>
+<td>$user_name</td>
+<td width=200>$status_img &nbsp;&nbsp;&nbsp; $status_title</td>
+</tr>
++++
+	}
+}
+</table></td>
+  </tr>	   
+</table>
+</body>
+</html>
+
+
+

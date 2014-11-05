@@ -1,0 +1,81 @@
+<!--#include virtual="temp_include.htm" -->
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+<tr>
+<td>
+<form method="GET" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="add_scrolling_news">
+<table border="0" cellspacing="1" cellpadding="3" bgcolor="#999999">
+<tr bgcolor="#dddddd">
+<td colspan="2">Add News Item</td>
+</tr>
+<tr align="left" valign="top" bgcolor="#FFFFFF">
+<td>News:</td>
+<td width="400">
+<input type="text" name="news" class="text_input" value="{$c{news}->get_value('news')}">
+</td>
+</tr>
+<tr align="left" valign="top" bgcolor="#FFFFFF">
+<td>Order:</td>
+<td>{$c{order_choice}}</td>
+</tr>
+<tr align="right" valign="top" bgcolor="#FFFFFF">
+<td colspan="2">
+<input type="submit" value="Add News" class="form_submit">
+</td>
+</tr>
+
+
+</table>
+</form>
+</td>
+</tr>
+<tr>
+<td>
+<p><b class="smallred">{$c{news}->{error_text}}</b>
+</p>
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+{
+	my $arr = $c{org}->get_child_array('scrolling_news');
+	
+	foreach my $newsobj (@$arr)
+	{
+		my $id = $newsobj->get_id;
+		my $news = $newsobj->get_value('news');
+		my $news_order = $newsobj->get_value('news_order');
+		$OUT.=<<"+++";
+<tr>
+<td>
+
+<form method="GET" action="$c{script}">
+<input type="hidden" name="session_id" value="$c{session_id}">
+<input type="hidden" name="method" value="save_scrolling_news">
+<input type="hidden" name="news_id" value="$id">
+<table border=0 cellpadding=5 cellspacing="1" bgcolor="#999999" width=680>
+<tr valign="top" bgcolor="#FFFFFF">
+<td class="small">$news_order</td>
+<td class="small" width="600">
+<input type="text" name="news" value="$news" class="text_input" style="width:600px;">
+</td>
+<td class="small">
+<input type="submit" value="Save" class="form_submit">
+</td>
+<td class="small"><a href="$c{href}&method=delete_scrolling_news&news_id=$id">delete</a></td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
++++
+	}
+}
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<br>
+<br>
+</td>
+</tr>
+</table>

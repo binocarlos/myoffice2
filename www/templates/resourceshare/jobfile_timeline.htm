@@ -1,0 +1,65 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+
+</script>
+<body style="background-color:#D4D0C8; margin:8px;">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+<tr>
+<td style="padding-bottom:8px;" valign="top"><img src="/images/icons/32x32/window_time.gif" width=32 height=32 align="absmiddle">&nbsp;&nbsp;<strong> Timeline for {$c{jobfile}->get_value('title')}</strong></td>
+</tr>
+<TR>
+ <TD HEIGHT="100%" BGCOLOR="#FFFFFF" CLASS="insetouter">
+<DIV STYLE="overflow-y:scroll; width:100%; height:100%;" CLASS="insetinner">
+<TABLE CELLPADDING="5" CELLSPACING="1" BORDER="0" bordercolor="#ffffff" BGCOLOR="#e5e5e5" WIDTH="100%">
+<TR>
+<TD nowrap valign=top WIDTH="50" align=right>Order</TD>
+<TD nowrap valign=top WIDTH="140">Action</TD>
+<TD nowrap valign=top WIDTH="*">Title</TD>
+<TD nowrap valign=top WIDTH="140">Who</TD>
+<TD nowrap valign=top WIDTH="140" align="right">Date</TD>
+</TR>
+{
+	my $order = 0;
+	
+	foreach my $ref (@{$c{refs}})
+	{
+		$order++;
+		
+		my $action = $ref->{action};
+		my $created = $ref->{date_st};
+		my $who = $ref->{author};
+		my $what = $ref->{title};
+		my $type = $ref->{type};
+		
+
+		$OUT.=<<"+++";
+<TR bgcolor=#ffffff>
+<TD nowrap valign=top WIDTH="50" align=right>$order</TD>
+<TD nowrap valign=top WIDTH="140">$action</TD>
+<TD nowrap valign=top WIDTH="*">$what</TD>
+<TD nowrap valign=top WIDTH="140">$who</TD>
+<TD nowrap valign=top WIDTH="140" align="right">$created</TD>
+</TR>
++++
+	}
+}
+</TABLE>
+</DIV>
+</TD>
+</TR>
+
+<TR>
+<TD ALIGN="RIGHT">
+<input type="BUTTON" value="Cancel" class="button2" style="width:75px;" onClick="top.close();">
+</TD>
+</TR>
+</TABLE>
+
+
+</body>
+</html>
+
+
+

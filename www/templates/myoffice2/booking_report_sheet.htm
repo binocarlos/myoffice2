@@ -1,0 +1,129 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+function viewVenue(venue_id)
+\{
+	document.location.href += '#venue' + venue_id;
+\}
+
+var bookings = new Object();
+
+function addBooking(id, notes)
+\{
+	var booking = new Object();
+	booking.id = id;
+	booking.notes = notes;
+	
+	bookings[booking.id] = booking;
+\}
+
+function editNotes(booking_id, td)
+\{
+	var booking = bookings[booking_id];
+		
+	var ret = get_modal_window_return('&method=editors_notes', 500, 430, booking.notes);			
+		
+	if(!ret) \{ return; \}		
+		
+	parent.title.addBookingField(booking_id, 'notes', ret.value);
+	td.innerHTML = ret.title;
+	booking.notes = ret.value;
+\}
+
+</script>
+<table width="750"  border="0" cellpadding="5" cellspacing="1" bgcolor="#cccccc">
+{
+	foreach my $venue (@{$c{tour}->ensure_child_array('venue')})
+	{
+		my $venue_title = $venue->get_city_title;
+		my $venue_id = $venue->get_id;
+			
+		$OUT.=<<"+++";
+  <tr valign="top" bgcolor="#FFFFFF">
+    <td colspan=8><b><a name="venue$venue_id"></a><a href="javascript:showVenueInfo($venue_id);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>$venue_title</a></b></td>
+</tr>	
+  <tr bgcolor="#f5f5f5">
+    <td width="100">Tour</td>
+    <td width="60">No Shows</td>	
+    <td width="300">Date / Attendance</td>
+    <td width="60">Profit/Loss</td>		
+    <td width="100">Booking Notes</td>			
+    <td width="150">Date Called</td>				
+  </tr>
++++
+
+		foreach my $showing (@{$venue->ensure_child_array('showing')})
+		{
+			my $tour = $c{org}->get_child('tour', $showing->tour_id);
+			my $dates = $showing->get_datetime_title;
+			my $no_shows = $showing->get_child_count('tourdate');
+			my $booking = $c{tour}->get_child('booking', $showing->booking_id);
+		
+			if(!$booking) { next; }
+			my $booking_id = $booking->get_id;
+		
+			if($no_shows<=0) { next; }
+		
+			my $tour_title = $tour->name;
+			my $current_attendance = $showing->get_current_attendance;
+			my $attendance_capacity = &POSIX::ceil($showing->get_attendance_capacity);
+			my $vs_entry = $booking->get_venue_status_entry('profit_loss', 1);
+			my $profitloss = $vs_entry->value;
+			my $tickets = $showing->{_tickets_on_sale};
+		
+			my $js_notes = Webkit::AppTools->js_quote($booking->{data}->{booking_note});
+			my $notes = Webkit::AppTools->html_quote($booking->{data}->{booking_note});
+		
+			my $date_called_value = $c{tour}->{_date_called_map}->{$venue->get_id}->{$tour->get_id};
+		
+			my $date_called = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($date_called_value);
+		
+			$OUT.=<<"+++";
+<tr valign="top" bgcolor="#FFFFFF">
+    <td align="right" style="color:blue;">$tour_title</td>
+    <td align="right" style="color:red;">$no_shows</td>
+	<td width="300">
+	<table border=0 cellspacing=0 cellpadding=3 width=100%>
+<tr align="right">				
+    <td>tickets on sale = <span style="color:red;">$tickets</span></td>
+    <td width="40"><u>$current_attendance</u></td>
+    <td width="40"><u>$attendance_capacity%</u></td>	
+</tr>		
++++
+
+			foreach my $tourdate (@{$showing->ensure_child_array('tourdate')})
+			{
+				my $entry = $tourdate->sales_figures_entry;
+				my $attendance = $entry->current_attendance;
+				my $capacity = 0;
+				my $title = $tourdate->get_datetime_title;
+				
+				if($showing->{_tickets_on_sale}>0)
+				{
+					 $capacity = &POSIX::ceil($attendance / $showing->{_tickets_on_sale} * 100);
+				}
+				
+				$OUT.=<<"+++";
+<tr align="right">				
+    <td style="color:green;">$title</td>
+    <td width="40">$attendance</td>
+    <td width="40">$capacity%</td>	
+</tr>	
++++
+			}
+			
+			$OUT.=<<"+++";	
+	</table>	</td>	
+
+    <td align="right">$profitloss</td>
+ <td width=100 class="editTd" onClick="editNotes($booking_id, document.getElementById('notes_$showing'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="notes_$showing">$notes</span></td>
+    <td width="150"><script>document.write(getMultiDateNoteText($date_called));</script></td>
+  </tr>
+<script>
+addBooking($booking_id, '$js_notes', $date_called);
+</script>		  
++++
+		}
+	}
+}
+</table>

@@ -1,0 +1,141 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	function gotoManualMarking()
+	\{
+		var new_loc = href + '&method=exams_manual_goto_marking&exam_id={$c{exam}->get_id}';
+		
+		document.location = new_loc;
+	\}
+
+	function editExamPupils()
+	\{
+		var new_loc = href + '&method=exams_exam_choose_pupils&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}
+	
+	function createSitting()
+	\{
+		var new_loc = href + '&method=exams_exam_sitting_form&exam_id={$c{exam}->get_id}';
+		
+		top.content.page.content.location = new_loc;
+	\}	
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+  <tr>
+    <td bgcolor="#666666"><strong style="color:#FFFFFF;">Assign {$c{org}->pupil_title}s </strong></td>
+  </tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	my $test_title = $c{org}->test_title;
+	my $pupil_title = $c{org}->pupil_title;
+	my $pupil_titles = $pupil_title.'s';
+	
+	if(!$c{exam}->has_completed_phase('invigilate'))
+	{
+		$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Assign $test_title $pupil_titles" onClick="editExamPupils();"></td>
+</tr>
++++
+	}
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		my $active_sitting = $c{exam}->get_active_exam_sitting;
+	
+		if((!$c{exam}->has_completed_phase('finished'))&&(!$c{exam}->is_manual))
+		{
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Create New Sitting" onClick="createSitting();"></td>
+</tr>
++++
+		}
+	
+		if($c{exam}->is_manual)
+		{
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Send Quiz To Marking" onClick="gotoManualMarking();"></td>
+</tr>
++++
+		}	
+	}
+}
+</table>
+<br>
+Click above to assign {$c{org}->pupil_title}s to take this {$c{org}->test_title}.<br>
+<br>
+Below is an overview of the {$c{org}->pupil_title}s currently assigned to this {$c{org}->test_title}. <br>
+<br>
+<table border="0" cellpadding="3" cellspacing="1" bgcolor="#d5d5d5">
+<tr bgcolor="#FFFFFF">
+  <td colspan=3><b>Current {$c{org}->pupil_title}s Assigned </b></td>
+</tr>
+	<tr bgcolor="#f0f0f0"><td colspan=2 align="right">Total {$c{org}->pupil_title}s</td>
+	<td align="right" bgcolor="#FFFFFF"><b>{$c{total_pupils}}</b></td>
+  </tr>
+ 	<tr bgcolor="#f0f0f0"><td colspan=2 align="right">Finished</td>
+	<td align="right" bgcolor="#FFFFFF"><b>{$c{finished_pupils}}</b></td>
+  </tr>
+ 	<tr bgcolor="#f0f0f0"><td colspan=2 align="right">Remaining</td>
+	<td align="right" bgcolor="#FFFFFF"><b>{$c{remaining_pupils}}</b></td>
+  </tr>
+	<tr align="right" bgcolor="#f0f0f0"><td>{$c{org}->generic_print_switch('Year', '')}</td>
+	<td>{$c{org}->generic_print_switch('Class', 'Group')}</td>
+	<td>{$c{org}->pupil_title}s</td>
+  </tr>
+{
+	my $refs = $c{exam}->load_pupils_control_panel;
+	
+	foreach my $ref (@$refs)
+	{
+		my $year = $ref->{year};
+		my $class = $ref->{classname};
+		my $pupils = $ref->{count};
+		
+		if($c{org}->is_generic_nctest)
+		{
+			$year = '';
+		}
+		
+		$OUT.=<<"+++";
+	<tr align="right" bgcolor=#ffffff><td>$year</td>
+	<td>$class</td><td>$pupils</td>
+	</tr>
++++
+	}
+}
+
+</table>
+</body>
+

@@ -1,0 +1,87 @@
+
+<html>
+<head>
+        <title>Error</title>
+<script>
+
+	function retryPage()
+	\{
+		document.location.reload();
+	\}
+	
+	function toggleErrorReport()
+	\{
+		var tr = document.getElementById('errorTr');
+		var button = document.getElementById('errorButton');
+		
+		if(tr.style.display=='none')
+		\{
+			tr.style.display = 'inline';
+			button.value = 'Hide Error Report';
+		\}
+		else
+		\{
+			tr.style.display = 'none';
+			button.value = 'Show Error Report';
+		\}
+	\}
+	
+</script>
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+</head>
+<body bgcolor="#FFFFFF">
+
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"
+	  HEIGHT="100%">
+		<TR>
+		  <TD HEIGHT="100%" WIDTH="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+			 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" width=460>
+
+				<TR>
+				  <TD>
+					 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="10" CELLSPACING="0"
+					  CLASS="panelinner" HEIGHT="100%">
+						<TR>
+						  <TD CLASS="panelbody" HEIGHT="100%" WIDTH="100%"
+							ALIGN="RIGHT" VALIGN="TOP">
+							 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+								<TR>
+								  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="35"><IMG
+									 SRC="/images/nav/warning.gif" WIDTH="22" HEIGHT="23" BORDER="0"></TD>
+
+<TD COLSPAN="2" ALIGN="LEFT" VALIGN="TOP"><b>There has been a problem loading this
+  page</b> <br>
+  <br>
+  Click 'retry' to try loading it again. If the problem persists - please contact support:<br>
+  <br>
+  Email: support@wk1.net<br>
+  Telephone: 08707 606 932<BR>
+<IMG SRC="/images/clear.gif" WIDTH="1"
+							 HEIGHT="5" BORDER="0"></TD>
+								</TR>
+								<tr align="right">
+								<td colspan="3"><INPUT TYPE="BUTTON"
+								VALUE="Retry" STYLE="width:60px;" CLASS="button2"
+								ONCLICK="retryPage();"><INPUT TYPE="BUTTON" id="errorButton"
+								VALUE="View Error Report" STYLE="width:100px;" CLASS="button2"
+								ONCLICK="toggleErrorReport();"></td>
+								</tr>
+								<TR style="display:none;" id="errorTr">
+								  <td></td><TD colspan="2" ALIGN="LEFT" VALIGN="TOP" style="padding:20px 5px 0px 5px;">{$c{error}}</TD>
+							   </TR>
+								<TR>
+								  <TD colspan="3" ALIGN="LEFT" VALIGN="TOP" height=10></TD>
+							   </TR>							   
+							 </TABLE>
+							 </TD>
+						</TR>
+					 </TABLE></TD>
+				</TR>
+			 </TABLE> </TD>
+		</TR>
+	 </TABLE>
+
+</body>
+</html>
+

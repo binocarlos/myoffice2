@@ -1,0 +1,814 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var invoiceIds = new Object();
+	var changeDemoDates = new Object();
+	
+{
+	my $nowdate = Webkit::Date->now;
+	my $months2date = $nowdate->clone;
+	my $years1date = $nowdate->clone;
+	
+	$months2date->epoch_days(62);
+	$years1date->epoch_days(365);
+	
+	my $months2string = $months2date->get_string;
+	my $years1string = $years1date->get_string;
+	
+	$OUT.=<<"+++";
+	changeDemoDates.months2 = '$months2string';
+	changeDemoDates.years1 = '$years1string';
++++
+}	
+
+	function testURL()
+	\{
+		var newUrl = 'http://{$c{school}->url}.{$c{domain}}';
+		window.open(newUrl);
+	\}
+	
+	function viewUsageReport()
+	\{
+		document.location = href + '&method=usage_log_report&school_id={$c{school}->get_id}';
+	\}
+	
+	function onlineDemoChanged()
+	\{
+		document.school_form.online_access_date.value = document.getElementById('input_online_access_date').value;
+	\}
+	
+	function setDemoDate(key)
+	\{
+		document.getElementById('input_online_access_date').value = changeDemoDates[key];
+		document.school_form.online_access_date.value = changeDemoDates[key];
+	\}
+	
+	function sendOnlineClubEmail()
+	\{
+		document.location = href + '&method=send_online_club_email&school_id={$c{school}->get_id}&postcode={$c{school}->postcode}';
+	\}
+	
+	function addInvoice(id)
+	\{
+		invoiceIds[id] = true;
+	\}
+	
+	function downloadInvoice()
+	\{
+		var newLoc = href + '&method=product_invoices_download&school_id={$c{school}->get_id}';
+		var idParts = new Array();
+		
+		for(var invoiceId in invoiceIds)
+		\{
+			var elem = document.getElementById('invoicecheckbox' + invoiceId);
+			
+			if(elem.checked)
+			\{
+				idParts.push(invoiceId);
+			\}
+		\}
+		
+		if(idParts.length<=0)
+		\{
+			alert('Please choose some products for the invoice!');
+			return;
+		\}
+		
+		var idQuery = idParts.join(':');
+		
+		newLoc += '&id_string=' + idQuery;
+
+		document.location = newLoc;
+	\}
+	
+	function addProductInvoiceToDownload(id)
+	\{
+		parent.sidebar.title.addProductInvoice(id);
+	\}
+	
+	function addSchoolDetailsToDownload()
+	\{
+		parent.sidebar.title.addSchoolDetails({$c{school}->get_id});
+	\}
+	
+	function downloadLicenceReport()
+	\{
+		var newLoc = href + '&method=product_invoices_licence_download&school_id={$c{school}->get_id}';
+		var idParts = new Array();
+		
+		for(var invoiceId in invoiceIds)
+		\{
+			var elem = document.getElementById('invoicecheckbox' + invoiceId);
+			
+			if(elem.checked)
+			\{
+				idParts.push(invoiceId);
+			\}
+		\}
+		
+		var idQuery = idParts.join(':');
+		
+		newLoc += '&id_string=' + idQuery;
+
+		document.location = newLoc;	
+	\}
+	
+	function autoFill(fieldName)
+	\{
+		var formElem = document.school_form[fieldName];
+		var modalLoc = '&method=choose_auto_fill_school&' + fieldName + '=' + formElem.value;
+		
+		var returnObj = top.get_modal_window_return(modalLoc, 760, 580);
+		
+		for(var retFieldName in returnObj)
+		\{
+			document.school_form[retFieldName].value = returnObj[retFieldName];
+		\}
+	\}
+	
+	function deleteSchool()
+	\{
+		//if(window.confirm('Are you sure you want to delete the whole schools and ALL invoices?'))
+		//\{
+			document.location = href + '&method=schools_delete_school&school_id={$c{school}->get_id}';
+		//\}	
+	\}
+	
+	function deleteDemoCD(id)
+	\{
+		if(window.confirm('Are you sure you want to delete this demo cd?'))
+		\{
+			document.location = href + '&method=school_remove_demo_cd_submit&school_id={$c{school}->get_id}&product_id=' + id;
+		\}
+	\}
+	
+	function addDemoCD()
+	\{
+		document.location = href + '&method=school_issue_demo_cd&school_id={$c{school}->get_id}';
+	\}
+	
+	function addNewCode()
+	\{
+		var loc = href + '&method=promotional_code_create&school_id={$c{school}->get_id}';
+		
+		document.location = loc;
+	\}
+	
+	function addSchoolAccount()
+	\{
+		document.location = href + '&method=school_account_form&school_id={$c{school}->get_id}';
+	\}
+	
+	function editSchoolAccount(id)
+	\{
+		document.location = href + '&method=school_account_form&school_id={$c{school}->get_id}&school_account_id=' + id;
+	\}
+	
+	function deleteSchoolAccount(id)
+	\{
+		if(window.confirm('Are you sure you want to remove this school account?'))
+		\{
+			document.location = href + '&method=school_account_delete_submit&school_account_id=' + id;
+		\}
+	\}
+	
+	function deleteInvoice(id)
+	\{
+		if(window.confirm('Are you sure you want to remove this invoice?'))
+		\{
+			document.location = href + '&back_to_school={$c{school}->get_id}&method=product_invoice_delete_submit&product_invoice_id=' + id;
+		\}	
+	\}
+	
+	function editWebInvoice(id)
+	\{
+		document.location = href + '&method=online_product_invoice_form&school_id={$c{school}->get_id}&product_invoice_id=' + id;
+	\}
+	
+	function editInvoice(id)
+	\{
+		document.location = href + '&method=cd_product_invoice_form&school_id={$c{school}->get_id}&product_invoice_id=' + id;
+	\}
+	
+	function addCDInvoice()
+	\{
+		document.location = href + '&method=cd_product_invoice_form&school_id={$c{school}->get_id}';
+	\}
+	
+	function addWebInvoice()
+	\{
+		document.location = href + '&method=online_product_invoice_form&school_id={$c{school}->get_id}';
+	\}	
+	
+	function accountTypeChanged()
+	\{
+		var newType = document.getElementById('account_type').value;
+		
+		var leaElem = document.getElementById('leaTr');
+		var gflElem = document.getElementById('gflTr');
+		
+		var leaDisplay = 'none';
+		var gflDisplay = 'none';
+		
+		if(newType=='lea')
+		\{
+			gflDisplay = 'inline';		
+		\}
+		else if(newType=='normal')
+		\{
+			leaDisplay = 'inline';			
+		\}
+		
+		leaElem.style.display = leaDisplay;
+		gflElem.style.display = gflDisplay;
+	\}
+	
+</script>
+<body>
+<table width="100%" height="100%" border="0" align="center" cellpadding="20" cellspacing="0">
+<tr valign="top">
+<td width="1" align="center">
+
+<form action="{$c{script}}" method="POST" name="school_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="school_form_submit">
+<input type="hidden" name="school_id" value="{$c{school}->get_id}">
+<input type="hidden" name="refresh" value="{$c{params}->{refresh}}">
+<input type="hidden" name="online_access_date" value="{$c{school}->get_online_access_date_string}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>School Details</legend>
+<div class="seccontent" align="left">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>ID:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"> {$c{school}->get_id} </td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Registered:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"> {$c{school}->get_registered_title} </td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan=3 height=15></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Add:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><a href="javascript:addSchoolDetailsToDownload();"><img src="/images/icons/24x24/add.gif" alt="Add To Download" width="24" height="24" border=0></a> </td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan=3 height=15></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Name (*):</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="name" type="text" class="text_field" id="name" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->name}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30"><a href="javascript:autoFill('name');"><img src="/images/icons/24x24/contract.gif" alt="Auto Complete On Name" width="24" height="24" border=0></a></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Account Type:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><select onChange="accountTypeChanged();" {$disabled} id="account_type" name="account_type" size="1" style="width:150px;" class="text_field">
+
+      {$c{accountoptions}}
+    
+</select></td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;display:none;" id="leaTr">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>LEA:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><select name="lea_parent_school_id" size="1" class="text_field" id="lea_parent_school_id" style="width:150px;" onChange="accountTypeChanged(this);" {$disabled}>
+
+
+      {$c{school}->get_lea_options}
+    
+
+</select></td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;display:none;" id="gflTr">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>GFL:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><select name="gfl_parent_school_id" size="1" class="text_field" id="gfl_parent_school_id" style="width:150px;" onChange="accountTypeChanged(this);" {$disabled}>
+
+
+      {$c{school}->get_gfl_options}
+    
+
+</select></td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>URL (*):</td>
+<td align="LEFT" valign="MIDDLE"><table border=0 width=100%>
+<tr>
+<td><input name="url" type="text" class="text_field" id="url" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->get_default_url}">
+</td>
+</tr>
+</table></td>
+<td width="30" align="LEFT" valign="MIDDLE">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>School Password (*):</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="password" type="text" class="text_field" id="password" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->password||$c{alternate_password}}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan=3 height=15></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Address:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="address" type="text" class="text_field" id="address" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->address}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>City/Town:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="city" type="text" class="text_field" id="city" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->city}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>County:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="county" type="text" class="text_field" id="county" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->county}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Postcode:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="postcode" type="text" class="text_field" id="postcode" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->postcode}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30"><a href="javascript:autoFill('postcode');"><img src="/images/icons/24x24/contract.gif" alt="Auto Complete On Postcode" width="24" height="24" border=0></a></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Grid for Learning:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="gfl" type="text" class="text_field" id="gfl" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->gfl}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan=3 height=15></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Main Contact Name:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="contact_name" type="text" class="text_field" id="contact_name" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->get_primary_contact_name}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Main Contact Email:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="contact_email" type="text" class="text_field" id="contact_email" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->get_primary_contact_email}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Main Contact Phone:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="contact_phone" type="text" class="text_field" id="contact_phone" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->get_primary_contact_phone}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="LEFT" valign="MIDDLE" style="padding-right:5px;" nowrap>Main Contact URL:</td>
+<td align="LEFT" valign="MIDDLE" width="100%"><input name="contact_url" type="text" class="text_field" id="contact_url" style="width:150px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->get_primary_contact_url}">
+</td>
+<td align="LEFT" valign="MIDDLE" width="30">&nbsp;</td>
+</tr>
+</table>
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{school}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE">
+{
+	if($c{school}->exists)
+	{
+		$OUT.=<<"+++";
+<input type="button"  value="Delete School" CLASS="button2" style="width:75px;background-color:#CC0000;color:#FFFFFF;" onClick="deleteSchool();">
++++
+	}
+}
+<input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="document.location = href + '&method=schools_home';">
+<input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form><br>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" style="display:{$c{table_display}};">
+<TR>
+<TD><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody"><fieldset style="height:100%;">
+<legend>Additional School Accounts </legend>
+<div class="seccontent" align="left">
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="1" bgcolor="#000000">
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Name</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Email</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Phone</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">URL</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Del</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Edit</TD>
+</TR>
+{
+	foreach my $school_account (@{$c{school}->ensure_child_array('school_account')})
+	{
+		if($school_account->is_primary) { next; }
+		
+		my $id = $school_account->get_id;
+		my $name = $school_account->fullname;
+		my $email = $school_account->email;
+		my $phone = $school_account->phone;
+		my $url = $school_account->url;
+		
+		$OUT.=<<"+++";
+<TR valign="top" bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" nowrap style="padding-right:5px;">$name</TD>
+<TD ALIGN="LEFT">$email</TD>
+<TD ALIGN="LEFT">$phone</TD>
+<TD ALIGN="LEFT">$url</TD>
+<TD ALIGN="LEFT"><a href="javascript:deleteSchoolAccount($id);"><img src="/images/icons/24x24/bookmark_delete.gif" alt="Delete School Account" width="24" height="24" border=0></a></TD>
+<TD ALIGN="LEFT"><a href="javascript:editSchoolAccount($id);"><img src="/images/icons/24x24/bookmark_new.gif" alt="Edit School Account" width="24" height="24" border=0></a></TD>
+</TR>
++++
+	}
+}
+</TABLE>
+</div>
+</fieldset>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Add School Account" CLASS="button2" style="width:150px;" onClick="addSchoolAccount();"></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></td>
+<td align="center"><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" style="display:{$c{table_display}};">
+<TR>
+<TD><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<fieldset style="height:100%;">
+<legend>Online  DEMO </legend>
+<div class="seccontent" align="left">
+<table width="94%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td>Online Access is Open Until :</td>
+<td><input onChange="onlineDemoChanged();" name="input_online_access_date" type="text" class="text_field" id="input_online_access_date" style="width:100px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->get_online_access_date_string}"></td>
+</tr>
+<tr>
+<td colspan="2"><input type="button"  value="+2 Months" CLASS="button2" style="width:80px;" onClick="setDemoDate('months2');"> <input type="button"  value="+1 Year" CLASS="button2" style="width:80px;" onClick="setDemoDate('years1');"></td>
+</tr>
+</table>
+</div>
+</fieldset>
+<br>
+<fieldset style="height:100%;">
+<legend>Online  Usage Report </legend>
+<div class="seccontent" align="left">
+<table width="94%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td colspan="2"><input type="button"  value="View Report" CLASS="button2" style="width:80px;" onClick="viewUsageReport();"> </td>
+</tr>
+</table>
+</div>
+</fieldset>
+<br>
+<fieldset style="height:100%;">
+<legend>Online Club Emailer </legend>
+<div class="seccontent" align="left">
+<table width="94%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td>Addresses on file:
+{
+	my $emails;
+	foreach my $school_account (@{$c{school}->ensure_child_array('school_account')})
+	{
+		my $email = $school_account->email;
+		if($email=~/\w/)
+		{
+			push(@$emails, $email);
+		}
+	}
+	
+	my $st = join(', ', @$emails);
+	
+	$OUT.=$st;
+}
+</td>
+</tr>
+<tr>
+<td><input type="button"  value="Send Email" CLASS="button2" style="width:80px;" onClick="sendOnlineClubEmail();">
+<input type="button"  value="Test URL" CLASS="button2" style="width:80px;" onClick="testURL();"> </td>
+</tr>
+</table>
+</div>
+</fieldset>
+<br>
+<fieldset style="height:100%;">
+<legend>Online Product Invoices </legend>
+<div class="seccontent" align="left">
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="1" bgcolor="#000000">
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Product</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Info</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Amount</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Dates</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Del</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Edit</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Download</TD>
+</TR>
+{
+	foreach my $invoice (@{$c{school}->ensure_child_array('product_invoice')})
+	{
+		my $product = $c{org}->get_child('product', $invoice->product_id);
+		
+		if(!$product->is_web) { next; }
+		
+		my $product_title = $product->name;
+		my $color = $product->color;
+		my $discounted_amount = $invoice->discounted_amount;
+		my $discount = $invoice->discount;
+		my $id = $invoice->get_id;
+		
+		my $amount_string=<<"+++";
+<b>£$discounted_amount</b>
++++
+
+		if($discount>0)
+		{
+			$amount_string.=<<"+++";
+<br><span style="color:#880000;font-size:7pt;">($discount\% off)</span>
++++
+		}
+		
+		my $date_string = $invoice->get_date_string;
+		
+		my $info_string;
+		
+		if($invoice->is_legacy_access)
+		{
+			$date_string = 'n/a';
+			$product_title .= ' CD';
+			$info_string.=<<"+++";
+<span style="color:#880000;font-size:7pt;">Legacy access<br> from CD sale</span>		
++++
+		}
+		elsif($invoice->is_promotional)
+		{
+			$info_string.=<<"+++";
+<span style="color:#880000;font-size:7pt;">Promotional Invoice</span>		
++++
+		}
+		
+		$OUT.=<<"+++";
+<script>
+	addInvoice($id);
+</script>
+<TR valign="top" bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT"><table width=24 height=24 border=1 cellpadding=0 cellspacing=1 bgcolor=#000000>
+<tr>
+<td width=24 height=24 bgcolor="#$color"></td>
+</tr>
+</table></TD>
+<TD ALIGN="LEFT" nowrap style="padding-right:5px;">$product_title</TD>
+<TD ALIGN="LEFT">$info_string</TD>
+<TD ALIGN="LEFT">$amount_string</TD>
+<TD width="80" ALIGN="LEFT">$date_string</TD>
+<TD ALIGN="LEFT"><a href="javascript:deleteInvoice($id);"><img src="/images/icons/24x24/document_delete.gif" alt="Delete School Account" width="24" height="24" border=0></a></TD>
+<TD ALIGN="LEFT"><a href="javascript:editWebInvoice($id);"><img src="/images/icons/24x24/document_new.gif" alt="Edit School Account" width="24" height="24" border=0></a></TD>
+<TD ALIGN="center"><input type="checkbox" id="invoicecheckbox$id"></td>
+</TR>
++++
+	}
+}
+</TABLE>
+</div>
+</fieldset>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Add Online Invoice" CLASS="button2" style="width:150px;" onClick="addWebInvoice();"></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></td>
+</tr>
+<tr>
+<td height="20"></td>
+</tr>
+<tr>
+<td><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" style="display:{$c{table_display}};">
+<TR>
+<TD><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>CD  DEMO's Issued </legend>
+<div class="seccontent" align="left">
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="1" bgcolor="#e5e5e5">
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Product</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Dates</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Del</TD>
+</TR>
+{
+	foreach my $product_id (keys %{$c{school}->{demo_cd_log}})
+	{
+		my $product = $c{org}->get_child('product', $product_id);
+		
+		if(!$product) { next; }
+		my $product_title = $product->name;
+		my $color = $product->color;
+		my $date = $c{school}->{demo_cd_log}->{$product_id};
+		my $product_id = $product->get_id;
+		
+		my $date_string = $date->get_string;
+		
+		$OUT.=<<"+++";
+<TR valign="top" bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT"><table width=24 height=24 border=1 cellpadding=0 cellspacing=1 bgcolor=#000000>
+<tr>
+<td width=12 height=12 bgcolor="#$color"></td>
+</tr>
+</table></TD>
+<TD ALIGN="LEFT" valign="middle" nowrap style="padding-right:5px;">$product_title</TD>
+<TD ALIGN="LEFT" valign="middle">$date_string</TD>
+<TD ALIGN="LEFT"><a href="javascript:deleteDemoCD($product_id);"><img src="/images/icons/24x24/document_delete.gif" alt="Delete School Account" width="24" height="24" border=0></a></TD>
++++
+	}
+}
+</TR>
+</TABLE>
+</div>
+</fieldset>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Add Demo CD" CLASS="button2" style="width:150px;" onClick="addDemoCD();"></TD></TR>
+</TABLE>
+<br>
+<fieldset style="height:100%;">
+<legend>CD Product Invoices </legend>
+<div class="seccontent" align="left">
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="1" bgcolor="#000000">
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Product</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Info</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Amount</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Dates</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Del</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Edit</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">Download</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+</TR>
+{
+	foreach my $invoice (@{$c{school}->ensure_child_array('product_invoice')})
+	{
+		my $product = $c{org}->get_child('product', $invoice->product_id);
+		
+		if(!$product->is_cd) { next; }
+		
+		my $product_title = $product->name;
+		my $color = $product->color;
+		my $discounted_amount = $invoice->discounted_amount;
+		my $discount = $invoice->discount;
+		my $id = $invoice->get_id;
+		
+		my $amount_string=<<"+++";
+<b>£$discounted_amount</b>
++++
+
+		if($discount>0)
+		{
+			$amount_string.=<<"+++";
+<br><i style="font-size:8pt;">($discount\% off)</i>
++++
+		}
+		
+		my $date_string = $invoice->get_date_string;
+		
+		my @sns = split(/:/, $invoice->serial_number);
+		
+		my $info = join('<br><br>', @sns);
+		
+		my $licence_title = $invoice->get_licence_name;
+		
+		if($info=~/\w/)
+		{
+			$info = "<br>$info";
+		}
+		
+		if($invoice->is_promotional)
+		{
+			$info.=<<"+++";
+<br><span style="color:#880000;font-size:7pt;">Promotional Invoice</span>		
++++
+		}
+		
+		$OUT.=<<"+++";
+<script>
+	addInvoice($id);
+</script>		
+<TR valign="top" bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT"><table width=24 height=24 border=1 cellpadding=0 cellspacing=1 bgcolor=#000000>
+<tr>
+<td width=24 height=24 bgcolor="#$color"></td>
+</tr>
+</table></TD>
+<TD ALIGN="LEFT" nowrap style="padding-right:5px;">$product_title</TD>
+<TD ALIGN="LEFT"><span style="color:#880000;font-size:7pt;">$licence_title</span>$info</TD>
+<TD ALIGN="LEFT">$amount_string</TD>
+<TD width="80" ALIGN="LEFT">$date_string</TD>
+<TD ALIGN="LEFT"><a href="javascript:deleteInvoice($id);"><img src="/images/icons/24x24/document_delete.gif" alt="Delete School Account" width="24" height="24" border=0></a></TD>
+<TD ALIGN="LEFT"><a href="javascript:editInvoice($id);"><img src="/images/icons/24x24/document_new.gif" alt="Edit School Account" width="24" height="24" border=0></a></TD>
+<TD ALIGN="center"><input type="checkbox" id="invoicecheckbox$id"></td>
+<TD ALIGN="center"><a href="javascript:addProductInvoiceToDownload($id);"><img src="/images/icons/24x24/add.gif" alt="Add To Download" width="24" height="24" border=0></a></td>
+</TR>
++++
+	}
+}
+</TABLE>
+</div>
+</fieldset>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Add CD Invoice" CLASS="button2" style="width:150px;" onClick="addCDInvoice();"></TD></TR>
+</TABLE></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></td>
+</tr>
+<tr>
+<td height="20"></td>
+</tr>
+<tr>
+<td>
+<TABLE width="400" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" style="display:{$c{table_display}};">
+<TR>
+<TD><TABLE BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody"><fieldset style="height:100%;">
+<legend>Download Invoice &amp; Licence Report </legend>
+<div class="seccontent" align="left">
+<br>
+Tick the download boxes on the invoices above to choose what to include in the invoice and what to make current in the licence report...
+<br>
+</div>
+</fieldset>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Download Invoice" CLASS="button2" style="width:150px;" onClick="downloadInvoice();">
+<br>
+<br>
+<input type="button"  value="Download Licence Report" CLASS="button2" style="width:150px;" onClick="downloadLicenceReport();"></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></td>
+</tr>
+</table>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br></td>
+</tr>
+</table>
+<script>
+accountTypeChanged();
+</script>
+</body>
+</html>
+
+
+

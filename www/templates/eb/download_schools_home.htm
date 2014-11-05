@@ -1,0 +1,73 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function runRobot()
+	\{
+		document.location = href + '&method=yell_robot_run';
+	\}
+</script>
+<body>
+<table border=0>
+<tr>
+{
+	my @arr = keys %{$c{data_refs}};
+	my $count = @arr;
+	
+	$OUT.=<<"+++";
+<td style="color:red;">$count Schools In Download</td>
++++
+}
+</tr></table>
+<form method="POST" action="{$c{script}}">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="yell_robot_remove_schools">
+<input type="hidden" name="search" value="{$c{params}->{search}}">
+<input type="submit" value="Remove Unchecked Schools" class="button">
+<br>
+<br>
+<input type="button" value="Download Schools" class="button" onClick="window.open(href + '&method=schools_excel_sheet');">
+<br>
+<br>
+<br>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr bgcolor="#FFFFFF">
+    <td><strong>Name</strong></td>
+    <td><strong>Address</strong></td>
+    <td><strong>Postcode</strong></td>
+    <td><strong>Phone</strong></td>
+    <td><strong>Add To Download </strong></td>	
+  </tr>
+{
+	foreach my $school_id (keys %{$c{data_refs}})
+	{
+		my $ref = $c{data_refs}->{$school_id};
+		my $name = $ref->{name};
+		my $address = $ref->{address1}.' --- '.$ref->{address2};
+		my $postcode = $ref->{postcode};
+		my $phone = $ref->{phone};
+		
+		my $checked = $c{session}->{download_schools}->{$school_id};
+		
+		if($checked) { $checked = ' CHECKED'; }
+		
+		my $checkbox=<<"+++";
+<input type="checkbox" name="download_$school_id" value="y"$checked>		
++++
+	
+		$OUT.=<<"+++";
+  <tr bgcolor="#FFFFFF">
+    <td>$name</td>
+    <td>$address</td>
+    <td>$postcode</td>
+    <td>$phone</td>
+	<td>$checkbox</td>
+  </tr>
++++
+	}
+}
+</table>
+</form>
+</body>
+</html>
+
+
+

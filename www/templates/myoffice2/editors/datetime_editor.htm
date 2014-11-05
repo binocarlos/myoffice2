@@ -1,0 +1,218 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var giMinYear = 2000;
+
+	var giMaxYear = 2020;
+	
+{
+	my $default_time = undef;
+	
+	if($c{value}!~/\w/)
+	{
+		if($c{session}->{booking_add_tourdate_epoch}>0)
+		{
+			$c{value} = $c{session}->{booking_add_tourdate_epoch};
+		}
+		else
+		{
+			$c{value} = now;
+			$default_time = 1;
+		}
+	}
+	
+	my $date = Webkit::DateTime->new($c{value});
+	
+	$c{date_st} = &Webkit::Date::get_string($date);
+	$c{hour_st} = $date->Hour || 0;
+	$c{min_st} = $date->Min || 0;
+	
+	$c{hour_st}  =~ s/^(\d)$/0$1/;
+	$c{min_st}  =~ s/^(\d)$/0$1/;
+	
+	if($default_time)
+	{
+		$c{hour_st} = 19;
+		$c{min_st} = 30;
+	}
+}
+
+	
+
+	function submitForm()
+	\{
+		var dateSt = document.getElementById('date').value;
+		var arr = get_date_array_from_string(dateSt);
+		
+		var hourSt = document.getElementById('hour').value.replace(/^0/, '');
+		var minuteSt = document.getElementById('min').value.replace(/^0/, '');
+		
+		var hour = parseInt(hourSt);
+		var minute = parseInt(minuteSt);		
+		
+		var date = new Date();
+		date.setDate(arr[0]);
+		date.setMonth(arr[1]-1);
+		date.setFullYear(arr[2]);
+		date.setHours(hour);
+		date.setMinutes(minute);
+		
+		var timeSt = hour + ':' + minute;
+		
+		var ret = new Object();
+		ret.epoch = Math.round(date.getTime()/1000);
+		ret.fullString = dateSt + ' - ' + timeSt;
+		ret.timeString = timeSt;
+		ret.dateString = dateSt;
+		
+		top.returnValue = ret;	
+		
+{
+	if($c{params}->{goto_timeline}=~/\w/)
+	{
+		$OUT.=<<"+++";
+		document.location =	href + '&method=booking_add_tourdate_timeline&done_return=1&tourdate_epoch=' + ret.epoch;
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		top.close();
++++
+	}
+}
+		
+	return 1;
+	\}
+</script>
+<body style="background-color:#D4D0C8;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}>
+<tr>
+<td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} align="center" valign="top">
+<style>
+.tab-page \{height:100%;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+{Webkit::Browser->if_not_mac('<script type="text/javascript" src="/lib/tabpane.js"></script>')}
+<table border="0" cellpadding="0" cellspacing="0" width="100%" {Webkit::Browser->if_not_mac('height="100%"')}><tr><td width="100%" {Webkit::Browser->if_not_mac('height="100%"')} valign="top">
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+<!--#### Document Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Edit Date & Time</h2>
+<script>tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<fieldset>
+<legend>Current Date & Time</legend>
+<div class="seccontent">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	<u>Current Date & Time</u><br><br>
++++
+}
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT"> Date:&nbsp;</td>
+<td align="LEFT"><input name="date" type="TEXT" class="text_field" id="date" style="width:100px;" value="{$c{date_st}}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+<td align="LEFT" width=30></td>
+<td align="LEFT">Time:</td>
+<td align="LEFT"><input name="hour" type="TEXT" class="text_field" id="hour" style="width:25px;text-align:right;" value="{$c{hour_st}}"></td>
+<td width=10 align=center><b>:</b></td>
+<td align="LEFT"><input name="min" type="TEXT" class="text_field" id="min" style="width:25px;text-align:right;" value="{$c{min_st}}"></td>
+</tr>
+</table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+</div>
+</fieldset>
+</div>
+</div>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="button" value="OK" CLASS="button2" style="width:75px;" onClick="submitForm();">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</table>
+</td>
+</tr>
+</table>
+<script>	
+		{Webkit::Browser->if_not_mac('setupAllTabs();')}
+</script>
+{
+	if(!Webkit::Browser->is_mac)
+	{
+		$OUT.=$c{calendar};
+	}
+	
+	if(Webkit::Browser->is_mac)
+	{
+		$OUT.=<<"+++";
+<script>
+	function get_date_array_from_string(datest)
+	{
+		var arr = new Array();
+		
+		if((!datest)||(datest==''))
+		{
+			var dt = new Date();
+			
+			arr[0] = dt.getDate();
+			arr[1] = dt.getMonth() + 1;
+			arr[2] = dt.getFullYear();
+		}
+		else
+		{
+			datest = datest.replace(/ /g, "");
+			arr = datest.split("/");
+		
+			for(var i=0; i<arr.length; i++)
+			{
+				var st = arr[i];
+				st = st.replace(/^0+/, "");
+				
+				var val = parseInt(st);
+			
+				if(val>0)
+				{
+					arr[i] = val;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+		
+		return arr;	
+		
+	}		
+	
+</script>
++++
+	}
+}
+</body>
+</html>
+
+
+

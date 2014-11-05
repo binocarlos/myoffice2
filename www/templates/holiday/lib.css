@@ -1,0 +1,27 @@
+BODY {background:#FFFFFF; margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial;}
+TD {cursor:default; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+.button {height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+.bla8 {font-family:tahoma,verdana,arial; font-size:11px; color:#000000;}
+.gre8 {font-family:tahoma, verdana, arial; font-size:11px; color:#7F7F7F;}
+.panellt {background:#FFFFFF; border-right:1px; border-bottom:1px; border-left:0px; border-top:0px; border-style:outset;}
+.panel {background:#D4D0C8; border:1px; border-style:outset;}
+.panelouter {BACKGROUND-COLOR: #D4D0C8; BORDER-BOTTOM: #404040 solid 1px; BORDER-LEFT: #D4D0C8 solid 1px; BORDER-RIGHT: #404040 solid 1px; BORDER-TOP:  #D4D0C8 solid 1px;}
+.panelinner {BORDER-BOTTOM: #808080 solid 1px; BORDER-LEFT: #FFFFFF solid 1px; BORDER-RIGHT: #808080 solid 1px; BORDER-TOP:  #FFFFFF solid 1px;}
+.panelbody {BORDER-BOTTOM:#D4D0C8 solid 1px; BORDER-LEFT:#D4D0C8 solid 1px; BORDER-RIGHT:#D4D0C8 solid 1px; BORDER-TOP:#D4D0C8 solid 1px;}
+.section_title {font-family:tahoma,verdana;	font-size:11px;	background:#D4D0C8;}
+.text_field {height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px;}
+.text_field2 {height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; BORDER-BOTTOM: #FFDEAD solid 2px; BORDER-LEFT: #C07300 solid 2px; BORDER-RIGHT: #FFDEAD solid 2px; BORDER-TOP:  #C07300 solid 2px; background-color:#FFF5E6;}
+.insetouter {border-left:#808080 1px solid; border-right:#FFFFFF 1px solid; border-top:#808080 1px solid; border-bottom:#FFFFFF 1px solid;}
+.insetinner {border-left:#404040 1px solid; border-right:#D4D0C8 1px solid; border-top:#404040 1px solid; border-bottom:#D4D0C8 1px solid;}
+.buttonouter {border-left:#FFFFFF 1px solid; border-right:#404040 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#404040 1px solid;}
+.buttoninner {border-left:#D4D0C8 1px solid; border-right:#808080 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#808080 1px solid;}.lightgre8 { font-family:tahoma,verdana,arial; font-size:11px; color:#666460; }
+.buttoninset {border-left:#404040 1px solid; border-right:#FFFFFF 1px solid; border-top:#404040 1px solid; border-bottom:#FFFFFF 1px solid;}
+.buttonoff {border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;}
+.keycolors {border-right:#808080 1px solid; border-bottom:#808080 1px solid; border-left:#FFFFFF 1px solid; border-top:#FFFFFF 1px solid;}
+.keycolorsltb {border-bottom:#808080 1px solid; border-left:#FFFFFF 1px solid; border-top:#FFFFFF 1px solid;}
+.keycolorstb {border-bottom:#808080 1px solid; border-top:#FFFFFF 1px solid;}
+.keycolorsrtb {border-right:#808080 1px solid; border-bottom:#808080 1px solid; border-top:#FFFFFF 1px solid;}
+.cellover {background:#BEBBB4;}
+.cellout {background:#D4D0C8;}
+.dynbutton {border-left:#FFFFFF 1px solid; border-right:#404040 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#404040 1px solid;}
+.dynbutton:hover {border-left:#404040 1px solid; border-right:#FFFFFF 1px solid; border-top:#404040 1px solid; border-bottom:#FFFFFF 1px solid;}

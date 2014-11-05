@@ -1,0 +1,285 @@
+<script>
+	var docs = new Object();
+	var selected_doc_id = null;
+
+	var doc_fields = new Array('title', 'author', 'mime_title', 'created', 'modified', 'notes');
+
+	function download_doc()
+	\{
+		var new_loc = href + '&method=documents_client_download&document_id=' + selected_doc_id;
+
+		parent.parent.download_file_loc(new_loc);
+
+		set_status('Downloading ...');
+	\}
+
+	function edit_doc()
+	\{
+		var new_loc = href + '&method=documents_edit_document&object_id=' + selected_doc_id;
+
+		document.location = new_loc;
+	\}
+
+	function delete_doc()
+	\{
+		var new_loc = href + '&method=documents_delete_document&object_id=' + selected_doc_id;
+
+		document.location = new_loc;
+	\}
+
+	function close_file_window()
+	\{
+		if(PopWin)
+		\{
+			PopWin.close();
+		\}
+	\}
+	
+	function do_folder_action(action)
+	\{
+		var new_loc = href + action;
+		
+		document.location = new_loc;
+	\}
+
+	function select_doc(id)
+	\{
+		var doc = docs[id];
+
+		if(selected_doc_id>0)
+		\{
+			unapply_doc(docs[selected_doc_id]);
+		\}
+
+		selected_doc_id = id;
+
+		apply_doc(doc);
+	\}
+
+	function set_status(text)
+	\{
+		document.getElementById('status').innerText = text;
+
+		setTimeout("clear_status();", 5000);
+	\}
+
+	function clear_status()
+	\{
+		document.getElementById('status').innerText = '';
+	\}
+
+	function unapply_doc(doc)
+	\{
+		document.getElementById('doc' + doc.id).bgColor = '';
+		document.getElementById('doc' + doc.id).style.border = '1px solid #FFFFFF';
+	\}
+
+	function apply_doc(doc)
+	\{
+		for(var i=0; i<doc_fields.length; i++)
+		\{
+			var field = doc_fields[i];
+
+			var value = doc[field];
+
+			document.getElementById('doc_' + field).innerHTML = value;
+		\}
+
+		document.getElementById('summarytable').style.display = 'inline';
+		document.getElementById('summarybuttons').style.display = 'inline';
+		document.getElementById('summarydesc').style.display = 'none';
+		document.getElementById('doc' + doc.id).bgColor = '#FFECCC';
+		document.getElementById('doc' + doc.id).style.border = '1px solid #FBAF2D';
+	\}
+
+	function new_doc(id, users_id, title, created, modified, mime_title, notes, author)
+	\{
+		var doc = new Object();
+
+		doc.id = id;
+		doc.title = title;
+		doc.created = created;
+		doc.modified = modified;
+		doc.mime_title = mime_title;
+		doc.notes = notes;
+		doc.users_id = users_id;
+		doc.author = author;
+
+		docs[doc.id] = doc;
+	\}
+
+{
+	my $arr = $c{document_array};
+
+	foreach my $document (@$arr)
+	{
+		my $title = $document->get_value('title');
+		my $id = $document->get_id;
+		my $mime_title = $document->get_mimetype_title;
+		my $created = $document->get_created_title;
+		my $modified = $document->get_modified_title;
+		my $notes = $document->get_notes_js_title;
+		my $user_id = $document->get_value('users_id');
+		my $author = $document->get_author_name;
+
+		$OUT.=<<"+++";
+new_doc($id, $user_id, '$title', '$created', '$modified', '$mime_title', '$notes', '$author');
++++
+	}
+}
+
+</script>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+	<TD WIDTH="280" ALIGN="LEFT" VALIGN="TOP"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="260">
+ <TR>
+	<TD HEIGHT="100%" CLASS="panelinner">
+	 <TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0" HEIGHT="100%" WIDTH="100%">
+		<TR>
+		 <TD ALIGN="left" VALIGN="TOP" HEIGHT="100%">
+<fieldset>
+<legend>File Details</legend>
+<table width="100%" height="150" border="0" cellpadding="0" cellspacing="0"><tr><td class="seccontent" align="left" valign="top">
+
+<table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0" id="summarydesc" style="display:inline;"><tr><td align="center" valign="middle">
+Click on a file on the right<BR>to view the file details.
+</td></tr></table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" id="summarytable" style="display:none;">
+ <TR STYLE="padding-bottom:5px;">
+	<TD ALIGN="right" VALIGN="TOP">Title:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP" width="100%"><span id="doc_title"></span></TD>
+ </TR>
+  <TR STYLE="padding-bottom:5px;">
+	
+<TD ALIGN="right" VALIGN="TOP">Author:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP" width="100%"><span id="doc_author"></span></TD>
+ </TR>
+ <TR STYLE="padding-bottom:5px;">
+	<TD ALIGN="right" VALIGN="TOP">File&nbsp;Type:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><span id="doc_mime_title"></span></TD>
+ </TR>
+ <TR STYLE="padding-bottom:5px;">
+	<TD ALIGN="right" VALIGN="TOP">Created:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><span id="doc_created"></span></TD>
+ </TR>
+ <TR STYLE="padding-bottom:5px;">
+	<TD ALIGN="right" VALIGN="TOP">Modified:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><span id="doc_modified"></span></TD>
+ </TR>
+ <TR STYLE="padding-bottom:5px;">
+	<TD ALIGN="right" VALIGN="TOP">Notes:&nbsp;</TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><span id="doc_notes"></span></TD>
+ </TR>
+ <TR>
+	<TD ALIGN="LEFT" VALIGN="TOP" COLSPAN="2"><BR><span id="status" style="color:red;"></span></TD>
+ </TR>
+</TABLE>
+</td></tr></table>
+</fieldset>
+		 </TD>
+		</TR>
+		<TR>
+		 <TD ALIGN="right">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" id="summarybuttons" style="display:none;">
+ <TR>
+	<TD WIDTH="75" ALIGN="RIGHT"><INPUT TYPE="BUTTON" NAME="button1" VALUE="Download" CLASS="button" style="width:75px;"  onClick="download_doc();"></TD>
+{
+	if($c{edit_mode})
+	{
+		$OUT.=<<"+++";
+	<TD ALIGN="CENTER" WIDTH="96"><INPUT TYPE="BUTTON" NAME="button1" VALUE="Edit" CLASS="button" style="width:75px;" onClick="edit_doc();"></TD>
+	<TD WIDTH="75" ALIGN="RIGHT"><INPUT TYPE="BUTTON" NAME="button1" VALUE="Delete" CLASS="button" style="width:75px;" onClick="delete_doc();"></TD>
++++
+	}
+}</TR>
+</TABLE></TD>
+		</TR>
+	 </TABLE> </TD>
+ </TR>
+</TABLE></TD>
+	<TD ALIGN="LEFT" VALIGN="TOP">
+<!--Folders Here-->
+<table cellpadding=5 border=0>
+<tr>
+{
+	my $arr = $c{folder_array};
+	my $fcount = 0;
+
+	foreach my $folder (@$arr)
+	{
+		$fcount++;
+
+		my $title = $folder->{title};
+		my $action = $folder->{action};
+		my $img = '/images/nav/bigfolder.gif';
+		
+		if($folder->{img} eq 'up')
+		{
+			$img = '/images/nav/folderup.gif';
+		}
+
+		$OUT.=<<"+++";
+<td align=center width="100"  style="border:1px solid #FFFFFF;">
+<a onClick="do_folder_action('$action');" style="cursor:hand;">
+<img src="$img" width="32" height="32"><br>
+$title</a></td>
+<td width=15></td>
++++
+
+		if($fcount==4)
+		{
+			$OUT.=<<"+++";
+</tr>
+<tr>
+<td height=10></td>
+</tr>
+<tr>
++++
+
+			$fcount = 0;
+		}
+	}
+}
+</table><br>
+<!--Files Here-->
+<table cellpadding=5 border=0>
+<tr>
+{
+	my $arr = $c{document_array};
+	my $count = 0;
+
+	foreach my $document (@$arr)
+	{
+		$count++;
+
+		my $img = $document->get_big_icon;
+		my $title = $document->get_value('title');
+		my $id = $document->get_id;
+
+		$OUT.=<<"+++";
+<td align=center id="doc$id" width="100"  style="border:1px solid #FFFFFF;">
+<a onClick="select_doc($id);" style="cursor:hand;">
+<img width=32 height=32 src="$img" border=0><br>
+$title</a></td>
+<td width=15></td>
++++
+
+		if($count==4)
+		{
+			$OUT.=<<"+++";
+</tr>
+<tr>
+<td height=10></td>
+</tr>
+<tr>
++++
+
+			$count = 0;
+		}
+	}
+}
+</table>
+	</TD>
+ </TR>
+</TABLE>

@@ -1,0 +1,104 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var graphMode = false;
+var newLevel = '{$c{return_level}}';
+
+top.returnValue = newLevel;
+
+function closeWindow()
+\{
+{
+	if($c{params}->{show_page_back_button})
+	{
+		$OUT.=<<"+++";
+		document.location = href + '&method=analysis_progress_topic_period_report&use_session=1';
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+	top.returnValue = newLevel;
+	top.close();
++++
+	}
+}
+\}
+</script>
+
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+-->
+</style>
+<form method="GET" action="{$c{href}}" name="overideForm">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="analysis_override_level_submit">
+<input type="hidden" name="pupil_id" value="{$c{pupil}->get_id}">
+<input type="hidden" name="exam_id" value="{$c{exam}->get_id}">
+<input type="hidden" name="topic_id" value="{$c{params}->{topic}}">
+<table border="0" cellspacing="0" cellpadding="3">
+  <tr>
+    <td colspan="3"><b>{$c{exam}->name}</b> - <b>{$c{pupil}->get_fullname}</b> - <b>{uc($c{topic})}</b> Level Summary</td>
+  </tr>
+{
+	if(!$c{params}->{hide_override})
+	{
+		my $options = $c{pupil}->get_assessment_level_options;
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td>Override Level: </td>
+    <td width="100"><select name="override_pupil_assessment_id" size="1" class="text_field" id="override_pupil_assessment_id" style="width:100%;">
+	$options
+    </select></td>
+    <td><input type="submit" class="button" value="Apply"></td>
+  </tr>
++++
+	}
+}
+</table>
+
+<p>
+  <input name="button" type="button" class="button" onClick="closeWindow();" value="Back">&nbsp;&nbsp;&nbsp;</p>
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#999999">
+<tr bgcolor="#FFFFFF">
+  <td>Level</span></td>
+  <td>Availiable Marks </td>
+  <td>Required Marks </td>
+  <td>Obtained Marks </td>
+  <td>Level Awarded?</td>
+</tr>
+{
+	foreach my $pa (@{$c{pupil}->ensure_child_array('pupil_assessment')})
+	{
+		my $level = $pa->level;
+		my $score = $pa->score;
+		my $req = $pa->required;
+		my $total = $pa->marks;
+		
+		my $img = '/images/holiday/cross.gif';
+		
+		if($pa->is_awarded_or_used)
+		{
+			$img = '/images/holiday/tick.gif';
+		}
+		
+		my $bg = ' bgcolor=#ffffff';
+		
+		if($pa->is_use_level)
+		{
+			$bg = ' bgcolor=#f0f0f0';
+		}
+		
+		$OUT.=<<"+++";
+<tr align="right"$bg>
+<td>$level</td>
+<td>$total</td>
+<td>$req</td>
+<td>$score</td>
+<td><img src="$img" width=14 height=14></td>
+</tr>
++++
+	}
+}
+</table>

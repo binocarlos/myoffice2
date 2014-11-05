@@ -1,0 +1,265 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+var groupStates = new Object();
+
+	function toggleGroup(id)
+	\{
+		var state = groupStates[id];
+		
+		if(!state) \{ state = false; \}
+		
+		state = !state;
+		
+		groupStates[id] = state;
+		
+		var display = 'inline';
+		var img = 'minus';
+		
+		if(!state)
+		\{
+			display = 'none';
+			img = 'plus';
+		\}
+		
+		document.getElementById('tr' + id).style.display = display;
+		document.getElementById('img' + id).src = '/images/nav/' + img + '.gif';
+	\}
+	
+	function goBack()
+	\{
+		var newLoc = href + '&method=visitors_school_home&school_id={$c{school}->get_id}';
+		
+		document.location = newLoc;
+	\}
+	
+	function visitorHome()
+	\{
+		var newLoc = href + '&method=visitors_timeline_home&visitor_id={$c{visitor}->get_id}';
+		
+		document.location = newLoc;
+	\}
+var graphMode = false;
+
+function toggleGraph()
+\{
+	graphMode = !graphMode;
+
+	var buttonTitle = 'Hide Graph';
+	var display = 'inline';
+
+	if(!graphMode)
+	\{
+		buttonTitle = 'Show Graph';
+		display = 'none';
+	\}
+
+	document.getElementById('graph').style.display = display;
+	document.getElementById('graphButton').value = buttonTitle;
+\}
+</script>
+
+<body>
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset>
+<legend>Visitor / Audit Details</legend>
+<div class="seccontent" align="left">  
+    <TABLE width="400" BORDER="0" CELLPADDING="4" CELLSPACING="0">
+      <TR>
+        <TD width="60" ALIGN="right" VALIGN="MIDDLE">Name:</TD>
+        <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{visitor}->name} </TD>
+        <TD width="20" ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+        <TD width="60" ALIGN="right" VALIGN="MIDDLE">School: </TD>
+        <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->name}</TD>
+      </TR>
+      <TR>
+        <TD ALIGN="right" VALIGN="MIDDLE"> Taken:</TD>
+        <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{audit}->taken_date} </TD>
+        <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+        <TD ALIGN="right" VALIGN="MIDDLE">City:</TD>
+        <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{school}->city}</TD>
+      </TR>
+  </TABLE>
+ </div>
+</fieldset>
+<div align="right">
+<input type="button" class="button2" value="School Home" onClick="goBack();">
+<input type="button" class="button2" value="Visitor Home" onClick="visitorHome();">
+<input type="button" class="button2" style="width:100px" id="graphButton" value="Show Graph" onClick="toggleGraph();">
+</div>
+</td></tr></table>						  
+</td></tr></table>
+<br> 
+The red and green reports show the areas the selected visitor is doing well in and which areas they could improve with.<br>
+    <br>
+	In order to have your results in the doing well or need to improve your average score for that section was less than 6 or greater than 6.
+<br>
+<br>
+Click on the Plus ( <img id="img$id" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> ) and Minus ( <img id="img$id" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> ) symbols to show and hide more detail about each question group... <br>
+<br>
+<div id="graph" style="display:none;">
+<center><img src="{$c{href}}&method=visitors_audit_graph&audit_id={$c{audit}->get_id}"></center>
+<br></div>
+
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td width="50%" bgcolor="#ffe5e5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#990000;"><b style="color:#990000; font-size:13px; font-variant:small-caps;">Need to improve</b></td>
+    <td></td>
+    <td width="50%" bgcolor="#e5ffe5" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#339900;"><b style="color:#339900; font-size:13px; font-variant:small-caps;">Doing well</b></td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#990000; background-color:#FFF2F2;">
+
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+      <tr bgcolor="#ffe5e5">
+        <td style="border-width:1px 1px 1px 1px;" class="r"><b>Group</b></td>
+        <td style="border-width:1px 1px 1px 0px;" class="r"><b>Priority</b></td>
+        <td style="border-width:1px 1px 1px 0px;" class="r" nowrap><b>Avg. Score</b></td>
+      </tr>
+{
+	foreach my $question_group (@{$c{audit}->{_notok_array}})
+	{
+		my $title = $question_group->title;
+		my $average = $question_group->average_score;
+		my $priority = $question_group->average_priority_score;
+		
+		my $leading_answer = $question_group->leading_answer;
+		my $text = $question_group->leading_question_text;
+		
+		my $leading_priority = $leading_answer->get_priority_score($question_group->is_good);
+		my $l_p = $leading_answer->get_priority;
+		my $l_s = $leading_answer->answer;
+		my $id = $question_group->get_id;
+		
+		$OUT.=<<"+++";	
+      <tr>
+       <td height="10" colspan="3"></td>
+      </tr>	
+          <tr bgcolor="#ffffff">
+            <td width="100%" valign="middle" bgcolor="#ffe5e5" class="r" style="border-width:1px 1px 1px 1px;"><a href="javascript:toggleGroup($id);" style="text-decoration:none;color:#990000;"><img id="img$id" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> <b>$title</b></a> </td>
+            <td align="center" style="border-width:1px 1px 1px 0px;" class="r">$priority</td>
+            <td align="center" style="border-width:1px 1px 1px 0px;" class="r">$average</td>
+          </tr>
+          <tr bgcolor="#ffffff">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="r"><table width=100% border=0 cellpadding=3 cellspacing=0>
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp;$leading_priority - $text</td>
+</tr>
+			</table>
+			</td>
+          </tr>								  
+          <tr bgcolor="#ffffff" style="display:none;" id="tr$id">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="r"><table width=100% border=0 cellpadding=3 cellspacing=0>
++++
+
+		foreach my $answer (@{$question_group->get_important_answers})
+		{
+			my $text = $answer->get_question_text;
+			my $priority = $answer->{_priority_score};
+			
+			$OUT.=<<"+++";
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp;$priority - $text</td>
+</tr>
++++
+		}
+
+		$OUT.=<<"+++";			
+			</table>
+			</td>
+          </tr>	
+		  <tr><td height=10></td></tr>				  					
++++
+	}
+}
+</table>
+    
+    </td>
+    <td><img src="/images/clear.gif" width="10" height="1"></td>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#339900; background-color:#F2FFF2;">
+
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+      <tr bgcolor="#e5ffe5">
+        <td style="border-width:1px 1px 1px 1px;" class="g"><b>Group</b></td>
+        <td style="border-width:1px 1px 1px 0px;" class="g"><b>Priority</b></td>
+        <td style="border-width:1px 1px 1px 0px;" class="g" nowrap><b>Avg. Score</b></td>
+      </tr>
+{
+	foreach my $question_group (@{$c{audit}->{_ok_array}})
+	{
+		my $title = $question_group->title;
+		my $average = $question_group->average_score;
+		my $priority = $question_group->average_priority_score;
+		
+		my $leading_answer = $question_group->leading_answer;
+		my $text = $question_group->leading_question_text;
+		
+		my $leading_priority = $leading_answer->get_priority_score($question_group->is_good);
+		my $l_p = $leading_answer->get_priority;
+		my $l_s = $leading_answer->answer;
+		my $id = $question_group->get_id;
+		
+		$OUT.=<<"+++";	
+      <tr>
+       <td height="10" colspan="3"></td>
+      </tr>	
+          <tr bgcolor="#ffffff">
+            <td width="100%" bgcolor="#e5ffe5" style="border-width:1px 1px 1px 1px;" class="g"><a href="javascript:toggleGroup($id);" style="text-decoration:none;color:#339900;"><img id="img$id" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> <b>$title</b></a></td>
+            <td align="center" style="border-width:1px 1px 1px 0px;" class="g">$priority</td>
+            <td align="center" style="border-width:1px 1px 1px 0px;" class="g">$average</td>
+          </tr>
+          <tr bgcolor="#ffffff">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="g"><table width=100% border=0 cellpadding=3 cellspacing=0>
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp;$leading_priority - $text</td>
+</tr>
+			</table>
+			</td>
+          </tr>								  
+          <tr bgcolor="#ffffff" style="display:none;" id="tr$id">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="g"><table width=100% border=0 cellpadding=3 cellspacing=0>
++++
+			
+			
+		foreach my $answer (@{$question_group->get_important_answers})
+		{
+			my $text = $answer->get_question_text;
+			my $priority = $answer->{_priority_score};
+			
+			$OUT.=<<"+++";
+<tr><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;</td>
+<td>&nbsp;$priority - $text</td>
+</tr>
++++
+		}
+					
+		$OUT.=<<"+++";			
+			</table>
+			</td>
+          </tr>						
+		  <tr><td height=10></td></tr>				  
++++
+	}
+}
+</table>    
+    
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
+
+
+

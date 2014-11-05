@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+
+<script src="/lib/budgethub/budget_toolbar.js">
+</script>
+<link rel="stylesheet" type="text/css" href="/lib/app.css">
+
+<style type="text/css">
+
+a \{ cursor: hand; \}
+
+</style>
+
+<script>
+	href = '{$c{href}}';
+</script>
+
+<body topmargin=0 rightmargin=0 leftmargin=0 bottommargin=0 marginwidth=0 marginheight=0 STYLE="background:#D4D0C8; border:0px; margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" height="100%">
+<tr id="budget_toolbar_table" style="display:none;">
+<td width="200" valign="middle" id="field_title_input">
+<input onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+	class="text_field" type="TEXT" name="toolbar_input" id="toolbar_input"
+	value="" style="width:100%;" onkeyup="toolbar_input_keyup();">
+</td>
+<td valign="middle">
+<table width="100%" border="0" cellspacing="0" cellpadding="3" height="100%">
+<tr valign="middle">
+<td width="20" align="center" id="tick_button">
+<a onClick="accept_input();">
+<img src="/images/holiday/tick.gif" width="14" height="14" border=0 alt="Accept Input"></a></td>
+<td width="20" align="center" id="cross_button">
+<a onClick="cancel_input();">
+<img src="/images/holiday/cross.gif" width="14" height="14" border=0 alt="Cancel Input"></a>
+
+</td>
+<td width="20" align="center">
+<a onClick="delete_budget_row();" id="delete_button">
+<img src="/images/holiday/trashcan.gif" width="18" height="19" alt="Delete Field"></a></td>
+<td width="20" align="center" id="add_button">
+<a onClick="add_budget_row();">
+<img src="/images/wkicons/editinvoice.gif" width="18" height="18" alt="Add Field" border=0></a></td>
+<td width="20" align="center" id="move_button">
+<a onClick="edit_budget_row_position();">
+<img src="/images/holiday/sortup.gif" width="10" height="5" alt="Move Position" border=0><br>
+<img src="/images/clear.gif" height=3 width=1><br>
+<img src="/images/holiday/sortdown.gif" width="10" height="5" alt="Move Position" border=0></a></td>
+<td width="20" align="center" id="currency_button">
+<a onClick="change_row_currency();">
+<img src="/images/wkicons/payinvoice.gif" width="18" height="18" alt="Change Currency" border=0></a></td>
+<td width="20" align="center" id="comment_button">
+<a onClick="edit_row_comment();">
+<img src="/images/nav/edit.gif" width="16" height="16" border=0 alt="Edit Comment"></a></td>
+<td><span style="color:#666666;" id="budget_toolbar_currency_span">&nbsp;</span></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr id="budget_toolbar_status" style="display:none;">
+<td colspan="2" valign="middle"><img src="/images/clear.gif" align="absmiddle" width=20 height=1>
+<span style="color:#666666;" id="budget_toolbar_status_span"></span></td>
+</tr>
+</table>
+<script>
+toolbar_init();
+</script>
+</body>
+</HTML>

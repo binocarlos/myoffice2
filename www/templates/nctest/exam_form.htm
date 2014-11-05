@@ -1,0 +1,226 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+	function typeChange(sel)
+	\{
+		var table = document.getElementById('templateTable');
+		
+		if(sel.value=='manual')
+		\{
+			table.style.display = 'none';
+		\}
+		else
+		\{
+			table.style.display = 'inline';		
+		\}
+	\}
+
+	function previewTemplate()
+	\{
+		var test_id = parseInt(document.exam_form.test_id.value);
+		
+		
+		if(test_id>0)
+		\{
+			var query = '&method=tests_preview_test_frameset&test_id=' + test_id;
+			
+			var ret = top.get_modal_window_return(query, 780, 580);
+		\}
+		else
+		\{
+			alert('You cannot preview the blank template');
+		\}
+	\}
+	
+	function validateExamForm(form)
+	\{
+		var name = form.name.value;
+		var levels = form.levels.value;
+		
+		if(name.length==0)
+		\{
+			alert('Please enter a name for this exam');
+			return false;
+		\}
+		
+		if(levels.length==0)
+		\{
+			alert('Please enter the levels for this exam');
+			return false;
+		\}
+		
+		return true;
+	\}
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="exam_form" method="POST" action="{$c{script}}" onSubmit="return validateExamForm(this);">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="exams_exam_form_submit">
+<input type="hidden" name="exam_id" value="{$c{exam}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Quiz Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Name
+      (Maths, Space etc):</TD>
+    <TD width="300" ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <input type="text" name="name" value="{$c{exam}->get_value('name')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:100%;" validator="string" required=1>
+    </TD>
+  </TR>
+{
+	if($c{org}->is_generic_nctest)
+	{
+		my $period_options = $c{exam}->get_period_date_options;	
+		
+		$OUT.=<<"+++";
+		<!--<input type="hidden" name="period_date" value="01/12/2007">-->
+		<input type="hidden" name="type" value="auto">
+		<input type="hidden" name="yeargroup" value="0">
+		<input type="hidden" name="levels" value="1">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Period:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">      
+      <select name="period_date" size="1" class="text_field" id="period_date" style="width:100%;">      
+        $period_options   
+      </select>
+    </TD>
+  </TR> 		
++++
+	}
+	else
+	{
+		my $period_options = $c{exam}->get_period_date_options;
+		my $yeargroup_options = $c{exam}->get_yeargroup_options;
+		my $levels_value = $c{exam}->get_levels;
+		
+		$OUT.=<<"+++";  
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Period:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">      
+      <select name="period_date" size="1" class="text_field" id="period_date" style="width:100%;">      
+        $period_options   
+      </select>
+    </TD>
+  </TR>   
++++
+
+		if(!$c{exam}->exists)
+		{
+			my $options = $c{exam}->get_type_options;
+		
+		$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Type:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">      
+      <select name="type" size="1" class="text_field" id="type" style="width:100%;" onChange="typeChange(this);">      
+        $options
+      </select>
+    </TD>
+  </TR>      
++++
+		}
+
+		$OUT.=<<"+++";
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Year Group:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">      
+      <select name="yeargroup" size="1" style="width:100%;" class="text_field">      
+        $yeargroup_options    
+      </select>
+    </TD>
+  </TR>
+                <TR style="padding-bottom:5px;">
+                  <TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Levels:</TD>
+                  <TD width="300" ALIGN="LEFT" VALIGN="MIDDLE">
+                    <input type="text" name="levels" value="$levels_value" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:100%;">
+                  </TD>
+                </TR> 
++++
+	}
+}
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Comments:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+      <textarea name="comments" class="text_field" id="comments" style="width:100%; height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{exam}->comments}</textarea>
+    </TD>
+  </TR>
+</TABLE>
+
+</div>
+</fieldset>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+              <TR>
+                <TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{exam}->{error_text}}</span></TD>
+                <TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit2" value="Save" CLASS="button2" style="width:75px;">
+                    <input name="button" type="button" CLASS="button2" style="width:75px;" onClick="history.back();"  value="Cancel"></TD>
+              </TR>
+          </TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+<br>
+<br>
+{
+	if(!$c{exam}->exists)
+	{
+		my $levels = $c{params}->{levels};
+		my $options = $c{exam}->get_test_template_options($c{org}->is_generic_nctest);
+		my $error_text = $c{exam}->{error_text};
+		
+		$OUT.=<<"+++";
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" id="templateTable">
+  <TR>
+    <TD>
+      <TABLE BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+        <TR>
+          <TD CLASS="panelbody">
+            <fieldset style="height:100%;">
+            <legend>Quiz Template </legend>
+            <div class="seccontent" align="left">
+              <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+                <TR style="padding-bottom:5px;">
+                  <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Quiz Template:</TD>
+                  <TD width="300" ALIGN="LEFT" VALIGN="MIDDLE">
+                    <select name="test_id" size="1" style="width:100%;" class="text_field">
+					$options
+                    </select>
+                  </TD>
+                </TR>
+                <TR style="padding-bottom:5px;">
+                  <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" colspan=2 nowrap><input name="Button" type="button" class="button" value="Preview" onClick="previewTemplate();"></TD>
+                </TR>
+              </TABLE>
+            </div>
+            </fieldset>
+            </TD>
+        </TR>
+    </TABLE></TD>
+  </TR>
+</TABLE>
++++
+	}
+}
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

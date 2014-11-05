@@ -1,0 +1,97 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script src="/lib/formhelp.js"></script>
+<script>
+	function changeCheck(field)
+	\{
+		var inp = document.getElementById(field);
+		var img = document.getElementById('Img' + field);
+
+		var src = 'tick.gif';
+
+		if(inp.value=='')
+		\{
+			inp.value = 'yes';
+		\}
+		else
+		\{
+			src = 'cross.gif';
+			inp.value = '';
+		\}
+
+		src = '/images/holiday/' + src;
+
+		img.src = src;
+	\}
+</script>
+
+<body>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE">
+
+
+<div class="panelouter" style="width:150px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+<fieldset>
+<legend>Course Status</legend>
+<div class="seccontent" align="left">
+<form method="POST" action="{$c{script}}" style="margin:0">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="course_status_submit">
+					<table border="0" cellspacing="0" cellpadding="3" width="220">
+                <tr>
+                  <td align="center" bgcolor="#FFFFFF">Click on the sign below to change the status<br>{$c{org}->get_course_status_gui}
+                    <table border="0" cellspacing="1" cellpadding="0" id="openTable" style="display:none;" width="100%" height="145">
+                      <tr>
+                        <td colspan="2">Click on the options to change:</td>
+                      </tr>
+                      <tr>
+                        <td>{$c{org}->get_course_status_checkbox('trolleys')}</td>
+                        <td>Trolleys</td>
+                      </tr>
+                      <tr>
+                        <td>{$c{org}->get_course_status_checkbox('power_caddies')}</td>
+                        <td>Power Caddies</td>
+                      </tr>
+                      <tr>
+                        <td>{$c{org}->get_course_status_checkbox('buggies')}</td>
+                        <td>Buggies</td>
+                      </tr>
+                      <tr>
+                        <td>{$c{org}->get_course_status_checkbox('exemption')}</td>
+                        <td nowrap>Exemption (Medical Certificate)</td>
+                      </tr>
+                      <tr>
+                        <td>{$c{org}->get_course_status_input('temp_greens')}</td>
+                        <td>Temporary Greens</td>
+                      </tr>
+                      <tr>
+                        <td>{$c{org}->get_course_status_input('temp_tees')}</td>
+                        <td>Temporary Tees</td>
+                      </tr>
+                    </table>
+					<table id="closedTable" style="display:none;" border=0 cellpadding=0 cellspacing=0></table>
+                    <table border="0" cellspacing="1" cellpadding="0" width="100%" height="145">
+											<tr>
+                        <td>Enter text below:</td>
+                      </tr>
+                      <tr>
+                        <td><textarea name="closedReason" style="width:100%;height:120px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field">{$c{org}->get_closed_reason(1)}</textarea></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              </table>
+
+</div>
+</fieldset>
+<div align="right"><input type="submit" value="Update" class="button2" style="width:75px"></div>
+</form>
+</div></div></div>
+
+
+</TD></TR></TABLE>
+</body>
+</html>
+
+
+

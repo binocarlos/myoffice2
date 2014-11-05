@@ -1,0 +1,148 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{height:23px; font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script>
+var graphMode = false;
+var namesMode = false;
+
+	function printPage()
+	\{
+		parent.content.focus();
+		parent.content.print();
+	\}
+	
+	function viewTargets()
+	\{
+		document.getElementById('graphButton').style.display = 'none';
+//		document.getElementById('namesButton').style.display = 'none';
+		
+		document.filter_form.method.value = 'analysis_target_report';		
+		document.filter_form.submit();		
+	\}
+	
+	function viewProgress()
+	\{
+		document.getElementById('graphButton').style.display = 'inline';
+//		document.getElementById('namesButton').style.display = 'inline';
+		
+		document.filter_form.method.value = 'analysis_progress_report';
+		document.filter_form.submit();		
+	\}	
+	
+	function viewNames()
+	\{
+		graphMode = false;
+		
+		document.filter_form.show_pupils.value = 1;
+		document.filter_form.submit();
+		document.filter_form.submit();		
+	\}
+	
+	function resetGraphButton(isWithPupils)
+	\{
+		graphMode = false;
+		
+		if(isWithPupils)
+		\{
+			document.filter_form.show_pupils.value = 1;
+		\}
+		else
+		\{
+			document.filter_form.show_pupils.value = '';		
+		\}
+	\}
+	
+	function toggleGraph()
+	\{
+		graphMode = !graphMode;
+	
+		var display = 'inline';
+	
+		if(!graphMode)
+		\{
+			display = 'none';
+		\}
+	
+		parent.content.document.getElementById('graphP').style.display = display;
+	\}	
+	
+		
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" height="100%">
+		<TR>
+    <TD WIDTH="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;" height="100%">
+      <table border="0" cellspacing="0" cellpadding="0" align="center">
+				<tr>
+					<td align="center" valign="middle">
+	<form method="GET" action="{$c{script}}" target="content" name="filter_form" style="margin:0px;padding:0px;">
+	<input type="hidden" name="session_id" value="{$c{session_id}}">
+	<input type="hidden" name="method" value="analysis_progress_report">
+	<input type="hidden" name="show_pupils" value="">
+	<input type="hidden" name="mode" value="{$c{params}->{mode}}">
+	<input type="hidden" name="from" value="{$c{params}->{from}}">
+	<input type="hidden" name="to" value="{$c{params}->{to}}">
+	<input type="hidden" name="year" value="{$c{params}->{year}}">
+	<input type="hidden" name="class_id" value="{$c{params}->{class_id}}">
+	<input type="hidden" name="pupil_id" value="{$c{params}->{pupil_id}}">		
+	<table border="0" cellpadding="5" cellspacing="0">
+	<tr><td height=5></td></tr>
+      <tr>
+        <td align="right"><b>Sex</b></td>
+        <td width="180"><select name="sex" size="1" style="width:100%;" class="text_field">
+		<option value="all">All</option>
+		<option value="m">Male</option>
+		<option value="f">Female</option>
+		    </select> </td>
+    <td align="right"><strong>SEN</strong></td>
+  <td width="180"><select name="sen" size="1" style="width:100%;" class="text_field">
+		{$c{select_pupil}->get_sen_options}
+		</select></td>
+    <td width="220">
+<a href="javascript:printPage();"><img src="/images/skillsaudit/adminmenu/print.gif" width="23" height="22" border="0"> Print Page</a></td>
+      </tr>
+      <tr>
+        <td align="right"><b>Ethnicity</b></td>
+        <td align="right" valign="middle"><select name="ethnicity" size="1" style="width:100%;" class="text_field">
+		{$c{select_pupil}->get_ethnicity_options}
+		</select> </td>
+    <td align="right"><strong>SEN Type</strong></td>
+	    <td><select name="sen_type" size="1" style="width:100%;" class="text_field">
+		{$c{select_pupil}->get_sen_type_options}
+		</select></td>
+	  <td><span id="graphButton" style="display:inline;"><a href="javascript:toggleGraph();"><img src="/images/skillsaudit/adminmenu/show_graph.gif" width="24" height="19" border="0"> Toggle Graph</a></span></td>
+      </tr>
+      <tr>
+        <td align="right"><b>View Mode </b></td>
+        <td align="right" valign="middle"><select name="carry_level_mode" size="1" class="text_field" id="carry_level_mode" style="width:100%;">
+          
+<option value="no_carry" selected>Don't Carry Levels Forward</option>
+<option value="carry">Carry Levels Forward</option>
+		
+        </select></td>
+        <td colspan="2" align="right">
+		<a href="javascript:viewProgress();"><img src="/images/skillsaudit/adminmenu/timeline.gif" width="24" height="24" border=0 align="absmiddle"> View Progress</a>
+		&nbsp;&nbsp;&nbsp;		
+		<a href="javascript:viewNames();"><img src="/images/skillsaudit/adminmenu/findindividuals.gif" width="24" height="24" border=0 align="absmiddle"> View Pupils</a>
+		&nbsp;&nbsp;&nbsp;
+		<a href="javascript:viewTargets();"><img src="/images/skillsaudit/adminmenu/targets.gif" width="24" height="24" border=0 align="absmiddle"> View targets</a>
+		</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+	</form>					
+					</td>
+				</tr>
+      </table>
+    </TD>
+		</TR>
+</TABLE></BODY>
+</HTML>

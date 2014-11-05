@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<menu_config>
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+	<menublock title="Users" width="90">
+		<menuitem title="Add User" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Add User&amp;frame_method=add_user&amp;appname=easemail');"/>
+		<menuitem title="View/Edit Users" action="get_menu_query('&amp;method=iframe_title_frame&amp;title=Current Users&amp;frame_method=users_home&amp;appname=easemail');"/>
+	</menublock>
++++
+	}
+}
+	<menublock title="Emails" width="90">	
+		<menuitem title="Create Email" action="send_email();"/>
+		<menuitem title="View Past Messages" action="emails_home();"/>		
+		<menuitem title="Remove Bounces" action="remove_bounces();"/>
+	</menublock>
+	<menublock title="Lists" width="90">
+		<menuitem title="Edit Current List" action="edit_current_list();"/>
+		<menuitem title="Add Child List" action="add_child_list();"/>
+	</menublock>
+	<menublock title="Members" width="90">
+		<menuitem title="Add Member" action="add_member();"/>
+		<menuitem title="Unsubscribe Member" action="unsubscribe();"/>		
+		<menuitem title="Upload Members" action="upload_members();"/>
+		<menuitem title="Download Members" action="download_members();"/>		
+		<menuitem title="Search Members" action="search_members();"/>		
+	</menublock>	
+</menu_config>
+

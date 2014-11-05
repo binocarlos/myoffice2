@@ -1,0 +1,48 @@
+<HTML> 
+  <HEAD> 
+	 <TITLE></TITLE>
+<script src="/lib/siteeditor/topbar.js"></script>
+<script>
+	href = '{$c{href}}';
+</script>
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px;\}
+</STYLE>
+  </HEAD> 
+  <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0"> 
+	 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="2" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%"> 
+		<TR> 
+		  
+<TD WIDTH="100%" HEIGHT="100%" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+
+<table border="0" cellspacing="0" cellpadding="5" id="control_table" style="display:none;">
+<tr>
+<td width=80><A ONCLICK="save_page();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/tools/save_large.gif"  HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Save <span id="save_span"></span></A></td>
+<td width="80"><A ONCLICK="preview_page();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/tools/preview_large.gif"  HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Preview</A></td>
+<td width="80"><A ONCLICK="reset_current_page();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/tools/reset_large.gif"  HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Reset</A></td>
+<td width="80"><A ONCLICK="close_page();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;"><IMG SRC="/images/tools/closepage_large.gif"  HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Close</A></td>
+<td><b style="color:#990000;" id="saving_status"></b></td>
+</tr>
+</table>
+
+
+<IFRAME SRC="{$c{href}}&method=siteeditor_save_form" WIDTH="1" HEIGHT="1" NAME="save" SCROLLING="no" FRAMEBORDER="no" STYLE="display:none;"></IFRAME>
+</TD> 
+		</TR> 
+	 </TABLE>
+{
+	if($c{params}->{page_id}>0)
+	{
+		my $id = $c{params}->{page_id};
+		
+		$OUT.=<<"+++";
+<script>
+assign_page_id($id);
+</script>
++++
+	}
+}
+	 
+	 </BODY>
+</HTML>

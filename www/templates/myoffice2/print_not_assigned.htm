@@ -1,0 +1,83 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function writeShowing(hash)
+	\{
+		document.write(getHTMLBlock('showing_row', hash));	
+	\}
+	
+	function assignPrintRun(id)
+	\{
+		var ret = get_modal_window_return('&method=print_assign_print_run&showing_id=' + id, 500, 430);	
+		
+		if(ret)
+		\{
+			/*
+			if(window.confirm('Print Run Assigned - would you like to goto this print sheet now?'))
+			\{
+				document.location = href + '&method=print_sheet&print_run_id=' + ret;
+			\}
+			*/
+			
+			window.alert('Print Run Assigned...');
+		\}
+	\}
+</script>
+<body onunload="parent.title.resetForm();">
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">   
+  <tr>
+    <td>Showing without a print run for the {$c{tour}->name} Tour</td>
+  </tr> 
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td class="welcome"><table  border="0" cellpadding="3" cellspacing="1" bgcolor="#e5e5e5">		
+		 <tr bgcolor="#f0f0f0">
+        <td>Date</td>
+        <td>Venue</td>
+        <td>&nbsp; </td>
+        </tr>	
+{
+	my $showing_row=<<"+++";
+	      <tr align="left" valign="top" bgcolor="#FFFFFF">
+        <td align=right style="color:green;">__date_titles__</div></td>
+        <td class="noOverflowX"><div class="noOverflowX" style="width:250px;"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></div></td>
+        <td><input type="submit" class="button" value="Assign" onClick="assignPrintRun(__showing_id__);"></td>
+        </tr>	
++++
+
+	$showing_row = Webkit::AppTools->js_quote($showing_row);
+	
+	$OUT.=<<"+++";
+<script>	
+	addHTMLBlock('showing_row', '$showing_row');
++++
+
+	foreach my $showing (@{$c{tour}->ensure_child_array('showing')})
+	{
+		my $date_titles = $showing->get_datetime_title;
+		my $venue = $c{tour}->get_child('venue', $showing->venue_id);
+		
+		if(!$venue) { next; }
+		
+		my $showing_js_hash = Webkit::AppTools->js_hash({
+			date_titles => $showing->get_datetime_title,
+			_print_req_id => $showing->{data}->{print_req_id},
+			_venue_id => $venue->get_id,
+			_showing_id => $showing->get_id,
+			venue_title => $venue->get_city_title });
+		
+		$OUT.=<<"+++";
+writeShowing($showing_js_hash);
++++
+	}
+}
+</script>
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>
+
+
+

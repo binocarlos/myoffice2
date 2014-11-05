@@ -1,0 +1,106 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+
+		parent.parent.page.clients_home.location = loc;
+	\}
+
+var tree = new WebFXTree('Overall Groups');
+tree.action = "javascript: get_xTree_query('&method=clients_home_list');";
+tree.icon = '/images/icons/16x16/folder_cubes.gif';
+tree.openIcon = '/images/icons/16x16/folder_cubes.gif';
+
+{
+	sub do_user_array
+	{
+		my ($userarr, $parent_node_name) = @_;
+		
+		if(!$userarr) { return; }
+		
+		foreach my $user (@$userarr)
+		{
+			my $id = $user->get_id;
+			my $name = $user->get_fullname;
+			
+			$name =~ s/'/\\'/g;
+
+			$OUT.=<<"+++";
+var users$id = new WebFXTreeItem('$name');
+users$id.action = "javascript: get_xTree_query('&method=clients_edit_user&object_id=$id');";
+users$id.icon = '/images/holiday/employee.gif';
+
+$parent_node_name.add(users$id);
++++
+		}		
+	}
+	
+	my $client_arr = $c{orgs};
+	
+	foreach my $client (@$client_arr)
+	{
+		my $client_id = $client->get_id;
+		my $client_name = $client->get_js_value('name');
+		
+		$OUT.=<<"+++";
+var client$client_id = new WebFXTreeItem('$client_name');
+client$client_id.action = "javascript: get_xTree_query('&method=clients_edit_client&object_id=$client_id');";
+client$client_id.icon = '/images/icons/16x16/folders.gif';
+client$client_id.openIcon = '/images/icons/16x16/folders.gif';
+var editall$client_id = new WebFXTreeItem('Edit All Users');
+editall$client_id.action = "javascript: get_xTree_query('&method=clients_edit_users&object_id=$client_id');";
+editall$client_id.icon = '/images/icons/16x16/folder_window.gif';
+editall$client_id.openIcon = '/images/icons/16x16/folder_window.gif';
+client$client_id.add(editall$client_id);
+tree.add(client$client_id);
++++
+
+		my $no_dept_array = $client->{_no_group};
+		
+		if($no_dept_array)
+		{
+			$OUT.=<<"+++";
+var nodept$client_id = new WebFXTreeItem('No Group');
+nodept$client_id.action = "javascript: get_xTree_query('&method=clients_edit_users&object_id=$client_id&department_id=-1');";
+client$client_id.add(nodept$client_id);	
++++
+
+			&do_user_array($no_dept_array, "nodept$client_id");
+		}
+
+		my $department_array = $client->get_child_array('department');
+		
+		if($department_array)
+		{
+			foreach my $department (@$department_array)
+			{
+				my $dept_id = $department->get_id;
+				my $dept_name = $department->name;
+				
+				$OUT.=<<"+++";
+	var dept$dept_id = new WebFXTreeItem('$dept_name');
+dept$dept_id.action = "javascript: get_xTree_query('&method=clients_edit_users&object_id=$client_id&department_id=$dept_id');";
+client$client_id.add(dept$dept_id);		
++++
+
+				my $deptuserarr = $department->ensure_child_array('users');
+		
+				&do_user_array($deptuserarr, "dept$dept_id");
+			}
+		}
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+
+

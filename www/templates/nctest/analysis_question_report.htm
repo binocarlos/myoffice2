@@ -1,0 +1,224 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+var pupilRows = new Object();
+var oldBgs = new Object();
+
+function setPupilNames(value)
+\{
+	for(var spanId in pupilRows)
+	\{
+		document.getElementById(spanId).style.display = value;
+	\}
+\}
+
+function writeAnswerCell(sub_question_id, exam_login_id, score, bg)
+\{
+	var td_id = sub_question_id + '_' + exam_login_id;
+	
+	
+	var st = '<td id="' + td_id + '" align=right ' + bg + ' style="cursor:hand;" class="c2" onMouseOver="tdOver(this);" onMouseOut="tdOut(this);" onClick="viewPupilAnswer(' + sub_question_id + ', ' + exam_login_id + ');">' + score + '</td>';
+	
+	document.write(st);
+\}
+
+function tdOver(td)
+\{
+	oldBgs[td.id] = td.bgColor;
+	
+	td.bgColor = '#ffcccc';
+\}
+
+function tdOut(td)
+\{
+	td.bgColor = oldBgs[td.id];
+\}
+
+function viewPupilAnswer(sub_question_id, exam_login_id)
+\{
+	var query = '&method=analysis_pupil_sub_question_report&sub_question_id=' + sub_question_id + '&exam_login_id=' + exam_login_id;
+
+	top.get_modal_window_return(query, 600, 500);
+\}
+
+function pupilSummary(id)
+\{
+	var loc = '&method=analysis_pupil_question_report&exam_id={$c{exam}->get_id}&pupil_id=' + id;
+	
+	top.get_modal_window_return(loc, 780, 580);
+\}
+
+function subQuestionSummary(id)
+\{
+	var loc = '&method=analysis_auto_marking_frameset_proxy&exam_id={$c{exam}->get_id}&sub_question_id=' + id;
+	
+	top.get_modal_window_return(loc, 780, 580);
+\}
+
+
+</script>
+
+<table border="0" cellpadding="5" cellspacing="1" bgcolor="#666666">
+  <tr align="left" bgcolor="#FFFFFF">
+    <td colspan="2"><b>{$c{exam}->get_fullname}</b> Question Summary<br>
+      {$c{report}->get_report_title}</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td align="right"><b>{$c{report}->test_marks}</b></td>
+    <td> &nbsp;marks are availiable in the quiz.</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td align="right"><b>{$c{report}->count_pupils}</b></td>
+    <td>&nbsp;pupils sat the exam.</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td align="right"><b>{$c{report}->exam_marks}</b></td>
+    <td>&nbsp;marks are availiable in the quiz ({$c{report}->test_marks} * {$c{report}->count_pupils})</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td align="right"><b>{$c{report}->exam_score}</b></td>
+    <td>&nbsp;marks in total were awarded for this quiz </td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td align="right"><b>{$c{report}->exam_percent}</b></td>
+    <td> average total  score awarded for this quiz </td>
+  </tr>
+</table>
+
+<span id="graphP" style="display:none;">
+<br>
+<table border=0 cellpadding=3 cellspacing=0>
+<tr>
+<td align=center><b class="welcome" style="color:#666666;">{$c{exam}->get_fullname} Question Percent Graph</b></td></tr>
+<tr><td><img id="graphImg" src="{$c{href}}&method=analysis_question_report_graph&exam_id={$c{exam}->get_id}&topic_id={$c{report}->{topic_id}}&operator={$c{report}->{query_operator}}&percent={$c{report}->{percent}}"></td></tr>
+</table>
+<br>
+</span><br>
+
+<TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+{
+	my $questions = $c{report}->load_questions;
+	my $pupils = $c{report}->load_pupils;
+	
+	$OUT.=<<"+++";
+  <tr><td colspan=3 rowspan=3 class="t">&nbsp;</td>	
++++
+
+	foreach my $qref (@$questions)
+	{
+		my $title = $c{report}->question_title($qref->{sub_question_id});
+		my $id = $qref->{sub_question_id};
+		
+		my $admin_txt = '';
+		
+		if($c{user}->is_webkit)
+		{
+			my $exam_id = $c{exam}->get_id;
+			
+			$admin_txt=<<"+++";
+		<br><a href="$c{href}&method=admin_remark_input&sub_question_id=$id&exam_id=$exam_id">Remark</a>
++++
+		}
+			
+		$OUT.=<<"+++";
+<td align=center CLASS="t"><a href="javascript:subQuestionSummary($id);" class="l2">$title</a>$admin_txt</td>
++++
+	}
+	
+	$OUT.=<<"+++";
+</tr>
++++
+
+	foreach my $qref (@$questions)
+	{
+		my $id = $qref->{sub_question_id};
+			
+		$OUT.=<<"+++";
+
++++
+	}
+	
+	$OUT.=<<"+++";
+<tr bgcolor=#ffffff>
++++
+
+	foreach my $qref (@$questions)
+	{
+		my $marks = $c{report}->question_marks($qref->{sub_question_id});
+		my $score = $c{report}->question_score($qref->{sub_question_id});
+			
+		$OUT.=<<"+++";
+<td align=center class="c2">$score/$marks</td>
++++
+	}
+	
+	$OUT.=<<"+++";
+</tr>
+<tr bgcolor=#ffffff>	
++++
+
+	foreach my $qref (@$questions)
+	{		
+		my $percent = $c{report}->question_percent($qref->{sub_question_id});
+			
+		$OUT.=<<"+++";
+<td align=center class="p">$percent%</td>
++++
+	}
+	
+	foreach my $pref (@$pupils)
+	{
+		my $pupil_name = $c{report}->pupil_name($pref->{exam_login_id});
+		my $score = $c{report}->pupil_score($pref->{exam_login_id});
+		my $marks = $c{report}->test_marks;
+		my $percent = $c{report}->pupil_percent($pref->{exam_login_id});
+		my $pupil_id = $pref->{pupil_id};
+		
+		$pupil_name =~ s/ /&nbsp;/g;
+		
+		my $display = 'none';
+		
+		if($c{org}->is_generic_nctest)
+		{
+			$display = 'inline';
+		}
+		
+		$OUT.=<<"+++";
+  <tr>
+    <td class="t" nowrap><img src="/images/icons/misc/view.gif" style="cursor:hand;" align="absmiddle" border="0" onclick="pupilSummary($pupil_id);"><span id="pupilName$pupil_id" style="display:$display;"><a href="javascript:pupilSummary($pupil_id);" class="l">&nbsp;&nbsp;$pupil_name</a></span></td>
+	<td align=right class="c2">$score/$marks</td>
+	<td align=right class="p">$percent%</td>
+<script>
+pupilRows.pupilName$pupil_id = 1;
++++
+	
+		foreach my $qref (@$questions)
+		{
+			my $exam_login_id = $pref->{exam_login_id};
+			my $sub_question_id = $qref->{sub_question_id};
+			
+			my $td_id = $sub_question_id.'_'.$exam_login_id;
+					
+			my $score = $c{report}->answer_score($sub_question_id, $exam_login_id);
+
+			my $bg = '';
+			
+			if($score!~/\d/) { $score = 0; }
+			
+			if($score==0)
+			{
+				$bg = ' bgcolor=#f5f5f5';
+			}
+			
+			$OUT.=<<"+++";
+writeAnswerCell($sub_question_id, $exam_login_id, $score, '$bg');
++++
+		}
+		
+		$OUT.=<<"+++";
+</script>
+  </tr>
++++
+	}
+}
+</table>

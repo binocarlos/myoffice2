@@ -1,0 +1,111 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function validate_school_form()
+	\{
+		var form = document.school_form;
+
+		if(form.name.value=="")
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a name for the school';
+
+			return false;
+		\}
+
+		return true;
+	\}
+</script>
+
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+
+<form name="school_form" method="POST" action="{$c{script}}" onSubmit="return validate_school_form();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="school_form_submit">
+<input type="hidden" name="school_id" value="{$c{school}->get_id}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;School Details&nbsp;</FONT></TD>
+                        <TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                                <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Name:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="name" value="{$c{school}->name}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Real School Id:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input type="text" name="real_school_id" value="{$c{school}->real_school_id}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:250px;">
+                                    </TD>
+                                  </TR>								  
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Type:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <select name="type" class="text_field" id="type" style="width:100%;">
+                                        {$c{school}->get_type_options}
+                                      </select>
+</TD>
+                                  </TR>								  
+								    <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">DfES No:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input name="dfes_number" type="text" class="text_field" id="dfes_number" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->dfes_number}">
+                                    </TD>
+                                  </TR>
+								    <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Address:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input name="address" type="text" class="text_field" id="address" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->address}">
+                                    </TD>
+                                  </TR>
+								    <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">City:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input name="city" type="text" class="text_field" id="city" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->city}">
+                                    </TD>
+                                  </TR>				
+								    <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Postcode:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                      <input name="postcode" type="text" class="text_field" id="postcode" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{school}->postcode}">
+                                    </TD>
+                                  </TR>								  				  								  
+                                </TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{school}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input name="button" type="button" CLASS="button" style="width:75px;" onClick="document.location = href + '&method=schools_home';"  value="Cancel">
+                          &nbsp; 
+                          <input type="submit" name="Submit" value="Save Details" CLASS="button" style="width:75px;">
+                        </TD>
+</TR></TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

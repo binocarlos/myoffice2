@@ -1,0 +1,241 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script src="/lib/kit.js"></script>
+<script src="/lib/myoffice2/lib.js"></script>
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+var appname = '{$c{app_name}}';
+
+	var print_reqs = new Object();
+	var print_runs = new Object();
+	var venues = new Object();
+	
+	var printRunId = null;
+	
+	var saveSpanMode = false;
+	var timeoutId = null;
+
+	
+	function clearSwitchSaveSpan()
+	\{
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = '';
+		button.style.color = '';
+		button.style.fontWeight = '';
+		span.style.backgroundColor = '';
+		span.style.color = '';
+		span.style.fontWeight = '';
+		
+		clearTimeout(timeoutId);
+		
+		timeoutId = null;	
+	\}
+	
+	function switchSaveSpan()
+	\{
+		saveSpanMode =! saveSpanMode;
+		
+		var buttonBg = '';
+		var buttonFg = '';
+		
+		var spanBg = '';
+		var spanFg = '';
+		
+		var buttonWeight = '';
+		var spanWeight = '';
+		
+		if(saveSpanMode)
+		\{
+			buttonBg = '#ffffff';
+			buttonFg = '#ff0000';
+			spanBg = '#ffffff';
+			spanFg = '#ff0000';
+			buttonWeight = 'bold';
+			spanWeight = 'bold';
+		\}
+		
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = buttonBg;
+		button.style.color = buttonFg;
+		button.style.fontWeight = buttonWeight;
+		span.style.backgroundColor = spanBg;
+		span.style.color = spanFg;
+		span.style.fontWeight = spanWeight;
+		
+		timeoutId = setTimeout("switchSaveSpan();", 1000);
+	\}		
+	
+	function showSaveSpan()
+	\{
+		document.getElementById('saveSpan').style.display = 'inline';
+		document.getElementById('saveButton').disabled = false;
+		
+		if(timeoutId==null)
+		\{		
+			switchSaveSpan();		
+		\}
+	\}
+	
+	
+	function addPrintRun()
+	\{
+		parent.content.document.location = href + '&method=print_form';
+	\}
+	
+	function viewNonAssigned()
+	\{
+		parent.content.document.location = href + '&method=print_not_assigned';
+	\}
+	
+	function addVenueField(venue_id, field, value)
+	\{
+		var venue = venues[venue_id];
+		
+		if(!venue)
+		\{
+			venue = new Object();
+			venue.id = venue_id;
+			venues[venue.id] = venue;
+		\}
+		
+		venue[field] = value;
+		
+		showSaveSpan();
+	\}		
+	
+	function addPrintRunField(print_run_id, field, value)
+	\{
+		var print_run = print_runs[print_run_id];
+		
+		if(!print_run)
+		\{
+			print_run = new Object();
+			print_run.id = print_run_id;
+			print_runs[print_run.id] = print_run;
+		\}
+		
+		print_run[field] = value;
+		
+		showSaveSpan();
+	\}	
+	
+	function addPrintReqField(print_req_id, field, value)
+	\{
+		var print_req = print_reqs[print_req_id];
+		
+		if(!print_req)
+		\{
+			print_req = new Object();
+			print_req.id = print_req_id;
+			print_reqs[print_req.id] = print_req;
+		\}
+		
+		print_req[field] = value;
+		
+		showSaveSpan();
+	\}
+
+	function resetForm()
+	\{
+		clearSwitchSaveSpan();		
+		document.getElementById('hiddenInputSpan').innerText = '';
+		document.getElementById('saveSpan').style.display = 'none';
+		document.getElementById('saveButton').disabled = true;
+		print_reqs = new Object();
+		print_runs = new Object();
+		venues = new Object();		
+	\}
+	
+	function applyObjectInputs(hash, tag)
+	\{
+		if(!hash) \{ return; \}
+		
+		var span = document.getElementById('hiddenInputSpan');	
+		
+		var st = '';
+		
+		for(var id in hash)
+		\{
+			var obj = hash[id];
+			
+			for(var field in obj)
+			\{
+				if(field!='id')
+				\{
+					//var elem = document.createElement('INPUT');
+					//elem.type = 'hidden';
+					//elem.name = tag + '_' + id + '_' + field;
+					//elem.value = obj[field];
+				
+					//span.appendChild(elem);
+					
+					st += '<field name="' + tag + '_' + id + '_' + field + '">' + obj[field] + '</field>';					
+				\}
+			\}
+		\}		
+		
+		return st;
+	\}
+	
+	function submitPrintSheet()
+	\{
+		var form = document.printForm;
+		
+		var data = applyObjectInputs(print_reqs, 'print_req');
+		data += applyObjectInputs(print_runs, 'print_run');
+		data += applyObjectInputs(venues, 'venue');		
+		
+		form.data.value = data;
+		
+		form.submit();
+	\}
+	
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" align="left" cellpadding="5" cellspacing="0">
+        <tr>
+          <td></td>
+          <td height="40" colspan="3"><strong>Print Runs  for the {$c{tour}->name} Tour</strong></td>
+		  <td colspan="3"><span style="color:red;display:none;font-weight:bold;font-size:15pt;" id="saveSpan">YOU HAVE DATA TO SAVE...</span></td>
+        </tr>	  
+        <tr>
+          <td width="10"></td>
+          <td><input type="button" class="button" id="addButton" onClick="addPrintRun();" value="Add Print Run"></td>
+          <td width="50">&nbsp;</td>
+          <td><input type="button" class="button" id="datesButton" onClick="viewNonAssigned();" value="View Non Assigned Dates"></td>
+          
+          <td width="50">&nbsp;</td>		  
+          <td align="left"><form method="POST" action="{$c{script}}" name="printForm" style="margin:0px;padding:0px;">
+              <input type="hidden" name="session_id" value="{$c{session_id}}">
+              <input type="hidden" name="method" value="print_toolbar_save">  
+              <input type="hidden" name="data" value="">  			  
+              <span id="hiddenInputSpan"></span>
+              <input type="button" value="Save Sheet" class="button" onClick="submitPrintSheet();" id="saveButton" disabled>
+          </form></td>
+          <td></td>
+        </tr>
+      </table>
+      </TD>
+		</TR>
+</TABLE>
+</BODY>
+</HTML>

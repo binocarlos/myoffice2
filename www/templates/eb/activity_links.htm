@@ -1,0 +1,73 @@
+Activities
+
+{	
+	foreach my $set (@{$c{set_array}})
+	{
+		my $set_id = $set->get_id;
+		my $set_name = $set->js_name;
+		
+		$OUT.=<<"+++";
+
+
+$set_name
++++
+
+		my $thread_array = $set->ensure_child_array('thread');
+		
+		my $count = @$thread_array;
+
+		foreach my $thread (@$thread_array)
+		{
+			my $thread_id = $thread->get_id;
+			my $thread_name = $thread->name;
+
+			$thread_name =~ s/'/\\'/g;
+		
+			my $activity_array = $thread->get_child_array('activity');		
+			my $variation_thread_array = $thread->get_child_array('thread');					
+
+			$OUT.=<<"+++";
+
+
+            $thread_name
+			
++++
+		
+			foreach my $activity (@$activity_array)
+			{
+				my $id = $activity->get_id;
+				my $name = $activity->name;
+				my $vactivity_array = $activity->get_child_array('activity');				
+				
+				my $width = $activity->width;
+				my $height = $activity->height;		
+
+				$name =~ s/'/\\'/g;
+
+				$OUT.=<<"+++";
+                                       $name - ($id, $width, $height)
++++
+
+				foreach my $vactivity (@$vactivity_array)
+				{
+					my $vid = $vactivity->get_id;
+					my $vname = $vactivity->name;
+					my $website = $c{org}->get_child('website', $vactivity->website_id);
+					
+					my $width = $vactivity->width;
+					my $height = $vactivity->height;												
+
+					$vname =~ s/'/\\'/g;
+					
+					$vname .= ' - '.$website->name.' Variation';
+
+					$OUT.=<<"+++";
+			                            $vname - ($vid, $width, $height)
++++
+				}
+			}
+		}
+	}
+}
+
+

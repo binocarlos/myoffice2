@@ -1,0 +1,455 @@
+<script>
+	var folders = new Object();
+	var resources = new Object();
+
+	var item_count = 0;
+
+	var original_description = '';
+
+	var selected_item_id = null;
+	var selected_item_mode = null;
+
+	var select_colors = new Object();
+
+	select_colors.selected = new Object();
+	select_colors.selected.bgColor = '#FFECCC';
+	select_colors.selected.border = '1px solid #FBAF2D';
+
+	function new_folder(id, title, created, notes, editable)
+	\{
+		var folder = new Object();
+
+		folder.id = id;
+		folder.title = title;
+		folder.created = created;
+		folder.notes = notes;
+		folder.editable = editable;
+		folder.itemtype = 'folder';
+
+		item_count++;
+
+		folders[folder.id] = folder;
+	\}
+
+	function new_resource(id, title, created, modified, mime, users_id, notes, keywords, size, editable)
+	\{
+		var resource = new Object();
+
+		resource.id = id;
+		resource.title = title;
+		resource.created = created;
+		resource.modified = modified;
+		resource.mime = mime;
+		resource.users_id = users_id;
+		resource.notes = notes;
+		resource.keywords = keywords;
+		resource.size = size;
+		resource.editable = editable;
+		resource.itemtype = 'resource';
+
+		item_count++;
+
+		resources[resource.id] = resource;
+	\}
+
+{
+	my @folderarr = @{$c{folder_array}};
+
+	foreach my $folder (@folderarr)
+	{
+		my $id = $folder->get_id;
+
+		my $title = $folder->get_value('title');
+		my $created = $folder->get_created_title;
+		my $notes = $folder->get_notes_js_title;
+		my $editable = $c{user}->can_edit_item($folder, 1);
+
+		$title =~ s/'/\\'/g;
+
+		$OUT.=<<"+++";
+new_folder($id, '$title', '$created', '$notes', $editable);
++++
+	}
+
+	my $resourcearr = $c{resource_array};
+
+	foreach my $resource (@$resourcearr)
+	{
+		my $id = $resource->get_id;
+		my $title = $resource->get_value('title');
+		my $created = $resource->get_created_title;
+		my $modified = $resource->get_modified_title;
+		my $users_id = $resource->get_value('users_id');
+		my $mime = $resource->get_mime_title;
+		my $notes = $resource->get_notes_js_title;
+		my $keywords = $resource->get_keywords_js_title;
+		my $size = $resource->get_size_title;
+		my $editable = $c{user}->can_edit_item($resource, 1);
+
+		$title =~ s/'/\\'/g;
+
+		$OUT.=<<"+++";
+new_resource($id, '$title', '$created', '$modified', '$mime', $users_id, '$notes', '$keywords', '$size', $editable);
++++
+	}
+}
+
+	function get_resource_description(resource_id)
+	\{
+		var resource_obj = resources[resource_id];
+
+		var users_title = top.get_user_title(resource_obj.users_id);
+
+		var text = 	'<b>' + resource_obj.title + '</b><br>'
+				+	resource_obj.mime + '<p>'
+				+	'Created By:<br>' + users_title + '<p>'
+				+	'Modified:<br>' + resource_obj.modified + '<p>'
+				+	'Size: ' + resource_obj.size + '<p>'
+				+	'Keywords: <br>' + resource_obj.keywords + '<p>'
+				+	resource_obj.notes + '<p>'
+				+	'<a href="javascript:remove_item();" class="recycle">Remove Resource</a><br>'
+				+	'<a href="javascript:restore_item();" class="recycle">Restore</a>';
+
+		return text;
+	\}
+
+	function get_folder_description(folder_id)
+	\{
+		var folder_obj = folders[folder_id];
+
+		var text = 	'<b>' + folder_obj.title + '</b><br>'
+				+	'Resource Folder<p>'
+				+	'Created:<br>' + folder_obj.created + '<p>'
+				+	folder_obj.notes + '<p>'
+				+	'<a href="javascript:remove_item();" class="recycle">Remove Folder</a><br>'
+				+	'<a href="javascript:restore_item();" class="recycle">Restore</a>';
+
+		return text;
+	\}
+
+	function set_description(text)
+	\{
+		document.getElementById('description').innerHTML = text;
+	\}
+
+	function reset_description()
+	\{
+		document.getElementById('description').innerHTML = original_description;
+	\}
+
+	function select_item_td(id, mode, key)
+	\{
+		selected_item_mode = mode;
+		selected_item_id = id;
+
+		var td_id = mode + id;
+
+		var elem = document.getElementById(td_id);
+
+		if(!key)
+		\{
+			key = 'selected';
+		\}
+
+		var color_obj = select_colors[key];
+
+		elem.bgColor = color_obj.bgColor;
+		elem.style.border = color_obj.border;
+	\}
+
+	function select_resource(resource_id)
+	\{
+		deselect_item();
+
+		var resource = resources[resource_id];
+
+		select_item_td(resource_id, 'resource');
+
+		set_description(get_resource_description(resource_id));
+
+		event.cancelBubble = true;
+	\}
+
+	function select_folder(folder_id)
+	\{
+		deselect_item();
+
+		var folder = folders[folder_id];
+
+		select_item_td(folder_id, 'folder');
+
+		set_description(get_folder_description(folder_id));
+
+		event.cancelBubble = true;
+	\}
+
+	function deselect_item()
+	\{
+		var item_id = selected_item_id;
+
+		if(item_id>0)
+		\{
+			var mode = selected_item_mode;
+
+			if(mode)
+			\{
+				var item_td = document.getElementById(mode + item_id);
+
+				item_td.bgColor = '';
+				item_td.style.border = '1px solid #ffffff';
+			\}
+		\}
+
+		reset_description();
+	\}
+
+	function remove_all()
+	\{
+		if(item_count>0)
+		\{
+			var check = window.confirm('Are you sure you want to delete these ' + item_count + ' items?');
+
+			if(check)
+			\{
+				var new_loc = href + '&method=resources_empty_recycle_bin&view_org_id={$c{params}->{view_org_id}}';
+
+				window.location = new_loc;
+			\}
+		\}
+	\}
+
+	function restore_all()
+	\{
+		if(item_count>0)
+		\{
+			var check = window.confirm('Are you sure you want to restore these ' + item_count + ' items?');
+
+			if(check)
+			\{
+				var new_loc = href + '&method=resources_restore_recycle_bin&view_org_id={$c{params}->{view_org_id}}';
+
+				window.location = new_loc;
+			\}
+		\}
+	\}
+
+	function remove_item()
+	\{
+		if(selected_item_id>0)
+		\{
+			var title = 'Folder';
+
+			if(selected_item_mode=='resource')
+			\{
+				title = 'Resource';
+			\}
+
+			var check = window.confirm('Are you sure you want to remove this ' + title + '?');
+
+			if(check)
+			\{
+				var new_loc = href + '&method=resources_remove_item&security_type=' + selected_item_mode;
+				new_loc += '&item_id=' + selected_item_id;
+
+				window.location = new_loc;
+			\}
+		\}
+	\}
+
+	function restore_item()
+	\{
+		if(selected_item_id>0)
+		\{
+			var title = 'Folder';
+
+			if(selected_item_mode=='resource')
+			\{
+				title = 'Resource';
+			\}
+
+			var check = window.confirm('Are you sure you want to restore this ' + title + '?');
+
+			if(check)
+			\{
+				var new_loc = href + '&method=resources_restore_item&security_type=' + selected_item_mode;
+				new_loc += '&item_id=' + selected_item_id;
+
+				window.location = new_loc;
+			\}
+		\}
+	\}
+
+	top.reset_selected_item();
+	top.entered_recycle_bin();
+
+	document.body.onclick = deselect_item;
+</script>
+<style>
+a.recycle \{color:#0000FF\}
+a.recycle:hover \{color:#FF0000\}
+</style>
+
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+<link rel="STYLESHEET" type="text/css" href="/lib/contextmenu/contextmenu.css">
+<!--<body onload="body_loaded();" oncontextmenu="contextForBody(this)">-->
+<body>
+<script src="/lib/contextmenu/contextmenu.js"></script>
+<script src="/lib/contextmenu/ieemu.js"></script>
+
+<script>
+function contextForBody(obj)
+\{
+   var eobj,popupoptions
+   popupoptions = [
+   					new ContextItem("Up",function()\{window.location.reload();\},true),
+						new ContextSeperator(),
+						new ContextItem("New Folder",function()\{window.location.reload();\}),
+						new ContextItem("New File",function()\{window.location.reload();\}),
+						new ContextItem("New Web Link",function()\{window.location.reload();\}),
+						new ContextItem("New Note",function()\{window.location.reload();\})
+   				  ]
+   ContextMenu.display(popupoptions)
+\}
+
+</script>
+
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+<TD WIDTH="180" ALIGN="LEFT" VALIGN="TOP" NOWRAP>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+          <td><img src="/images/icons/48/recyclebin.gif" width="48" height="48"></td>
+</tr>
+<tr>
+<td style="font-size:12px;font-weight:bold; padding-top:10px;" height="40" valign="top" align="left">Recycle Bin</td>
+</tr>
+<tr>
+          <td id="description" align=left valign=top>This folder contains items
+            you have deleted. You can either remove or restore each item.<br>
+            <br>
+			<a href="javascript:remove_all();" class="recycle">Empty Recycle Bin</a><br>
+			<a href="javascript:restore_all();" class="recycle">Restore All Items</a>
+          </td>
+</tr>
+</table>
+
+</TD>
+<td width="10"></td>
+<TD ALIGN="center" VALIGN="TOP">
+<table border=0 cellpadding=3 cellspacing=10>
+<tr>
+<!--Folders Here-->
+
+{
+	my $col_count = 0;
+
+	my $folderarr = $c{folder_array};
+
+	foreach my $folder (@$folderarr)
+	{
+		my $title = $folder->title;
+		my $id = $folder->get_id;
+
+		my $src = '';
+		my $link = '';
+		my $end_link = '';
+
+		if(!$c{user}->can_see_item($folder))
+		{
+			next;
+		}
+		else
+		{
+			$src = $folder->get_grey_icon;
+		}
+
+		if($c{user}->can_read_item($folder))
+		{
+			$src = $folder->get_icon;
+
+			$link=<<"+++";
+<a onClick="select_folder($id);" style="cursor:hand;">
++++
+
+			$end_link = '</a>';
+		}
+
+		$OUT.=<<"+++";
+<td width=80 valign=top align=center id="folder$id" style="border:1px solid #ffffff;">$link<img src="$src" width="32" height="32"><br>
+$title$end_link</td>
++++
+		$col_count++;
+
+		if($col_count==5)
+		{
+			$col_count = 0;
+
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+
+	my $resourcearr = $c{resource_array};
+
+	foreach my $resource (@$resourcearr)
+	{
+		my $title = $resource->get_value('title');
+		my $id = $resource->get_id;
+
+		my $src = '';
+		my $link = '';
+		my $end_link = '';
+
+		if(!$c{user}->can_see_item($resource))
+		{
+			next;
+		}
+		else
+		{
+			$src = $resource->get_grey_icon;
+		}
+
+		if($c{user}->can_read_item($resource))
+		{
+			$src = $resource->get_icon;
+
+			$link=<<"+++";
+<a onClick="select_resource($id);"  style="cursor:hand;">
++++
+
+			$end_link = '</a>';
+		}
+
+		$OUT.=<<"+++";
+<td width=80 valign=top align=center id="resource$id" style="border:1px solid #ffffff;">$link<img src="$src" border=0><br>$title$end_link</td>
++++
+
+		$col_count++;
+
+		if($col_count==5)
+		{
+			$col_count = 0;
+
+			$OUT.=<<"+++";
+</tr><tr>
++++
+		}
+	}
+}
+</table>
+</td></tr></table>
+<script>
+			original_description = document.getElementById('description').innerHTML;
+
+{
+	if($c{params}->{tree_reload})
+	{
+		$OUT.=<<"+++";
+top.content.sidebar.content.document.location.reload();
++++
+	}
+}
+</script>

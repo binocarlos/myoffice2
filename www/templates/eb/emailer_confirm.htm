@@ -1,0 +1,127 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+var sentCount = 0;
+
+function startSending(buttonObj)
+\{
+	buttonObj.style.display = 'none';
+	document.loadFrame.document.location = '{$c{href}}&method=emailer_send_next_email';
+\}
+
+function updateMessage(text)
+\{
+	sentCount++;
+	document.getElementById('sentCount').innerText = sentCount;
+	document.getElementById('currentMessage').innerHTML = text;
+	document.getElementById('messageLog').innerHTML = text + '<br><br>' + document.getElementById('messageLog').innerHTML;
+	
+\}
+</script>
+<body>
+
+
+<table border="0" align="center" cellpadding="20" cellspacing="0" style="display:inline;" id="mainTable">
+<tr valign="top">
+<td height="100%" align="center">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="1" bgcolor="#999999">
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">From Address:</TD>
+<TD width="200" ALIGN="LEFT" VALIGN="MIDDLE">{$c{session}->{emailer_from}}
+</TD>
+</TR>
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Subject:</TD>
+<TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{session}->{emailer_subject}}
+</TD>
+</TR>
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">Message Body:</TD>
+</TR>
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">
+<textarea name="message" readonly class="text_field" id="message" style="width:500px;height:320px;" wrap="off">{$c{message}}
+</textarea></TD>
+</TR>
+<TR bgcolor="#D4D0C8" style="padding-bottom:5px;">
+<TD colspan="2" ALIGN="LEFT" VALIGN="top" nowrap style="padding-right:5px;">&nbsp;</TD>
+</TR>
+</TABLE>
+</fieldset>
+
+
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</td>
+<td align="left"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody"><fieldset style="height:100%;">
+sent <strong style="color:#CC0000;font-size:14pt;" id="sentCount">0</strong> of 
+<strong style="color:#CC0000;font-size:14pt;">{$c{rc}}</strong> <br>
+<br>
+<br>
+<input name="Submit" type="submit" class="button" value="START SENDING" onClick="startSending(this);">
+<br> 
+</fieldset></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE>
+<br>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody"><fieldset style="height:100%;">
+<table width="400" border="0" cellspacing="1" cellpadding="0">
+<tr>
+<td align="center" id="currentMessage" style="color:#CC0000;font-weight:bold;"></td>
+</tr>
+<tr>
+<td height=20></td>
+</tr>
+<tr>
+<td align="left" id="messageLog" style="color:#000000;"></td>
+</tr>
+</table>
+<br>
+</fieldset></TD>
+</TR>
+</TABLE></TD>
+</TR>
+</TABLE></td></tr>
+<tr valign="top">
+<td height="100%" colspan="2" align="center">
+<iframe name="loadFrame" id="loadFrame" width=500 height=500 style="width:500px;height:500px;display:none;">
+</iframe>
+</td></tr>
+</table>
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,283 @@
+<script>
+	var statements = new Object();
+	var allStatementArray = new Array();
+	var statementsByTopic = new Object();
+
+	function setStatementDisplay(mode)
+	\{
+		var questionSpan = document.getElementById('questionSpan');
+		var statementTable = document.getElementById('statementTable');
+		var editStatementTable = document.getElementById('editStatementTable');
+		
+		if(mode)
+		\{
+			questionSpan.style.display = 'none';
+			statementTable.style.display = 'none';
+			editStatementTable.style.display = 'inline';
+			//createTable();
+		\}
+		else
+		\{
+			questionSpan.style.display = 'inline';
+			statementTable.style.display = 'inline';
+			editStatementTable.style.display = 'none';					
+		\}
+	\}
+	
+	function addStatement(id, subject_id, topic, section, level, text)
+	\{
+		var statement = new Object();
+		statement.id = id;
+		statement.subject_id = subject_id;
+		statement.topic = topic;
+		statement.section = section;
+		statement.level = level;
+		statement.text = text;
+		
+		statements[statement.id] = statement;
+		
+		var topicArr = statementsByTopic[statement.topic];
+		
+		if(!topicArr)
+		\{
+			topicArr = new Array();
+			statementsByTopic[statement.topic] = topicArr;
+		\}
+		
+		topicArr.push(statement);
+		allStatementArray.push(statement);
+	\}
+	
+	// This sets the statement value to begin the page with
+	
+	function setExistingValue(statementId)
+	\{
+		if(statementId==null) 
+		\{
+			return;
+		\}
+		else
+		\{
+			var statement = statements[statementId];
+			
+			document.question_form.skill_statement_id.value = statement.id;
+		
+			statementChanged(statement.id);
+		\}
+	\}
+	
+	function topicChanged()
+	\{
+		document.question_form.skill_statement_id.value = '';
+		document.getElementById('statementDiv').innerText = '';
+		document.getElementById('statementDesc').innerText = '';
+	\}
+	
+	// the subject changed therefore we need to rebuild the statement options
+	function createTable()
+	\{
+		var subjectFilter = document.getElementById('subject_filter').value;
+		var topicFilter = document.getElementById('topic_filter').value;
+		var levelFilter = document.getElementById('level_filter').value;
+		var searchFilter = document.getElementById('searchFilter').value;
+		
+		var html = '';
+		
+		for(var i=0; i<allStatementArray.length; i++)
+		\{
+			var statement = allStatementArray[i];
+			
+			var subject = statement.subject_id;
+			var topic = statement.topic;
+			var section = statement.section;
+			var level = statement.level;
+			var text = statement.text;
+			
+			var match = true;
+			
+			if(subjectFilter!="-1")
+			\{
+				if(subject!=subjectFilter) \{ match = false; \}
+			\}
+			
+			if(topicFilter!="-1")
+			\{
+				if(topic!=topicFilter) \{ match = false; \}
+			\}
+			
+			if(levelFilter!="-1")
+			\{
+				if(level!=levelFilter) \{ match = false; \}
+			\}						
+			
+			if(searchFilter!="")
+			\{
+				if(text.indexOf(searchFilter)<0) \{ match = false; \}
+			\}
+			
+			if(match)
+			\{
+				var sel = '';
+				
+				if(statement.id==document.question_form.skill_statement_id.value)
+				\{
+					sel = ' bgcolor=#ffffff';
+				\}
+			
+				var level = '';
+			
+				if(statement.level!=null) \{ level = statement.level; \}
+			
+				html += '<table width=100% border=0 cellpadding=3 cellspacing=0 style="border: solid #aaaaaa 1px;">';
+				html += '<tr id="statementTr_' + statement.id + '"' + sel + ' style="cursor:hand;" onClick="statementChanged(' + statement.id + ');"><td align=left width=60>' + statement.subject_id + ' - ' + statement.section + ' - ' + statement.topic + ' (' + level + ')' + '</td>';
+				html += '<td align=left valign=top>' + statement.text + '</td></tr>';
+				html += '</table><br>';			
+			\}
+		\}
+		
+		document.getElementById('statementTableTd').innerHTML = html;
+	\}
+	
+	// changes the statement_of_ability_id in the form when the statement option changes
+	function statementChanged(statementId)
+	\{		
+		var existing_id = document.question_form.skill_statement_id.value;
+		
+		if(parseInt(existing_id)>0)
+		\{
+			var elem = document.getElementById('statementTr_' + existing_id);
+			
+			if(elem)
+			\{
+				elem.bgColor = '';
+			\}
+		\}
+		
+		var statement = statements[statementId];
+		if(!statement) \{ return; \}
+		
+		var subject = statement.subject_id;
+				
+		var level = '';
+			
+		if(statement.level!=null) \{ level = statement.level; \}		
+		
+		document.getElementById('statementDiv').innerHTML = statement.text;
+		document.getElementById('statementDesc').innerHTML = 'Skill = ' + statement.section + ' (' + level + ')';
+		document.question_form.skill_statement_id.value = statement.id;
+		
+		var statementTr = document.getElementById('statementTr_' + statement.id);
+		
+		if(statementTr)
+		\{
+			statementTr.bgColor = '#ffffff';
+		\}
+
+		setStatementDisplay(false);
+	\}
+	
+{
+	$c{org}->load_skill_statements;
+		
+	foreach my $skill (@{$c{org}->ensure_child_array('skill_statement')})
+	{
+		my $id = $skill->get_id;
+		my $subject = $skill->subject;
+		my $topic = $skill->topic_id;
+		my $section = $skill->section;
+		my $level = $skill->level;
+		my $statement = $skill->statement;
+		
+		if($level!~/\w/) { $level = 'null'; }
+		else { $level = "'$level'"; }
+		
+		$statement =~ s/\n/<br>/g;
+		$statement =~ s/'/\\'/g;
+		
+		$OUT.=<<"+++";
+addStatement($id, '$subject', '$topic', '$section', $level, '$statement');		
++++
+	}
+}		
+
+</script>
+<input type="hidden" name="skill_statement_id" id="skill_statement_id" value="{$c{question}->skill_statement_id}">
+<TABLE width="450" BORDER="0" CELLPADDING="0" CELLSPACING="0" id="statementTable">
+  <TR id="topicTr" style="padding-bottom:5px;"> 
+    <TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Attainment Target:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+    <select name="topic_id" id="topic_id" size="1" style="width:350px;" class="text_field" onChange="topicChanged();">{$c{assessment_group}->get_topic_options}</select></TD>
+  </TR>
+  <TR id="levelTr" style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Level:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+    <select name="level" size="1" style="width:350px;" class="text_field">{$c{assessment_group}->get_level_options}</select></TD>
+  </TR>  
+  <TR id="categoryTr" style="padding-bottom:5px;"> 
+    <TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Skill:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" id="categoryTd"><input type="button" class="button" value="Edit" onClick="setStatementDisplay(true);"></TD>
+  </TR>  
+  <TR id="statementTr" style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" colspan=2>
+<div id="statementDesc" style="padding:4px;text-align:left;">&nbsp;</div> 	
+      <div id="statementDiv" style="padding:4px;text-align:left;">&nbsp;</div> 
+    </TD>
+  </TR>  
+</table>
+<br>
+<TABLE width="450" BORDER="0" CELLPADDING="0" CELLSPACING="0" id="editStatementTable" style="display:none;">
+  <TR style="padding-bottom:5px;"> 
+    <TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Subject:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+    <select name="subject_filter" id="subject_filter" size="1" style="width:350px;" class="text_field">
+	{$c{org}->skill_statement_subject_options}
+	</select></TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Topic:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+        <select name="topic_filter" id="topic_filter" size="1" style="width:350px;" class="text_field">
+	{$c{org}->skill_statement_topic_options}
+	
+      </select></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Level:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+        <select name="level_filter" id="level_filter" size="1" style="width:350px;" class="text_field">
+	{$c{org}->skill_statement_level_options}
+	
+      </select></TD>
+  </TR> 
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Search:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">
+        <input type="text" name="searchFilter" id="searchFilter" style="width:350px;"></TD>
+  </TR>   
+  <TR style="padding-bottom:5px;">                               
+	<TD width="100" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">
+	  <input type="button" class="button" value="Cancel" onClick="setStatementDisplay(false);">
+	</TD>
+	<TD ALIGN="right" VALIGN="MIDDLE" nowrap style="padding-right:5px;">
+	  <input type="button" class="button" value="Show Skills" onClick="createTable();">	</TD>	
+  </TR>
+  <TR style="padding-bottom:5px;">                            
+	<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap colspan=2>
+		<div style="width:100%;height:280px;overflow-y:auto;" id="statementTableTd">
+		
+		</div>
+	</TD>
+  </TR>  
+</TABLE>
+<script>
+{
+	if($c{question}->skill_statement_id>0)
+	{
+		my $id = $c{question}->skill_statement_id;
+		
+		$OUT.=<<"+++";
+	statementChanged($id);	
++++
+	}
+}
+</script>

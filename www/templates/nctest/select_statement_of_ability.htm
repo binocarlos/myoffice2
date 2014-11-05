@@ -1,0 +1,226 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+
+// The bottom drop-down depends on the top one's value
+// I.e. the statements are a property of the subjects and
+// when the subject changes - so do the statements
+
+	var subjects = new Object();
+	var statements = new Object();
+	var subjectMap = new Object();
+	
+	function addSubject(id, title)
+	\{
+		var subject = new Object();
+		subject.id = id;
+		subject.title = title;
+
+		subjects[subject.id] = subject;
+	\}
+	
+	function addStatement(id, subject_id, code, text)
+	\{
+		var statement = new Object();
+		statement.id = id;
+		statement.subject_id = subject_id;
+		statement.code = code;
+		statement.text = text;
+		
+		statements[statement.id] = statement;
+		
+		if(subjectMap[subject_id]==null)
+		\{
+			subjectMap[subject_id] = new Array();
+		\}
+		
+		var arr = subjectMap[subject_id];
+		
+		arr[arr.length] = statement;
+	\}
+	
+	// This sets the value to begin the page with
+	
+	function setExistingValue(statementId)
+	\{
+		if(statementId==null) 
+		\{
+			subjectChanged();
+		\}
+		else
+		\{
+			var statement = statements[statementId];
+		
+			document.getElementById('subject_id').value = statement.subject_id;
+		
+			subjectChanged();
+		
+			document.getElementById('statement_id').value = statement.id;
+		
+			statementChanged();
+		\}
+	\}
+	
+	function subjectChanged()
+	\{
+		var subjectId = document.getElementById('subject_id').value;
+		
+		var statementArray = subjectMap[subjectId];
+
+		if(!statementArray) \{ return; \}
+		
+		var html = '<select id="statement_id" size="1" style="width:100%;" class="text_field" onChange="statementChanged();">';
+		
+		for(var i=0; i<statementArray.length; i++)
+		\{
+			var statement = statementArray[i];
+			var subject = subjects[statement.subject_id];
+			
+			html += '<option value="' + statement.id + '">';
+			html += statement.code + ' - ' + subject.title;
+			html += '</option>';
+		\}
+		
+		html += '</select>';
+		
+		document.getElementById('statement_options').innerHTML = html;
+		
+		statementChanged();
+	\}
+	
+	function statementChanged()
+	\{
+		var statementId = document.getElementById('statement_id').value;
+		
+		var statement = statements[statementId];
+		
+		if(!statement) \{ return; \}
+		
+		document.getElementById('statementTd').innerHTML = statement.text;
+	\}
+	
+	function cancel()
+	\{
+		top.returnValue = null;
+		top.close();
+	\}
+	
+	function save()
+	\{
+		var elem = document.getElementById('statement_id');
+		
+		var ret = new Object();
+		
+		ret.id = elem.value;
+
+		var statement = statements[ret.id];
+		var subject = subjects[statement.subject_id];
+		
+		ret.title = statement.code + ' - ' + subject.title;
+		
+		top.returnValue = ret;
+		top.close();		
+	\}
+
+
+{
+	foreach my $statement (@{$c{statement_array}})
+	{
+		my $id = $statement->get_id;
+		my $subject_id = $statement->get_value('subject_id');
+		my $code = $statement->get_value('code');
+		my $text = $statement->get_js_value('statement', 1);
+		
+		$OUT.=<<"+++";
+addStatement($id, '$subject_id', '$code', '$text');
++++
+	}
+	
+	my $subjects = &Webkit::NcTest::NCHub::get_subject_array;
+	
+	foreach my $subject (@$subjects)
+	{
+		my $id = $subject->{code};
+		my $title = $subject->{title};
+		
+		$OUT.=<<"+++";
+addSubject('$id', '$title');
++++
+	}
+}
+</script>
+<body>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="middle">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+                        <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Select Statement Of Ability&nbsp;</FONT></TD>
+<TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD></TR><TR><TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD><TD WIDTH="100%"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0"><TR><TD>
+
+                                
+                              <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                <TR> 
+                                    
+                                  <TD width="100" ALIGN="LEFT" VALIGN="MIDDLE">Subject:</TD>
+                                    
+                                  <TD width="200" ALIGN="LEFT" VALIGN="MIDDLE"> 
+                                    <select id="subject_id" size="1" style="width:100%;" class="text_field" onChange="subjectChanged();">
+									  {$c{subject_options}}
+                                      </select>
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE">Statement:</TD>
+                                    <TD ALIGN="LEFT" VALIGN="MIDDLE" id="statement_options"> 
+                                    </TD>
+                                  </TR>
+                                  <TR> 
+                                    <TD id="statementTd" colspan="2" ALIGN="LEFT" VALIGN="MIDDLE">&nbsp; 
+                                    </TD>
+                                  </TR>
+                                </TABLE>
+
+</TD></TR></TABLE></TD><TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD></TR><TR><TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD></TR></TABLE>
+<br>
+<IMG src="/images/layout/clear.gif" WIDTH="1" HEIGHT="8" BORDER="0"><BR>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+                        <TD ALIGN="LEFT" VALIGN="MIDDLE">&nbsp;</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="button"  value="Cancel" CLASS="button" style="width:75px;" onClick="cancel();">&nbsp; 
+                          <input type="submit" name="button" value="Save Details" CLASS="button" style="width:75px;" onClick="save();">
+                        </TD>
+</TR></TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</td>
+</tr>
+</table>
+<script>
+{
+	my $id = $c{params}->{statement_of_ability_id};
+
+	if(!$id>0) { $id = 'null'; }
+	
+	$OUT.=<<"+++";
+	
+setExistingValue($id);		
+
++++
+}
+</script>
+</body>
+</html>
+
+
+

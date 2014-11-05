@@ -1,0 +1,713 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#D4D0C8;">
+<script>
+	var helptext = new Object();
+	var session_id = '<wk>$session_id</wk>';
+	var keyword_hash = new Object();
+	var new_keyword_id = 1;
+	var currentSection = 'general_info';
+	var event_color_hash = new Object();
+	
+	function addNewEvent(id, color)
+	\{		
+		event_color_hash[id] = color;
+	\}
+{
+	foreach my $event_obj (@{$c{calendar_events}})
+	{
+		my $id = $event_obj->{id};
+		my $color = $event_obj->{color};
+		
+		$OUT.=<<"+++";
+	addNewEvent($id, '$color');	
++++
+	}
+}
+	function multiday_clicked()
+	\{
+		var gui = document.getElementById('multiday');
+		
+		if(gui.checked)
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';		
+			document.getElementById('start_time_table').style.display = 'none';
+			document.getElementById('end_time_table').style.display = 'none';
+			document.getElementById('end_date_table').style.display = 'inline';
+			document.getElementById('all_day_tr').style.display = 'none';
+			
+			document.getElementById('end_date').value = document.getElementById('start_date').value;
+		\}
+		else
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';		
+			document.getElementById('end_date_table').style.display = 'none';
+			document.getElementById('all_day_tr').style.display = 'inline';		
+			
+			if(document.getElementById('all_day').checked)
+			\{
+				document.getElementById('start_time_table').style.display = 'none';			
+				document.getElementById('end_time_table').style.display = 'none';
+			\}
+			else
+			\{
+				document.getElementById('start_time_table').style.display = 'inline';			
+				document.getElementById('end_time_table').style.display = 'inline';			
+			\}
+
+		\}		
+	\}
+	
+	function all_day_clicked()
+	\{
+		var gui = document.getElementById('all_day');
+		
+		if(gui.checked)
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';		
+			document.getElementById('start_time_table').style.display = 'none';
+			document.getElementById('end_time_table').style.display = 'none';
+			document.getElementById('end_date_table').style.display = 'none';
+		\}
+		else
+		\{
+			document.getElementById('start_date_table').style.display = 'inline';
+			document.getElementById('start_time_table').style.display = 'inline';
+			document.getElementById('end_time_table').style.display = 'inline';
+			document.getElementById('end_date_table').style.display = 'none';
+		\}
+	\}
+
+	function event_type_changed(gui)
+	\{
+		var gui = document.getElementById('event_type');
+		var color = event_color_hash[gui.value];
+		
+		if(color==null) \{ color = '#cccccc'; \}
+		
+		document.getElementById('event_bg').bgColor = color;
+	\}
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}
+	
+	function uploadedOk()
+	\{
+
+	\}
+
+	function new_keyword(id, word, value)
+	\{
+		if(!id)
+		\{
+			id = 'new' + new_keyword_id;
+			new_keyword_id++;
+		\}
+
+		var keyword = new Object();
+		keyword.id = id;
+		keyword.word = word;
+		keyword.value = value;
+
+		keyword_hash[keyword.id] = keyword;
+	\}
+{
+	foreach my $keyword (@{$c{keyword_array}})
+	{
+		my $id = $keyword->get_id;
+		my $word = $keyword->word;
+		my $value = $keyword->value;
+
+		$OUT.=<<"+++";
+new_keyword($id, '$word', '$value');
++++
+	}
+}
+
+	function get_keywords_packet()
+	\{
+		var packet = "<keywords>\n";
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			packet += "<keyword id=\"" + keyword.id + "\" word=\"" + keyword.word + "\" value=\"" + keyword.value + "\"";
+
+			if(keyword.deleted)
+			\{
+				packet += " deleted=\"true\"";
+			\}
+
+			packet += "/>\n";
+		\}
+
+		packet += "</keywords>";
+
+		return packet;
+	\}
+
+	function create_keyword()
+	\{
+		var new_word = document.getElementById('new_word');
+		var existing_word = document.getElementById('existing_word');
+		var value = document.getElementById('keyword_value');
+
+		var word = '';
+
+		if(new_word.value!='')
+		\{
+			word = new_word.value;
+		\}
+		else
+		\{
+			word = existing_word.value;
+		\}
+
+		if(word=='')
+		\{
+			form_error('Please enter a keyword');
+			return;
+		\}
+
+		if(value.value=='')
+		\{
+			form_error('Please enter a value');
+			return;
+		\}
+
+		new_keyword(null, word, value.value);
+
+		apply_keyword_table();
+
+		new_word.value = '';
+		value.value = '';
+	\}
+
+	function apply_keyword_table()
+	\{
+		var html = get_keyword_table();
+
+		document.getElementById('keywords_td').innerHTML = html;
+	\}
+
+	function delete_keyword(id)
+	\{
+		var keyword = keyword_hash[id];
+
+		keyword.deleted = true;
+
+		apply_keyword_table();
+	\}
+
+	function get_keyword_table()
+	\{
+		var table = '<table width=100% border=0 cellspacing=0 cellpadding=0>';
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				var keyword_row = 	'<tr><td align=left valign=bottom class="dottedline">'
+								+ '<font class="keyword">' + keyword.word + ' = '
+								+	keyword.value + '&nbsp;</font></td>'
+								+	'<td align=right width=16>'
+								+	'<a style="cursor:hand;" onClick="delete_keyword(\'' + keyword.id + '\');">'
+								+	'<img alt="Delete Keyword" src="/images/icons/16/recyclebin.gif" width=16 height=16 border=0>'
+								+	'</a></td></tr>';
+
+				table += keyword_row;
+			\}
+		\}
+
+		table += '</table>';
+
+		return table;
+	\}
+
+	function author_changed(select)
+	\{
+		var sel = select.selectedIndex;
+
+		if(sel>0)
+		\{
+			var author_text = select.options[sel].text;
+
+			document.resourceform.author.value = author_text;
+		\}
+	\}
+
+	function calendar_person_changed(select)
+	\{
+		var sel = select.selectedIndex;
+		var value = select.options[sel].value;
+		
+		if(value!="-1")
+		\{
+			var splitArr = value.split(':');
+
+			document.resourceform.calendar_person.value = splitArr[1];
+			document.resourceform.calendar_person_id.value = splitArr[0];
+		\}
+	\}
+
+	function validate_resourceform()
+	\{
+		var ret = true;
+		var form = document.resourceform;
+		var required_texts = new Array('title');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+
+			if(form[field])
+			\{
+				var value = form[field].value;
+
+				if((value=='')&&(form.type.value!='file'))
+				\{
+					form_error('You must supply a ' + field + ' value.');
+					form[field].className = 'text_field2';
+					ret = false;
+				\}
+			\}
+		\}
+
+		if(form.resource_id.value=='')
+		\{
+			if(form.file)
+			\{
+				if((form.file.value=='')&&(form.type.value=='file'))
+				\{
+					form_error('You must choose a file to upload');
+					ret = false;
+				\}
+			\}
+		\}
+
+		if(ret)
+		\{
+			//form.keywords_packet.value = get_keywords_packet();
+			//submit_security_form();
+			form_error('Saving {$c{resource}->get_item_title} Details ........');
+		\}
+
+		//document.getElementById('tabPane1').style.display = 'none';
+		//document.getElementById('save_button').style.display = 'none';
+
+		return ret;
+	\}
+
+	function do_cancel()
+	\{
+		top.close();
+	\}
+
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+		setTimeout("clear_form_error();", 10000);
+	\}
+
+	function clear_form_error()
+	\{
+		document.all('error_span').innerText = '';
+	\}
+
+	function existing_value_changed(select)
+	\{
+		var value = select.value;
+
+		if(value!="-1")
+		\{
+			document.getElementById('keyword_value').value = value;
+		\}
+	\}
+
+	function existing_keyword_changed(select)
+	\{
+		var value = select.value;
+
+		var option_text = '<select onChange="existing_value_changed(this);" size="1" style="width:140px;" class="text_field" name="existing_value" id="existing_value">';
+		option_text += '<option value="-1">&#151;&#151;&#151;&#151;&#151;</option>';
+
+		if(value!="-1")
+		\{
+			var arr = keyword_values[value];
+
+			if(arr)
+			\{
+				for(var i=0; i<arr.length; i++)
+				\{
+					var value = arr[i];
+
+					option_text += '<option value="' + value + '">' + value + '</option>';
+				\}
+			\}
+		\}
+
+		option_text += '</select>';
+
+		document.getElementById('existing_value_span').innerHTML = option_text;
+	\}
+	
+	function extra_option_changed(gui, text_id)
+	\{
+		var value = gui.value;
+		
+		if((value!='')&&(value!='-1'))
+		\{
+			document.getElementById(text_id).value = value;
+		\}
+	\}
+	
+	function show_calendar_clicked(gui)
+	\{
+		var gui = document.getElementById('show_calendar');
+		
+		var displaySt = 'none';
+		
+		if(gui.checked)
+		\{
+			displaySt = 'inline';
+		\}
+		
+		document.getElementById('date_table').style.display = displaySt;
+	\}
+
+</script>
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="resourceform" onSubmit="return validate_resourceform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_resource_form_submit">
+<input type="hidden" name="type" value="{$c{resource}->get_type}">
+<input type="hidden" name="keywords_packet" value="">
+<input type="hidden" name="resource_id" value="{$c{resource}->get_id}">
+<input type="hidden" name="access_code" id="access_code" value="{$c{resource}->access_code}">
+<input type="hidden" name="from_website" value="{$c{params}->{from_website}}">
+<input type="hidden" name="auto_folder_value" value="{$c{params}->{auto_folder_value}}">
+<input type="hidden" name="privilage_packet" id="privilage_packet" value="">
+<input type="hidden" name="calendar_person_id" id="calendar_person_id" value="{$c{resource}->users_id}">
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">		
+
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top><select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="general_info" selected>General Info</option>
+
+{
+	if(!$c{resource}->exists)
+	{
+		$OUT.=<<"+++";
+
+<option value="repeat_info">Repeat</option>
+
++++
+	}
+}
+
+</select></td>
+<td align="left" valign=top>
+<!--
+
+
+	RESOURCE DETAILS
+	
+	
+	-->
+<span id="general_info_section" style="display:inline;">
+	<b>Event Info{$c{resource}->calendar_all_day}</b><br>
+<br>
+            <table width="96%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+              <tr style="padding-bottom:5px;">
+                <td align="RIGHT">Title:&nbsp;</td>
+<td width="100%" align="LEFT">
+<input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="title" value="{$c{resource}->get_value('title')}" style="width:100%;"></td>
+</tr>
+<tr><td height=10></td>
+</tr>
+ <tr style="padding-bottom:5px;">
+                <td align="RIGHT">Job.No:&nbsp;</td>
+<td width="100%" align="LEFT">
+<input name="job_number" type="TEXT" class="text_field" id="job_number" style="width:100%;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{resource}->jobno}"></td>
+</tr>
+<tr><td height=20></td>
+</tr>
+<tr><td colspan=2>
+{
+	my $start_datetime = $c{resource}->start_datetime;
+	my $end_datetime = $c{resource}->end_datetime;
+	
+	if(!$start_datetime)
+	{
+		$start_datetime = Webkit::DateTime->now;
+		$start_datetime->Hour(9);
+		$start_datetime->Min(0);
+	}
+	
+	if(!$end_datetime)
+	{
+		$end_datetime = $start_datetime->clone;
+		$end_datetime->Hour(17);
+		$end_datetime->Min(0);
+	}
+	
+	my $include_checked = '';
+	my $table_display = 'none';
+	
+	my $start_date_st = '';
+	my $end_date_st = '';
+	my $start_hour = '';
+	my $start_min = '';
+	my $end_hour = '';
+	my $end_min = '';
+	
+	$start_date_st = $start_datetime->get_calendar_string;
+	$start_hour = $start_datetime->Hour;
+	$start_min = $start_datetime->Min;
+	
+	$end_date_st = $end_datetime->get_calendar_string;
+	$end_hour = $end_datetime->Hour;
+	$end_min = $end_datetime->Min;
+	
+	if($c{resource}->is_in_calendar)
+	{
+		$include_checked = ' CHECKED';
+		$table_display = 'inline';
+	}
+	
+	my $person = $c{resource}->calendar_person;
+	
+	my $all_day_checked = $c{resource}->calendar_all_day_checked;
+	my $multiday_checked = $c{resource}->calendar_multiday_checked;
+	
+	if($c{params}->{set_start_date}=~/\w/)
+	{
+		$start_date_st = $c{params}->{set_start_date};
+	}
+	
+	$OUT.=<<"+++";
+	<input type="hidden" name="show_calendar" value="yes">
+<table border="0" cellpadding="0" cellspacing="0" style="display:inline;" id="date_table">
+<tr>
+<td><table  border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="60">Event Type: </td>
+<td width="240"><select name="event_type" size="1" class="text_field" id="event_type" style="width:100%;" onFocus="" onBlur="" onChange="event_type_changed(this);">
+{$c{event_options}}
+</select></td>
+<td></td>
+<td width="25" id="event_bg">&nbsp;</td>
+</tr>
+</table>
+<br>
+<table  border="0" cellspacing="0" cellpadding="0">
+<tr style="padding-bottom:5px;">
+                <td width="60" align="left"> Person:&nbsp;</td>
+            <td align="LEFT"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                <td width=240><select name="calendar_person_select" size="1" onChange="calendar_person_changed(this);" style="width:100%;" class="text_field" onFocus="" onBlur="">{$c{calendar_user_options}}
+                    </select></td>
+                  <td width=140><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="calendar_person" value="$person" style="width:100%;"></td>
+                </tr>
+</table></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td height=10>
+
+</td>
+</tr>
+<tr>
+<td height=10>
+<input type="checkbox" id="multiday" name="multiday" value="yes" onClick="multiday_clicked(this);" $multiday_checked>
+<label for=multiday>Event Spans Several Days?</label></td>
+</tr>
+<tr>
+<td height=10>
+
+</td>
+</tr>
+<tr id="all_day_tr">
+<td height=10>
+<input type="checkbox" id="all_day" name="all_day" value="yes" onClick="all_day_clicked(this);" $all_day_checked>
+<label for=all_day>All Day Event?</label></td>
+</tr>
+<tr>
+<td height=10>
+
+</td>
+</tr>
+<tr>
+<td>
+<table  border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" id="start_date_table">
+<tr style="padding-bottom:5px;">
+<td width="80" align="RIGHT"> Start Date:</td>
+<td align="LEFT"><input name="start_date" type="TEXT" class="text_field" id="start_date" style="width:100px;" value="$start_date_st"></td>
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('start_date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
+</tr>
+</table>
+</td>
+<td width="30">&nbsp;</td>
+<td>
+<table border=0 cellpadding="0" cellspacing="0" id="start_time_table">
+<tr>
+<td width="60" align="LEFT">Start Time:</td>
+<td align="LEFT"><input name="start_hour" type="TEXT" class="text_field" id="start_hour" style="width:25px;text-align:right;" value="$start_hour"></td>
+<td width=10 align=center><b>:</b></td>
+<td align="LEFT"><input name="start_min" type="TEXT" class="text_field" id="start_min" style="width:25px;text-align:right;" value="$start_min"></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td height=10 colspan=3></td>
+</tr>
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" id="end_date_table">
+<tr style="padding-bottom:5px;">
+<td width="80" align="RIGHT"> End Date:</td>
+<td width="80" align="LEFT"><input name="end_date" type="TEXT" class="text_field" id="end_date" style="width:100px;" value="$end_date_st"></td>
+<td align="LEFT"><A ONCLICK="calendar_click(document.getElementById('end_date'));"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
+</tr>
+</table>
+</td>
+<td>&nbsp;</td>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" id="end_time_table">
+<td width="60" align="LEFT">End Time:</td>
+<td align="LEFT"><input name="end_hour" type="TEXT" class="text_field" id="end_hour" style="width:25px;text-align:right;" value="$end_hour"></td>
+<td align=center width=10><b>:</b></td>
+<td align="LEFT"><input name="end_min" type="TEXT" class="text_field" id="end_min" style="width:25px;text-align:right;" value="$end_min"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
++++
+}
+</td>
+</tr>
+<tr><td height=20></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="RIGHT" valign="top">Notes:&nbsp;</td>
+<td align="LEFT"><textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="notes" style="width:100%; height:140px;">{$c{resource}->get_value('notes')}</textarea></td>
+</tr>
+</table>
+</span>
+
+{
+	if(!$c{resource}->exists)
+	{
+		$OUT.=<<"+++";
+	<span id="repeat_info_section" style="display:none;">
+	<b>Repeat Event</b><br>
+<br>
+<table  border="0" cellspacing="0" cellpadding="0">
+<tr style="padding-bottom:5px;">
+<td width="120" align="left"> Repeat Event? </td>
+<td width="240" align="LEFT"><input type="checkbox" id="should_repeat" name="should_repeat" value="yes"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan="2" align="left" height=10></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td width="120" align="left"> Repeat Every:&nbsp;</td>
+<td width="240" align="LEFT"><select name="repeat_every" size="1" style="width:100%;" class="text_field" onFocus="" onBlur="">
+<option value="day">Day</option>
+<option value="week">Week</option>
+<option value="fortnight">Fortnight</option>
+<option value="month">Month</option>
+<option value="year">Year</option>
+</select></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan="2" align="left" height=10></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td align="left">No. Times:</td>
+<td align="LEFT"><select name="repeat_for" size="1" style="width:100%;" class="text_field" onFocus="" onBlur="">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+</select></td>
+</tr>
+</table>
+
+	</span>
++++
+	}
+}
+</td>
+</tr>
+<tr>
+<td colspan=2>
+
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="100%">
+<tr>
+<td align="LEFT" valign="TOP" style="padding-top:12px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{resource}->{error_text}}</span></font></td>
+<td align="RIGHT" valign="TOP">
+<input type="submit" value="Save" class="button" name="submit" style="width:75px;" id="save_button"><input type="button" value="Cancel" class="button2" name="Button" onClick="do_cancel();" style="width:75px;">
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</form>
+
+<script>
+		//setupAllTabs();
+
+		event_type_changed();
+		all_day_clicked();
+		multiday_clicked();
+
+</script>
+{$c{calendar}}
+</body>

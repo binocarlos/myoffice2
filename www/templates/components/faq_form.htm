@@ -1,0 +1,104 @@
+<!--#include virtual="../queryhandler/temp_include.htm" -->
+
+<script>
+	function do_cancel()
+	\{
+		var cancel_method = '{$c{cancel_method}}';
+		
+		if(cancel_method!='')
+		\{
+			var new_loc = href + '&method=' + cancel_method;
+			
+			document.location = new_loc;
+		\}
+	\}
+
+	function validate_faqform()
+	\{
+		var ret = true;
+		var form = document.faqform;
+		var required_texts = new Array('question', 'answer');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			\{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			\}
+		\}
+
+		return ret;
+	\}
+	
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+	\}
+
+</script>
+	 
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%" WIDTH="100%">
+<TR>
+	 
+<TD ALIGN="CENTER" VALIGN="top">
+<form method="POST" action="{$c{script}}" style="margin:0;" name="faqform" onSubmit="return validate_faqform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="faq_id" value="{$c{faq}->get_id}">
+<table border="0" width="100%" cellpadding="0" cellspacing="0" class="panelouter">
+<tr>
+<td valign="top">				 
+<table width="100%" border="0" cellpadding="8" cellspacing="0" class="panelinner">
+<tr>
+<td class="panelbody">
+<fieldset>
+<legend>FAQ Details</legend>
+<div class="seccontent">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT" style="padding-top:4px;">Position:&nbsp;</td>
+<td align="LEFT" width="100%"><select size="1" style="width:100%;" class="text_field" name="position">{$c{position_options}}</select>
+</td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT" style="padding-top:4px;">Question:&nbsp;</td>
+<td align="LEFT" colspan="3"><textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="question" style="width:100%; height:155px;">{$c{faq}->get_value('question')}</textarea></td>
+</tr>
+<tr valign="top" style="padding-bottom:5px;">
+<td align="RIGHT">Answer:&nbsp;</td>
+<td align="LEFT" colspan="3"><textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="answer" style="width:100%; height:160px;">{$c{faq}->get_value('answer')}</textarea></td>
+</tr>
+</table>
+</div>
+</fieldset>
+<img src="/images/clear.gif" width="1" height="8" border="0"><br>
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="100%">
+<tr>
+<td align="LEFT" valign="TOP"><font color="red"><b id="error_span">{$c{faq}->{error_text}}</b></font></td>
+<td align="RIGHT" valign="TOP"><input type="submit" value="{$c{submit_title}}" class="button" name="submit"><img src="/images/clear.gif" width="8" height="1" border="0"><input type="button" value="Cancel" class="button" name="Button" onClick="do_cancel();" style="width:75px;"></td>
+</tr>
+</table>
+</td>
+</tr>
+				 
+</table>
+</table>
+</form>
+</TD>
+{
+	if($c{extra_faq_form})
+	{
+		$OUT.=<<"+++";
+<td width="10"><img src="/images/clear.gif" width="10" height="1" border="0"></td>
+<TD ALIGN="CENTER" VALIGN="top" width="350">$c{extra_faq_form}</TD>
++++
+	}
+}
+</TR>
+			
+</TABLE>

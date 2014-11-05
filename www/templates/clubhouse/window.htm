@@ -1,0 +1,152 @@
+<HTML>
+  <HEAD>
+	 <TITLE>{$c{org}->get_value('name')} Clubhouse</TITLE>
+		<link rel="stylesheet" type="text/css" href="/lib/app.css">
+		<script src="/lib/hidestatus.js"></script>
+		<script src="/lib/error.js"></script>
+		<script>
+window.focus();
+window.moveTo(0,0);
+window.resizeTo(screen.availWidth, screen.availHeight);
+
+var href = '{$c{href}}';
+var hostname = '{$c{hostname}}';
+var session_id = '{$c{session_id}}';
+var help_domain = '{$c{help_domain}}';
+{
+if(!$c{session_id})
+{
+		$OUT.=<<"+++";
+var accounttype = 'login';
+var appname = 'login';
++++
+}
+elsif($c{user}->admin)
+{
+		$OUT.=<<"+++";
+var accounttype = 'admin';
+var appname = '$c{app_name}';
++++
+}
+else
+{
+		$OUT.=<<"+++";
+var accounttype = 'user';
+var appname = '$c{app_name}';
++++
+}
+}
+			var pages_frame_mode = true;
+			
+			function get_menu_query(query)
+			\{
+				var new_loc = href + query;
+
+				document.content.location = new_loc;
+			\}
+			
+			function get_iframe_query(query)
+			\{
+				var new_loc = '/wkhtml/iframe_title_frame/?session_id=' + session_id;
+				new_loc += query;
+				
+
+
+				document.content.location = new_loc;
+			\}
+						
+		function toggle_pages_frame()
+		\{
+			var cols = '200,*';
+			var title = 'Hide';
+			
+			pages_frame_mode = !pages_frame_mode;
+			
+			if(!pages_frame_mode)
+			\{
+				cols = '0,*';
+				title = 'Show';
+			\}
+			
+			if(document.content.document.all.siteeditor_frameset)
+			\{
+				document.getElementById('pages_frameset_title').innerText = title;
+				document.content.document.all.siteeditor_frameset.cols = cols;
+			\}
+		\}
+		
+		
+			function application_logout()
+			\{
+				get_menu_query('&method=iframe_title_frame&title=Log Out&frame_method=log_out');
+			\}
+
+			
+			function close_window()
+		  \{
+		  //  event.returnValue = "Clicking OK will close the application that you are using.";
+		  \}
+			</script>
+
+	</HEAD>
+<body style="background:#D4D0C8; border:0px; margin:0px;" onload="loading.style.display='none'; set_status('Done', true);" onBeforeUnload="close_window();">
+<DIV ID="loading" STYLE="top:2000px;display:block; width:100%; height:100%; background-color:#D4D0C8; position:absolute; bottom:20px;"><TABLE WIDTH="100%" HEIGHT="100%" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE"><B>Loading...</B></TD></TR></TABLE></DIV>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD><TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="21" BORDER="0"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">{$c{menu}}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+				 <TR>
+					<TD>
+					 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR>
+							<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+							<A ONCLICK="application_logout(); set_status('Log Out', true);" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;" TITLE="Log Out {$c{user}->get_value('firstname')}..."><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A>
+							<IMG src="/images/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+							<A ONCLICK="get_menu_query('&method=siteeditor_home&appname=siteeditor'); set_status('Home', true);" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;" TITLE="Home"><IMG SRC="/images/menus/but_home.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp;Home</A>
+							<IMG src="/images/clear.gif" WIDTH="5" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE">
+							<A id="hide_pages_button" ONCLICK="toggle_pages_frame();" onMouseOver="this.className='buttonouter';" onMouseOut="this.className='buttonoff';" CLASS="buttonoff" style="padding:4px;display:none;"><IMG SRC="/images/tools/showpages_large.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp;&nbsp;<span id="pages_frameset_title">Hide</span> Pages</A>
+							</TD>
+							<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent">{$c{org}->get_logo_tag}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3" COLSPAN="2"><IMG src="/images/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%"><IFRAME SRC="{$c{href}}&method=siteeditor_home&appname=siteeditor" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="no" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME><!--<IFRAME SRC="{$c{href}}&method=iframe_title_frame&title=Home+Page&frame_method=home_page" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="no" FRAMEBORDER="yes" STYLE="display:block;"></IFRAME>--></TD></TR></TABLE></TD>
+	 </TR>
+<!--
+	 <TR>
+		<TD HEIGHT="3" COLSPAN="2"><IMG src="/images/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="18" COLSPAN="2"><TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+	 <TR>
+		<TD CLASS="insetouter">&nbsp;<span id="status_text">Loading...</span></TD>
+		<TD WIDTH="2"></TD>
+		<TD WIDTH="12" CLASS="insetouter"><a onclick="get_menu_query('&method=iframe_title_frame&title=About&frame_method=about_home'); set_status('About', true);"><IMG src="/images/secure.gif" WIDTH="12" HEIGHT="15" BORDER="0" STYLE="margin-left:3px; margin-right:3px; margin-top:1px; margin-bottom:1px;"></a></TD>
+	 	<TD WIDTH="2"></TD>
+	 	<TD WIDTH="18" CLASS="insetouter">&nbsp;</TD>
+	 </TR>
+	</TABLE></TD>
+	 </TR>
+-->
+	</TABLE>
+</body>
+</HTML>

@@ -1,0 +1,78 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+
+	function validate_searchform()
+	\{
+		var form = document.searchform;
+		
+		if(form.search.value=='')
+		\{
+			alert('Please enter a search term');
+			
+			return false;
+		\}
+		
+		return true;
+	\}
+
+</script>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%" HEIGHT="100%">
+<TR>
+    <TD height="1"> 
+      <form method="GET" action="{$c{script}}" style="margin:0;" name="searchform">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="easemail_search_members">
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter" WIDTH="100%">
+<TR>
+<TD WIDTH="100%">
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset>
+                    <legend>Search Members of {$c{list_title}}</legend>
+                    <div class="seccontent">
+                      <table  border="0" cellpadding="0" cellspacing="0">
+                        <tr> 
+                          <td align="RIGHT">&nbsp;&nbsp;Address:&nbsp;</td>
+                          <td align="LEFT">
+                            <input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="search" value="{$c{params}->{search}}" style="width:200px;">
+                          </td>
+                          <td align="RIGHT">&nbsp;From:</td>
+                          <td align="LEFT" width=120> 
+                            <input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="from" value="{$c{from}}" style="width:100%;">
+                          </td>
+                          <td align="LEFT">&nbsp; 
+                            <input type="submit" value="Search" class="button" style="width:75px;height:19px;">
+                          </td>
+                        </tr>
+                        <tr> 
+                          <td colspan="2" align="RIGHT">&nbsp;</td>
+                          <td align="RIGHT">Number:</td>
+                          <td align="LEFT"> 
+                            <input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="to" value="{$c{to}}" style="width:100%;">
+                          </td>
+                          <td align="LEFT">&nbsp;</td>
+                        </tr>
+                      </table>
+</div>
+</fieldset>
+</td>
+</tr>
+</table>
+</TD>
+</TR>
+</TABLE>
+</form>
+<img src="/images/clear.gif" height="8" width="1"><BR>
+    </TD>
+</TR>
+
+<TR>
+<TD ALIGN="left" VALIGN="top" WIDTH="100%" HEIGHT="100%">{$c{object_table}}</TD>
+</TR>
+</TABLE>
+
+

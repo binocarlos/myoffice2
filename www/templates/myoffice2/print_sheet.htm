@@ -1,0 +1,532 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var totalFields = new Array("leaflets", "a3s", "dcs", "foursheets", "delivery_cost", "total_cost");
+	var printRun = new Object();
+	var printReqs = new Object();
+	var venues = new Object();
+	
+	printRun.leaflet_cost = {$c{print_run}->leaflet_cost};
+	printRun.a3_cost = {$c{print_run}->a3_cost};
+	printRun.dc_cost = {$c{print_run}->dc_cost};
+	printRun.foursheet_cost = {$c{print_run}->foursheet_cost};
+	printRun.leaflet_total = {$c{print_run}->leaflet_total || 0};
+	printRun.a3_total = {$c{print_run}->a3_total || 0};
+	printRun.dc_total = {$c{print_run}->dc_total || 0};
+	printRun.foursheet_total = {$c{print_run}->foursheet_total || 0};
+	printRun.delivery_total = {$c{print_run}->delivery_total || 0};
+	printRun.total_cost = {$c{print_run}->total_cost || 0};
+	
+	function downloadExcel()
+	\{		
+		window.open(href + '&method=print_excel_sheet&print_run_id={$c{print_run}->get_id}');
+	\}
+		
+	
+	function writeShowing(hash)
+	\{
+		newVenueObj(hash.venue_id, hash.box_office_number);
+		newPrintReqObj(hash.print_req_id, hash.total_cost, hash.leaflets, hash.leaflet_cost, hash.a3s, hash.a3_cost, hash.dcs, hash.dc_cost, hash.foursheets, hash.foursheet_cost, hash.delivery_cost, hash.print_despatched, hash.print_received, hash.js_address, hash.js_notes);
+		document.write(getHTMLBlock('showing_row', hash));	
+	\}
+	
+	function writeTitle()
+	\{
+		document.write(getHTMLBlock('title_row'));		
+	\}
+	
+	function calculateTotals()
+	\{
+		var totals = new Object(\{
+			delivery_cost:0,
+			leaflets:0,
+			a3s:0,
+			dcs:0,
+			foursheets:0,
+			total_cost:0 \});
+		
+		for(var printReqId in printReqs)
+		\{
+			var printReq = printReqs[printReqId];
+			
+			totals.delivery_cost += printReq.delivery_cost;
+			totals.leaflets += printReq.leaflets_total;
+			totals.a3s += printReq.a3s_total;
+			totals.dcs += printReq.dcs_total;
+			totals.foursheets += printReq.foursheets_total;
+			totals.total_cost += getPrintReqValue(printReq, 'total_cost', printReq.calculated_total_cost);
+		\}
+		
+		assignTotalField('total_leaflets', 'leaflet_total', totals.leaflets);
+		assignTotalField('total_a3s', 'a3_total', totals.a3s);		
+		assignTotalField('total_dcs', 'dc_total', totals.dcs);				
+		assignTotalField('total_foursheets', 'foursheet_total', totals.foursheets);				
+		assignTotalField('total_delivery_cost', 'delivery_total', totals.delivery_cost);	
+		assignTotalField('total_total_cost', 'total_cost', totals.total_cost);						
+	\}
+	
+	function assignTotalField(gui_id, field, default_value)
+	\{
+		var gui = document.getElementById(gui_id);
+		
+		var value = default_value;
+		
+		if(printRun[field]>0)
+		\{
+			gui.style.fontWeight = 'bold';
+			gui.style.backgroundColor = '#ffcccc';		
+			value = printRun[field];
+		\}
+		
+		gui.value = round2dp(value);
+	\}
+	
+	function calculateAllPrintReqs()
+	\{
+		for(var printReqId in printReqs)
+		\{
+			var printReq = printReqs[printReqId];
+			
+			calculatePrintReq(printReq);
+		\}
+	\}
+	
+	function getPrintRunValue(field, calculated)
+	\{
+		var ret = printRun[field];
+		
+		if(ret>0)
+		\{
+			return ret;
+		\}
+		else
+		\{
+			return calculated;
+		\}
+	\}	
+	
+	function getPrintReqValue(printReq, field, calculated)
+	\{
+		var ret = printReq[field];
+		
+		if(ret>0)
+		\{
+			return ret;
+		\}
+		else
+		\{
+			return calculated;
+		\}
+	\}
+	
+	function calculatePrintReq(printReq)
+	\{
+		var total = 0;
+		
+		var leaflets_total = getPrintReqValue(printReq, 'leaflet_cost', printRun.leaflet_cost * printReq.leaflets);
+		var a3s_total = getPrintReqValue(printReq, 'a3_cost', printRun.a3_cost * printReq.a3s);
+		var dcs_total = getPrintReqValue(printReq, 'dc_cost', printRun.dc_cost * printReq.dcs);
+		var foursheets_total = getPrintReqValue(printReq, 'foursheet_cost', printRun.foursheet_cost * printReq.foursheets);
+
+		printReq.leaflets_total = leaflets_total;
+		printReq.a3s_total = a3s_total;
+		printReq.dcs_total = dcs_total;
+		printReq.foursheets_total = foursheets_total;
+		
+		total += leaflets_total;
+		total += a3s_total;
+		total += dcs_total;
+		total += foursheets_total;
+		total += printReq.delivery_cost;
+		
+		printReq.calculated_total_cost = round2dp(total);
+		
+		var totalGui = document.getElementById('print_req_total_cost_' + printReq.id);
+
+		if(printReq.total_cost<=0)
+		\{
+			totalGui.value = printReq.calculated_total_cost;
+		\}
+		else
+		\{
+			totalGui.style.fontWeight = 'bold';
+			totalGui.style.backgroundColor = '#ffcccc';	
+		\}
+		
+		var autoFields = new Array('leaflet', 'a3', 'dc', 'foursheet');
+		
+		for(var i=0; i<autoFields.length; i++)
+		\{
+			var manual_field = autoFields[i] + '_cost';
+			var total_field = autoFields[i] + 's_total';
+			
+			var gui = document.getElementById('print_req_' + manual_field + '_' + printReq.id);
+			
+			if(printReq[manual_field]<=0)
+			\{
+				gui.value = round2dp(printReq[total_field]);
+			\}
+			else
+			\{
+				gui.style.fontWeight = 'bold';
+				gui.style.backgroundColor = '#ffcccc';					
+			\}
+		\}
+	\}
+	
+	function newPrintReqObj(id, total_cost, leaflets, leaflet_cost, a3s, a3_cost, dcs, dc_cost, foursheets, foursheet_cost, delivery_cost, print_despatched, print_received, delivery_address, notes)
+	\{
+		var printReq = new Object();
+		printReq.id = id;
+		printReq.total_cost = total_cost;
+		printReq.leaflets = leaflets;
+		printReq.leaflet_cost = leaflet_cost;
+		printReq.a3s = a3s;
+		printReq.a3_cost = a3_cost;
+		printReq.dcs = dcs;
+		printReq.dc_cost = dc_cost;
+		printReq.foursheets = foursheets;
+		printReq.foursheet_cost = foursheet_cost;
+		printReq.delivery_cost = delivery_cost;
+		printReq.print_despatched = print_despatched;
+		printReq.print_received = print_received;
+		printReq.delivery_address = delivery_address;
+		printReq.notes = notes;
+		
+		printReqs[printReq.id] = printReq;
+	\}
+	
+	function newVenueObj(id, box_office_number)
+	\{
+		var venue = new Object();
+		venue.id = id;
+		venue.box_office_number = box_office_number;
+		
+		venues[venue.id] = venue;
+	\}
+	
+	function boChanged(venue_id, gui)
+	\{
+		var venue = venues[venue_id];
+
+		parent.title.addVenueField(venue_id, 'box_office_number', gui.value);		
+		venue.box_office_number = gui.value;
+	\}
+	
+	function printRunChanged(field, gui)
+	\{
+		parent.title.addPrintRunField({$c{print_run}->get_id}, field, gui.value);
+		printRun[field] = parseFloat(gui.value);
+		
+		calculateAllPrintReqs();
+		calculateTotals();
+	\}
+	
+	function printRunTotalChanged(field, gui)
+	\{
+		parent.title.addPrintRunField({$c{print_run}->get_id}, field, gui.value);
+		printRun[field] = parseFloat(gui.value);
+		
+		gui.style.fontWeight = 'bold';
+		gui.style.backgroundColor = '#ffcccc';		
+	\}	
+	
+	function printReqChanged(id, field, gui)
+	\{
+		var printReq = printReqs[id];
+		
+		parent.title.addPrintReqField(id, field, gui.value);
+		printReq[field] = parseFloat(gui.value);
+		
+		calculatePrintReq(printReq);
+		calculateTotals();
+	\}
+	
+	function printReqCostChanged(id, field, gui)
+	\{
+		var printReq = printReqs[id];
+		
+		parent.title.addPrintReqField(id, field, gui.value);
+		printReq[field] = parseFloat(gui.value);
+		
+		gui.style.fontWeight = 'bold';
+		gui.style.backgroundColor = '#ffcccc';		
+		
+		calculatePrintReq(printReq);
+		calculateTotals();		
+	\}
+	
+	function editPrintReqDate(id, field, td)
+	\{
+		var print_req = printReqs[id];
+			
+		var ret = get_modal_window_return('&method=editors_date&date=' + print_req[field], 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		parent.title.addPrintReqField(id, field, ret);
+		td.innerHTML = ret;
+		print_req[field] = ret;
+	\}
+	
+	function editAddress(print_req_id, td)
+	\{
+		var print_req = printReqs[print_req_id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, print_req.delivery_address);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addPrintReqField(print_req_id, 'delivery_address', ret.value);
+		td.innerHTML = ret.title;
+		print_req.delivery_address = ret.value;
+	\}
+	
+	function editNotes(print_req_id, td)
+	\{
+		var print_req = printReqs[print_req_id];
+		
+		var ret = get_modal_window_return('&method=editors_notes', 500, 430, print_req.notes);			
+		
+		if(!ret) \{ return; \}		
+		
+		parent.title.addPrintReqField(print_req_id, 'notes', ret.value);
+		td.innerHTML = ret.title;
+		print_req.notes = ret.value;
+	\}	
+	
+{
+	my $print = $c{central_print};
+	my $id = $print->get_id;
+	my $total_cost = $print->total_cost || 0;
+	my $leaflets = $print->leaflets || 0;
+	my $leaflet_cost = $print->leaflet_cost || 0;
+	my $a3s = $print->a3s || 0;
+	my $a3_cost = $print->a3_cost || 0;
+	my $dcs = $print->dcs || 0;
+	my $dc_cost = $print->dc_cost || 0;
+	my $foursheets = $print->foursheets || 0;
+	my $foursheet_cost = $print->foursheet_cost || 0;
+	my $delivery_cost = $print->delivery_cost || 0;
+	my $notes = $print->get_js_value('notes');
+	
+	$OUT.=<<"+++";
+	newPrintReqObj($id, $total_cost, $leaflets, $leaflet_cost, $a3s, $a3_cost, $dcs, $dc_cost, $foursheets, $foursheet_cost, $delivery_cost, null, null, '', '$notes');
++++
+}
+</script>
+<body onunload="if(parent.title)\{parent.title.resetForm();\}">
+<table width="100%"  border="0" cellspacing="0" cellpadding="5"> 
+<tr>
+  <td class="welcome">Print Sheet For {$c{print_run}->qtr_title} - {$c{print_run}->name}<br>
+    <br>
+    <input type="button" class="button" id="excelButton" onClick="downloadExcel();" value="Download Excel File"></td>
+</tr>  
+  <tr>
+    <td height=10></td>
+  </tr> 
+  <tr>
+    <td class="welcome"><table width="1520"  border="0" cellpadding="3" cellspacing="1" bgcolor="#d5d5d5">
+      <tr bgcolor="#FFFFFF">
+        <td colspan="3" align="right" bgcolor="#FFFFFF" style="font-weight:bold;color:red;">Unit Print Costs </td>
+		<td width="50" bgcolor="#f5f5f5">LFLTs</td>
+        <td align="right" bgcolor="#f5f5f5" style="font-weight:bold;"><input type="text" name="print_run_leaflet_cost" id="print_run_leaflet_cost" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunChanged('leaflet_cost', this);"></td>
+		<td width="50" bgcolor="#FFFFFF">A3s</td>
+        <td align="right" bgcolor="#ffffff" style="font-weight:bold;"><input type="text" name="print_run_a3_cost" id="print_run_a3_cost" value="{$c{print_run}->a3_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunChanged('a3_cost', this);"></td>
+		<td width="50" bgcolor="#f5f5f5">DCs</td>		
+        <td align="right" bgcolor="#f5f5f5" style="font-weight:bold;"><input type="text" name="print_run_dc_cost" id="print_run_dc_cost" value="{$c{print_run}->dc_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunChanged('dc_cost', this);"></td>
+		<td width="50" bgcolor="#ffffff">A4s</td>		
+        <td align="right" bgcolor="#ffffff" style="font-weight:bold;"><input type="text" name="print_run_foursheet_cost" id="print_run_foursheet_cost" value="{$c{print_run}->foursheet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunChanged('foursheet_cost', this);"></td>
+        <td colspan="6" bgcolor="#FFFFFF">&nbsp;</td>
+        </tr>
+      <tr bgcolor="#f5f5f5">
+        <td height=30 colspan="17" bgcolor="#f5f5f5">Remember that the grand total is calculated from the total of each visit - not by the main totals shown just below...</td>
+		</tr>		
+      <tr bgcolor="#FFFFFF">
+        <td colspan="3" align="right" bgcolor="#FFFFFF" style="font-weight:bold;color:red;"> TOTALS</td>
+        <td bgcolor="#f5f5f5">&nbsp;</td>		
+		<td align="right" bgcolor="#fff0f0"><input type="text" name="total_leaflets" id="total_leaflets" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunTotalChanged('leaflet_total', this);"></td>
+        <td align="right" bgcolor="#FFFFFF">&nbsp;</td>		
+		<td align="right" bgcolor="#fff0f0"><input type="text" name="total_a3s" id="total_a3s" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunTotalChanged('a3_total', this);"></td>
+        <td align="right" bgcolor="#FFFFFF">&nbsp;</td>
+		<td align="right" bgcolor="#fff0f0"><input type="text" name="total_dcs" id="total_dcs" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunTotalChanged('dc_total', this);"></td>
+        <td align="right" bgcolor="#ffffff">&nbsp;</td>
+		<td align="right" bgcolor="#fff0f0"><input type="text" name="total_foursheets" id="total_foursheets" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunTotalChanged('foursheet_total', this);"></td>
+        <td align="right" bgcolor="#fff0f0"><input type="text" name="total_delivery_cost" id="total_delivery_cost" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunTotalChanged('delivery_total', this);"></td>
+        <td align="right" bgcolor="#fff0f0"><input type="text" name="total_total_cost" id="total_total_cost" value="{$c{print_run}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printRunTotalChanged('total_cost', this);"></td>	
+        <td colspan="4" bgcolor="#FFFFFF">&nbsp;</td>
+        </tr>	
+		 <tr bgcolor="#f0f0f0">
+        <td bgcolor="#f0f0f0">Date</td>
+        <td width="250" bgcolor="#f0f0f0">Venue</td>
+        <td width="80" bgcolor="#f0f0f0"><u>B.O Number</u> </td>
+		<td width="50" bgcolor="#f5f5f5"><u>No.LFLTs</u></td>
+        <td width="50" align="right" bgcolor="#f5f5f5">&nbsp;</td>
+		<td width="50" bgcolor="#ffffff"><u>No.A3s</u></td>
+        <td width="50" align="right" bgcolor="#ffffff">&nbsp;</td>
+		<td bgcolor="#f5f5f5"><u>No.DCs</u></td>
+        <td width="50" align="right" bgcolor="#f5f5f5">&nbsp;</td>
+		<td bgcolor="#ffffff"><u>No.A4s</u></td>
+        <td width="50" align="right" bgcolor="#ffffff">&nbsp;</td>
+        <td width="50" align="right" bgcolor="#f0f0f0"><u>D.Cost</u></td>
+        <td width="50" align="right" bgcolor="#f0f0f0">T.Cost </td>
+        <td width="60" bgcolor="#f0f0f0"><u>Despatched</u></td>
+        <td width="60" bgcolor="#f0f0f0"><u>Recieved</u></td>
+        <td width="140" bgcolor="#f0f0f0"><u>Address</u></td>
+        <td width="140" bgcolor="#f0f0f0"><u>Notes</u></td>
+      </tr>			
+	      <tr align="left" valign="top" bgcolor="#FFFFFF">
+        <td align=right bgcolor="#FFFFFF" style="color:green;">n/a</div></td>
+        <td width="250" bgcolor="#FFFFFF" class="noOverflowX"><div class="noOverflowX" style="width:250px;color:blue;"><b>Central Showing</b></div></td>
+        <td bgcolor="#FFFFFF">&nbsp;</td>
+		<td bgcolor="#f5f5f5"><input type="text" name="print_req_leaflets_{$c{central_print}->get_id}" id="print_req_leaflets_{$c{central_print}->get_id}" value="{$c{central_print}->leaflets}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged({$c{central_print}->get_id}, 'leaflets', this);"></td>
+        <td bgcolor="#f5f5f5"><input type="text" name="print_req_leaflet_cost_{$c{central_print}->get_id}" id="print_req_leaflet_cost_{$c{central_print}->get_id}" value="{$c{central_print}->leaflet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged({$c{central_print}->get_id}, 'leaflet_cost', this);"></td>
+        <td bgcolor="#FFFFFF"><input type="text" name="print_req_a3s_{$c{central_print}->get_id}" id="print_req_a3s_{$c{central_print}->get_id}" value="{$c{central_print}->a3s}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged({$c{central_print}->get_id}, 'a3s', this);"></td>
+        <td bgcolor="#ffffff"><input type="text" name="print_req_a3_cost_{$c{central_print}->get_id}" id="print_req_a3_cost_{$c{central_print}->get_id}" value="{$c{central_print}->a3_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged({$c{central_print}->get_id}, 'a3_cost', this);"></td>
+        <td bgcolor="#f5f5f5"><input type="text" name="print_req_dcs_{$c{central_print}->get_id}" id="print_req_dcs_{$c{central_print}->get_id}" value="{$c{central_print}->dcs}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged({$c{central_print}->get_id}, 'dcs', this);"></td>
+        <td bgcolor="#f5f5f5"><input type="text" name="print_req_dc_cost_{$c{central_print}->get_id}" id="print_req_dc_cost_{$c{central_print}->get_id}" value="{$c{central_print}->dc_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged({$c{central_print}->get_id}, 'dc_cost', this);"></td>
+        <td bgcolor="#ffffff"><input type="text" name="print_req_foursheets_{$c{central_print}->get_id}" id="print_req_foursheets_{$c{central_print}->get_id}" value="{$c{central_print}->foursheets}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged({$c{central_print}->get_id}, 'foursheets', this);"></td>
+        <td bgcolor="#ffffff"><input type="text" name="print_req_foursheet_cost_{$c{central_print}->get_id}" id="print_req_foursheet_cost_{$c{central_print}->get_id}" value="{$c{central_print}->foursheet_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged({$c{central_print}->get_id}, 'foursheet_cost', this);"></td>
+        <td bgcolor="#FFFFFF"><input type="text" name="print_req_delivery_cost_{$c{central_print}->get_id}" id="print_req_delivery_cost_{$c{central_print}->get_id}" value="{$c{central_print}->delivery_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged({$c{central_print}->get_id}, 'delivery_cost', this);"></td>
+        <td width="50" bgcolor="#FFFFFF"><input type="text" name="print_req_total_cost_{$c{central_print}->get_id}" id="print_req_total_cost_{$c{central_print}->get_id}" value="{$c{central_print}->total_cost}" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged({$c{central_print}->get_id}, 'total_cost', this);"></td>
+		<td colspan=3 bgcolor="#FFFFFF"></td>
+        <td width="140" bgcolor="#FFFFFF" class="editTd" onClick="editNotes({$c{central_print}->get_id}, this);" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);">{$c{central_print}->get_html_value('notes')}</td>
+      </tr>				
+
+{
+	my $title_row=<<"+++";
+		 <tr bgcolor="#f0f0f0">
+        <td bgcolor="#f0f0f0">Date</td>
+        <td width="250" bgcolor="#f0f0f0">Venue</td>
+        <td width="80" bgcolor="#f0f0f0"><u>B.O Number</u> </td>
+		<td bgcolor="#f5f5f5"><u>No.LFLTs</u></td>
+        <td width="50" align="right" bgcolor="#f5f5f5">Cost</td>
+		<td bgcolor="#ffffff"><u>No.A3s</u></td>
+        <td width="50" align="right" bgcolor="#ffffff">Cost</td>
+		<td bgcolor="#f5f5f5"><u>No.DCs</u></td>
+        <td width="50" align="right" bgcolor="#f5f5f5">Cost</td>
+		<td bgcolor="#ffffff"><u>No.A4s</u></td>
+        <td width="50" align="right" bgcolor="#ffffff">Cost</td>
+        <td width="50" align="right" bgcolor="#f0f0f0"><u>D.Cost</u></td>
+        <td width="50" align="right" bgcolor="#f0f0f0">T.Cost </td>
+        <td width="80" bgcolor="#f0f0f0"><u>Despatched</u></td>
+        <td width="80" bgcolor="#f0f0f0"><u>Recieved</u></td>
+        <td width="140" bgcolor="#f0f0f0"><u>Address</u></td>
+        <td width="140" bgcolor="#f0f0f0"><u>Notes</u></td>
+      </tr>	
++++
+
+	my $showing_row=<<"+++";
+	      <tr align="left" valign="top" bgcolor="#FFFFFF">
+        <td width="180" align=right bgcolor="#FFFFFF" style="color:green;">__date_titles__</div></td>
+        <td width="250" bgcolor="#FFFFFF" class="noOverflowX"><div class="noOverflowX" style="width:250px;"><b><a href="javascript:showVenueInfo(__venue_id__);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>__venue_title__</a></b></div></td>
+        <td bgcolor="#FFFFFF"><input type="text" name="venue_box_office_number___venue_id__" id="venue_box_office_number___venue_id__" value="__box_office_number__" class="text_field" style="width:80px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="boChanged(__venue_id__, this);"></td>
+		<td bgcolor="#f5f5f5"><input type="text" name="print_req_leaflets___print_req_id__" id="print_req_leaflets___print_req_id__" value="__leaflets__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged(__print_req_id__, 'leaflets', this);"></td>
+        <td bgcolor="#f5f5f5"><input type="text" name="print_req_leaflet_cost___print_req_id__" id="print_req_leaflet_cost___print_req_id__" value="__leaflet_cost__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged(__print_req_id__, 'leaflet_cost', this);"></td>
+        <td bgcolor="#FFFFFF"><input type="text" name="print_req_a3s___print_req_id__" id="print_req_a3s___print_req_id__" value="__a3s__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged(__print_req_id__, 'a3s', this);"></td>
+        <td bgcolor="#ffffff"><input type="text" name="print_req_a3_cost___print_req_id__" id="print_req_a3_cost___print_req_id__" value="__a3_cost__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged(__print_req_id__, 'a3_cost', this);"></td>
+        <td bgcolor="#f5f5f5"><input type="text" name="print_req_dcs___print_req_id__" id="print_req_dcs___print_req_id__" value="__dcs__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged(__print_req_id__, 'dcs', this);"></td>
+        <td bgcolor="#f5f5f5"><input type="text" name="print_req_dc_cost___print_req_id__" id="print_req_dc_cost___print_req_id__" value="__dc_cost__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged(__print_req_id__, 'dc_cost', this);"></td>
+        <td bgcolor="#ffffff"><input type="text" name="print_req_foursheets___print_req_id__" id="print_req_foursheets___print_req_id__" value="__foursheets__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged(__print_req_id__, 'foursheets', this);"></td>
+        <td bgcolor="#ffffff"><input type="text" name="print_req_foursheet_cost___print_req_id__" id="print_req_foursheet_cost___print_req_id__" value="__foursheet_cost__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged(__print_req_id__, 'foursheet_cost', this);"></td>
+        <td bgcolor="#FFFFFF"><input type="text" name="print_req_delivery_cost___print_req_id__" id="print_req_delivery_cost___print_req_id__" value="__delivery_cost__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqChanged(__print_req_id__, 'delivery_cost', this);"></td>
+        <td width="50" align=right bgcolor="#FFFFFF"><input type="text" name="print_req_total_cost___print_req_id__" id="print_req_total_cost___print_req_id__" value="__total_cost__" class="text_field" style="width:50px;text-align:right;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" onChange="printReqCostChanged(__print_req_id__, 'total_cost', this);"></td>
+		<td width="80" align="center" bgcolor="#FFFFFF" class="editTd" onClick="editPrintReqDate(__print_req_id__, 'print_despatched', document.getElementById('__print_req_id__print_despatched'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__print_req_id__print_despatched">&nbsp;__print_despatched__</span></td>
+		<td width="80" align="center" bgcolor="#FFFFFF" class="editTd" onClick="editPrintReqDate(__print_req_id__, 'print_received', document.getElementById('__print_req_id__print_received'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__print_req_id__print_received">&nbsp;__print_received__</span></td>
+        <td width="140" bgcolor="#FFFFFF" class="editTd" onClick="editAddress(__print_req_id__, document.getElementById('__print_req_id__address'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__print_req_id__address">__address__</span></td>
+        <td width="140" bgcolor="#FFFFFF" class="editTd" onClick="editNotes(__print_req_id__, document.getElementById('__print_req_id__notes'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="__print_req_id__notes">__notes__</span></td>
+      </tr>	
++++
+
+	$showing_row = Webkit::AppTools->js_quote($showing_row);
+	$title_row = Webkit::AppTools->js_quote($title_row);
+	
+	$OUT.=<<"+++";
+	<script>
+addHTMLBlock('showing_row', '$showing_row');
+addHTMLBlock('title_row', '$title_row');
+
+writeTitle();
++++
+
+	my $title_count = 0;
+
+	foreach my $showing (@{$c{print_run}->ensure_child_array('showing')})
+	{
+		$title_count++;
+		
+		if($title_count>=5)
+		{
+			$OUT.=<<"+++";
+writeTitle();			
++++
+
+			$title_count = 0;
+		}
+		
+		my $venue = $c{print_run}->get_child('venue', $showing->venue_id);
+		my $print_req = $showing->{_print_req_obj};
+		
+		my $address = $print_req->delivery_address;
+		my $html_notes = $print_req->get_html_value('notes');
+		my $js_notes = $print_req->get_js_value('notes');
+		
+		if($address!~/\w/)
+		{
+			$address = $venue->get_full_address;
+		}
+		
+		my $js_address = $address;
+		my $html_address = $address;
+		
+		$js_address =~ s/\n/\\n/g;
+		$js_address =~ s/'/\\'/g;
+		
+		$html_address =~ s/\n/<br>/g;
+		
+		my $showing_js_hash = Webkit::AppTools->js_hash({
+			address => $html_address,
+			js_address => $js_address,
+			notes => $html_notes,
+			js_notes => $js_notes,
+			print_despatched => $print_req->print_despatched_title,
+			print_received => $print_req->print_received_title,
+			date_titles => $showing->get_datetime_title,
+			_showing_id => $showing->get_id,
+			_venue_id => $venue->get_id,
+			_print_req_id => $print_req->get_id,
+			_total_cost => $print_req->total_cost,
+			_leaflets => $print_req->leaflets,
+			_leaflet_cost => $print_req->leaflet_cost,
+			_a3s => $print_req->a3s,
+			_a3_cost => $print_req->a3_cost,
+			_dcs => $print_req->dcs,
+			_dc_cost => $print_req->dc_cost,
+			_foursheets => $print_req->foursheets,
+			_foursheet_cost => $print_req->foursheet_cost,
+			_delivery_cost => $print_req->delivery_cost,
+			venue_title => $venue->get_city_title,
+			box_office_number => $venue->box_office_number });
+		
+		$OUT.=<<"+++";
+
+writeShowing($showing_js_hash);
++++
+	
+	}
+	
+	$OUT.=<<"+++";
+</script>
++++
+}
+    </table></td>
+  </tr>
+</table>
+<script>
+calculateAllPrintReqs();
+calculateTotals();
+</script>
+</body>
+</html>
+
+
+

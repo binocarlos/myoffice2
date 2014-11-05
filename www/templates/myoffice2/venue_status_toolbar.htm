@@ -1,0 +1,291 @@
+<HTML>
+<HEAD><TITLE></TITLE>
+<STYLE TYPE="text/css">
+body \{background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,verdana,arial; font-size:11px;\}
+td \{font-family:tahoma,verdana,arial; font-size:11px; color:#000000;\}
+.text_field \{height:20px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:1px inset;\}
+.buttonouter \{border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;\}
+.buttonoff \{border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid; \}
+.button \{ font-family:tahoma,verdana,arial; font-size:11px; color:#000000;background-color:#D4D0C8;\}
+</STYLE>
+<script src="/lib/kit.js"></script>
+<script src="/lib/myoffice2/lib.js"></script>
+<script>
+var href = '{$c{href}}';
+var session_id = '{$c{session_id}}';
+var hostname = '{$c{hostname}}';
+var help_domain = '{$c{help_domain}}';
+var appname = '{$c{app_name}}';
+
+var venue_id = null;
+
+{
+	if($c{venue})
+	{
+		my $venue_id = $c{venue}->get_id;
+		$OUT.=<<"+++";
+venue_id = $venue_id;		
++++
+	}
+}
+
+	var deals = new Object();
+	var bookings = new Object();
+	var showings = new Object();
+	var venueStatusEntries = new Object();
+	
+	var saveSpanMode = false;
+	var timeoutId = null;
+	
+	function setVenue(id, name)
+	\{
+		document.getElementById('venueSpan').style.display = 'inline';
+		document.getElementById('venueName').innerText = name;
+		document.venueStatusForm.venue_id.value = id;
+		venue_id = id;
+	\}
+	
+	function clearSwitchSaveSpan()
+	\{
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = '';
+		button.style.color = '';
+		button.style.fontWeight = '';
+		span.style.backgroundColor = '';
+		span.style.color = '';
+		span.style.fontWeight = '';
+		
+		clearTimeout(timeoutId);
+		
+		timeoutId = null;	
+	\}
+	
+	function switchSaveSpan()
+	\{
+		saveSpanMode =! saveSpanMode;
+		
+		var buttonBg = '';
+		var buttonFg = '';
+		
+		var spanBg = '';
+		var spanFg = '';
+		
+		var buttonWeight = '';
+		var spanWeight = '';
+		
+		if(saveSpanMode)
+		\{
+			buttonBg = '#ffffff';
+			buttonFg = '#ff0000';
+			spanBg = '#ffffff';
+			spanFg = '#ff0000';
+			buttonWeight = 'bold';
+			spanWeight = 'bold';
+		\}
+		
+		var button = document.getElementById('saveButton');
+		var span = document.getElementById('saveSpan');
+		
+		button.style.backgroundColor = buttonBg;
+		button.style.color = buttonFg;
+		button.style.fontWeight = buttonWeight;
+		span.style.backgroundColor = spanBg;
+		span.style.color = spanFg;
+		span.style.fontWeight = spanWeight;
+		
+		timeoutId = setTimeout("switchSaveSpan();", 1000);
+	\}				
+	
+	function showSaveSpan()
+	\{
+		document.getElementById('saveSpan').style.display = 'inline';
+		document.getElementById('saveButton').disabled = false;
+		
+		if(timeoutId==null)
+		\{
+			switchSaveSpan();			
+		\}
+	\}
+	
+	function resetForm()
+	\{
+		clearSwitchSaveSpan();		
+		document.getElementById('hiddenInputSpan').innerText = '';
+		document.getElementById('saveSpan').style.display = 'none';
+		document.getElementById('saveButton').disabled = true;
+
+		deals = new Object();
+		showings = new Object();
+		bookings = new Object();
+		venueStatusEntries = new Object();
+	\}
+
+	function addVenueStatusField(id, field, value)
+	\{
+		var entry = venueStatusEntries[id];
+		
+		if(!entry)
+		\{
+			entry = new Object();
+			entry.id = id;
+			venueStatusEntries[id] = entry;
+		\}
+		
+		entry[field] = value;
+		
+		showSaveSpan();
+	\}
+	
+	function addShowingField(id, field, value)
+	\{
+		var showing = showings[id];
+		
+		if(!showing)
+		\{
+			showing = new Object();
+			showing.id = id;
+			showings[showing.id] = showing;
+		\}
+		
+		showing[field] = value;
+		
+		showSaveSpan();
+	\}			
+	
+	function addBookingField(id, field, value)
+	\{
+		var booking = bookings[id];
+		
+		if(!booking)
+		\{
+			booking = new Object();
+			booking.id = id;
+			bookings[booking.id] = booking;
+		\}
+		
+		booking[field] = value;
+		
+		showSaveSpan();
+	\}		
+
+	function addDealField(id, field, value)
+	\{
+		var deal = deals[id];
+		
+		if(!deal)
+		\{
+			deal = new Object();
+			deal.id = id;
+			deals[deal.id] = deal;
+		\}
+		
+		deal[field] = value;
+		
+		showSaveSpan();
+	\}						
+	
+	function applyObjectInputs(hash, tag, delim)
+	\{
+		if(!hash) \{ return; \}
+		
+		if(!delim) \{ delim = '_'; \}
+		
+		var span = document.getElementById('hiddenInputSpan');	
+		
+		var st = '';
+		
+		for(var id in hash)
+		\{
+			var obj = hash[id];
+			
+			for(var field in obj)
+			\{
+				if(field!='id')
+				\{
+					//var elem = document.createElement('INPUT');
+					//elem.type = 'hidden';
+					//elem.name = tag + delim + id + delim + field;
+					//elem.value = obj[field];
+				
+					//span.appendChild(elem);
+					
+					st += '<field name="' + tag + delim + id + delim + field + '">' + obj[field] + '</field>';					
+				\}
+			\}
+		\}		
+		
+		return st;
+	\}
+	
+	function sumbitVenueStatusSheet()
+	\{
+		var form = document.venueStatusForm;
+			
+		var data = applyObjectInputs(deals, 'deal');		
+		data += applyObjectInputs(bookings, 'booking');				
+		data += applyObjectInputs(showings, 'showing');						
+		data += applyObjectInputs(venueStatusEntries, 'venue_status_entry', ':');						
+		
+		form.data.value = data;
+		
+		form.submit();
+	\}
+	
+</script>
+  </HEAD>
+ <BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" STYLE="border-bottom:1px #808080 solid;" HEIGHT="100%">
+		<TR>
+    <TD WIDTH="100%" HEIGHT="100%" valign="middle" STYLE="font-family:tahoma,verdana; font-size:11px; color:#000000;">
+      <table border="0" align="left" cellpadding="5" cellspacing="0">
+        <tr>
+          <td></td>
+          <td height="40" colspan=2><strong>Venue History  for {$c{tour}->name} Tour</strong></td>
+		  <td colspan=4><span style="color:red;display:none;font-weight:bold;font-size:15pt;" id="saveSpan">YOU HAVE DATA TO SAVE...</span></td>
+        </tr>	
+		<tr><td></td>
+		
+{
+	if($c{venue})
+	{
+		$c{venueName} = $c{venue}->get_city_title;
+	}
+	else
+	{
+		$c{hiddenSpan} = 'display:none;';
+	}	
+
+	$OUT.="";
+}
+	
+<td width="300"><span id="venueSpan" style="{$c{hiddenSpan}}"><b><a href="javascript:showVenueInfo(venue_id);"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span><span id="venueName">{$c{venueName}}</span></a></b></span>	
+		</td>
+{
+	if($c{params}->{from_search}=~/\w/)
+	{
+		$OUT.=<<"+++";		
+          <td width=10></td>
+          <td align="left"><input type="button" value="Back To Search Results" style="width:140px;" class="button" onClick="top.venueStatusSearchResults();"></td>		  		
++++
+	}
+}
+          <td width=10 align="left"></td>
+          <td align="left"><form method="POST" action="{$c{script}}" name="venueStatusForm" style="margin:0px;padding:0px;">
+              <input type="hidden" name="session_id" value="{$c{session_id}}">
+              <input type="hidden" name="method" value="venue_status_toolbar_save"> 
+			  <input type="hidden" name="venue_id" value="{$c{params}->{venue_id}}">
+			  <input type="hidden" name="data" value="">			  
+			  
+              <span id="hiddenInputSpan"></span>
+              <input type="button" value="Save Sheet" class="button" onClick="sumbitVenueStatusSheet();" id="saveButton" disabled>
+          </form></td>
+          <td width="400">&nbsp;</td>
+        </tr>
+      </table>
+      </TD>
+		</TR>
+</TABLE>
+</BODY>
+</HTML>

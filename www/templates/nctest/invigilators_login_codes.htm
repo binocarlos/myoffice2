@@ -1,0 +1,62 @@
+<!--#include virtual="temp_include.htm" -->
+<body style="background-color:#D4D0C8; margin:8px;">
+<script>
+	function gotoPrintPage()
+	\{
+		document.location = href + '&method=inivigilators_list_login_codes&exam_id={$c{exam}->get_id}&print=1';
+	\}
+
+</script>
+
+<table cellpadding="0" cellspacing="0" border="0" width="395">
+	<tr>
+		<td bgcolor="#FFFFFF" style="height:430px;">
+		<div CLASS="insetouter"><DIV STYLE="overflow-y:scroll; width:100%; height:430px;" CLASS="insetinner">
+<table border="0" cellspacing="0" cellpadding="3">
+{
+	my $classes = $c{exam}->ensure_child_array('class');
+
+	foreach my $class (@$classes)
+	{
+		my $class_title = $class->get_title;
+
+		$OUT.=<<"+++";
+  <tr>
+    <td colspan=2 style="padding-left:5px;"><b>$class_title</b></td>
+  </tr>
++++
+
+		foreach my $exam_login (@{$class->ensure_child_array('exam_login')})
+		{
+			my $code = $exam_login->login_code;
+			my $pupil_name = $exam_login->get_pupil_name;
+
+			$OUT.=<<"+++";
+  <tr>
+    <td align=right style="padding-left:20px;"><input style="width:80px;font-family:'Courier New', Courier, mono;" value="$code"></td>
+    <td>&nbsp;&#151;&#151;&#151;&#151;&#151;&#151;&nbsp;</td>
+    <td>$pupil_name</td>
+  </tr>
++++
+		}
+
+		$OUT.=<<"+++";
+  <tr>
+    <td colspan=2 height=20>&nbsp;</td>
+  </tr>
++++
+	}
+}
+</table>
+		</DIV></div>
+		</td>
+	</tr>
+<tr>
+<td align="right">
+
+      <input type="button" class="button2" style="width:75px;" value="Print" onClick="gotoPrintPage();">
+
+      <input type="button" class="button2" style="width:75px;" value="Cancel" onClick="top.close();">
+</td>
+</tr>
+</table>

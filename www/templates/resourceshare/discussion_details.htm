@@ -1,0 +1,393 @@
+<!--#include virtual="temp_include.htm" -->
+<script src="/lib/formhelp.js">
+</script>
+<script>
+	var currentSection = 'general_info';
+	
+	function sectionChanged(gui)
+	\{
+		var newSectionId = document.getElementById('menu_choose_section').value;
+		
+		if(newSectionId==currentSection)
+		\{
+			return;
+		\}
+		
+		var oldElem = document.getElementById(currentSection + '_section');
+		currentSection = newSectionId;
+		var newElem = document.getElementById(currentSection + '_section');
+		
+		oldElem.style.display = 'none';
+		newElem.style.display = 'inline';
+	\}
+	
+	var helptext = new Object();
+
+	helptext.title = 'Enter the title to display next to the folder';
+	helptext.notes = 'Enter the comment to accompany the folder';
+	helptext.access_code = 'Select the default security setting';
+
+	function validate_folderform()
+	\{
+		var form = document.folderform;
+
+		if(form.title.value=='')
+		\{
+			document.getElementById('error_span').innerText = 'Please enter a Title';
+
+			return false;
+		\}
+		
+		form.view_text.value = get_keywords_packet();
+		submit_security_form();
+		applyRichTextValue();
+		
+		return true;
+	\}
+	
+	var keyword_hash = new Object();
+
+	var new_keyword_id = 1;
+
+	function new_keyword(id, word, value)
+	\{
+		if(!id)
+		\{
+			id = 'new' + new_keyword_id;
+			new_keyword_id++;
+		\}
+
+		var keyword = new Object();
+		keyword.id = id;
+		keyword.word = word;
+		keyword.value = value;
+
+		keyword_hash[keyword.id] = keyword;
+	\}
+{
+	foreach my $keyword (@{$c{keyword_array}})
+	{
+		my $id = $keyword->{id};
+		my $word = $keyword->{word};
+		my $value = $keyword->{value};
+		
+		$value =~ s/'/\\'/g;
+
+		$OUT.=<<"+++";
+new_keyword($id, '$word', '$value');
++++
+	}
+}
+
+	function get_keywords_packet()
+	\{
+		var packet = "";
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				packet += keyword.word + "=" + keyword.value + "\n";
+			\}
+		\}
+
+		return packet;
+	\}
+
+	function create_keyword()
+	\{
+		var new_word = document.getElementById('new_word');
+		var existing_word = document.getElementById('existing_word');
+		var value = document.getElementById('keyword_value');
+
+		var word = '';
+
+		if(new_word.value!='')
+		\{
+			word = new_word.value;
+		\}
+		else
+		\{
+			word = existing_word.value;
+		\}
+
+		if(word=='')
+		\{
+			
+			return;
+		\}
+
+		if(value.value=='')
+		\{
+			
+			return;
+		\}
+
+		new_keyword(null, word, value.value);
+
+		apply_keyword_table();
+
+		new_word.value = '';
+		value.value = '';
+	\}
+
+	function apply_keyword_table()
+	\{
+		var html = get_keyword_table();
+
+		document.getElementById('keywords_td').innerHTML = html;
+	\}
+
+	function delete_keyword(id)
+	\{
+		var keyword = keyword_hash[id];
+
+		keyword.deleted = true;
+
+		apply_keyword_table();
+	\}
+
+	function get_keyword_table()
+	\{
+		var table = '<table width=100% border=0 cellspacing=0 cellpadding=0>';
+
+		for(var keyword_id in keyword_hash)
+		\{
+			var keyword = keyword_hash[keyword_id];
+
+			if(!keyword.deleted)
+			\{
+				var keyword_row = 	'<tr><td align=left valign=bottom class="dottedline">'
+								+ '<font class="keyword">' + keyword.word + ' = '
+								+	keyword.value + '&nbsp;</font></td>'
+								+	'<td align=right width=16>'
+								+	'<a style="cursor:hand;" onClick="delete_keyword(\'' + keyword.id + '\');">'
+								+	'<img alt="Delete Keyword" src="/images/icons/16/recyclebin.gif" width=16 height=16 border=0>'
+								+	'</a></td></tr>';
+
+				table += keyword_row;
+			\}
+		\}
+
+		table += '</table>';
+
+		return table;
+	\}
+	
+	function existing_value_changed(select)
+	\{
+		var value = select.value;
+
+		if(value!="-1")
+		\{
+			document.getElementById('keyword_value').value = value;
+		\}
+	\}
+
+	function existing_keyword_changed(select)
+	\{
+		var value = select.value;
+
+		var option_text = '<select onChange="existing_value_changed(this);" size="1" style="width:140px;" class="text_field" name="existing_value" id="existing_value" onFocus="" onBlur="">';
+		option_text += '<option value="-1">&#151;&#151;&#151;&#151;&#151;</option>';
+
+		if(value!="-1")
+		\{
+			var arr = keyword_values[value];
+
+			if(arr)
+			\{
+				for(var i=0; i<arr.length; i++)
+				\{
+					var value = arr[i];
+
+					option_text += '<option value="' + value + '">' + value + '</option>';
+				\}
+			\}
+		\}
+
+		option_text += '</select>';
+
+		document.getElementById('existing_value_span').innerHTML = option_text;
+	\}
+	
+	function extra_option_changed(gui, text_id)
+	\{
+		var value = gui.value;
+		
+		if((value!='')&&(value!='-1'))
+		\{
+			document.getElementById(text_id).value = value;
+		\}
+	\}	
+	
+</script>
+
+<body style="background-color:#D4D0C8;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td width="100%" height="100%" align="center" valign="top">
+<style>
+.tab-page \{height:252px;width:100%;\}
+.label \{padding-right:5px; width:75px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+.keyword \{background-color:#D4D0C8;\}
+</style>
+
+<script type="text/javascript" src="/lib/tabpane.js"></script>
+<form method="POST" action="{$c{script}}" style="margin:0;" name="folderform" onSubmit="return validate_folderform();" enctype="multipart/form-data">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="resources_folder_form_submit">
+<input type="hidden" name="folder_id" value="{$c{folder}->get_id}">
+<input type="hidden" name="view_text" value="">
+<input type="hidden" name="is_forum" value="y">
+<input type="hidden" name="access_code" id="access_code" value="{$c{folder}->access_code}">
+<input type="hidden" name="from_website" value="{$c{params}->{from_website}}">
+<input type="hidden" name="privilage_packet" id="privilage_packet" value="">
+<input type="hidden" name="rich_text" id="rich_text" value="">
+<input type="hidden" name="folder_path" id="folder_path" value="{$c{params}->{folder_path}}">
+
+<table width="100%" border=0 cellpadding=10>
+<tr>
+<td width=100 valign=top>
+<select name="menu_choose_section" id="menu_choose_section" size=20 onChange="sectionChanged(this);" style="font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:11px; color:#000000; padding-left:3px; border:2px inset;">
+<option value="general_info" selected>Discussion Details</option>
+{
+		if($c{user}->admin)
+		{
+			$OUT.=<<"+++";
+<option value="access_control">Access Control</option>
+</select>
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+</select>			
+<input type="hidden" name="inherit_security" id="inherit_security" value="y">			
++++
+		}
+}
+</td>
+<td align="left" valign=top>
+<!--
+
+
+	FOLDER DETAILS
+	
+	
+	-->
+<span id="general_info_section" style="display:inline;">	
+<b>Discussion Info</b><br><br>
+<table width="96%" border="0" cellpadding="0" cellspacing="0">
+<tr style="padding-bottom:5px;">
+<td width="100" align="RIGHT">Discussion Title:&nbsp;</td>
+<td align="LEFT"><input type="text" name="title" value="{$c{folder}->get_value('title')}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" style="width:300px;"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td colspan=2>Enter the text to start the discussion below...</td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td height="5" colspan="2" align="RIGHT"></td>
+</tr>
+<tr style="padding-bottom:5px;">
+<td  colspan="2" align="LEFT">
+	<script language="JavaScript" type="text/javascript" src="/wk/lib/newRichEdit/html2xhtml.js"></script>
+	<!-- To decrease bandwidth, use richtext_compressed.js instead of richtext.js //-->
+	<script language="JavaScript" type="text/javascript" src="/wk/lib/newRichEdit/richtext.js"></script>
+	
+<script language="JavaScript" type="text/javascript">
+
+function notesChanged(gui)
+\{
+	if(!window.confirm('Do you want to copy the notes into the webpage text?')) \{ return; \}
+	
+	var value = gui.value;
+	
+	if(!currentRTE) \{ currentRTE = 'rte1'; \}
+
+	var oRTE = frames['rte1'];
+	var oBody = oRTE.document.body;
+	
+
+	oBody.innerHTML = value;
+
+
+	return;
+	oRng.collapse(false);
+	oRng.select();
+\}
+
+function applyRichTextValue()
+\{
+	//make sure hidden and iframe values are in sync before submitting form
+	//to sync only 1 rte, use updateRTE(rte)
+	//to sync all rtes, use updateRTEs
+	updateRTE('rte1');
+	//updateRTEs();
+	//alert("rte1 = " + document.RTEDemo.rte1.value);
+	
+	document.folderform.rich_text.value = document.folderform.rte1.value;
+	
+	//change the following line to true to submit form
+	return false;
+\}
+
+//Usage: initRTE(imagesPath, includesPath, cssFile, genXHTML)
+initRTE("/wk/lib/newRichEdit/images/", "/wk/lib/newRichEdit/", "", true);
+
+//Usage: writeRichText(fieldname, html, width, height, buttons, readOnly)
+writeRichText('rte1', '{$c{folder}->get_js_value('rich_text')}', 540, 300, true, false);
+
+</script>
+
+
+</td>
+</tr>
+</table>
+</span>
+
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+<span id="access_control_section" style="display:none;">		
+<b>Access Control</b><br><br>
+$c{security_tab}
+</span>
++++
+	}
+
+}
+
+
+</div>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" ALIGN="RIGHT" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-top:8px; padding-left:8px;"><font color="#404040"><span id="helpspan"></span><span id="error_span">{$c{folder}->{error_text}}</span></font></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;">
+<input type="button" onClick="top.returnValue=null;top.close();" name="Submit2" value="Cancel" class="button2" style="width:75px;">
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+
+</form>
+
+</body>
+</html>
+
+
+

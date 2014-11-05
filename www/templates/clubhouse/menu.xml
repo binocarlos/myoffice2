@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<menu_config>
+{
+	if($c{session}->is_privilaged('clubhouse', 'news'))
+	{
+		$OUT.=<<"+++";
+		<menublock title="Club News" width="90">
+			<menuitem title="Add News Item" action="get_iframe_query('&amp;title=Add News&amp;frame_method=news_add_news&amp;appname=news');"/>
+			<menuitem title="View/Edit News Items" action="get_iframe_query('&amp;title=Current News&amp;frame_method=news_home&amp;appname=news');"/>
+		</menublock>
++++
+	}
+
+	if($c{session}->is_privilaged('clubhouse', 'siteeditor'))
+	{
+		$OUT.=<<"+++";
+		<menublock title="Course Status" width="90">
+			<menuitem title="Change Course Status" action="get_iframe_query('&amp;title=Change Course Status&amp;frame_method=home_page&amp;appname=clubhouse');"/>
+		</menublock>
++++
+	}
+	if($c{session}->is_privilaged('clubhouse', 'calendar'))
+	{
+		$OUT.=<<"+++";
+		<menublock title="Calendars" width="90">
+			<menuitem title="View Calendars" action="get_iframe_query('&amp;title=Calendars&amp;frame_method=calendar_entry_home&amp;appname=calendar');"/>
+			<menublock title="Events" width="90">
+				<menuitem title="Add an Event" action="get_iframe_query('&amp;title=Add an Event&amp;frame_method=calendar_entry_form&amp;appname=calendar');"/>
+			</menublock>
+			<menublock title="Event Types" width="90">
+				<menuitem title="Add an Event Type" action="get_iframe_query('&amp;title=Add an Event Type&amp;frame_method=calendar_event_form&amp;appname=calendar');"/>
+				<menuitem title="View/Edit Event Types" action="get_iframe_query('&amp;title=Current Event Types&amp;frame_method=calendar_events_home&amp;appname=calendar');"/>
+			</menublock>
++++
+
+		if($c{user}->is_webkit)
+		{
+			$OUT.=<<"+++";
+			<menublock title="Calendars" width="90">
+				<menuitem title="Add Calendar" action="get_iframe_query('&amp;title=Add Calendar Installation&amp;frame_method=calendar_installation_form&amp;appname=calendar');"/>
+				<menuitem title="View/Edit Calendars" action="get_iframe_query('&amp;title=Current Calendar Installations&amp;frame_method=calendar_installations_home&amp;appname=calendar');"/>
+			</menublock>
+			<menublock title="Style Sheets" width="90">
+				<menuitem title="Add Style Sheet" action="get_iframe_query('&amp;title=Add Style Sheet&amp;frame_method=calendar_style_sheet_form&amp;appname=calendar');"/>
+				<menuitem title="View/Edit Style Sheets" action="get_iframe_query('&amp;title=Current Style Sheets&amp;frame_method=calendar_style_sheets_home&amp;appname=calendar');"/>
+			</menublock>
++++
+		}
+
+		$OUT.=<<"+++";
+		</menublock>
++++
+	}
+	if($c{session}->is_privilaged('clubhouse', 'clubhouse_rotating_icons'))
+	{
+		$OUT.=<<"+++";
+		<menublock title="Rotating Icons" width="90">
+			<menuitem title="Add Rotating Icon" action="get_iframe_query('&amp;title=Add Rotating Icon&amp;frame_method=icon_form&amp;appname=clubhouse');"/>
+			<menuitem title="View/Edit Rotating Icons" action="get_iframe_query('&amp;title=Current Rotating Icons&amp;frame_method=icons_home&amp;appname=clubhouse');"/>
+		</menublock>
++++
+	}
+
+	if(($c{session}->is_privilaged('clubhouse', 'sitestatistics'))||($c{user}->is_privilaged('rk', 'sitestatistics')))
+	{
+		$OUT.=<<"+++";
+	<menublock title="Website Stats" width="140">
++++
+
+		if($c{session}->is_privilaged('clubhouse', 'sitestatistics'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Statistics" action="get_menu_query('&amp;method=stats_home&amp;appname=sitemanager');"/>
++++
+		}
+
+		if($c{session}->is_privilaged('rk', 'emailmanager'))
+		{
+			$OUT.=<<"+++";
+		<menublock title="Email" width="160">
+			<menuitem title="View/Edit Email Accounts" action="get_menu_query('&amp;method=email_home&amp;appname=sitemanager');"/>
+			<menuitem title="Add a Mailbox" action="get_menu_query('&amp;method=email_home&amp;main_frame_method=email_add_pop_account_frameset&amp;appname=sitemanager');"/>
+			<menuitem title="Add an Address" action="get_menu_query('&amp;method=email_home&amp;main_frame_method=email_add_alias_frameset&amp;appname=sitemanager');"/>
+		</menublock>
++++
+		}
+
+		$OUT.=<<"+++";
+	</menublock>
++++
+	}
+
+
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+		<menublock title="Users" width="90">
+			<menuitem title="Add User" action="get_iframe_query('&amp;title=Add User&amp;frame_method=add_user&amp;appname=clubhouse');"/>
+			<menuitem title="View/Edit Users" action="get_iframe_query('&amp;title=Current Users&amp;frame_method=users_home&amp;appname=clubhouse');"/>
+		</menublock>
++++
+	}
+
+}
+
+</menu_config>

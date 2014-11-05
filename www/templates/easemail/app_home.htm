@@ -1,0 +1,110 @@
+<script>
+
+</script>
+
+<link rel="stylesheet" href="/lib/app.css" type="text/css">
+
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+ <TR>
+<TD WIDTH="140" ALIGN="LEFT" VALIGN="TOP" NOWRAP>
+
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><img src="/images/icons/48/mydocuments.gif" width="48" height="48"></td>
+        </tr>
+        <tr> 
+          <td style="font-size:12px;font-weight:bold; padding-top:10px;" height="40" valign="top" align="left">{$c{org}->get_value('name')} 
+            Emails </td>
+        </tr>
+        <tr>
+          <td height="10" valign="top" align="left"></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top"> 
+            <input type="button" CLASS="button" style="width:120px;" onClick="top.send_email();" value="Send Email">
+            <br>
+            <br>
+            <input type="button" CLASS="button" style="width:120px;" onClick="top.unsubscribe();" value="Unsubscribe Member">
+            <br>
+            <br>
+            <input type="button" CLASS="button" style="width:120px;" onClick="top.remove_bounces();" value="Remove Bounces">
+            <br>
+            <br>
+            <input type="button" CLASS="button" style="width:120px;" onClick="top.emails_home();" value="View All Messages">
+          </td>
+        </tr>
+      </table>
+
+</TD>
+<td width="10"></td>
+    <TD ALIGN="left" VALIGN="TOP"> <br>
+      <br>
+      <table width="100%" border="0" cellspacing="1" cellpadding="0">
+        <tr>
+          <td height="200" align="left" valign="top">{$c{to_send_table}}</td>
+        </tr>
+        <tr>
+          <td height=10></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top"> 
+            <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+              <TR> 
+                <TD> 
+                  <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+                    <TR> 
+                      <TD CLASS="panelbody"> 
+                        <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" width=100%>
+                          <TR> 
+                            <TD COLSPAN="2" ALIGN="LEFT" BACKGROUND="/images/layout/panelt.gif" HEIGHT="13"><IMG src="/images/layout/paneltl.gif" BORDER="0" WIDTH="7" HEIGHT="13" ALIGN="ABSMIDDLE"><FONT CLASS="section_title"
+>&nbsp;Email Statistics&nbsp;</FONT></TD>
+                            <TD WIDTH="2" HEIGHT="13" VALIGN="TOP"><IMG src="/images/layout/paneltr.gif" BORDER="0" WIDTH="2" HEIGHT="13"></TD>
+                          </TR>
+                          <TR> 
+                            <TD WIDTH="2" BACKGROUND="/images/layout/panell.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                            <TD WIDTH="100%"> 
+                              <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0">
+                                <TR> 
+                                  <TD> 
+                                    <TABLE width="100%" BORDER="0" CELLPADDING="4" CELLSPACING="0">
+                                      <TR> 
+                                        <TD ALIGN="LEFT" VALIGN="MIDDLE"> Total 
+                                          Members:</TD>
+                                        <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{total_members}}</strong></TD>
+                                      </TR>
+                                      <TR> 
+                                        <TD ALIGN="LEFT" VALIGN="MIDDLE">Total 
+                                          Lists: </TD>
+                                        <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{total_lists}}</strong></TD>
+                                      </TR>
+                                      <TR> 
+                                        <TD ALIGN="LEFT" VALIGN="MIDDLE">Messages 
+                                          Sent: </TD>
+                                        <TD ALIGN="right" VALIGN="MIDDLE"><strong style="color:red;">{$c{total_emails}}</strong></TD>
+                                      </TR>
+                                    </TABLE>
+                                  </TD>
+                                </TR>
+                              </TABLE>
+                            </TD>
+                            <TD WIDTH="2" BACKGROUND="/images/layout/panelr.gif"><IMG src="/images/layout/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0"></TD>
+                          </TR>
+                          <TR> 
+                            <TD HEIGHT="2" COLSPAN="3" BACKGROUND="/images/layout/panelb.gif" ALIGN="RIGHT"><IMG src="/images/layout/panelbr.gif" BORDER="0" WIDTH="2" HEIGHT="2"></TD>
+                          </TR>
+                        </TABLE>
+                        <BR>
+                      </TD>
+                    </TR>
+                  </TABLE>
+                </TD>
+              </TR>
+            </TABLE>
+          </td>
+        </tr>
+      </table>
+      <br>
+    </td>
+  </tr></table>
+

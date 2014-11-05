@@ -1,0 +1,198 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script src="/templates/skillsaudit/audit_analysis.js"></script>
+<script>
+	var giMinYear = 2004;
+
+	var giMaxYear = 2010;
+</script>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+      <td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;"><b style="color:#ff9900; font-size:13px; font-variant:small-caps;">
+        <table width=100% border=0 cellpadding=0 cellspacing=0>
+          <tr>
+            <td> <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/adminmenu/timeline.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> LA - Timeline analysis </b> </td>
+            <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;"><img id="imghelp" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Help</td>
+          </tr>
+        </table>
+      </b></td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">The timeline below shows you progression over time for each question group within the audit. <br>
+      The timeline is split into <span style="color:blue;">{$c{org}->{slice}}s</span> - with each <span style="color:blue;">{$c{org}->{slice}}</span> giving you an overall average (the numbers in red) and averages for each section (the numbers in black).<br>
+      <br> 
+      There are <b style="color:red;">{$c{org}->{_visitor_count}}</b> visitors  present in the result set.      <br>
+      <br>
+      The filter is set as follows: <br>
+	  <table border=0 cellpadding=5 cellspacing=0>
+	<tr>
+	  <td align=right>Audit between </td>
+	  <td style="color:blue;">{$c{org}->{from_date}} and {$c{org}->{to_date}}</td>
+	</tr>	  
+{
+	my @props = qw(subject keystage school_type postcode);
+	
+	foreach my $prop (@props)
+	{
+		my $value = $params{$prop};
+		
+		if(($value=~/\w/)&&($value!=-1))
+		{
+			$OUT.=<<"+++";
+	<tr><td align=right>$prop =</td><td style="color:red;">$value</td></tr>
++++
+		}
+	}
+}
+</table>      
+      <br>
+      Please note these are  average results across teachers from the whole LA. <br>
+To look at specific individuals outside  the average, please choose a school from the tree on the left where you will find a list of teachers. </td>
+  </tr>
+<td height=20></td></tr>
+<td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#6600aa; background-color:#f5e5ff;"><b style="color:#6600aa; font-size:13px; font-variant:small-caps;">
+      <table width=100% border=0 cellpadding=0 cellspacing=0>
+        <tr>
+          <td> <b style="color:#6600aa; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/timeline_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> TIMELINE Analysis LINE Graph </b> </td>
+          <td width=100 align="right" onClick="toggleGroup('graph');" style="cursor:hand;color:blue;"><img id="imggraph" src="/images/nav/plus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Graph&nbsp;&nbsp;</td>
+        </tr>
+      </table>
+    </b></td>
+  </tr>
+  <tr id="trgraph" style="display:none;">
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffff;"><img src="{$c{href}}&method=visitors_group_timeline_graph&school_id={$c{params}->{school_id}}&from_date={$c{org}->{from_date}}&to_date={$c{org}->{to_date}}&subject={$c{params}->{subject}}&keystage={$c{params}->{keystage}}&school_type={$c{params}->{school_type}}&postcode={$c{params}->{postcode}}&slice={$c{org}->{slice}}"></td>  
+  <tr>
+    <td height=20></td>
+  </tr>
+  <tr>
+    <td>
+<TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="outertable">
+{
+	my $cols = @{$c{org}->{date_keys}};
+	$cols++;
+	
+	$OUT.=<<"+++";
+  <tr>
+    <td class="t" colspan=$cols>
+	<table cellpadding=0 cellspacing=0 border=0 style="padding-bottom:10px;padding-top:10px;padding-right:10px;"><tr><td valign="middle">
+	<b style="color:red;font-size:12pt;">$c{org}->{_visitor_count}</b> visitors in result set</td>
+	</tr></table></td>
+  </tr>
++++
+}
+  <tr>
+    <td class="t"><b>{$c{org}->{slice}}</b></td>  
+{
+	foreach my $date_key (@{$c{org}->{date_keys}})
+	{
+		my $title = $c{org}->get_date_key_title($date_key);
+		
+		$OUT.=<<"+++";	
+    <td class="t" align="center"><b>$title</b></td>
++++
+	}
+}
+</tr>
+  <tr>
+    <td class="t"><b style="color:blue;">No. Audits Taken</b></td>  
+{
+	foreach my $date_key (@{$c{org}->{date_keys}})
+	{
+		my $count = $c{org}->{audit_count_map}->{$date_key};
+		
+		$OUT.=<<"+++";	
+    <td class="t" align="right"><b style="color:blue;">$count</b></td>
++++
+	}
+}
+</tr>
+<tr>
+      <td class="t"><b style="color:red;">Average Score</b></td>  
+{
+	my $prev_avg;
+
+	foreach my $date_key (@{$c{org}->{date_keys}})
+	{
+		my $avg = $c{org}->{timeline_map}->{$date_key}->{avg};
+		
+		my $bg = ' bgcolor=';
+		
+		if(!$prev_avg)
+		{
+			$bg .= '#ffffff';
+		}
+		elsif($prev_avg>=$avg)
+		{
+			$bg .= '#ffe5e5';
+		}
+		else
+		{
+			$bg .= '#e5ffe5';
+		}
+		
+		$prev_avg = $avg;
+		
+		$OUT.=<<"+++";	
+    <td $bg class="c1" align="right"><b style="color:red;">$avg</b></td>
++++
+	}
+}  </tr>
+{
+	foreach my $key (sort keys %{$c{org}->{timeline_tags}})
+	{
+		my $title = $c{org}->{timeline_tags}->{$key};
+		
+		$OUT.=<<"+++";
+<tr>
+<td class="t">$title</td>
++++
+
+		my $prev_avg;
+
+		foreach my $date_key (@{$c{org}->{date_keys}})
+		{
+			my $avg = $c{org}->{timeline_map}->{$date_key}->{$key}->{avg};
+			
+			if($avg!~/\d/) { $avg = 'n/a'; }			
+		
+			my $bg = ' bgcolor=';
+		
+			if(((!$prev_avg)||($prev_avg eq 'n/a'))&&($avg ne 'n/a'))
+			{
+				$bg .= '#ffffff';
+			}
+			elsif($avg eq 'n/a')
+			{
+				$bg .= '#e5e5e5';
+			}
+			elsif($prev_avg>=$avg)
+			{
+				$bg .= '#ffe5e5';
+			}
+			else
+			{
+				$bg .= '#e5ffe5';
+			}
+		
+			$prev_avg = $avg;
+			
+			$OUT.=<<"+++";
+<td align=right $bg class="c1">$avg</td>			
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+}
+</table>	</td>
+  </tr>
+</table>
+{$c{calendar_table}}
+</body>
+</html>
+
+
+

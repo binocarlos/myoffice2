@@ -1,0 +1,16 @@
+BODY {background:#FFFFFF; margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px; border:0px; font-family:tahoma,verdana,arial; font-size:11px;}
+h1	{display:none;}
+
+h2 {font-family:tahoma;font-size:11px;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:0px; BACKGROUND-COLOR: #D4D0C8; BORDER-BOTTOM: #808080 solid 1px; BORDER-LEFT: #D4D0C8 solid 1px; BORDER-RIGHT: #808080 solid 1px; BORDER-TOP:  #D4D0C8 solid 1px;}
+h4	{font-family:tahoma; font-size:13px; display:none;}
+th	{font-family:tahoma; font-size:13px;}
+td.alt1	{font-family:tahoma; font-size:11px;}
+td.alt2	{font-family:tahoma; font-size:11px;}
+th.total	{font-family:tahoma; font-size:11px;}
+.fineprint	{font-family:tahoma; font-size:11px;}
+.smallfont	{font-family:tahoma; font-size:11px;}
+
+.navitem {font-family:tahoma; font-size:11px;}
+hr {color:#FFFFFF;}
+a {color:#0000FF}
+a:hover {color:#ffa201}

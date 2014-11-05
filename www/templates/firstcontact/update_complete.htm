@@ -1,0 +1,57 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.b \{border-style:solid; border-color:#000099;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script>
+	function chooseMuseum(id)
+	\{
+		document.location = href + '&method=website_proxy_change_museum_id&museum_id=' + id;
+	\}
+	
+	function addNewMuseum()
+	\{
+		document.location = href + '&method=website_proxy_change_museum_id';
+	\}
+</script>
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/icons/24x24/documents.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> Museum Data Saved! </b></td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;">&nbsp;</td>
+  </tr></table>
+  </td>
+  </tr>
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">
+Your information has been saved – thank you.<br>
+<br>
+
+
+It will appear on the museums4schools website as soon as we have checked it, normally within a couple of working days. We’ll send you an email to tell you when this has happened.
+<br>
+<br>
+
+What would you like to do now?
+	
+	</td>
+  </tr>  
+  <tr>
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><input type="button" style="width:200px;" class="button" value="add or edit another museum" onClick="document.location = '{$c{href}}' + '&method=website_proxy_homepage';">
+<br>
+<br>
+<input type="button" style="width:200px;" class="button" value="logout" onClick="top.close();"></td>
+  </tr>
+</table>
+</body>
+</html>
+
+
+

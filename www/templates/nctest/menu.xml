@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<menu_config>
+{
+	if($c{user}->admin)
+	{
+		$OUT.=<<"+++";
+	<menublock title="Users" width="90">
+		<menuitem title="Add User" action="get_menu_iframe_query('add_user', 'Users');"/>
+		<menuitem title="View/Edit Users" action="get_menu_iframe_query('users_home', 'Users');"/>
+	</menublock>
++++
+	}
+
+#	if($c{session}->is_privilaged('nctest', 'nctest_tests'))
+#	{
+#		$OUT.=<<"+++";
+#	<menublock title="Quiz Papers" width="160">
+#			<menuitem title="Create New Paper" action="get_menu_iframe_query('tests_test_form', 'Test Papers');"/>
+#			<menuitem title="View/Edit Papers" action="get_menu_iframe_query('tests_home', 'Test Papers');"/>
+#	</menublock>
+#+++
+#	}
+
+	if($c{session}->is_privilaged('nctest', 'nctest_pupils'))
+	{
+		if($c{org}->is_generic_nctest)
+		{	
+			$OUT.=<<"+++";
+	<menublock title="Students" width="160">
+			<menuitem title="View/Edit Student Groups" action="get_menu_iframe_query('pupils_home', 'Students');"/>
+			<menuitem title="Search Students" action="get_menu_iframe_query('pupils_search_pupils', 'Students');"/>
+	</menublock>
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+	<menublock title="Pupils" width="160">
+			<menuitem title="View/Edit Classes" action="get_menu_iframe_query('pupils_home', 'Pupils');"/>
+			<menuitem title="Search Pupils" action="get_menu_iframe_query('pupils_search_pupils', 'Pupils');"/>
+	</menublock>
++++
+		}
+	}
+
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+	<menublock title="Tests" width="160">
++++
+
+		if($c{session}->is_privilaged('nctest', 'nctest_exams'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Create New Test" action="get_menu_iframe_query('exams_exam_form', 'Tests');"/>		
+		<menuitem title="View/Edit Tests" action="get_menu_iframe_query('exams_home', 'Tests');"/>
++++
+		}
+
+		if($c{session}->is_privilaged('nctest', 'nctest_invigilators'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Invigilate Test" action="get_menu_iframe_query('invigilators_home', 'Invigilate');"/>
++++
+		}
+
+		if($c{session}->is_privilaged('nctest', 'nctest_marking'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Mark Test" action="get_menu_iframe_query('marking_home', 'Mark Tests');"/>
++++
+		}
+		
+		$OUT.=<<"+++";
+		<menuitem title="Admin Homepage" action="top.viewAdminControlPanel();"/>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+	<menublock title="Quizzes" width="160">
++++
+
+		if($c{session}->is_privilaged('nctest', 'nctest_exams'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Create New Quiz" action="get_menu_iframe_query('exams_exam_form', 'Exams');"/>		
+		<menuitem title="View/Edit Quizzes" action="get_menu_iframe_query('exams_home', 'Exams');"/>
++++
+		}
+
+		if($c{session}->is_privilaged('nctest', 'nctest_invigilators'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Invigilate Quiz" action="get_menu_iframe_query('invigilators_home', 'Invigilate');"/>
++++
+		}
+
+		if($c{session}->is_privilaged('nctest', 'nctest_marking'))
+		{
+			$OUT.=<<"+++";
+		<menuitem title="Mark Quiz" action="get_menu_iframe_query('marking_home', 'Mark Exams');"/>
++++
+		}
+	}
+	
+	$OUT.=<<"+++";
+	</menublock>
++++
+
+	if($c{session}->is_privilaged('nctest', 'nctest_analysis'))
+	{
+		if(!$c{org}->is_generic_nctest)
+		{
+			$OUT.=<<"+++";
+	<menublock title="Analysis" width="160">
+		<menuitem title="Proccess Quiz" action="get_menu_iframe_query('analysis_process_home', 'Proccess Exam');"/>
+		<menuitem title="Marking Analysis" action="get_menu_iframe_query('analysis_auto_marking_home', 'Automatic Marking Analysis');"/>
+		<menuitem title="Question Analysis" action="get_menu_iframe_query('analysis_question_home', 'Question Analysis');"/>
+		<menuitem title="Level Analysis" action="get_menu_iframe_query('analysis_level_home', 'Level Analysis');"/>
+		<menuitem title="Progress Analysis" action="progressAnalysis();"/>
+	</menublock>
++++
+		}
+	}
+	
+	if($c{user}->is_webkit)
+	{
+		$OUT.=<<"+++";
+	<menublock title="Admin" width="160">
+		<menuitem title="Remark Input" action="get_menu_iframe_query('admin_remark_input', 'Remark Input');"/>
+		<menuitem title="Show Zero Scores" action="get_menu_iframe_query('admin_show_zero_scores', 'Show Zero Scores');"/>		
+	</menublock>
++++
+	}
+
+#	<menublock title="Help" width="90">
+#		<menuitem title="Online Help" action="RH_ShowHelp(0,'' + helpurl + appname + '/index.htm>Help',0,0);"/>
+#		<menuitem title="Contact Support" action="get_menu_iframe_query('support_home', 'Support');"/>
+#		<menuitem title="Edit Personal Details" action="get_menu_iframe_query('edit_personal_details', 'Edit Personal Details');"/>
+#		<menuitem title="About" action="get_menu_iframe_query('about_home', 'About');"/>
+#	</menublock>
+}	
+</menu_config>

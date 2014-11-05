@@ -1,0 +1,32 @@
+<DIV ID="incoming" STYLE="display:none">
+<BR><BR><BR><BR>
+<DIV ID="stories">
+{
+	my $id = 0;
+	
+	foreach my $news (@{$c{news_array}})
+	{
+		$id++;
+		
+		my $title = $news->get_truncated_title($news, 179);
+		
+		$title .= '.';
+		
+		$OUT.=<<"+++";
+ <DIV ID="$id">
+  <DIV ID="Summary">$title</DIV>
+  <DIV ID="SiteLink">/theclub/clubnews.html</DIV>
+ </DIV>
++++
+	}
+	
+	$OUT.=<<"+++";
+</DIV>
+
+<DIV ID="properties">
+ <DIV ID="itemcount">$id</DIV>
+</DIV>
++++
+}
+
+</DIV>

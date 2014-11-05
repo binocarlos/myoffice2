@@ -1,0 +1,299 @@
+<style>
+.tab-page \{height:300px;width:540px;\}
+.label \{padding-right:10px; padding-bottom:5px;\}
+.space \{width:30px;\}
+.field \{padding-bottom:5px;\}
+.priv1 \{padding-left:15px;\}
+</style>
+
+<div class="tab-pane" id="tabPane1">
+<script type="text/javascript">tp1 = new WebFXTabPane( document.getElementById( "tabPane1" ) );</script>
+{
+	if($c{form_config}->{personal_details})
+	{
+		my $firstname = $c{formuser}->get_value('firstname');
+		my $surname = $c{formuser}->get_value('surname');
+
+		$OUT.=<<"+++";
+<!--#### Personal Details ####-->
+<div class="tab-page" id="tabPage1">
+<h2 class="tab"  id="tabShow1">Personal Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage1" ) );</script>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Firstname(s):</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="firstname" value="$firstname" style="width:160px;"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Surname:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="surname" value="$surname" style="width:160px;"></TD>
+</TR>
+</TABLE>
+</div>
++++
+	}
+
+	if($c{form_config}->{personal_details})
+	{
+		my $position = $c{formuser}->get_value('position');
+		my $phone = $c{formuser}->get_value('phone');
+
+		$OUT.=<<"+++";
+		<!--#### Employment Details ####-->
+<div class="tab-page" id="tabPage2">
+<h2 class="tab" id="tabShow2">Employment Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage2" ) );</script>
+<fieldset>
+<legend>General</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Position:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="position" value="$position" style="width:160px;"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Phone:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="phone" value="$phone" style="width:160px;"></TD>
+</TR>
+</TABLE>
+</div>
+</fieldset><br>
++++
+
+		if($c{form_config}->{department})
+		{
+			my $department_options = Webkit::Department->get_department_options($c{formorg}, $c{formuser});
+
+			my $otherdepartment = $c{params}->{otherdepartment};
+
+			$OUT.=<<"+++";
+<fieldset>
+<legend>Group</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Group:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><select name="department_id" size="1" style="width:160px;" class="text_field">$department_options</select></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">New&nbsp;Group:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="otherdepartment" value="$otherdepartment" style="width:160px;"></TD>
+</TR>
+</TABLE>
+</div>
+</fieldset>
++++
+		}
+		
+		if($c{form_config}->{holiday})
+		{
+			$OUT.=<<"+++";		
+<fieldset>
+<legend>Group</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">				 
+<tr>
+										
+<td align="RIGHT" valign="MIDDLE"
+										 width="95">Employee&nbsp;Number:</td>
+<td align="LEFT" valign="TOP">
+<input
+										 onFocus="this.className='text_field2';" onBlur="this.className='text_field';"
+										 class="text_field" type="text" name="number" value="{$c{formuser}->get_value('number')}"
+										 style="width:160px;">
+</td>
+<td align="RIGHT" valign="MIDDLE"
+										 width="95">Start&nbsp;Date:</td>
+<td align="LEFT" valign="MIDDLE">
+<input class="text_field"
+										 type="TEXT" name="startdate" style="width:129px;" readonly="READONLY"
+										 value="">
+<img src="/images/holiday/clear.gif" width="5" height="1"
+										 border="0" align="ABSMIDDLE"><a onClick="calendar_click(document.userform.startdate);"><img
+										 src="/images/holiday/but_date.gif" width="26" height="20" border="0"
+										 align="ABSMIDDLE"></a></td>
+</tr>
+									 
+<tr>
+										
+<td align="RIGHT" valign="MIDDLE">Type:</td>
+<td align="LEFT" valign="MIDDLE">
+										 
+<select name="employment_type" size="1" style="width:160px;"
+											class="text_field">
+											{$c{employement_type_options}}
+										 
+</select>
+</td>
+<td align="RIGHT" valign="MIDDLE">Work&nbsp;Weekends:</td>
+<td align="LEFT" valign="MIDDLE">
+<input type="checkbox" name="saturdays" value="y"{$c{sat_check}}>
+Sat
+<input type="checkbox" name="sundays" value="y"{$c{sun_check}}>
+ Sun
+</td>
+</tr>
+<tr>
+<td align="RIGHT">Holiday&nbsp;Allowance:</td>
+<td align="LEFT">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+ 
+<td width="25" valign="middle">
+	
+<input onChange="allowance_changed();" onFocus="this.className='text_field2';"
+	 onBlur="this.className='text_field';" class="text_field" type="TEXT"
+	 name="allowance" size="5" value="{$c{formuser}->get_value('allowance')}"
+	 style="width:25px; text-align:right;">
+ </td>
+<td align="LEFT" valign="MIDDLE">&nbsp;Days <span id="starting_block">(<span
+	id="starting_allowance_span">{$c{formuser}->get_value('starting_allowance')}</span>
+	Days in <span id="starting_year">2002</span>)</span></td>
+</tr>
+</table>
+</td>
+<td align="RIGHT">Owed&nbsp;Days:</td>
+<td align="LEFT">
+										 
+<table border="0" cellpadding="0" cellspacing="0">
+											
+<tr>
+											 
+<td>
+<input onFocus="this.className='text_field2';"
+												onBlur="this.className='text_field';" class="text_field" type="TEXT"
+												name="owed_days" size="5" value="{$c{formuser}->get_value('owed_days')}"
+												style="width:25px; text-align:right;">
+</td>
+<td align="LEFT" valign="MIDDLE">&nbsp;Days</td>
+</tr>
+										 
+</table>
+</td>
+</tr>							
+</table>
+</div></fieldset>
++++
+		}
+		
+		$OUT.=<<"+++";
+</div>
++++
+
+	}
+
+	if($c{form_config}->{signin_details})
+	{
+		my $username = $c{formuser}->get_value('username');
+		my $password = $c{formuser}->get_value('password');
+
+		$OUT.=<<"+++";
+<!--#### Account Details ####-->
+<div class="tab-page" id="tabPage3">
+<h2 class="tab"  id="tabShow3">Account Details</h2>
+<script type="text/javascript">tp1.addTabPage( document.getElementById( "tabPage3" ) );</script>		
+<fieldset>
+<legend>Log In Details</legend>
+<div class="seccontent">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Email&nbsp;(Username):</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="username" value="$username" style="width:160px;"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="space"></TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Password:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="text" name="password" value="$password" style="width:160px;"></TD>
+</TR>
++++
+
+		if($c{user}->admin)
+		{
+			my $type_options = $c{formuser}->get_type_options;
+			
+			$OUT.=<<"+++";
+<TR>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="label">Account Type:</TD>
+ <TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="field"><select name="type" size="1" style="width:160px;" class="text_field">$type_options</select></TD>
+</TR>
++++
+		}
+		
+		$OUT.=<<"+++";
+		</TABLE>
+</div>
+</fieldset><br>
++++
+	}
+
+	if($c{form_config}->{privilages})
+	{
+		$OUT.=<<"+++";
+<fieldset>
+<legend>Account Privilages</legend>
+<div class="seccontent">
+<table border="0" cellspacing="0" cellpadding="0">
++++
+
+		$c{formuser}->load_all_privilages;
+
+		my $main_application_id = $c{main_application_id};
+
+		if($main_application_id!~/\w/)
+		{
+			$main_application_id = $c{session}->{base_application};
+		}
+
+		my $main_application = Webkit::Apache::ApplicationHub->get_application($main_application_id);
+
+		my $sub_apps = $main_application->get_subapplication_ids;
+
+		if(defined($c{sub_applications}))
+		{
+			$sub_apps = $c{sub_applications};
+		}
+
+		my $main_title = $main_application->get_value('title');
+
+		my $main_check = $c{formuser}->get_priv_checkbox($main_application->get_id, undef, $c{params});
+
+		my $sub_application_ids = join(':', @$sub_apps);
+
+		$OUT.=<<"+++";
+<tr valign="middle">
+<td><b>$main_title</b></td>
+<td align="right">$main_check<input type="hidden" name="main_application_id" value="$main_application_id"><input type="hidden" name="sub_application_ids" value="$sub_application_ids"></td>
++++
+
+		my $scount = 0;
+
+		foreach my $sub_app (@$sub_apps)
+		{
+			$scount++;
+
+			my $sub_application = Webkit::Apache::ApplicationHub->get_application($sub_app);
+
+			my $sub_title = $sub_application->get_value('title');
+			my $sub_check = $c{formuser}->get_priv_checkbox($main_application->get_id, $sub_application->get_id, $c{params});
+
+			$OUT.=<<"+++";
+<td align="right" class="priv1">$sub_title</td>
+<td align="right">$sub_check</td>
++++
+
+			if($scount>=2)
+			{
+				$scount=0;
+
+				$OUT.=<<"+++";
+</tr><tr><td></td><td></td>
++++
+			}
+		}
+		
+		$OUT.=<<"+++";
+</tr>
+</table>
+</div>
+</fieldset>
+	</div>		
++++
+	}
+}			
+
+</div>

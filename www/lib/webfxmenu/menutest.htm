@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Simple Menu (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<style type="text/css">
+
+p {
+	font:	Message-Box;
+	font:	MessageBox;
+	margin:	10px;
+}
+
+.warning {
+	color:	red;
+}
+
+</style>
+<script type="text/javascript">
+
+var ie55 = /MSIE ((5\.[56789])|([6789]))/.test( navigator.userAgent ) &&
+			navigator.platform == "Win32";
+
+if ( !ie55 ) {
+	window.onerror = function () {
+		return true;
+	};
+}
+
+function writeNotSupported() {
+	if ( !ie55 ) {
+		document.write( "<p class=\"warning\">" +
+			"This script only works in Internet Explorer 5.5" +
+			" or greater for Windows</p>" );
+	}
+}
+
+</script>
+<script type="text/javascript" src="poslib.js"></script>
+<script type="text/javascript" src="scrollbutton.js"></script>
+<script type="text/javascript" src="menu4.js"></script>
+<script type="text/javascript" src="winxp.css.js"></script>
+<script type="text/javascript">
+
+// write the needed style element
+document.write("<style type=\"text/css\">" + cssText + "<\/style>");
+
+</script>
+<script type="text/javascript">
+//<![CDATA[
+
+var tmp, tmp2;
+
+// set default css file to use
+Menu.prototype.cssText = cssText;
+
+// test menu
+
+var testMenu = new Menu();
+
+testMenu.add(tmp = new MenuItem("New Window", document.location.href));
+tmp.target = "_blank";
+tmp.mnemonic = 'n';
+tmp.shortcut = "Ctrl+N";
+
+
+testMenu.add(tmp = new MenuItem("Alert", function () { alert("Clicked " + this.text); }) );
+tmp.mnemonic = 'a';
+
+testMenu.add(new MenuSeparator);
+
+testMenu.add(tmp = new MenuItem("Close", function () { window.close(); }) );
+tmp.mnemonic = 'c';
+
+
+// Check box menu
+
+var cbm = new Menu();
+
+function onCheckBoxChanged() {
+	alert("The menu item with the text " + this.text +
+		" is now " + (this.checked ? "checked" : "unchecked"));
+}
+
+cbm.add( new CheckBoxMenuItem("Check Me 1", false, onCheckBoxChanged) );
+cbm.add( new CheckBoxMenuItem("Check Me 2", false, onCheckBoxChanged) );
+
+
+// Radio Menu
+
+var rm = new Menu();
+
+function onRadioChanged() {	
+	var text;
+	if (rb1.checked)
+		text = rb1.text;
+	else if (rb2.checked)
+		text = rb2.text;
+	else if (rb3.checked)
+		text = rb3.text;
+	alert("You selected " + text);
+};
+
+var rb1 = new RadioButtonMenuItem("Vanilla", false, "flavorGroup", onRadioChanged);
+var rb2 = new RadioButtonMenuItem("Chocolate", true, "flavorGroup", onRadioChanged);
+var rb3 = new RadioButtonMenuItem("Strawberry", false, "flavorGroup", onRadioChanged);
+rm.add(rb1);
+rm.add(rb2);
+rm.add(rb3);
+
+
+// sub menus
+
+var sm = new Menu();
+
+// manual
+var sm2 = new Menu();
+sm.add( tmp = new MenuItem( "Item with sub (ACTION)", "http://webfx.eae.net", null, sm2) );
+sm2.add( new MenuItem("Item inside sub menu") );
+
+sm.add( new MenuSeparator() );
+
+// loop
+for (var i = 0; i < 5; i++) {
+	tmp = new Menu;
+	sm.add( new MenuItem("Sub Menu " + i, null, null, tmp) );
+	for (var j = 0; j < 5; j++) {
+		tmp2 = new Menu();
+		tmp.add( new MenuItem("Item " + i + "." + j, null, null, tmp2) );
+		for (var k = 0; k < 5; k++) {
+			tmp2.add( new MenuItem("Item " + i + "." + j + "." + k) );	
+		}
+	}	
+}
+
+
+// menu bar
+
+var menuBar = new MenuBar();
+
+var testButton = new MenuButton("Test", testMenu);
+testButton.mnemonic = "t";
+menuBar.add(testButton);
+
+menuBar.add( tmp = new MenuButton("Check Box Menu", cbm) );
+tmp.mnemonic = 'c';
+
+menuBar.add( tmp = new MenuButton("Radio Menu", rm) );
+tmp.mnemonic = 'r';
+
+menuBar.add( tmp = new MenuButton("Sub Menus", sm) );
+tmp.mnemonic = 's';
+
+//]]>
+</script>
+</head>
+<body onload="//window.setTimeout('location.reload()', 50)">
+<script type="text/javascript">
+
+menuBar.write();
+
+</script>
+
+<script type="text/javascript">
+writeNotSupported();
+</script>
+
+<p>
+<a href="simpledemo.html" onclick="document.location = 'view-source:' + document.location; return false;">View Source</a>
+</p>
+
+
+
+</body>
+</html>

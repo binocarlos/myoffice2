@@ -1,0 +1,58 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function markQuestion(id)
+	\{
+		document.location = href + '&method=marking_redirect_to_marking_editor&sub_question_id=' + id + '&exam_id={$c{exam}->get_id}';
+	\}
+</script>
+
+<table border="0" align="left" cellpadding="5" cellspacing="1" bgcolor="#999999">
+  <tr bgcolor="#FFFFFF">
+    <td><input type="button" value="Back to Marking" onClick="document.location = href + '&method=marking_home';" class="button">
+	</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td width="300">
+      <p>Mark By Question</p>
+	</td>
+  </tr>
+  <tr valign="top" bgcolor="#FFFFFF">
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+{
+	foreach my $question (@{$c{test}->ensure_child_array('question')})
+	{
+		my $title = $question->get_value('title');
+		my $order = $question->get_value('numberorder');
+		
+		my $sub_questions = $question->ensure_child_array('sub_question');
+		my $sub_question_count = @$sub_questions;
+		
+		foreach my $sub_question (@$sub_questions)
+		{
+			my $sqorder = $sub_question->get_order_title;
+			my $count = $sub_question->unmarked_manual_answers;
+			my $sqid = $sub_question->get_id;
+			
+			my $part_title = $order;
+			
+			if($sub_question_count>1)
+			{
+				$part_title.=$sqorder;
+			}
+			
+		$OUT.=<<"+++";
+        <tr>
+          <td>$part_title - $title</td>
+          <td><b style="color:red;">$count</b></td>
+		  <td width="1">
+	      <input type="button" value="Mark Question" class="button" onClick="markQuestion($sqid);"></td>
+        </tr>
++++
+		}
+	}
+}
+      </table>
+    </td>
+  </tr>
+</table>

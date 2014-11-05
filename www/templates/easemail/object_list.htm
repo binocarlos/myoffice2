@@ -1,0 +1,185 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var selectedCell = null;
+	
+	function selectCell(id)
+	\{
+		if(selectedCell!=null)
+		\{
+			document.getElementById(selectedCell).bgColor = '#ffffff';
+		\}
+		
+		selectedCell = id;
+		
+		document.getElementById(selectedCell).bgColor = '#ffe5e5';
+	\}
+	
+	function normal_method(method)
+	\{
+		var new_loc = href + '&method=' + method;
+		
+		document.location = new_loc;
+	\}
+	
+	function object_list_get_selected_id()
+	\{
+		return selectedCell;
+	\}
+
+	function object_method(method)
+	\{
+
+		var selectedRow = object_list_get_selected_id();
+		
+		if(selectedRow!=null)
+		\{
+			var object_tag = 'object';
+			
+{
+	if($c{object_tag}=~/\w/)
+	{
+		$OUT.=<<"+++";
+			object_tag = '$c{object_tag}';
++++
+	}
+}
+			var new_loc = href + '&method=' + method + '&' + object_tag + '_id=' + selectedRow;
+
+			document.location = new_loc;
+		\}
+	\}
+
+</script>
+Please remember to highlight (by clicking) the entry you want to edit.... <br>
+<br>
+<TABLE ID="tableheader" CELLPADDING="5" CELLSPACING="1" bgcolor=#666666 BORDER="0" WIDTH="100%">
+ <TR bgcolor=#ffffff>
+{
+	$c{colspan} = 0;
+	
+	foreach my $def (@{$c{defs}})
+	{
+		$c{colspan}++;
+		
+		$OUT.=<<"+++";
+	<TD WIDTH="$def->{width}">&nbsp;$def->{title}</TD>
++++
+	}
+}
+
+ </TR>
+{
+	foreach my $object (@{$c{objects}})
+	{	
+		my $id = $object->get_id;
+
+		$OUT.=<<"+++";
+<TR id="$id" bgcolor=#ffffff style="cursor:hand;" onClick="selectCell($id);">
++++
+
+		foreach my $def (@{$c{defs}})
+		{
+			my $value;
+			
+			if($def->{prop}=~/\w/)
+			{
+				$value = $object->get_value($def->{prop});
+			}
+			elsif($def->{method}=~/\w/)
+			{
+				my $method = $def->{method};
+				
+				my $args = $def->{args};
+				
+				$value = $object->$method(@$args);
+			}
+			elsif($def->{value}=~/\w/)
+			{
+				$value = $def->{value};
+			}
+			
+			my $align;
+			
+			if($def->{align}=~/\w/)
+			{
+				$align = ' align="'.$def->{align}.'"';
+			}
+		
+			my $width = $def->{width};
+			my $width_px = $width.'px';
+			
+			my $title = $value;
+
+			$title =~ s/<.*?>//g;
+						
+			$OUT.=<<"+++";		
+<TD nowrap valign=top WIDTH="$width"$align>$value</TD>
++++
+		}
+		
+		$OUT.=<<"+++";
+</tr>
++++
+	}
+	
+	my $button_texts = undef;
+	
+	my $button_refs = $c{button_refs};
+	
+	foreach my $button_ref (@$button_refs)
+	{
+		my $title = $button_ref->{title};
+		my $method = $button_ref->{method};
+		my $key = $button_ref->{key};
+		my $jsfunc = 'object_method';
+		my $width = 75;
+		
+		if($key!~/\w/)
+		{
+			$key = $title;
+			$key =~ s/\W//g;
+		}
+			
+		if($button_ref->{normal_method}=~/\w/)
+		{
+			$method = $button_ref->{normal_method};
+			$jsfunc = 'normal_method';
+		}
+		
+		if($button_ref->{js_func}=~/\w/)
+		{
+			$jsfunc = $button_ref->{js_func};
+		}		
+		
+		if($button_ref->{width}=~/\d/)
+		{
+			$width = $button_ref->{width};
+		}
+		
+		if($width!~/px$/)
+		{
+			$width.='px';
+		}
+		
+		$key = 'object_button_'.$key;
+		
+		my $button_text=<<"+++";
+<input type="BUTTON" name="$key" id="$key" value="$title" class="button2" style="width:$width;" onClick="$jsfunc('$method');">
++++
+
+		push(@$button_texts, $button_text);
+	}
+	
+	my $join=<<"+++";
++++
+
+	$c{all_button_text} = join($join, @$button_texts);
+	
+	$OUT.="";	
+}
+
+<TR bgcolor=#ffffff>
+ <TD colspan={$c{colspan}} ALIGN="RIGHT">{$c{all_button_text}}</TD>
+</TR>
+</TABLE>
+</body>

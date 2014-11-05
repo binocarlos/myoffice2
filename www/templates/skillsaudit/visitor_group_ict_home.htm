@@ -1,0 +1,350 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script src="/templates/skillsaudit/audit_analysis.js"></script>
+<script>
+	function goBack()
+	\{
+
+	\}
+
+	var giMinYear = 2004;
+
+	var giMaxYear = 2010;
+	
+var clickedInfoId = null;	
+
+function infoTdClick(td, subject, tag, date_key)
+\{
+	if(clickedInfoId)
+	\{
+		var oldTd = document.getElementById(clickedInfoId);
+		
+		oldTd.bgColor = '';
+	\}
+	
+	clickedInfoId = td.id;
+	
+	td.bgColor = '#66ff66';
+	
+ 	var iFrame = document.getElementById('summary' + date_key);
+
+	iFrame.src = href + '&method=visitors_group_ict_summary&subject=' + subject + '&tag=' + tag + '&date_key=' + date_key + '&slice={$c{params}->{slice}}';
+\}
+
+function infoTdOver(td, total, count, avg, date_key, color)
+\{
+	if(td.id==clickedInfoId) \{ return; \}
+	td.bgColor = '#ffcccc';
+	
+	if(color==null) \{ color = 'black'; \}
+	
+	var st = 	'<span style="color:' + color + ';">'
+	+			'Total = ' + total + '<br>'
+	+			'Answers = ' + count + '<br><br>'
+	+			'Average = <b>' + avg + '</b></span>';
+	
+	document.getElementById('infoTd_' + date_key).innerHTML = st;
+\}
+
+function infoTdOut(td, date_key)
+\{
+	if(td.id==clickedInfoId) \{ return; \}
+	td.bgColor = '';
+	document.getElementById('infoTd_' + date_key).innerHTML = '';
+\}
+
+
+
+</script>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+        <td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;"><table width=100% border=0 cellpadding=0 cellspacing=0>
+          <tr>
+            <td> <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/adminmenu/ict.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> LA ICT ACROSS THE CURRICULUM analysis </b> </td>
+            <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;"><img id="imghelp" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Help</td>
+          </tr>
+        </table></td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;">Each table below represents a <span style="color:blue;">{$c{org}->{slice}}</span> in which audits were taken and gives average scores in each cell. <br>
+      <br>
+      The filter is set as follows: <br>
+	  <table border=0 cellpadding=5 cellspacing=0>
+	<tr>
+	  <td align=right>Audit between </td>
+	  <td style="color:blue;">{$c{org}->{from_date}} and {$c{org}->{to_date}}</td>
+	</tr>	  
+{
+	my @props = qw(keystage school_type postcode);
+	
+	foreach my $prop (@props)
+	{
+		my $value = $c{params}->{$prop};
+		
+		if(($value=~/\w/)&&($value!=-1))
+		{
+			$OUT.=<<"+++";
+	<tr><td align=right>$prop =</td><td style="color:red;">$value</td></tr>
++++
+		}
+	}
+}
+</table>	  <br>
+      Use the links below to jump to each phase in the timeline.      <br>
+	  <table border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td valign="top"><table width="100%"  border="0" cellspacing="0" cellpadding="5">
+{	
+	foreach my $date_key (@{$c{org}->{_date_keys}})
+	{
+		my $title = $c{org}->get_date_key_title($date_key);
+		
+		$OUT.=<<"+++";	
+      <tr>
+        <td><a onClick="setGroup('$date_key', true);" href="#$date_key">$title</a></td>
+      </tr>
++++
+	}}
+    </table></td>
+    <td valign="top" style="color:#666666;">0 = Unsure of meaning<br>
+10 = Never<br>
+20 = Occasionally<br>
+30 = Regularly </td>
+  </tr>
+</table>
+      <br>
+      Please note these are  average results across teachers from the whole LA. <br>
+To look at specific individuals outside  the average, please choose a school from the tree on the left where you will find a list of teachers.<br>
+<br>
+The scores in each of the cells is out of a maximum of 30. <br>
+This is the average score for all of the tests taken in this question group. <br>
+Individuals may have higher or lower scores
+
+ 
+
+<br>
+These scores indicate relative strengths and weaknesses of department teams (rows) and of cross curricular coverage of the key ICT concepts (columns).”
+
+ 
+
+ </td>
+  </tr><tr>
+    <td height=20></td>
+  </tr>
+  <tr>
+    <td>
+	
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+{
+	my $count = 1;
+	
+	foreach my $date_key (@{$c{org}->{_date_keys}})
+	{
+		$count++;
+		
+		my $title = $c{org}->get_date_key_title($date_key);
+		
+		my $tags = Webkit::SkillsAudit::Question->get_ict_tags;
+		my $subjects = Webkit::SkillsAudit::Question->get_ict_subjects;
+		
+		my $img = 'plus';
+		my $display = 'none';
+		
+		if($count<=1)
+		{
+			$img = 'minus';
+			$display = 'inline';
+			
+			$OUT.=<<"+++";
+<script>
+groupStates['$date_key'] = true;
+</script>			
++++
+		}
+			
+		$OUT.=<<"+++";
+  <tr>
+    <td>
+	<table border=0 cellpadding="0" cellspacing="0">
+	<tr><td width="270">
+	<a name="$date_key"></a><a href="javascript:toggleGroup('$date_key');" style="text-decoration:none;color:#339900;"><img id="img$date_key" src="/images/nav/$img.gif" width="9" height="9" align="absmiddle" border=0> <b style="font-size:14pt;color:red;">$title</b></a>
+	</td>
+    <td align="left"><a href="#top">Back To Top ^</a> </td>
+	</tr></table></td>
+  </tr>
+  <tr id="tr$date_key" style="display:$display;">
+  	<td>
+		<table border=0 cellpadding=10 cellspacing=0>
+		<tr>
+		<td>
+		<table border=0 cellpadding=5 cellspacing=1 bgcolor="#CCCCCC">
+		<tr bgcolor="#FFFFFF"><td align="right" id="infoTd_$date_key">&nbsp;
+		</td>
++++
+
+		foreach my $tag (@$tags)
+		{
+			my $title = $tag->{title};
+			
+			$OUT.=<<"+++";
+<td width="1" height="200" align="left" valign="top" style="color:green;writing-mode: tb-rl;filter: flipv fliph;">$title</td>			
++++
+		}
+
+		$OUT.=<<"+++";
+		<td></td>
+	</tr>
++++
+
+		foreach my $subject (@$subjects)
+		{
+			my $subject_title = Webkit::SkillsAudit::Visitor->subject_title($subject);
+			my $subjectid = 'ict_'.$date_key.'_'.$subject;			
+			
+			my $total = 0;
+			my $count = 0;
+			my $avg = 0;
+			
+			foreach my $tag (@$tags)			
+			{
+				my $tag_key = $tag->{key};
+				
+				my $ref = $c{org}->{_ict_map}->{$date_key}->{$tag_key}->{$subject};
+				
+				$total += $ref->{total};
+				$count += $ref->{count};
+			}
+			
+			if($count>0)
+			{
+				$avg = sprintf("%.2f", $total/$count);
+			}			
+			
+			$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF"><td id="$subjectid" align="right" style="color:blue;cursor:hand;" onClick="infoTdClick(this, '$subject', '', '$date_key');" onMouseOver="infoTdOver(this, $total, $count, $avg, '$date_key');" onMouseOut="infoTdOut(this, '$date_key');">$subject_title</td>			
++++
+
+			foreach my $tag (@$tags)
+			{
+				my $tag_key = $tag->{key};
+				
+				my $ref = $c{org}->{_ict_map}->{$date_key}->{$tag_key}->{$subject};
+				my $total = $ref->{total};
+				my $count = $ref->{count};
+				my $avg = '&nbsp;';
+				my $dec_avg = 0;
+				
+				my $bg = ' bgcolor=#f5f5f5';
+				
+				my $mouseOver = '';
+				my $style = '';
+				
+				if($count>0)
+				{
+					$avg = sprintf("%.0f", $total/$count);
+					$dec_avg = sprintf("%.2f", $total/$count);					
+					
+					$style = ' style="cursor:hand;"';
+					$mouseOver = " onClick=\"infoTdClick(this, '$subject', '$tag_key', '$date_key');\" onMouseOver=\"infoTdOver(this, $total, $count, $dec_avg, '$date_key');\" onMouseOut=\"infoTdOut(this, '$date_key');\"";
+					$bg = '';
+
+				}
+				
+				my $id = 'ict_'.$date_key.'_'.$subject.'_'.$tag_key;
+				
+				$OUT.=<<"+++";
+<td $bg $mouseOver $style id="$id" $date_key>$avg</td>
++++
+			}
+			
+			my $total_ref = $c{org}->{_ict_map}->{$date_key}->{$subject};
+			
+			my $total = $total_ref->{total} || 0;
+			my $count = $total_ref->{count} || 0;
+			
+			my $avg = '';
+			my $dec_avg = 0;
+				
+			if($count>0)
+			{
+				$avg = sprintf("%.0f", $total/$count);
+				$dec_avg = sprintf("%.2f", $total/$count);				
+			}			
+			
+			$OUT.=<<"+++";
+<td id="end$subjectid" onClick="infoTdClick(this, '$subject', '', '$date_key');" onMouseOver="infoTdOver(this, $total, $count, $dec_avg, '$date_key', 'blue');" onMouseOut="infoTdOut(this, '$date_key');" style="cursor:hand;"><b style="color:blue;">$avg</b></td>
+</tr>
++++
+		}
+		
+		$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF"><td></td>
++++
+
+		foreach my $tag (@$tags)
+		{
+			my $tag_key = $tag->{key};
+				
+			my $ref = $c{org}->{_ict_map}->{$date_key}->{$tag_key};
+			my $total = $ref->{total} || 0;
+			my $count = $ref->{count} || 0;
+			my $avg = '&nbsp;';
+			my $dec_avg = 0;
+				
+			if($count>0)
+			{
+				$dec_avg = sprintf("%.2f", $total/$count);			
+				$avg = sprintf("%.0f", $total/$count);
+			}
+				
+			$OUT.=<<"+++";
+<td onMouseOver="infoTdOver(this, $total, $count, $dec_avg, '$date_key', 'green');" onMouseOut="infoTdOut(this, '$date_key');" style="cursor:hand;"><b style="color:green;">$avg</b></td>
++++
+		}
+		
+		my $gtotal_ref = $c{org}->{_ict_map}->{$date_key};
+		my $total = $gtotal_ref->{total} || 0;
+		my $count = $gtotal_ref->{count} || 0;
+		
+		my $dec_avg = 0;
+				
+		if($count>0)
+		{
+			$dec_avg = sprintf("%.2f", $total/$count);			
+			$avg = sprintf("%.0f", $total/$count);
+		}	
+		
+		$OUT.=<<"+++";
+		<td onMouseOver="infoTdOver(this, $total, $count, $dec_avg, '$date_key', 'red');" onMouseOut="infoTdOut(this, '$date_key');" style="cursor:hand;"><b style="color:red;">$avg</b></td>
+</tr>
+	  </table>
+	  
+	  </td>
+	  <td width="400" height="100"> <IFRAME SRC="/templates/blank.htm" WIDTH="100%" HEIGHT="100%" NAME="summary$date_key" SCROLLING="auto" FRAMEBORDER="no" STYLE="display:block;"></IFRAME> </td>
+	  
+	  </tr></table>
+	  
+	  
+	</td>
+  </tr>
++++
+	}
+}
+</table>	
+	</td>
+  </tr>
+</table>
+<br>
+{$c{calendar_table}}
+</body>
+</html>
+
+
+

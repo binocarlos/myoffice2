@@ -1,0 +1,69 @@
+<!--#include virtual="temp_include.htm" -->
+<body>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+<tr>
+<td width="150" valign=top>
+
+<div class="panelouter" style="width:150px;"><div class="panelinner"><div class="panelbody" style="padding:8px;" align="left">
+<fieldset>
+<legend>Calendars</legend>
+<div class="seccontent" align="left">
+{
+	foreach my $calendar (@{$c{calendars}})
+	{
+		my $id = $calendar->get_id;
+		my $title = $calendar->get_value('title');		
+		
+		my $href = '';
+		
+		if($id==$c{installation}->get_id)
+		{
+			$OUT.=<<"+++";
+<A CLASS="buttoninset" style="padding:4px; width:100%; margin-top:5px; cursor:default; text-decoration:none; color:#000000;"><IMG SRC="/images/menus/but_calendar.gif" WIDTH="31" HEIGHT="32" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; $title</A><br>
++++
+		}
+		else
+		{
+			$OUT.=<<"+++";
+<A href="$c{href}&method=calendar_switch_calendar&calendar_id=$id" onMouseOver="this.className='buttoninset';" onMouseOut="this.className='buttonouter';" CLASS="buttonouter" style="padding:4px; width:100%; margin-top:5px; cursor:default; text-decoration:none; color:#000000;"><IMG SRC="/images/menus/but_calendar.gif" WIDTH="31" HEIGHT="32" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; $title</A><br>
++++
+		}
+	}
+}
+</div>
+</fieldset>
+<br>
+
+<form method="GET" action="" style="margin:0;">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="calendar_change_style_sheet">
+
+<fieldset>
+<legend>Events</legend>
+<div class="seccontent" align="left">
+Click on an event to edit or delete.<br>
+<input type="button" value="Add an Event" onClick="document.location=href+'&method=calendar_entry_form';" class="button" style="width:108px; margin-top:5px;">
+<input type="button" value="Event Types" onClick="document.location=href+'&method=calendar_events_home';" class="button" style="width:108px; margin-top:5px;">
+</div>
+</fieldset>
+<br>
+<fieldset>
+<legend>Appearance</legend>
+<div class="seccontent" align="left">
+<select name="style_id" id="style_id" class="text_field" style="width:108px;">{$c{style_options}}</select><br>
+<input type="submit" value="Change" name="submit" class="button" style="width:108px; margin-top:5px;">
+</div>
+</fieldset>
+
+</form>
+
+</div></div></div>
+</td>
+<td width="20"><img src="/images/clear.gif" width="20" height="1"></td>
+<td valign="top">{$c{calendar}}</td>
+</tr>
+</table>
+
+</body>

@@ -1,0 +1,144 @@
+<!--#include virtual="temp_include.htm" -->
+<style>
+.r \{border-style:solid; border-color:#990000;\}
+.b \{border-style:solid; border-color:#000099;\}
+.g \{border-style:solid; border-color:#339900;\}
+.b \{border-style:solid; border-color:#000099;\}
+ol \{margin:0px 0px 0px 25px\}
+li \{margin:0px 0px 5px 0px\}
+</style>
+<script src="/templates/skillsaudit/audit_analysis.js"></script>
+<script>
+	var giMinYear = 2004;
+
+	var giMaxYear = 2010;
+	
+	function showGraph(tag)
+	\{
+		openWindow(href + '&method=audit_graph_html&tag=' + tag + '&visitor_id={$c{params}->{visitor_id}}', 640, 460);
+	\}	
+	
+	function viewAnswers(tag)
+	\{
+		openWindow(href + '&method=visitor_analysis_view_answers&tag=' + tag + '&visitor_id={$c{params}->{visitor_id}}', 800, 600);
+	\}
+	
+
+</script>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">	
+{
+	if($c{params}->{visitor_id}>0)
+	{
+		$OUT.=<<"+++";
+<tr>
+<td valign="top" colspan=3 style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffe5;">
+  <table width=100% border=0 cellpadding=0 cellspacing=0>
+  <tr>
+    <td>  <b style="color:#ff9900; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/target_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> QUESTIONNAIRE ANALYSIS </b></td>
+    <td width=100 align="center" onClick="toggleGroup('help');" style="cursor:hand;color:blue;"><img id="imghelp" src="/images/nav/minus.gif" width="9" height="9" align="absmiddle" border=0> Toggle Help</td>
+  </tr></table>
+  </td>
+  </tr>
+  <tr id="trhelp">
+    <td valign="top" colspan=3 style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#fffff2;"><a href="$c{href}&method=review_audit&visitor_id=$c{params}->{visitor_id}&audit_id=$c{audit_id}">Click here</a> to view the actual questionnaire submitted... </td>
+  </tr>	
+  <tr><td colspan=3 height=20></td>
+</tr>  
++++
+	}
+}
+<tr>
+<td valign="top" style="border-width:1px 1px 1px 1px; border-style:solid; border-color:#6600aa; background-color:#f5e5ff;"><b style="color:#6600aa; font-size:13px; font-variant:small-caps;">
+      <table width=100% border=0 cellpadding=0 cellspacing=0>
+        <tr>
+          <td> <b style="color:#6600aa; font-size:13px; font-variant:small-caps;"><IMG SRC="/images/skillsaudit/timeline_24.gif" WIDTH="24" HEIGHT="24" BORDER="0" ALIGN="ABSMIDDLE"> QUESTIONNAIRE SECTION GRAPH </b> </td>
+          <td width=100 align="right" onClick="toggleGroup('graph');" style="cursor:hand;color:blue;">&nbsp;</td>
+        </tr>
+      </table>
+    </b></td>
+  </tr>
+  <tr id="trgraph" style="display:inline;">
+    <td valign="top" style="border-width:0px 1px 1px 1px; border-style:solid; border-color:#999999; background-color:#ffffff;"><img src="{$c{href}}&method=audit_graph&visitor_id={$c{params}->{visitor_id}}"></td>  
+  <tr><td height=20></td>  
+  
+ 
+  <tr>
+    <td valign="top">
+  
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+        
+{	
+	my $groupcount = 0;
+	
+	foreach my $question_group (@{$c{org}->{_question_groups}})
+	{		
+		$groupcount++;
+		
+		my $title = $question_group->{group_title};
+		my $id = $question_group->{question_group_tag};
+		my $groupavg = sprintf("%.2f", $question_group->{_group_avg});
+		
+		$OUT.=<<"+++";	
+	
+          <tr bgcolor="#ffffff">
+            <td width="100%" bgcolor="#e5e5ff" style="border-width:1px 1px 1px 1px; border-color:#000099;" class="r">
+				<table width=100% border=0 cellpadding="0" cellspacing="0"><tr>	
+					<td><a href="#" style="text-decoration:none;color:#000099;"><b> &nbsp;$groupcount $title</b></a></td>
+					<td width=100><a href="javascript:showGraph('$id');">Show Graph</a></td>
+					<td width=50 align=right><b style="color:#000099;">$groupavg</b></td>
+					</tr></table>
+					
+					</td>
+          </tr>						  
+          <tr bgcolor="#ffffff" style="display:inline;" id="tr$id">
+            <td colspan=3 style="border-width:0px 1px 1px 1px;" class="b"><table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#e5e5e5">
++++
+
+		my $count = 0;
+		
+		foreach my $question (@{$c{org}->{_questions}->{$id}})
+		{
+			$count++;
+			my $text = $question->{question_text};
+			my $avg = sprintf("%.2f", $question->{avg});
+			my $tag = $question->{question_tag};
+			
+			my $contents = $avg;
+
+			if($question->{question_type} ne 'score')
+			{
+				$contents=<<"+++";
+<a href="javascript:viewAnswers('$tag');">View</a>	
++++
+			}
+			
+			$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF"><td width=1 align=right valign="top">&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;$count</td>
+<td>&nbsp; $text</td>
+<td width=50 align=right>$contents</td>
+</tr>
++++
+		}
+
+		$OUT.=<<"+++";			
+			</table>
+			</td>
+          </tr>						
+                <tr>
+       <td height="10"></td>
+      </tr>	 					
++++
+	}
+}
+</table>
+
+    </td>
+    </tr>
+</table>
+</body>
+</html>
+
+
+

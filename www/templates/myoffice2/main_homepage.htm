@@ -1,0 +1,279 @@
+<!--#include virtual="temp_include.htm" -->
+
+<style type="text/css">
+<!--
+.style1 \{
+	font-size:10pt;
+	color: #666666;
+	font-weight: bold;
+\}
+
+.style2 \{
+	font-size:12pt;
+	color: #CC0000;
+	font-weight: bold;
+\}
+.style1 {font-weight: bold}
+.style2 {font-weight: bold}
+-->
+</style>
+<script>
+	function deleteNoteEntry(id)
+	\{
+		if(window.confirm('Are you sure you want to delete this note entry?'))
+		\{
+			document.location = href + '&method=delete_note_entry&note_entry_id=' + id;
+		\}
+	\}
+	
+	function viewArchiveMonth(selectGui)
+	\{
+		var newMonth = selectGui.value;
+		
+		document.location = href + '&method=homepage_screen&archive_month=' + newMonth;
+	\}
+	
+	function viewPencilBooking(id)
+	\{
+		top.get_double_frameset('myoffice2_booking_penciled&booking_id=' + id);
+	\}
+	
+	function viewBooking(id)
+	\{
+		top.get_double_frameset('myoffice2_booking_progress&booking_id=' + id);
+	\}
+	
+	function viewDealSheet(id)
+	\{
+		document.location = href + '&method=booking_deal_summary&showing_id=' + id;
+	\}
+	
+	function viewVenueHistory(id)
+	\{
+		top.get_double_frameset('myoffice2_venue_status&venue_id=' + id);		
+	\}
+	
+	function editNoteEntry(id, date, content)
+	\{
+		var args = new Object();
+		
+		args.content = content;
+		args.date = date;
+		
+		var ret = get_modal_window_return('&method=editors_notes_date', 500, 430, args);			
+		
+		if(!ret) \{ return; \}		
+		
+		var form = document.save_note_form;
+		
+		form.note_entry_id.value = id;
+		form.note_content.value = ret.content;
+		form.date_value.value = ret.date;
+		
+		form.submit();	
+	\}
+	
+	function addNoteEntry()
+	\{
+		var args = new Object();
+		args.content = '';
+		args.date = '';
+		
+		var ret = get_modal_window_return('&method=editors_notes_date', 500, 430, args);			
+		
+		if(!ret) \{ return; \}
+		
+		var form = document.save_note_form;
+		
+		form.note_entry_id.value = 0;
+		form.note_content.value = ret.content;
+		form.date_value.value = ret.date;
+		
+		form.submit();
+	\}	
+</script>
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td class="welcome">Homepage for the {$c{tour}->name} Tour</td>
+  </tr>
+  <tr valign="middle">
+    <td width="50">
+<form name="save_note_form" method="POST" action="{$c{script}}">
+<input type="hidden" name="note_content" value="">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="note_entry_id" value="">
+<input type="hidden" name="date_value" value="">
+<input type="hidden" name="method" value="homepage_screen_save_notes">
+</form>
+	</td>
+  </tr>
+<tr valign="middle">
+<td align="center"><span class="style2">NOTICEBOARD</span><br>
+<br>
+<a href="javascript:addNoteEntry();" style="cursor:hand;"><img src="/images/icons/24x24/add.gif" alt="Add Note Entry" width="24" height="24" border=0 align="absmiddle"> Click here to add to the noticeboard </a> <br>
+Jump To Archive: 
+<select name="select" class="text_field" style="width:200px;" onChange="viewArchiveMonth(this);">
+{$c{org}->get_note_entry_month_options($c{params}->{archive_month})}
+</select></td>
+</tr>
+<tr valign="middle">
+<td align="center">
+<table width="75%"  border="0" cellpadding="5" cellspacing="1" bgcolor="#999999">
+<tr bgcolor="#FFFFFF">
+<td width=30><strong>Edit</strong></td>
+<td width="30"><strong>Delete</strong></td>
+<td width="100"><strong>User</strong></td>
+<td width="100"><strong>Date</strong></td>
+<td><strong>Note</strong></td>
+</tr>
+{
+	foreach my $note_entry (@{$c{org}->ensure_child_array('note_entry')})
+	{
+		my $id = $note_entry->get_id;
+		my $user_name = $note_entry->{data}->{users_name};
+		my $date = $note_entry->get_date_title;
+		my $notes = $note_entry->get_html_value('content');
+		my $calendar_date = $note_entry->created->get_calendar_string;
+		
+		my $js_notes = $note_entry->get_js_value('content');
+		
+		$OUT.=<<"+++";
+<tr valign="top" bgcolor="#FFFFFF">
+<td width="30"><a href="javascript:editNoteEntry($id, '$calendar_date', '$js_notes');" style="cursor:hand;"><img src="/images/icons/24x24/document_edit.gif" width="24" height="24" border="0"></a></td>
+<td width="30"><a href="javascript:deleteNoteEntry($id);" style="cursor:hand;"><img src="/images/icons/24x24/document_delete.gif" width="24" height="24" border="0"></a></td>
+<td width="100" bgcolor="#FFFF99">$user_name</td>
+<td width="100" bgcolor="#FFFF99">$date</td>
+<td bgcolor="#FFFF99">$notes</td>
+</tr>
++++
+	}
+}
+</table>
+</td>
+</tr>  
+<tr valign="middle">
+<td align="center">
+<br>
+<br>
+<span class="style2"> BOOKING UPDATE</span>
+</td>
+</tr>
+<tr>
+<td><span class="style1">Last 10 Confirmed Bookings....</span></td>
+</tr>
+<tr valign="middle">
+<td><table width="100%"  border="0" cellpadding="5" cellspacing="1" bgcolor="#999999">
+<tr valign="bottom" bgcolor="#FFFFFF">
+<td width=60><strong>View<br>
+Deal<br>
+Sheet</strong></td>
+<td width=60><strong>View<br>
+Venue<br>
+History</strong></td>
+<td width="100"><strong>Tour</strong></td>
+<td width="250"><strong>Venue</strong></td>
+<td width="150"><strong>Dates</strong></td>
+<td width="100"><strong>Deal Created</strong></td>
+</tr>
+{
+	foreach my $booking (@{$c{tour}->ensure_child_array('booking')})
+	{
+		if(!$booking->agreed) { next; }
+		
+		my $tour = $c{org}->get_child('tour', $booking->tour_id);
+		my $venue = $c{tour}->get_child('venue', $booking->venue_id);
+		my $showing = $booking->{_showing};
+		
+		my $showing_id = $showing->get_id;
+		my $venue_id = $venue->get_id;
+		
+		my $tour_name = $tour->name;
+		my $venue_name = $venue->get_city_title;
+		my $dates = $booking->get_datetime_title;
+		my $notes = $booking->notes;
+		my $agreed_date = $booking->get_date_title('agreed');
+		my $id = $booking->get_id;
+		
+		my $date_called = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->date_called);		
+		
+		$OUT.=<<"+++";
+<tr valign="top" bgcolor="#FFFFFF">
+<td width=20><a href="javascript:viewDealSheet($showing_id);" style="cursor:hand;"><img src="/images/icons/24x24/contract.gif" alt="View Deal Sheet" width="24" height="24" border="0"></a></td>
+<td width=20><a href="javascript:viewVenueHistory($venue_id);" style="cursor:hand;"><img src="/images/icons/24x24/scroll.gif" alt="View Venue History" width="24" height="24" border="0"></a></td>
+<td>$tour_name</td>
+<td>$venue_name</td>
+<td>$dates</td>
+<td>$agreed_date</td>
+</tr>
++++
+	}
+}
+</table></td>
+</tr>
+
+<tr valign="middle">
+<td><span class="style1">Last 10 Pencil Bookings....</span></td>
+</tr>
+<tr valign="middle">
+<td><table width="100%"  border="0" cellpadding="5" cellspacing="1" bgcolor="#999999">
+<tr valign="bottom" bgcolor="#FFFFFF">
+<td width=60><strong>View<br>
+Booking<br>
+Progress
+</strong></td>
+<td width=60><strong>View<br>
+Pencil<br>
+Booking</strong></td>
+<td width=60><strong>View<br>
+Venue<br>
+History</strong></td>
+<td width="100"><strong>Tour</strong></td>
+<td width="250"><strong>Venue</strong></td>
+<td width="150"><strong>Dates</strong></td>
+<td width="100"><strong>Pencilled</strong></td>
+<td><strong>Notes</strong></td>
+</tr>
+{
+	foreach my $booking (@{$c{tour}->ensure_child_array('booking')})
+	{
+		if($booking->agreed) { next; }
+			
+		my $tour = $c{org}->get_child('tour', $booking->tour_id);
+		my $venue = $c{tour}->get_child('venue', $booking->venue_id);
+		
+		my $tour_name = $tour->name;
+		my $venue_name = $venue->get_city_title;
+		my $dates = $booking->get_datetime_title;
+		my $notes = $booking->notes;
+		my $penciled_date = $booking->get_date_title('penciled');
+		my $id = $booking->get_id;
+		my $venue_id = $venue->get_id;
+		
+		my $date_called = Webkit::MyOffice2::Admin->editors_multidatenote_js_value($booking->date_called);		
+		
+		$OUT.=<<"+++";
+<tr valign="top" bgcolor="#FFFFFF">
+<td width=20><a href="javascript:viewBooking($id);" style="cursor:hand;"><img src="/images/icons/24x24/document_out.gif" alt="View Booking Progress" width="24" height="24" border="0"></a></td>
+<td width=20><a href="javascript:viewPencilBooking($id);" style="cursor:hand;"><img src="/images/icons/24x24/document_preferences.gif" alt="View Pencil Booking Entry" width="24" height="24" border="0"></a></td>
+<td width=20><a href="javascript:viewVenueHistory($venue_id);" style="cursor:hand;"><img src="/images/icons/24x24/scroll.gif" alt="View Venue History" width="24" height="24" border="0"></a></td>
+<td>$tour_name</td>
+<td>$venue_name</td>
+<td>$dates</td>
+<td>$penciled_date</td>
+<td><script>document.write(getMultiDateNoteText($date_called));</script></td>
+</tr>
++++
+	}
+}
+</table></td>
+</tr>
+
+</table>
+<br>
+<br>
+</body>
+</html>
+
+
+

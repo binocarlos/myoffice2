@@ -1,0 +1,39 @@
+<link href="/templates/resourceshare_web/default_table_styles.css" rel="stylesheet" type="text/css"> 
+
+<TABLE BGCOLOR="white" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="1-02_table">
+<TR ALIGN="LEFT" VALIGN="top">
+<TD CLASS="1-02_title" NOWRAP WIDTH="100%">Name</TD>
+<TD CLASS="1-02_title" NOWRAP WIDTH="1">Type</TD>
+<TD CLASS="1-02_title" NOWRAP WIDTH="1">Author</TD>
+<TD CLASS="1-02_title" NOWRAP WIDTH="1">Last&nbsp;Modified</TD>
+<TD CLASS="1-02_title" NOWRAP WIDTH="1">Size</TD>
+<TD CLASS="1-02_title" NOWRAP WIDTH="1">&nbsp;</TD>
+</TR>
+{
+	foreach my $resource (@{$c{resources}})
+	{
+		my $id = $resource->get_id;
+		my $title = $resource->get_value('title');
+		my $type = $resource->get_mime_title;
+		my $author = $resource->get_value('author');
+		if($author!~/\w/)
+		{
+			$author = '&nbsp;';
+		}
+		my $modified = $resource->get_modified_title;
+		my $notes = $resource->get_value('notes');
+		my $size = $resource->get_size_title;
+	
+		$OUT.=<<"+++";
+<TR ALIGN="LEFT" VALIGN="top" CLASS="wkresources_tr" ONMOUSEOVER="this.className='1-02_trhl';" ONMOUSEOUT="this.className='1-02_tr';" title="$notes">
+<TD CLASS="1-02_cell1" NOWRAP>$title</TD>
+<TD CLASS="1-02_cell2" NOWRAP>$type</TD>
+<TD CLASS="1-02_cell2" NOWRAP>$author</TD>
+<TD CLASS="1-02_cell2" NOWRAP>$modified</TD>
+<TD CLASS="1-02_cell2" NOWRAP>$size</TD>
+<TD CLASS="1-02_cell2" NOWRAP><A HREF="$c{href}&method=resources_download_resource&resource_id=$id" CLASS="1-02_action">Download</A></TD>
+</TR>
++++
+	}
+}
+</TABLE>

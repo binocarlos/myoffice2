@@ -1,0 +1,65 @@
+body {margin:20px; cursor:default; background-color:#FFFFFF;}
+.leftcol {width:50px; vertical-align:top;}
+.rightcol {width:60px; vertical-align:bottom;}
+.prevbut {width:25px; height:27px; margin-right:5px; cursor:hand;}
+.nextbut {width:25px; height:27px; cursor:hand;}
+.title {font-family:arial,verdana; color:#000000; padding-left:20px; height:30px; font-weight:bold; font-size:16px;}
+.number {font-family:arial,verdana; text-align:center; padding:5px; width:30px; border:1px #000000 solid; font-size:16px; color:#000000; background-color:#B2CFFF; font-weight:bold;}
+.text {font-family:arial,verdana; font-size:13px; color:#000000; background-color:#E0ECFF; padding:5px;}
+.comment {font-family:arial,verdana; font-size:13px; color:#000000; padding-right:3px; padding-left:3px;}
+.image {font-family:arial,verdana; font-size:13px; color:#000000;}
+.sound {width:30px; height:30px; cursor:hand; margin-top:20px;}
+.marks {font-family:tahoma,verdara,arial; font-size:11px; color:#000000; text-align:right; margin-bottom:5px;}
+.checkbox {cursor:hand; width:24px; height:25px; margin-left:5px;}
+.checkbox_label {font-family:arial,verdana; font-size:13px; color:#000000; padding:5px 15px 0px 2px}
+.textarea {margin-top:5px; width:100%; height:150px; font-family:arial,verdana; font-size:13px; color:#052AA2; padding:3px 3px 3px 5px; border:2px #000000 dotted;}
+.textfield {margin-top:5px; width:100%; height:27px; font-family:arial,verdana; font-size:13px; color:#052AA2; padding:3px 3px 3px 5px; border:2px #000000 dotted;}
+
+
+.editor_div {width:100%; border:1px #D4D0C8 solid;}
+.editor_td {padding:3px; border:1px #D4D0C8 solid; font-family:tahoma,verdana,arial; font-size:11px;}
+.editor_td_on {background-color:#D9DCE6; padding:3px; border:1px #0A246A dashed; font-family:tahoma,verdana,arial; font-size:11px;}
+.editor_leftcol {background-color:#D4D0C8; height:100%; width:45px; vertical-align:top; border:1px #D4D0C8 solid;}
+.editor_rightcol {background-color:#ffffff; height:100%; width:60px; vertical-align:bottom;}
+.editor_prevbut {filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20,FinishOpacity=0,Style=0,StartX=0,FinishX=100,StartY=0,FinishY=100); width:25px; height:27px; margin-right:5px;}
+.editor_nextbut {filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20,FinishOpacity=0,Style=0,StartX=0,FinishX=100,StartY=0,FinishY=100); width:25px; height:27px;}
+.editor_title {font-family:arial,verdana; color:#000000; padding-left:20px; height:30px; font-weight:bold; font-size:16px;}
+.editor_number {font-family:arial,verdana; text-align:center; padding:5px; width:30px; border:1px #000000 solid; font-size:16px; color:#000000; background-color:#B2CFFF; font-weight:bold;}
+.editor_text {font-family:arial,verdana; font-size:13px; color:#000000;  background-color:#E0ECFF; padding:5px;}
+.editor_comment {font-family:arial,verdana; font-size:13px; color:#000000; }
+.editor_image {font-family:arial,verdana; font-size:13px; color:#000000; }
+.editor_sound {background-color:#D4D0C8; width:100%; height:100%;}
+.editor_marks {font-family:tahoma,verdara,arial; font-size:11px; color:#000000; text-align:right; margin-bottom:5px;}
+.editor_checkbox {cursor:hand; width:24px; height:25px; margin-left:5px;}
+.editor_checkbox_label {font-family:arial,verdana; font-size:13px; color:#000000; padding:5px 15px 0px 2px}
+.editor_textarea {margin-top:5px; width:100%; height:150px; font-family:arial,verdana; font-size:13px; color:#052AA2; padding:3px 3px 3px 5px; border:2px #000000 dotted;}
+.editor_textfield {margin-top:5px; width:100%; height:27px; font-family:arial,verdana; font-size:13px; color:#052AA2; padding:3px 3px 3px 5px; border:2px #000000 dotted;}
+
+.tree_number {padding:0px 3px 0px 3px; background-color:#B2CFFF; border:1px #6C95DA solid; text-align:center; font-family:tahoma,verdara,arial; font-size:11px; color:#273D62; font-weight:bold;}
+.tree_number_over {padding:0px 3px 0px 3px; background-color:#B2CFFF; border-left:1px #FF0000 solid; border-top:1px #FF0000 solid; border-bottom:1px #FF0000 solid; border-right:1px #6C95DA solid; text-align:center; font-family:tahoma,verdara,arial; font-size:11px; color:#273D62; font-weight:bold;}
+.tree_number_selected {padding:0px 3px 0px 3px; background-color:#FFB3B2; border:1px #FF4947 solid; text-align:center; font-family:tahoma,verdara,arial; font-size:11px; color:#273D62; font-weight:bold;}
+.tree_number_completed {padding:0px 3px 0px 3px; background-color:#D0D6E0; border:1px #97A0AE solid; text-align:center; font-family:tahoma,verdara,arial; font-size:11px; color:#273D62; font-weight:bold;}
+
+.tree_question {padding:0px 4px 0px 4px; width:100%; background-color:#D8E7FF; border-right:1px #B5CAEC solid;  border-top:1px #B5CAEC solid;  border-bottom:1px #B5CAEC solid; font-family:tahoma,verdara,arial; font-size:11px; color:#000000;}
+.tree_question_over {padding:0px 4px 0px 4px; width:100%; background-color:#D8E7FF; border-right:1px #FF0000 solid;  border-top:1px #FF0000 solid;  border-bottom:1px #FF0000 solid; font-family:tahoma,verdara,arial; font-size:11px; color:#000000;}
+.tree_question_selected {padding:0px 4px 0px 4px; width:100%; background-color:#FFD8D8; border-right:1px #FFA2A2 solid;  border-top:1px #FFA2A2 solid;  border-bottom:1px #FFA2A2 solid; font-family:tahoma,verdara,arial; font-size:11px; color:#000000;}
+.tree_question_completed {padding:0px 4px 0px 4px; width:100%; background-color:#E7EAEF; border-right:1px #CACFD6 solid;  border-top:1px #CACFD6 solid;  border-bottom:1px #CACFD6 solid; font-family:tahoma,verdara,arial; font-size:11px; color:#000000;}
+
+.window_body {background:#D4D0C8; border:0px; margin:0px; font-family:tahoma,arial,verdana; font-size:11px; color:#000000;}
+.window_insetouter {border-left:#808080 1px solid; border-right:#FFFFFF 1px solid; border-top:#808080 1px solid; border-bottom:#FFFFFF 1px solid;}
+.window_insetinner {border-left:#FFFFFF 1px solid; border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;}
+.window_insetinnerl {border-left:#FFFFFF 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;}
+.window_insetinnerr {border-right:#808080 1px solid; border-top:#FFFFFF 1px solid; border-bottom:#808080 1px solid;}
+.window_pupil {font-family:tahoma,arial,verdana; font-size:13px; color:#000000; font-weight:bold;}
+.window_testtitle {font-family:tahoma,arial,verdana; font-size:13px; color:#000000; font-weight:bold;}
+.window_instructions {font-family:arial,verdana; font-size:13px; color:#000000;}
+
+.login_outer {BACKGROUND-COLOR:#D4D0C8; BORDER-BOTTOM:#404040 solid 1px; BORDER-LEFT:#D4D0C8 solid 1px; BORDER-RIGHT:#404040 solid 1px; BORDER-TOP:#D4D0C8 solid 1px;}
+.login_inner {BORDER-BOTTOM:#808080 solid 1px; BORDER-LEFT:#FFFFFF solid 1px; BORDER-RIGHT:#808080 solid 1px; BORDER-TOP:#FFFFFF solid 1px;}
+.login_title {font-family:tahoma,verdana; font-size:13px; color:#FFFFFF; padding:5px; font-weight:bold;}
+.login_instructions {font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:13px; color:#000000;}
+.login_fieldname {font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:13px; color:#000000; font-weight:bold;}
+.login_field {height:22px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:13px; color:#000000; padding-left:3px; border:2px inset;}
+.login_field2 {height:22px; font-family:tahoma,verdana,arial,helvetica,sans-serif; font-size:13px; color:#000000; padding-left:3px; BORDER-BOTTOM:#FFDEAD solid 2px; BORDER-LEFT:#C07300 solid 2px; BORDER-RIGHT:#FFDEAD solid 2px; BORDER-TOP:#C07300 solid 2px; background-color:#FFF5E6;}
+.login_button {margin:8px; height:25px; font-family:tahoma,verdana,arial; font-size:13px; color:#000000;background-color:#D4D0C8;}
+.login_error {font-family:tahoma,verdana; font-size:13px; color:#FF0000; padding:5px; font-weight:bold;}

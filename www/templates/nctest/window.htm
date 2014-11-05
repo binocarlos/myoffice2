@@ -1,0 +1,272 @@
+<HTML>
+<HEAD>
+<TITLE>TestingTool</TITLE>
+<META HTTP-EQUIV="MSThemeCompatible" Content="no">
+<style type="text/css">
+<!--
+.statustext \{  font-family: Tahoma, Verdana, Arial; font-size: 12px; color: #990000\}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="/lib/app.css" />
+<script>
+function buttonOver(elem)
+\{
+	elem.style.borderLeft = '#FFFFFF 1px solid';
+	elem.style.borderRight = '#808080 1px solid';
+	elem.style.borderTop = '#FFFFFF 1px solid';
+	elem.style.borderBottom = '#808080 1px solid';
+\}
+
+function buttonOut(elem)
+\{
+	elem.style.borderLeft = '#D4D0C8 1px solid';
+	elem.style.borderRight = '#D4D0C8 1px solid';
+	elem.style.borderTop = '#D4D0C8 1px solid';
+	elem.style.borderBottom = '#D4D0C8 1px solid';	
+\}
+
+window.focus();
+window.moveTo(0,0);
+window.resizeTo(screen.availWidth, screen.availHeight);
+
+var href = '{$c{href}}';
+var hostname = '{$c{hostname}}';
+var help_domain = 'help.wk1.net';
+var appname = 'nctest';
+
+			var session_id = '{$c{session_id}}';
+			var script = '{$c{script}}';
+			var subQuestionSaved = true;
+			var currentSubQuestionId = null;
+
+			function setCurrentSubQuestionId(id)
+			\{
+				currentSubQuestionId = id;
+				subQuestionSaved = true;
+			\}
+
+			function setSubQuestionSaved(value)
+			\{
+				subQuestionSaved = value;
+			\}
+
+			function isSubQuestionSaved()
+			\{
+				if(subQuestionSaved)
+				\{
+					return true;
+				\}
+				else
+				\{
+					var ret = window.confirm('Warning - you have not saved the currently open sub-question - Click OK to Continue (without saving) or Cancel to return');
+
+					if(ret)
+					\{
+						subQuestionSaved = true;
+						return true;
+					\}
+					else
+					\{
+						return false;
+					\}
+				\}
+			\}
+			
+			function progressAnalysis()
+			\{
+				var ret = get_modal_window_return('&method=analysis_progress_report_choose_mode');
+				
+				if(ret)
+				\{
+					var new_loc = '/htmlhub/frames_double?frameset_key=nctest_progress_analysis&session_id={$c{session_id}}';
+					new_loc += '&mode=' + ret.mode;
+					new_loc += '&from=' + ret.from;
+					new_loc += '&to=' + ret.to;
+					
+					document.content.location = new_loc;				
+				\}
+			\}
+
+			function go_home()
+			\{
+				var new_loc = '/htmlhub/frames_single?appname=nctest&session_id={$c{session_id}}&frame_method=nctest_home';
+				document.content.location = new_loc;
+			\}
+
+			function get_menu_query(query)
+			\{
+				if(isSubQuestionSaved())
+				\{
+					var new_loc = href + query;
+
+					document.content.location = new_loc;
+				\}
+			\}
+
+			function get_menu_iframe_query(method, title)
+			\{
+				if(isSubQuestionSaved())
+				\{
+					var new_loc = '/wkhtml/iframe_single_frame/?session_id=' + session_id + '&appname=' + appname;
+					new_loc += '&frame_method=' + method + '&title=' + title;
+
+					document.content.location = new_loc;
+				\}
+			\}
+
+			function show_modal_window(loc, width, height, args)
+			\{
+				width += 20;
+				height += 20;
+
+				var props = 'center:yes;status:no;resizable:no;dialogWidth:' + width + 'px;dialogHeight:' + height + 'px;help:no;scroll:no;status:no;';
+
+				var ret = window.showModalDialog(loc, 'nctest', props);
+
+				return ret;
+			\}
+
+			function get_modal_window_return(query, width, height)
+			\{
+				var modal_loc = "/wkhtml/modal_frameset/?session_id=" + session_id + "&appname=" + appname;
+				modal_loc += query;
+
+				var ret = show_modal_window(modal_loc, width, height);
+
+				return ret;
+			\}
+
+{			
+	if($c{org}->is_generic_nctest)
+	{			
+		$OUT.=<<"+++";		
+			function viewExams()
+			\{
+				//get_menu_query('&method=iframe_title_frame&title=Tests&frame_method=control_panel_home_generic');
+				var new_loc = '/htmlhub/frames_double?session_id=' + session_id + '&frameset_key=nctest_exams_home&reverse=1';
+
+
+				top.content.location = new_loc;
+			\}			
+			
+			function viewAdminControlPanel()
+			\{
+				//get_menu_query('&method=iframe_title_frame&title=Tests&frame_method=control_panel_home_generic');
+				var new_loc = '/htmlhub/frames_double?session_id=' + session_id + '&frameset_key=nctest_exams_home&reverse=1&admin_panel=1';
+
+
+				top.content.location = new_loc;			
+			\}
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+			function viewExams()
+			\{
+				var new_loc = '/htmlhub/frames_double?session_id=' + session_id + '&frameset_key=nctest_exams_home&reverse=1';
+
+
+				top.content.location = new_loc;
+			\}			
++++
+	}
+}
+
+			function application_logout()
+			\{
+				get_menu_query('&method=iframe_title_frame&title=Log Out&frame_method=log_out');
+			\}
+
+</script>
+<script  type="text/javascript" src="/lib/kit.js"></script>
+</HEAD>
+<body STYLE="background:#D4D0C8; border:0px; margin:0px;">
+<DIV ID="window_loading" STYLE="display:none; width:100%; height:100%; background-color:#D4D0C8;"><TABLE WIDTH="100%" HEIGHT="100%" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR><TD WIDTH="100%" HEIGHT="100%" ALIGN="CENTER" VALIGN="MIDDLE"><B>Loading...</B></TD></TR></TABLE></DIV>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	 <TR>
+		<TD>
+		 <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+			<TR>
+			 <TD>
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="insetouter">
+				 <TR>
+					<TD><DIV ID="menuhl" STYLE="display:none; width:100%; height:23px; background:#FFFF00; position:absolute; z-index:-2000;"></DIV>
+					 <TABLE ID="menu" WIDTH="100%" BORDER="0" CELLPADDING="1" CELLSPACING="0" CLASS="indent">
+						<TR>
+						 <TD><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="21" BORDER="0"><IMG SRC="/images/menus/menu_left3.gif" WIDTH="3" HEIGHT="19" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="1" BORDER="0" ALIGN="absmiddle"></TD>
+						 <TD WIDTH="100%">{$c{menu}}</TD>
+						</TR>
+					 </TABLE></TD>
+				 </TR>
+
+				 <TR>
+					<TD>
+
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE" CLASS="indent"><IMG SRC="/images/menus/clear.gif" WIDTH="2" HEIGHT="39" BORDER="0" ALIGN="absmiddle"><IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE"><IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="application_logout();" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/menus/but_logoff.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Log Out {$c{user}->get_value('firstname')}...</A><img src="/images/clear.gif" width="5" height="1"><A ONCLICK="go_home();" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/menus/but_home.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Home</A>
+<IMG SRC="/images/menus/menu_left2.gif" WIDTH="3" HEIGHT="35" BORDER="0" ALIGN="ABSMIDDLE">
+{
+	if($c{org}->is_generic_nctest)
+	{
+		if($c{session}->is_privilaged('nctest', 'nctest_pupils'))
+		{
+			$OUT.=<<"+++";
+<IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="get_menu_iframe_query('pupils_home', 'Students');" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/nctest/homepage/but_pupils.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Students</A>
++++
+		}
+	
+		if($c{session}->is_privilaged('nctest', 'nctest_exams'))
+		{
+			$OUT.=<<"+++";	
+<img src="/images/clear.gif" width="5" height="1"><A ONCLICK="viewExams();" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/nctest/homepage/but_exams.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Tests</A>
++++
+		}	
+	}
+	else
+	{
+		if($c{session}->is_privilaged('nctest', 'nctest_pupils'))
+		{
+			$OUT.=<<"+++";
+<IMG SRC="/images/menus/clear.gif" WIDTH="4" HEIGHT="1" BORDER="0" ALIGN="ABSMIDDLE"><A ONCLICK="get_menu_iframe_query('pupils_home', 'Pupils');" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/nctest/homepage/but_pupils.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Pupils</A>
++++
+		}
+	
+		if($c{session}->is_privilaged('nctest', 'nctest_exams'))
+		{
+			$OUT.=<<"+++";	
+<img src="/images/clear.gif" width="5" height="1"><A ONCLICK="viewExams();" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/nctest/homepage/but_exams.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Exams</A>
++++
+		}
+	
+		if($c{session}->is_privilaged('nctest', 'nctest_analysis'))
+		{
+			$OUT.=<<"+++";
+<img src="/images/clear.gif" width="5" height="1"><A ONCLICK="progressAnalysis();" onMouseOver="buttonOver(this);" onMouseOut="buttonOut(this);" style="padding:4px;border-left:#D4D0C8 1px solid; border-right:#D4D0C8 1px solid; border-top:#D4D0C8 1px solid; border-bottom:#D4D0C8 1px solid;"><IMG SRC="/images/nctest/homepage/but_analysis.gif" WIDTH="27" HEIGHT="27" BORDER="0" ALIGN="ABSMIDDLE">&nbsp; Analysis</A>
++++
+		}
+	}
+}
+						 </TD>
+<TD ALIGN="RIGHT" WIDTH="1" VALIGN="MIDDLE" CLASS="indent"><img src="/images/logos/testingtool_window.gif" border="0"></TD>
+</TR>
+</TABLE>
+</TD>
+				 </TR>
+				</TABLE></TD>
+			</TR>
+		 </TABLE></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="3"><IMG SRC="/images/menus/clear.gif" WIDTH="1" HEIGHT="3" BORDER="0"></TD>
+	 </TR>
+	 <TR>
+		<TD HEIGHT="100%" COLSPAN="2"><TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH="100%" HEIGHT="100%">
+		<IFRAME SRC="/htmlhub/frames_single?appname=nctest&session_id={$c{session_id}}&frame_method=nctest_home" WIDTH="100%" HEIGHT="100%" NAME="content" SCROLLING="no" FRAMEBORDER="no" STYLE="display:block;"></IFRAME>
+		</TD></TR></TABLE></TD>
+	 </TR>
+	</TABLE>
+</body>
+</HTML>

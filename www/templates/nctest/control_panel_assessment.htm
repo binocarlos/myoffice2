@@ -1,0 +1,199 @@
+<!--#include file="temp_include.htm" -->
+<script>
+	
+	function editExam()
+	\{
+		var new_loc = href + '&method=tests_redirect_to_assessment_groups_form&test_id={$c{exam}->test_id}&include_save_button=1';
+		
+		top.content.page.content.location = new_loc;
+	\}
+	
+	function publishExam()
+	\{
+		var new_loc = href + '&method=tests_assessment_groups_form_submit&mode=control_panel';
+		
+		top.content.page.content.location = new_loc;
+	\}
+</script>
+<body>
+<table width=100% border=0 cellpadding=5 cellspacing=1 bgcolor="#333333">
+<tr>
+<td bgcolor="#666666"><strong style="color:#FFFFFF;">{$c{org}->generic_print_switch('Edit Assessment Groups', 'Publish Test Paper')}</strong></td>
+</tr>
+{
+	my $name = $c{exam}->name;
+	my $year = $c{exam}->yeargroup;
+	my $period = $c{exam}->get_period_title;
+	
+	if(!$c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#dddddd><strong>$period</strong></td>
+  </tr>
+  <tr>
+    <td bgcolor=#FFFFFF>Year $year - $name</td>
+  </tr>
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+  <tr>
+    <td bgcolor=#FFFFFF>$name</td>
+  </tr>
++++
+	}
+}
+</table>
+<br>
+<table border=0 cellspacing=5>
+{
+	if($c{org}->is_generic_nctest)
+	{
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="Publish" onClick="publishExam();"></td>
+</tr>
++++
+	}
+	else
+	{
+		if(!$c{exam}->is_manual)
+		{
+			my $title = 'Edit';
+		
+			if($c{test}->is_locked) { $title = 'View'; }
+		
+			$OUT.=<<"+++";
+<tr>
+  <td><input type="button" class="button" value="$title" onClick="editExam();"></td>
+</tr>
++++
+		}
+	}
+}
+</table>
+{
+	if(!$c{org}->is_generic_nctest)
+	{
+		my $levels = $c{test}->levels;
+		
+		$OUT.=<<"+++";
+<br>
+<table border="0" cellpadding="2" cellspacing="1" bgcolor="#d5d5d5">
+<tr bgcolor="#FFFFFF">
+  <td colspan=3><b>Level Breakdown </b></td>
+</tr>
+<tr bgcolor="#FFFFFF"><td colspan=3>Levels: $levels</td></tr>
++++
+
+		if(!$c{test}->is_manual)
+		{
+			my $marks = $c{tree}->get_total_marks;
+		
+			$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF"><td colspan=3>Total Marks: $marks</td></tr>
++++
+		}
+	
+		foreach my $subject (@{$c{tree}->get_level_subjects})
+		{
+			my $title = &Webkit::NcTest::NCHub::get_subject_field($subject, 'title');
+			my $marks;
+		
+			if(!$c{test}->is_manual)
+			{
+				$marks = $c{tree}->get_subject_marks($subject);
+			}
+		
+			$OUT.=<<"+++";
+
+    <tr><td colspan="3" height="5" bgcolor=#e5e5e5></td></tr>
+<tr bgcolor="#FFFFFF"><td>&nbsp;</td>
+<td align=right><strong>Marks</strong></td>
+  <td align=right><strong>Info</strong></td>
+</tr>
+  <tr><td colspan="3" height="5" bgcolor=#e5e5e5></td></tr>
+<tr bgcolor="#FFFFFF"><td><b>$title</b></td><td align=right><strong style="color:#666666;">$marks</strong></td>
+  <td align=right>&nbsp;</td>
+</tr>
++++
+
+			foreach my $topic (@{$c{tree}->get_subject_topics($subject)})
+			{
+				my $marks;
+				my $bg = ' bgcolor="#ffffff"';
+				my $ratiost = '';
+				my $ratio_marks;
+				my $red_st = '';
+			
+				if(!$c{test}->is_manual)
+				{
+					my $topic_marks = $c{tree}->get_topic_marks($topic);
+					$ratio_marks = $c{tree}->get_topic_ratio_marks($topic);
+					my $ratio = $c{tree}->get_topic_weight($topic);
+				
+					my $diff = $topic_marks - $ratio_marks;
+					if($diff<0) { $diff *= -1; }
+				
+					$ratiost = ' - '.$ratio.':1';
+				
+					$marks = $topic_marks;
+				
+					if($diff>=1)
+					{
+						$bg = ' bgcolor="#ffe5e5" title="This AT needs '.$ratio_marks.' to be balanced." ';
+						$red_st = ' style="color:red;"';
+					}
+				}
+			
+				$OUT.=<<"+++";
+  <tr><td colspan="3" height="5" bgcolor=#ffffff></td></tr>
+<tr $bg>
+  <td>-- <b>$topic</b>$ratiost</td><td align=right><strong $red_st>$marks</strong></td>
+  <td align=right>$ratio_marks</td>
+</tr>			
++++
+
+				if(!$c{test}->is_manual)
+				{
+					foreach my $level (@{$c{tree}->get_topic_levels($topic)})
+					{
+						my $assessment_group = $c{tree}->get_assessment_group($topic, $level);
+						my $required = $assessment_group->get_required_marks;
+						my $total = $assessment_group->get_total_marks;
+						my $percent = $assessment_group->percentage;
+					
+					$OUT.=<<"+++";
+<tr bgcolor="#FFFFFF">
+  <td align="right">$level&nbsp;&nbsp;</td><td align=right><strong style="color:#666666;">$total</strong></td>
+  <td align=right>$percent% = $required</td>
+</tr>	
++++
+					}
+				}
+			}
+		}
+		
+		$OUT.=<<"+++";
+</table>
+<br>
+The table below shows a breakdown of the attainment targets and marks within the quiz.<br>
+<br>
+Because of the different weighting between AT's - rows may show up in red, this means you need to balance the marks accross the quiz, the marks each AT should have are shown in the Info column for the At rows.<br>
+<br>
+For each level within an AT - it will show how many marks are availiable for that level, and the Info column will show how many marks the pupil must get to be awarded the level.</body>
+		
++++
+	}
+	
+	if($c{org}->is_generic_nctest)
+	{
+		$OUT.=<<"+++";
+<br>
+Press the publish button to finalize the test paper and start assigning students to it
++++
+	}
+}
+

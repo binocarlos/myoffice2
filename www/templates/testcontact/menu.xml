@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<menu_config>
+	<menublock title="Users" width="90">
+		<menuitem title="Add" action="get_menu_iframe_query('add_user','Add User');"/>
+		<menuitem title="View/Edit" action="get_menu_iframe_query('users_home','Current Users');"/>
+	</menublock>
+	<menublock title="Contacts" width="90">
+		<menuitem title="Manage Contacts" action="get_menu_iframe_query('contact_home', 'Current Contacts');"/>
+	</menublock>	
+</menu_config>

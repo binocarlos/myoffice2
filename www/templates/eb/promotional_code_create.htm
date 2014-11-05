@@ -1,0 +1,72 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function addNewCode()
+	\{
+		var loc = href + '&method=promotional_code_create&school_id={$c{school}->get_id}';
+		
+		document.location = loc;
+	\}
+</script>
+<body>
+<table height="100%" border="0" align="center" cellpadding="20" cellspacing="0">
+<tr valign="top">
+<td height="1" align="center">
+
+<form action="{$c{script}}" method="POST" name="set_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="promotional_code_create_submit">
+<input type="hidden" name="school_id" value="{$c{school}->get_id}">
+<input type="hidden" name="code" value="{$c{code}->code}">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+<fieldset style="height:100%;">
+<legend>Promotional Code  Details</legend>
+<div class="seccontent" align="left">
+
+<TABLE BORDER="0" CELLPADDING="5" CELLSPACING="0">
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>School:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">{$c{school}->name}
+    </TD>
+  </TR>
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Amount:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="amount" type="text" class="text_field" id="code" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{params}->{amount}}">
+    </TD>
+  </TR>   
+  <TR style="padding-bottom:5px;"> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Code:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">{$c{code}->code}
+    </TD>
+  </TR>  
+</TABLE>
+
+</div>
+</fieldset>
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{code}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</form></td>
+</tr>
+</table>
+</body>
+</html>
+
+
+

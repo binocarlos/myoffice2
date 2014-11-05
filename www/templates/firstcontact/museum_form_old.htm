@@ -1,0 +1,1800 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "hmpro6.dtd">
+<HTML> 
+  <HEAD> 
+	 <TITLE>museums4schools</TITLE>  
+<script>
+	var currentTable = 'start';
+	
+	var keyArray = new Array();	
+	var keyTreeItems = new Object();
+	
+	var saving = false;
+	
+	var requiredPageKey = 'general1';
+	
+	function addKey(key, obj)
+	\{
+		keyArray[keyArray.length] = key;
+		keyTreeItems[key] = obj;
+	\}
+	
+	function getKeyIndex(key)
+	\{
+		for(var i=0; i<keyArray.length; i++)
+		\{
+			if(key==keyArray[i]) \{ return i; \}
+		\}
+		
+		return -1;
+	\}
+	
+	function nextPage()
+	\{
+		if(saving) \{ return; \}
+		
+		var currentIndex = getKeyIndex(currentTable);
+		
+		currentIndex++;
+		
+		if(currentIndex>=keyArray.length) \{ return; \}
+		
+		var nextKey = keyArray[currentIndex];
+		var nextObj = keyTreeItems[nextKey];
+		
+		nextObj.select();
+		
+		viewPage(nextKey);
+	\}
+	
+	function lastPage()
+	\{
+		if(saving) \{ return; \}
+			
+		var currentIndex = getKeyIndex(currentTable);
+		
+		currentIndex--;
+		
+		if(currentIndex<0) \{ return; \}
+		
+		var prevKey = keyArray[currentIndex];
+		var prevObj = keyTreeItems[prevKey];
+		
+		prevObj.select();
+		
+		viewPage(prevKey);
+	\}	
+	
+	function viewPage(key)
+	\{
+		if(saving) \{ return; \}
+			
+		enableTable(key);
+	\}
+
+	function setTable(key, mode)
+	\{
+		var tableObj = document.getElementById(key + 'Table');
+		
+		if(!tableObj) \{ return; \}
+		
+		var display = 'none';
+		
+		if(mode) \{ display = 'inline'; \}
+		
+		tableObj.style.display = display;
+	\}
+	
+	function enableTable(key)
+	\{
+		if(currentTable!=null)
+		\{
+			setTable(currentTable, false);
+		\}
+		
+		setTable(key, true);
+		
+		currentTable = key;
+	\}
+	
+	function checkForm()
+	\{
+		var form = document.museum_form;
+		
+		var requiredFields = new Array('name', 'contact_name', 'city', 'postcode', 'phone');
+		
+		for(var i=0; i<requiredFields.length; i++)
+		\{
+			var field = requiredFields[i];
+			
+			if(form[field].value=='')
+			\{
+				var requiredObj = keyTreeItems[requiredPageKey];			
+				requiredObj.select();
+		
+				viewPage(requiredPageKey);		
+				
+				form[field].style.backgroundColor = '#ffeeaa';
+				form[field].onfocus = clearHighlight;
+				
+				alert('Please supply a ' + field + ' value...');				
+				return false;
+			\}
+		\}
+		
+		if(form.county.value=="-1")
+		\{
+				var requiredObj = keyTreeItems[requiredPageKey];			
+				requiredObj.select();
+		
+				viewPage(requiredPageKey);		
+				
+				form.county.style.backgroundColor = '#ffeeaa';
+				form.county.onfocus = clearHighlight;
+				
+				alert('Please supply a county value...');				
+				return false;		
+		\}
+		
+		document.getElementById('formTable').style.display = 'none';
+		document.getElementById('saveTable').style.display = 'inline';		
+		
+		return true;
+	\}
+	
+	function clearHighlight()
+	\{
+		var gui = event.srcElement;
+		gui.style.backgroundColor = '';
+		
+		gui.onfocus = '';
+	\}
+	
+	function assignDifferentFields()
+	\{
+{
+	if($c{compare_museum})
+	{
+		$c{compare_museum}->load_fields;
+		
+		my $main_fields = $c{museum}->get_main_fields;
+		my $other_fields = $c{museum}->get_other_fields;
+		
+		push(@$main_fields, 'county');
+		
+		foreach my $main_field (@$main_fields)
+		{
+			if($c{museum}->get_value($main_field) ne $c{compare_museum}->get_value($main_field))
+			{
+				my $elem_id = $main_field.'TR';
+				
+				$OUT.=<<"+++";
+	document.getElementById('$elem_id').className = 'different_field';
++++
+			}
+		}
+		
+		foreach my $other_field (@$other_fields)
+		{
+			if($c{museum}->get_field_value($other_field) ne $c{compare_museum}->get_field_value($other_field))
+			{
+				my $elem_id = $other_field.'TR';
+				
+				$OUT.=<<"+++";
+	document.getElementById('$elem_id').className = 'different_field';
++++
+			}
+		}
+	}
+}
+	\}
+</script>
+<style type="text/css">
+<!--
+.different_field \{ background-color:#FF99FF; padding: 3px;\}
+.style1 \{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+\}
+.style2 \{font-family: Arial, Helvetica, sans-serif\}
+-->
+</style>
+</HEAD> 
+  <BODY>
+  
+  <table border=0 cellpadding=10 cellspacing=0>
+  <tr>
+  <td width=240 align="left" valign="top">
+  
+  <table width="100%" border=0 cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<script>
+
+var tree = new WebFXTree('{$c{museum}->get_js_value('name')} Info');
+tree.icon = '/images/icons/16/group.gif';
+//tree.action = "javascript: viewAll();";
+
+
+
+{			
+	my $arr = [
+		{	title => 'Start',
+			key => 'start' },
+		{	title => 'general info (1)',
+			key => 'general1' },
+		{	title => 'general info (2)',
+			key => 'general2' },
+		{	title => 'about your museum (1)',
+			key => 'about1' },
+		{	title => 'about your museum (2)',
+			key => 'about2' },
+		{	title => 'education support: KS1',
+			key => 'educationKS1' },
+		{	title => 'curriculum support: KS1',
+			key => 'curriculumKS1' },
+		{	title => 'education support: KS2',
+			key => 'educationKS2' },
+		{	title => 'curriculum support: KS2 (1)',
+			key => 'curriculumKS2_1' },
+		{	title => 'curriculum support: KS2 (2)',
+			key => 'curriculumKS2_2' },
+		{	title => 'what have we missed?',
+			key => 'missed' },
+		{	title => 'save and finish...',
+			key => 'finish' } ];
+
+	foreach my $ref (@$arr)
+	{
+		my $title = $ref->{title};
+		my $key = $ref->{key};
+		
+		$title =~ s/'/\\'/g;
+		
+		$OUT.=<<"+++";
+
+		
+var page$key = new WebFXTreeItem('$title');
+page$key.icon = '/images/tools/16px/new.gif';
+page$key.openIcon = '/images/tools/16px/new.gif';
+page$key.action = "javascript: viewPage('$key');";
+
+addKey('$key', page$key);		
+
+tree.add(page$key)
++++
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.expandAll();
+
+</script>
+
+</td>
+</tr>
+<tr>
+<td height=20></td>
+</tr>
+<tr>
+<td><a href="{$c{href}}&method={$c{cancel_method}}">&lt;- Click here</a> to cancel any changes and go back to the museums list... <br>
+	<br>
+	Use the tree items above to navigate to different pages... <br>
+	<br>
+	Use the red buttons to go to the next or previous page...<br>
+	<br>
+	(*) fields are required...
+	<br>
+<br>
+<span style="color:red;font-weight:bold;">{$c{museum}->{error_text}}</span>
+</td>
+</tr>
+</table>
+  </td>
+<td align="center" valign="top">
+<a href="javascript:lastPage();"><img src="/images/firstcontact/prev_off.gif" width="25" height="27" border=0></a>
+</td>
+  <td align="left" valign="top" width=500>
+  
+<FORM name="museum_form" target="_self" method="POST" action="{$c{script}}" style="masrgin:0px;padding:0px;" onSubmit="return checkForm();"> 
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="museum_id" value="{$c{museum}->get_id}">
+
+<table border=0 cellpadding=0 cellspacing=0 id="formTable">
+<tr>
+<td align="left" valign="top" id="startTable" style="display:inline;">
+<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="10" WIDTH="500"> 
+		  <TR> 
+			 <TD ALIGN="RIGHT"><span class="style2"><FONT CLASS="page_title1">help on<br>
+completing this<br>
+survey
+</FONT></span><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD class="section_title">
+<strong>Important
+
+</strong><br>
+<br>
+The information you supply here is used to create the online listing for your museum on museums4schools.
+
+Filling in the basic facts about your museum and its services should be fairly straightforward. The survey also includes questions about the areas of the curriculum that your permanent displays, object loan or outreach service could support (for brevity these are all called “permanent displays” in the survey). This is so that teachers can search the online database by curriculum theme. They will want to know if there is plenty to see and do related to their area of study, <strong>so please only tick the themes for which your displays/object loan/outreach service really could be useful.
+
+</strong><br>
+<br>
+To keep updating to a minimum, the database does not include rapidly changing information. Rather, it will encourage teachers to get in touch with your museum or service directly to get up to date information on events, charging details, etc.
+
+<br>
+<br>
+The curriculum themes are different for each Key Stage. The ages of children in each Key Stage are shown on the survey. If you know that school groups use your museum for other themes, please include these on the last page of the survey so that this information can be included in the listing for your museum.
+
+<br>
+<br>
+<strong>For now, the online database is for primary teachers only. It will be extended to secondary teachers later in 2005, at which time you will be able to add information for Key Stages 3 and 4.
+
+</strong><br>
+<br>
+You don’t need to complete the survey all in one go. You can click “save and return later” at any time. The information will not appear on the website until you have finished the whole survey and it has been checked through by a member of our editorial staff.
+			 
+			 </TD> 
+		  </TR> 
+</TABLE>
+</tr>
+<tr>
+<td align="left" valign="top" id="general1Table" style="display:none;">
+		<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="10" WIDTH="500"> 
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="RIGHT"><FONT CLASS="page_title1">general</FONT><BR><FONT CLASS="page_title2">info</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="2" class="section_title">For us to contact you about
+				this survey:</TD> 
+		  </TR> 
+		  <TR>
+			 <TD>your name (*) </TD> 
+			 <TD id="contact_nameTR" class="normalfield"><INPUT NAME="contact_name" TYPE="TEXT" CLASS="text_field" id="contact_name" STYLE="width:300px;" value="{$c{museum}->contact_name}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>job title</TD> 
+			 <TD id="job_titleTR" class="normalfield"><INPUT NAME="job_title" TYPE="TEXT" CLASS="text_field" id="job_title" STYLE="width:300px;" value="{$c{museum}->job_title}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>phone (*)</TD> 
+			 <TD id="phoneTR" class="normalfield"><INPUT NAME="phone" TYPE="TEXT" CLASS="text_field" id="phone" STYLE="width:300px;" value="{$c{museum}->phone}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>email</TD> 
+			 <TD id="emailTR" class="normalfield"><INPUT NAME="email" TYPE="TEXT" CLASS="text_field" id="email" STYLE="width:300px;" value="{$c{museum}->email}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>how do you prefer to be contacted?</TD> 
+			 <TD id="contact_viaTR" class="normalfield" ALIGN="CENTER"><INPUT TYPE="RADIO" NAME="contact_via" VALUE="phone"{$c{museum}->radio_checked('contact_via', 'phone')}>
+			 <BR>phone<BR><BR><INPUT TYPE="RADIO" NAME="contact_via" VALUE="email"{$c{museum}->radio_checked('contact_via', 'email')}>
+			 <BR>email<BR><BR><INPUT TYPE="RADIO" NAME="contact_via" VALUE="either"{$c{museum}->radio_checked('contact_via', 'either')}>
+			 <BR>don't mind</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="2" class="section_title"><BR>
+			 	Information for inclusion
+				on the website:</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>museum name (*) </TD> 
+			 <TD id="nameTR" class="normalfield"><INPUT NAME="name" TYPE="TEXT" CLASS="text_field" id="name" STYLE="width:300px;" value="{$c{museum}->name}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD VALIGN="TOP">full address</TD> 
+			 <TD id="addressTR" class="normalfield"><TEXTAREA NAME="address" COLS="20" ROWS="2" CLASS="text_field" id="address" STYLE="width:300px; height:100px;">{$c{museum}->address}</TEXTAREA></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>town/city (*) </TD> 
+			 <TD id="cityTR" class="normalfield"><INPUT NAME="city" TYPE="TEXT" CLASS="text_field" id="city" STYLE="width:300px;" value="{$c{museum}->city}"></TD> 
+		  </TR> 	
+		  <TR> 
+			 <TD>county (*) </TD> 
+			 <TD id="countyTR" class="normalfield"><select name="county" id="county" class="text_field" style="width:300px;">
+			 {$c{museum}->get_county_options}
+			 </select>
+			 </TD> 
+		  </TR> 	
+		  <TR> 
+			 <TD> </TD> 
+			 <TD><INPUT NAME="new_county" TYPE="TEXT" CLASS="text_field" id="new_county" STYLE="width:300px;" value="{$c{params}->{new_county}}"></TD> 
+		  </TR> 			    	  
+		  <TR> 
+			 <TD>postcode (*)</TD> 
+			 <TD id="postcodeTR" class="normalfield"><INPUT NAME="postcode" TYPE="TEXT" CLASS="text_field" id="postcode" STYLE="width:300px;" value="{$c{museum}->postcode}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>your museum's website</TD> 
+			 <TD id="websiteTR" class="normalfield"><INPUT NAME="website" TYPE="TEXT" CLASS="text_field" id="website" STYLE="width:300px;" value="{$c{museum}->website}"></TD> 
+		  </TR> 
+</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="general2Table" style="display:none;">
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="RIGHT"><FONT CLASS="page_title1">general</FONT><BR><FONT CLASS="page_title2">info</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>education information and bookings phone </TD> 
+			 <TD id="education_phoneTR" class="normalfield"><INPUT NAME="education_phone" TYPE="TEXT" CLASS="text_field" id="education_phone" STYLE="width:300px;" value="{$c{museum}->education_phone}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>education information email </TD> 
+			 <TD id="education_emailTR" class="normalfield"><INPUT NAME="education_email" TYPE="TEXT" CLASS="text_field" id="education_email" STYLE="width:300px;" value="{$c{museum}->education_email}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>do you want your name to appear on the website? </TD> 
+			 <TD ALIGN="CENTER" id="publish_nameTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="publish_name" VALUE="yes"{$c{museum}->radio_checked('publish_name', 'yes')}>
+					 <BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="publish_name" VALUE="no"{$c{museum}->radio_checked('publish_name', 'no')}><BR>no</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="publish_name" VALUE="either"{$c{museum}->radio_checked('publish_name', 'either')}><BR>don't mind</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>which days is the museum normally open to schools? </TD> 
+			 <TD ALIGN="CENTER"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_monTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_mon" VALUE="y"{$c{museum}->field_radio_checked('gen_open_mon', 'y')}><BR>mon</TD> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_tueTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_tue" VALUE="y"{$c{museum}->field_radio_checked('gen_open_tue', 'y')}><BR>tue</TD> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_wedTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_wed" VALUE="y"{$c{museum}->field_radio_checked('gen_open_wed', 'y')}><BR>wed</TD> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_thuTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_thu" VALUE="y"{$c{museum}->field_radio_checked('gen_open_thu', 'y')}><BR>thu</TD> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_friTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_fri" VALUE="y"{$c{museum}->field_radio_checked('gen_open_fri', 'y')}><BR>fri</TD> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_satTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_sat" VALUE="y"{$c{museum}->field_radio_checked('gen_open_sat', 'y')}><BR>sat</TD> 
+					 <TD ALIGN="CENTER" WIDTH="40" VALIGN="TOP" id="gen_open_sunTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="gen_open_sun" VALUE="y"{$c{museum}->field_radio_checked('gen_open_sun', 'y')}><BR>sun</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>is the museum open all year round? </TD> 
+			 <TD ALIGN="CENTER" id="gen_openallyearTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_openallyear" VALUE="yes"{$c{museum}->field_radio_checked('gen_openallyear', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_openallyear" VALUE="no"{$c{museum}->field_radio_checked('gen_openallyear', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>if not, when is the closed period? </TD> 
+			 <TD id="closed_periodTR" class="normalfield"><INPUT NAME="closed_period" TYPE="TEXT" CLASS="text_field" id="closed_period" STYLE="width:300px;" value="{$c{museum}->closed_period}"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>how much of the museum is accessible to wheelchair users?</TD> 
+			 <TD ALIGN="CENTER" id="gen_wheelchairTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="70" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_wheelchair" VALUE="noareas"{$c{museum}->field_radio_checked('gen_wheelchair', 'noareas')}><BR>no areas</TD> 
+					 <TD ALIGN="CENTER" WIDTH="70" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_wheelchair" VALUE="someareas"{$c{museum}->field_radio_checked('gen_wheelchair', 'someareas')}><BR>some areas</TD> 
+					 <TD ALIGN="CENTER" WIDTH="70" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_wheelchair" VALUE="mostareas"{$c{museum}->field_radio_checked('gen_wheelchair', 'mostareas')}><BR>most areas</TD> 
+					 <TD ALIGN="CENTER" WIDTH="70" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_wheelchair" VALUE="allareas"{$c{museum}->field_radio_checked('gen_wheelchair', 'allareas')}><BR>all areas</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>is there somewhere for coaches to drop off and collect pupils?
+		  </TD> 
+			 <TD ALIGN="CENTER" id="gen_coachesTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_coaches" VALUE="yes"{$c{museum}->field_radio_checked('gen_coaches', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_coaches" VALUE="no"{$c{museum}->field_radio_checked('gen_coaches', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum regularly have temporary/changing
+				exhibitions?</TD> 
+			 <TD ALIGN="CENTER" id="gen_exhibitionsTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_exhibitions" VALUE="yes"{$c{museum}->field_radio_checked('gen_exhibitions', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="gen_exhibitions" VALUE="no"{$c{museum}->field_radio_checked('gen_exhibitions', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="about1Table" style="display:none;">		
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="RIGHT"><FONT CLASS="page_title1">about</FONT><BR><FONT CLASS="page_title1">your</FONT><BR><FONT CLASS="page_title2">museum</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="left">Please give an overview of your museum or heritage organisation. This should be a snapshot (around 200 words), written for a teacher who has never heard of your museum or service.
+<br>
+<br>
+The opening paragraph is the <strong>first bit teachers will read</strong>, so you may need to give it some thought. Describe what your organisation is and what it has to offer schools in a nutshell. Following paragraphs should give more detailed information, focussing on what you can offer <strong>to schools</strong>.
+
+<br>
+<br>
+If you don&rsquo;t want to start from scratch, try adapting a description that has already been written for other marketing purposes, such as:
+
+<br>
+<br>
+Museums Association Museums &amp; Galleries Yearbook<br>
+<br>
+MuseumNet<br>
+<a href="http://www.museums.co.uk" target="_blank">www.museums.co.uk</a><br>
+<br>
+Engage gallery finder (art galleries)<br>
+<a href="http://www.engage.org/galleryfinder" target="_blank">www.engage.org/galleryfinder</a><BR>
+<BR></TD> 
+		  </TR> 		  
+		  <TR> 
+			 <TD COLSPAN="2" id="notesTR" class="normalfield"><TEXTAREA NAME="notes" COLS="20" ROWS="2" CLASS="text_field" id="notes" STYLE="width:480px; height:200px;">{$c{museum}->notes}</TEXTAREA></TD> 
+		  </TR> 
+		</TABLE>	
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="about2Table" style="display:none;">					
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="RIGHT"><FONT CLASS="page_title1">about</FONT><BR><FONT CLASS="page_title1">your</FONT><BR><FONT CLASS="page_title2">museum</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="2">Please answer the following questions about what your
+				museum provides for school groups: </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum charge entry for school groups? </TD> 
+			 <TD ALIGN="CENTER" WIDTH="300" id="aym_chargegroupsTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_chargegroups" VALUE="yes"{$c{museum}->field_radio_checked('aym_chargegroups', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_chargegroups" VALUE="no"{$c{museum}->field_radio_checked('aym_chargegroups', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum charge schools for educational sessions? </TD> 
+			 <TD ALIGN="CENTER" id="aym_chargesessionsTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_chargesessions" VALUE="yes"{$c{museum}->field_radio_checked('aym_chargesessions', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_chargesessions" VALUE="no"{$c{museum}->field_radio_checked('aym_chargesessions', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum have a staffed education service? </TD> 
+			 <TD ALIGN="CENTER" id="aym_staffedTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_staffed" VALUE="yes"{$c{museum}->field_radio_checked('aym_staffed', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_staffed" VALUE="no"{$c{museum}->field_radio_checked('aym_staffed', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum have a separate education/study/workshop area?
+		  </TD> 
+			 <TD ALIGN="CENTER" id="aym_workshopTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_workshop" VALUE="yes"{$c{museum}->field_radio_checked('aym_workshop', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_workshop" VALUE="no"{$c{museum}->field_radio_checked('aym_workshop', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum have an area where school groups can have lunch?
+		  </TD> 
+			 <TD ALIGN="CENTER" id="aym_lunchTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_lunch" VALUE="yes"{$c{museum}->field_radio_checked('aym_lunch', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_lunch" VALUE="no"{$c{museum}->field_radio_checked('aym_lunch', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum offer help with planning school visits? </TD> 
+			 <TD ALIGN="CENTER" id="aym_offerhelpTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_offerhelp" VALUE="yes"{$c{museum}->field_radio_checked('aym_offerhelp', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_offerhelp" VALUE="no"{$c{museum}->field_radio_checked('aym_offerhelp', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum produce a visit planning guide? </TD> 
+			 <TD ALIGN="CENTER" id="aym_planningguideTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_planningguide" VALUE="yes"{$c{museum}->field_radio_checked('aym_planningguide', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_planningguide" VALUE="no"{$c{museum}->field_radio_checked('aym_planningguide', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum offer teachers free planning visits? </TD> 
+			 <TD ALIGN="CENTER" id="aym_teachersfreeTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_teachersfree" VALUE="yes"{$c{museum}->field_radio_checked('aym_teachersfree', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_teachersfree" VALUE="no"{$c{museum}->field_radio_checked('aym_teachersfree', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>would you like the museum to be described as "actively looking to
+				work with teachers to develop new resources"? </TD> 
+			 <TD ALIGN="CENTER" id="aym_lookingtoworkTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_lookingtowork" VALUE="yes"{$c{museum}->field_radio_checked('aym_lookingtowork', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="aym_lookingtowork" VALUE="no"{$c{museum}->field_radio_checked('aym_lookingtowork', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="educationKS1Table" style="display:none;">					
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="3" ALIGN="RIGHT"><FONT CLASS="page_title1">education
+				support:</FONT><BR><FONT CLASS="page_title2">key stage 1</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">Which of these is regularly offered <B>at the
+				museum</B> for KS1 children (aged 5-7) and their teachers? </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>museum or gallery tours led by educators </TD> 
+					 <TD WIDTH="1" id="ks1_museum_toursTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_museum_tours" VALUE="y"{$c{museum}->field_radio_checked('ks1_museum_tours', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD ROWSPAN="5"><BR></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for pupils</TD> 
+					 <TD WIDTH="1" id="ks1_museum_pupilresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_museum_pupilres" VALUE="y"{$c{museum}->field_radio_checked('ks1_museum_pupilres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>living history</TD> 
+					 <TD WIDTH="1" id="ks1_museum_historyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_museum_history" VALUE="y"{$c{museum}->field_radio_checked('ks1_museum_history', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>on-gallery activities</TD> 
+					 <TD WIDTH="1" id="ks1_museum_galleryTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_museum_gallery" value="y"{$c{museum}->field_radio_checked('ks1_museum_gallery', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for teachers</TD> 
+					 <TD WIDTH="1" id="ks1_museum_teachresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_museum_teachres" value="y"{$c{museum}->field_radio_checked('ks1_museum_teachres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>continuing professional development </TD> 
+					 <TD WIDTH="1" id="ks1_museum_developmentTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_museum_development" value="y"{$c{museum}->field_radio_checked('ks1_museum_development', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>&nbsp;</TD> 
+			 <TD>&nbsp;</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum offer sessions run by museum staff for children
+				aged 5-7? </TD> 
+			 <TD ALIGN="CENTER" id="ks1_sessionsTR" class="normalfield">
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="ks1_sessions" VALUE="yes"{$c{museum}->field_radio_checked('ks1_sessions', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="ks1_sessions" VALUE="no"{$c{museum}->field_radio_checked('ks1_sessions', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">If "yes", which curriculum areas do they relate
+				to?</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>History</TD> 
+					 <TD WIDTH="1" id="ks1_sessions_yes_historyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_sessions_yes_history" value="y"{$c{museum}->field_radio_checked('ks1_sessions_yes_history', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD ROWSPAN="6"> <BR></TD> 
+			 <TD ROWSPAN="6"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Art &amp; Design</TD> 
+					 <TD WIDTH="1" id="ks1_sessions_yes_artdesignTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_sessions_yes_artdesign" value="y"{$c{museum}->field_radio_checked('ks1_sessions_yes_artdesign', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Design &amp; Technology</TD> 
+					 <TD WIDTH="1" id="ks1_sessions_yes_dandtTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_sessions_yes_dandt" value="y"{$c{museum}->field_radio_checked('ks1_sessions_yes_dandt', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Geography</TD> 
+					 <TD WIDTH="1" id="ks1_sessions_yes_geographyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_sessions_yes_geography" value="y"{$c{museum}->field_radio_checked('ks1_sessions_yes_geography', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Science</TD> 
+					 <TD WIDTH="1" id="ks1_sessions_yes_scienceTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_sessions_yes_science" value="y"{$c{museum}->field_radio_checked('ks1_sessions_yes_science', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>&nbsp;</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">Which of these is regularly offered for use<B> in
+				schools</B> by KS1 children (aged 5-7) and their teachers? </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>loans boxes</TD> 
+					 <TD WIDTH="1" id="ks1_schools_boxesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_schools_boxes" value="y"{$c{museum}->field_radio_checked('ks1_schools_boxes', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD ROWSPAN="5"><BR></TD> 
+			 <TD ROWSPAN="5"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for pupils</TD> 
+					 <TD WIDTH="1" id="ks1_schools_pupilresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_schools_pupilres" value="y"{$c{museum}->field_radio_checked('ks1_schools_pupilres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for teachers</TD> 
+					 <TD WIDTH="1" id="ks1_schools_teachresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_schools_teachres" value="y"{$c{museum}->field_radio_checked('ks1_schools_teachres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>web-based or other e-learning resources </TD> 
+					 <TD WIDTH="1" id="ks1_schools_webTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_schools_web" value="y"{$c{museum}->field_radio_checked('ks1_schools_web', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>sessions led by museum staff</TD> 
+					 <TD WIDTH="1" id="ks1_schools_sessionsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_schools_sessions" value="y"{$c{museum}->field_radio_checked('ks1_schools_sessions', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="curriculumKS1Table" style="display:none;">					
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="3" ALIGN="RIGHT"><FONT CLASS="page_title1">curriculum
+				support:</FONT><BR><FONT CLASS="page_title2">key stage 1</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">The following are the main curriculum themes that
+				museums can support at Key Stage 1. Are your permanent displays useful for KS1
+				children (aged 5-7) learning about: </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"><B>History</B></TD> 
+			 <TD ROWSPAN="18"><BR></TD> 
+			 <TD WIDTH="50%"><B>Art &amp; Design</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Famous local people</TD> 
+					 <TD WIDTH="1" id="ks1_history_famouspeopleTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_famouspeople" value="y"{$c{museum}->field_radio_checked('ks1_history_famouspeople', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Portraits</TD> 
+					 <TD WIDTH="1" id="ks1_artdesign_portraitsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_artdesign_portraits" value="y"{$c{museum}->field_radio_checked('ks1_artdesign_portraits', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Local people's lives in the past </TD> 
+					 <TD WIDTH="1" id="ks1_history_localpeopleTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_localpeople" value="y"{$c{museum}->field_radio_checked('ks1_history_localpeople', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Textiles</TD> 
+					 <TD WIDTH="1" id="ks1_artdesign_textilesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_artdesign_textiles" value="y"{$c{museum}->field_radio_checked('ks1_artdesign_textiles', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Toys past &amp; present</TD> 
+					 <TD WIDTH="1" id="ks1_history_toysTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_toys" value="y"{$c{museum}->field_radio_checked('ks1_history_toys', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Sculptures</TD> 
+					 <TD WIDTH="1" id="ks1_artdesign_sculpturesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_artdesign_sculptures" value="y"{$c{museum}->field_radio_checked('ks1_artdesign_sculptures', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Homes past &amp; present</TD> 
+					 <TD WIDTH="1" id="ks1_history_homesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_homes" value="y"{$c{museum}->field_radio_checked('ks1_history_homes', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Natural objects as inspiration for artwork </TD> 
+					 <TD WIDTH="1" id="ks1_artdesign_naturalTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_artdesign_natural" value="y"{$c{museum}->field_radio_checked('ks1_artdesign_natural', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Seaside holidays past &amp; present </TD> 
+					 <TD WIDTH="1" id="ks1_history_seasideTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_seaside" value="y"{$c{museum}->field_radio_checked('ks1_history_seaside', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Shape and pattern in buildings </TD> 
+					 <TD WIDTH="1" id="ks1_artdesign_buildingsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_artdesign_buildings" value="y"{$c{museum}->field_radio_checked('ks1_artdesign_buildings', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Florence Nightingale, Crimean War </TD> 
+					 <TD WIDTH="1" id="ks1_history_florenceTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_florence" value="y"{$c{museum}->field_radio_checked('ks1_history_florence', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Remembrance Day</TD> 
+					 <TD WIDTH="1" id="ks1_history_rememberTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_history_remember" value="y"{$c{museum}->field_radio_checked('ks1_history_remember', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"><B>Design &amp; Technology</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Vehicles</TD> 
+					 <TD WIDTH="1" id="ks1_dandt_vehiclesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_dandt_vehicles" value="y"{$c{museum}->field_radio_checked('ks1_dandt_vehicles', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"><B>Science</B></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Wheels &amp; axles</TD> 
+					 <TD WIDTH="1" id="ks1_dandt_wheelsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_dandt_wheels" value="y"{$c{museum}->field_radio_checked('ks1_dandt_wheels', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Our bodies</TD> 
+					 <TD WIDTH="1" id="ks1_science_bodiesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_bodies" value="y"{$c{museum}->field_radio_checked('ks1_science_bodies', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Puppets</TD> 
+					 <TD WIDTH="1" id="ks1_dandt_puppetsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_dandt_puppets" value="y"{$c{museum}->field_radio_checked('ks1_dandt_puppets', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Local plants/their habitats</TD> 
+					 <TD WIDTH="1" id="ks1_science_plantsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_plants" value="y"{$c{museum}->field_radio_checked('ks1_science_plants', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Houses and homes: different types of construction </TD> 
+					 <TD WIDTH="1" id="ks1_dandt_homesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_dandt_homes" value="y"{$c{museum}->field_radio_checked('ks1_dandt_homes', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Local animals/their habitats</TD> 
+					 <TD WIDTH="1" id="ks1_science_animalsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_animals" value="y"{$c{museum}->field_radio_checked('ks1_science_animals', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Similarities and differences between living things </TD> 
+					 <TD WIDTH="1" id="ks1_science_livingthingsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_livingthings" value="y"{$c{museum}->field_radio_checked('ks1_science_livingthings', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"><B>Geography</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Properties and uses of common materials </TD> 
+					 <TD WIDTH="1" id="ks1_science_materialsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_materials" value="y"{$c{museum}->field_radio_checked('ks1_science_materials', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Using maps</TD> 
+					 <TD WIDTH="1" id="ks1_geography_mapsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_geography_maps" value="y"{$c{museum}->field_radio_checked('ks1_geography_maps', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Forces and movement</TD> 
+					 <TD WIDTH="1" id="ks1_science_forcesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_forces" value="y"{$c{museum}->field_radio_checked('ks1_science_forces', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>The local landscape</TD> 
+					 <TD WIDTH="1" id="ks1_geography_landscapeTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_geography_landscape" value="y"{$c{museum}->field_radio_checked('ks1_geography_landscape', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Using electricity</TD> 
+					 <TD WIDTH="1" id="ks1_science_electricityTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_electricity" value="y"{$c{museum}->field_radio_checked('ks1_science_electricity', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Going to the seaside</TD> 
+					 <TD WIDTH="1" id="ks1_geography_seasideTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_geography_seaside" value="y"{$c{museum}->field_radio_checked('ks1_geography_seaside', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Light and sound</TD> 
+					 <TD WIDTH="1" id="ks1_science_lightTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks1_science_light" value="y"{$c{museum}->field_radio_checked('ks1_science_light', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"></TD> 
+		  </TR>
+		  <TR>
+		  	<TD colspan="3"><table width="100%"  border="0" cellpadding="5" cellspacing="0" id="ks1_notlistedTR" class="normalfield">
+            	<tr>
+            		<td valign="middle">Any other KS1 curriculum areas not listed here?<br>
+            			If &quot;yes&quot;, please specify on the last page. </td>
+            		<td width="80" align="center" valign="middle"><INPUT TYPE="RADIO" NAME="ks1_notlisted" VALUE="yes"{$c{museum}->field_radio_checked('ks1_notlisted', 'yes')}><br>yes</td>
+            		<td width="80" align="center" valign="middle"><INPUT TYPE="RADIO" NAME="ks1_notlisted" VALUE="no"{$c{museum}->field_radio_checked('ks1_notlisted', 'no')}><br>no</td>
+       		</tr>
+            	</table></TD>
+	  	</TR> 
+		</TABLE>		
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="educationKS2Table" style="display:none;">				 
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="3" ALIGN="RIGHT"><FONT CLASS="page_title1">education
+				support:</FONT><BR><FONT CLASS="page_title2">key stage 2</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">Which of these is regularly offered <B>at the
+				museum</B> for KS2 children (aged 7-11) and their teachers? </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>museum or gallery tours led by educators </TD> 
+					 <TD WIDTH="1" id="ks2_museum_toursTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_tours" value="y"{$c{museum}->field_radio_checked('ks2_museum_tours', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD ROWSPAN="4"><BR></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for pupils</TD> 
+					 <TD WIDTH="1" id="ks2_museum_pupilresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_pupilres" value="y"{$c{museum}->field_radio_checked('ks2_museum_pupilres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>taught sessions or workshops</TD> 
+					 <TD WIDTH="1" id="ks2_museum_workshopsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_workshops" value="y"{$c{museum}->field_radio_checked('ks2_museum_workshops', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>on-gallery activities</TD> 
+					 <TD WIDTH="1" id="ks2_museum_galleryTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_gallery" value="y"{$c{museum}->field_radio_checked('ks2_museum_gallery', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>living history</TD> 
+					 <TD WIDTH="1" id="ks2_museum_historyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_history" value="y"{$c{museum}->field_radio_checked('ks2_museum_history', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>continuing professional development </TD> 
+					 <TD WIDTH="1" id="ks2_museum_developmentTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_development" value="y"{$c{museum}->field_radio_checked('ks2_museum_development', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for teachers</TD> 
+					 <TD WIDTH="1" id="ks2_museum_teachresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_museum_teachres" value="y"{$c{museum}->field_radio_checked('ks2_museum_teachres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">&nbsp;</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">Which of these is regularly offered for use<B> in
+				schools</B> by KS2 children (aged 7-11) and their teachers? </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>loans boxes</TD> 
+					 <TD WIDTH="1" id="ks2_schools_boxesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_schools_boxes" value="y"{$c{museum}->field_radio_checked('ks2_schools_boxes', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD ROWSPAN="4"><BR></TD> 
+			 <TD ROWSPAN="4"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for pupils</TD> 
+					 <TD WIDTH="1" id="ks2_schools_pupilresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_schools_pupilres" value="y"{$c{museum}->field_radio_checked('ks2_schools_pupilres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>printed resources for teachers</TD> 
+					 <TD WIDTH="1" id="ks2_schools_teachresTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_schools_teachres" value="y"{$c{museum}->field_radio_checked('ks2_schools_teachres', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>web-based or other e-learning resources </TD> 
+					 <TD WIDTH="1" id="ks2_schools_webTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_schools_web" value="y"{$c{museum}->field_radio_checked('ks2_schools_web', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">&nbsp;</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD>does the museum offer sessions <B>in schools</B> run by museum
+				staff for KS2 children (aged 7-11)? </TD> 
+			 <TD></TD> 
+			 <TD ALIGN="CENTER" id="ks2_sessionsTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="ks2_sessions" VALUE="yes"{$c{museum}->field_radio_checked('ks2_sessions', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="ks2_sessions" VALUE="no"{$c{museum}->field_radio_checked('ks2_sessions', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">If "yes", which curriculum areas do they relate
+				to?</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>History</TD> 
+					 <TD WIDTH="1" id="ks2_sessions_yes_historyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_sessions_yes_history" value="y"{$c{museum}->field_radio_checked('ks2_sessions_yes_history', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD ROWSPAN="5"></TD> 
+			 <TD ROWSPAN="5"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Art &amp; Design</TD> 
+					 <TD WIDTH="1" id="ks2_sessions_yes_artdesignTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_sessions_yes_artdesign" value="y"{$c{museum}->field_radio_checked('ks2_sessions_yes_artdesign', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Design &amp; Technology</TD> 
+					 <TD WIDTH="1" id="ks2_sessions_yes_dandtTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_sessions_yes_dandt" value="y"{$c{museum}->field_radio_checked('ks2_sessions_yes_dandt', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Geography</TD> 
+					 <TD WIDTH="1" id="ks2_sessions_yes_geographyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_sessions_yes_geography" value="y"{$c{museum}->field_radio_checked('ks2_sessions_yes_geography', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Science</TD> 
+					 <TD WIDTH="1" id="ks2_sessions_yes_scienceTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_sessions_yes_science" value="y"{$c{museum}->field_radio_checked('ks2_sessions_yes_science', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="curriculumKS2_1Table" style="display:none;">					
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="3" ALIGN="RIGHT"><FONT CLASS="page_title1">curriculum
+				support:</FONT><BR><FONT CLASS="page_title2">key stage 2</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="3">The following are the main curriculum themes that
+				museums can support at Key Stage 2. Are your permanent displays useful for KS2
+				children (aged 7-11) learning about: </TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"><B>History</B></TD> 
+			 <TD ROWSPAN="17"><BR></TD> 
+			 <TD WIDTH="50%"><B>Science</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Ancient Egypt</TD> 
+					 <TD WIDTH="1" id="ks2_history_egyptTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_egypt" value="y"{$c{museum}->field_radio_checked('ks2_history_egypt', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Habitats, keys and food chains </TD> 
+					 <TD WIDTH="1" id="ks2_science_foodchainTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_foodchain" value="y"{$c{museum}->field_radio_checked('ks2_science_foodchain', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Ancient Greeks</TD> 
+					 <TD WIDTH="1" id="ks2_history_greeksTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_greeks" value="y"{$c{museum}->field_radio_checked('ks2_history_greeks', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Life cycles</TD> 
+					 <TD WIDTH="1" id="ks2_science_lifecyclesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_lifecycles" value="y"{$c{museum}->field_radio_checked('ks2_science_lifecycles', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Indus Valley (ancient India)</TD> 
+					 <TD WIDTH="1" id="ks2_history_indusTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_indus" value="y"{$c{museum}->field_radio_checked('ks2_history_indus', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Keeping healthy</TD> 
+					 <TD WIDTH="1" id="ks2_science_healthyTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_healthy" value="y"{$c{museum}->field_radio_checked('ks2_science_healthy', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Romans</TD> 
+					 <TD WIDTH="1" id="ks2_history_romansTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_romans" value="y"{$c{museum}->field_radio_checked('ks2_history_romans', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Skeletons and muscles</TD> 
+					 <TD WIDTH="1" id="ks2_science_skeletonsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_skeletons" value="y"{$c{museum}->field_radio_checked('ks2_science_skeletons', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Anglo Saxons</TD> 
+					 <TD WIDTH="1" id="ks2_history_saxonsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_saxons" value="y"{$c{museum}->field_radio_checked('ks2_history_saxons', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Helping plants grow well</TD> 
+					 <TD WIDTH="1" id="ks2_science_plantsgrowTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_plantsgrow" value="y"{$c{museum}->field_radio_checked('ks2_science_plantsgrow', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Vikings</TD> 
+					 <TD WIDTH="1" id="ks2_history_vikingsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_vikings" value="y"{$c{museum}->field_radio_checked('ks2_history_vikings', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Micro-organisms</TD> 
+					 <TD WIDTH="1" id="ks2_science_microorganismsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_microorganisms" value="y"{$c{museum}->field_radio_checked('ks2_science_microorganisms', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Henry VIII and his wives</TD> 
+					 <TD WIDTH="1" id="ks2_history_henryviiiTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_henryviii" value="y"{$c{museum}->field_radio_checked('ks2_history_henryviii', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Insulating and conducting materials </TD> 
+					 <TD WIDTH="1" id="ks2_science_insulconductTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_insulconduct" value="y"{$c{museum}->field_radio_checked('ks2_science_insulconduct', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Rich &amp; poor in Tudor times</TD> 
+					 <TD WIDTH="1" id="ks2_history_tudorTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_tudor" value="y"{$c{museum}->field_radio_checked('ks2_history_tudor', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Rocks and soils</TD> 
+					 <TD WIDTH="1" id="ks2_science_rocksTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_rocks" value="y"{$c{museum}->field_radio_checked('ks2_science_rocks', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Local life in Victorian times</TD> 
+					 <TD WIDTH="1" id="ks2_history_localvictorianTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_localvictorian" value="y"{$c{museum}->field_radio_checked('ks2_history_localvictorian', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Changing materials</TD> 
+					 <TD WIDTH="1" id="ks2_science_materialsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_materials" value="y"{$c{museum}->field_radio_checked('ks2_science_materials', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Children in Victorian Britain</TD> 
+					 <TD WIDTH="1" id="ks2_history_childrenvictorianTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_childrenvictorian" value="y"{$c{museum}->field_radio_checked('ks2_history_childrenvictorian', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Separating mixtures</TD> 
+					 <TD WIDTH="1" id="ks2_science_mixturesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_mixtures" value="y"{$c{museum}->field_radio_checked('ks2_science_mixtures', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Britain 1930-1947 and/or World War II </TD> 
+					 <TD WIDTH="1" id="ks2_history_ww2TR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_ww2" value="y"{$c{museum}->field_radio_checked('ks2_history_ww2', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Electricity and circuits</TD> 
+					 <TD WIDTH="1" id="ks2_science_electricityTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_electricity" value="y"{$c{museum}->field_radio_checked('ks2_science_electricity', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Children in World War II</TD> 
+					 <TD WIDTH="1" id="ks2_history_childrenww2TR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_childrenww2" value="y"{$c{museum}->field_radio_checked('ks2_history_childrenww2', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Forces and motion</TD> 
+					 <TD WIDTH="1" id="ks2_science_forcesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_forces" value="y"{$c{museum}->field_radio_checked('ks2_science_forces', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Britain since 1948</TD> 
+					 <TD WIDTH="1" id="ks2_history_since1948TR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_since1948" value="y"{$c{museum}->field_radio_checked('ks2_history_since1948', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Light and sound</TD> 
+					 <TD WIDTH="1" id="ks2_science_lightTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_light" value="y"{$c{museum}->field_radio_checked('ks2_science_light', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Famous local person or people from the past </TD> 
+					 <TD WIDTH="1" id="ks2_history_famouslocalsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_famouslocals" value="y"{$c{museum}->field_radio_checked('ks2_history_famouslocals', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Earth, Sun and Moon</TD> 
+					 <TD WIDTH="1" id="ks2_science_earthTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_science_earth" value="y"{$c{museum}->field_radio_checked('ks2_science_earth', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Local sites or buildings across time </TD> 
+					 <TD WIDTH="1" id="ks2_history_localsitesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_history_localsites" value="y"{$c{museum}->field_radio_checked('ks2_history_localsites', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%">&nbsp;</TD> 
+			 <TD WIDTH="50%">&nbsp;</TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="curriculumKS2_2Table" style="display:none;">			
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="3" ALIGN="RIGHT"><FONT CLASS="page_title1">curriculum
+				support:</FONT><BR><FONT CLASS="page_title2">key stage 2</FONT><BR><BR></TD> 
+		  </TR>  		
+		  <TR> 
+			 <TD WIDTH="50%"><B>Art &amp; Design</B></TD> 
+					 <TD ROWSPAN="18"><BR></TD> 
+			 <TD WIDTH="50%"><B>Geography</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Sculpture</TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_sculptureTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_sculpture" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_sculpture', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Using maps</TD> 
+					 <TD WIDTH="1" id="ks2_geography_mapsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_geography_maps" value="y"{$c{museum}->field_radio_checked('ks2_geography_maps', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Public art</TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_publicartTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_publicart" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_publicart', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>The geography of the local area </TD> 
+					 <TD WIDTH="1" id="ks2_geography_localareaTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_geography_localarea" value="y"{$c{museum}->field_radio_checked('ks2_geography_localarea', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Still life</TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_stilllifeTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_stilllife" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_stilllife', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Rivers and waterways</TD> 
+					 <TD WIDTH="1" id="ks2_geography_riversTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_geography_rivers" value="y"{$c{museum}->field_radio_checked('ks2_geography_rivers', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Landscapes</TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_landscapesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_landscapes" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_landscapes', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Development of Roman, Anglo-Saxon or Viking settlements
+				  </TD> 
+					 <TD WIDTH="1" id="ks2_geography_romansTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_geography_romans" value="y"{$c{museum}->field_radio_checked('ks2_geography_romans', 'y')}></TD>
+					 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Images depicting relationships between people </TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_relationshipsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_relationships" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_relationships', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Vessels and containers</TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_containersTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_containers" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_containers', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"><B>Citizenship</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Chairs</TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_chairsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_chairs" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_chairs', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Animal welfare and rights</TD> 
+					 <TD WIDTH="1" id="ks2_citizenship_animalTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_citizenship_animal" value="y"{$c{museum}->field_radio_checked('ks2_citizenship_animal', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Textiles from different times and/or cultures </TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_textilesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_textiles" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_textiles', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>The media and reporting the news </TD> 
+					 <TD WIDTH="1" id="ks2_citizenship_mediaTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_citizenship_media" value="y"{$c{museum}->field_radio_checked('ks2_citizenship_media', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Headwear from different times and/or cultures </TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_headwearTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_headwear" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_headwear', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Children's personal and cultural identities in a diverse
+						world </TD> 
+					 <TD WIDTH="1" id="ks2_citizenship_childrensTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_citizenship_childrens" value="y"{$c{museum}->field_radio_checked('ks2_citizenship_childrens', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Costume from different times and/or cultures </TD> 
+					 <TD WIDTH="1" id="ks2_artdesign_costumeTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_artdesign_costume" value="y"{$c{museum}->field_radio_checked('ks2_artdesign_costume', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+			 <TD WIDTH="50%" ROWSPAN="7"></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%">&nbsp;</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"><B>Design &amp; Technology</B></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Purses, wallets and bags</TD> 
+					 <TD WIDTH="1" id="ks2_dandt_pursesTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_dandt_purses" value="y"{$c{museum}->field_radio_checked('ks2_dandt_purses', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Musical instruments from different times and/or cultures
+				  </TD> 
+					 <TD WIDTH="1" id="ks2_dandt_instrumentsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_dandt_instruments" value="y"{$c{museum}->field_radio_checked('ks2_dandt_instruments', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>Moving toys</TD> 
+					 <TD WIDTH="1" id="ks2_dandt_toysTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_dandt_toys" value="y"{$c{museum}->field_radio_checked('ks2_dandt_toys', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%"> 
+				<TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD>How motors work</TD> 
+					 <TD WIDTH="1" id="ks2_dandt_motorsTR" class="normalfield"><INPUT TYPE="CHECKBOX" NAME="ks2_dandt_motors" value="y"{$c{museum}->field_radio_checked('ks2_dandt_motors', 'y')}></TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%" COLSPAN="3">&nbsp;</TD> 
+		  </TR> 
+		  <TR> 
+			 <TD WIDTH="50%">Any other KS2 curriculum areas not listed here? If
+				"yes", please specify on the next page. </TD> 
+			 <TD></TD> 
+			 <TD WIDTH="50%" ALIGN="CENTER" id="ks2_anymoreTR" class="normalfield"> 
+				<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"> 
+				  <TR> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="ks2_anymore" VALUE="yes"{$c{museum}->field_radio_checked('ks2_anymore', 'yes')}><BR>yes</TD> 
+					 <TD ALIGN="CENTER" WIDTH="60" VALIGN="TOP"><INPUT TYPE="RADIO" NAME="ks2_anymore" VALUE="no"{$c{museum}->field_radio_checked('ks2_anymore', 'no')}><BR>no</TD> 
+				  </TR> 
+				</TABLE></TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+<tr>
+<td align="left" valign="top" id="missedTable" style="display:none;">			 
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="RIGHT"><FONT CLASS="page_title1">what have
+				we</FONT><BR><FONT CLASS="page_title2">missed?</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="2" id="extra_infoTR" class="normalfield"> <TEXTAREA NAME="extra_info" COLS="20" ROWS="2" CLASS="text_field" id="extra_info" STYLE="width:480px; height:200px;">{$c{museum}->extra_info}</TEXTAREA></TD> 
+		  </TR> 
+		</TABLE>
+</td>
+</tr>
+	<tr>
+<td align="left" valign="top" id="finishTable" style="display:none;">			 
+		<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="10" WIDTH="500">
+		  <TR> 
+			 <TD COLSPAN="2" ALIGN="RIGHT"><FONT CLASS="page_title1">save and finish</FONT><BR><BR></TD> 
+		  </TR> 
+		  <TR> 
+			 <TD COLSPAN="2" align="right">Click the button below when you are finished on this museum, <br>
+remember you can always come back and edit it later...<br>
+<br>
+<input class="button" type="submit" value="Save Museum Data"></TD> 
+		  </TR> 
+		</TABLE>
+	</td>
+	</tr>
+</table>		
+	<table border=0 cellpadding=5 cellspacing=0 id="saveTable" style="display:none;">
+	<tr><td style="color:red;" align=right">
+	Saving - Please Wait ...
+	</td></tr></table>
+  </FORM>
+
+	
+  </td>
+<td align="center" valign="top">
+<a href="javascript:nextPage();"><img src="/images/firstcontact/next_off.gif" width="25" height="27" border=0></a>
+</td>	
+  </tr>
+  </table>  
+<script>
+assignDifferentFields();
+</script>
+  </BODY>
+</HTML>

@@ -1,0 +1,126 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	function tourTypeChange()
+	\{
+		var type = document.tour_form.type.value;
+		
+		var display = 'none';
+		var countryDisplay = 'inline';
+		
+		if(type=='combined')
+		\{
+			display = 'inline';
+			countryDisplay = 'none';
+		\}
+		
+		document.getElementById('combinedSpan').style.display = display;
+		document.getElementById('countryTr').style.display = countryDisplay;
+	\}
+</script>
+<body>
+<form action="{$c{script}}" method="POST" name="tour_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="tour_form_submit">
+<input type="hidden" name="tour_id" value="{$c{tour}->get_id}">
+<table cellpadding="10" cellspacing="0" border="0" width="100%" height="100%">
+<tr>
+<td width="50%" height="100%" align="center" valign="top">
+
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+<fieldset style="height:100%;">
+<legend>Tour Details</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Tour Details
++++
+}
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Name:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"> 
+      <input name="name" type="text" class="text_field" id="name" style="width:250px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';" value="{$c{tour}->name}">
+    </TD>
+  </TR> 
+  <TR style="padding-bottom:5px;display:inline;" id="countryTr">
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Country:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="country_id" class="text_field" style="width:100%;">{$c{tour}->get_country_options}</select>
+    </TD>
+  </TR> 
+  <TR> 
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Type:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%"><select name="type" id="type" class="text_field" style="width:100%;" onChange="tourTypeChange();">
+      {$c{tour}->get_type_options}
+    </select> 
+    </TD>
+  </TR>
+</TABLE>
+<span id="combinedSpan" style="display:none;">
+<br>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR>
+    <TD colspan="2" ALIGN="LEFT" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Edit Combined Tours </TD>
+    </TR>
+{
+	foreach my $tour (@{$c{org}->get_normal_tours})
+	{
+		my $id = $tour->get_id;
+		my $name = $tour->name;
+		
+		my $checked = '';
+		
+		if($c{tour}->contains_tour($tour->get_id))
+		{
+			$checked = ' CHECKED';
+		}
+		
+		$OUT.=<<"+++";	
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" style="padding-right:5px;" nowrap><input type="checkbox" name="tour_$id" value="y"$checked></TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE" width="100%">&nbsp;$name </TD>
+  </TR>
++++
+	}
+}
+</TABLE>
+</span>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+</div>
+</fieldset>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{tour}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="history.back();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE></td>
+</tr>
+</table>
+</form>
+<script>
+tourTypeChange();
+</script>
+</body>
+</html>
+
+
+

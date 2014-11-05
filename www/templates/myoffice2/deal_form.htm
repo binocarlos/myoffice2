@@ -1,0 +1,598 @@
+<!--#include virtual="temp_include.htm" -->
+<script>
+	var giMinYear = 2000;
+
+	var giMaxYear = 2010;
+	
+	var ticket_price = '{$c{booking}->ticket_price}';
+	var gross_box_office = {$c{booking}->gross_box_office || 0};
+	var tickets_on_sale = {$c{booking}->tickets_on_sale || 0};
+	var tickets_on_sale_reason = '{$c{booking}->tickets_on_sale_reason}';
+	var capacity = {$c{venue}->capacity || 0};
+	var tourdate_count = {$c{booking}->get_child_count('tourdate')};
+	var vat = 0.175;
+	var deal = {$c{booking}->deal || 0};
+	
+	var brochure_mailing_dates = {Webkit::MyOffice2::Admin->editors_multidatenote_js_value($c{deal}->brochure_mailing_dates)};
+	var brochure_copy_deadline = {Webkit::MyOffice2::Admin->editors_multidatenote_js_value($c{deal}->brochure_copy_deadline)};	
+	
+	function goBack()
+	\{
+{
+	if($c{params}->{modal}=~/\w/)
+	{
+		$OUT.=<<"+++";
+	top.close();
++++
+	}
+	elsif($c{params}->{summary_mode}!~/\w/)
+	{
+		$OUT.=<<"+++";
+		top.get_double_frameset('myoffice2_booking_penciled&venue_id={$c{venue}->get_id}');
++++
+	}
+	else
+	{
+		$OUT.=<<"+++";
+		document.location = href + '&method=tourlist_sheet';
++++
+	}
+}
+	\}
+	
+	function initMultiDates()
+	\{
+		initBrochureMailingDates();
+		initBrochureCopyDeadline();
+	\}
+	
+	function initBrochureCopyDeadline()
+	\{
+		document.getElementById('brochureCopyDeadlineTd').innerHTML = getMultiDateNoteText(brochure_copy_deadline);
+		document.deal_form.brochure_copy_deadline.value = getMultiDateNoteReturn(brochure_copy_deadline);
+	\}	
+	
+	function initBrochureMailingDates()
+	\{
+		document.getElementById('brochureMailingDatesTd').innerHTML = getMultiDateNoteText(brochure_mailing_dates);
+		document.deal_form.brochure_mailing_dates.value = getMultiDateNoteReturn(brochure_mailing_dates);
+	\}
+	
+	function editBrochureCopyDeadline(td)
+	\{			
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, brochure_copy_deadline);
+		
+		if(!ret) \{ return; \}
+		
+		brochure_copy_deadline = ret;
+		
+		document.getElementById('brochureCopyDeadlineTd').innerHTML = getMultiDateNoteText(brochure_copy_deadline);
+		document.deal_form.brochure_copy_deadline.value = getMultiDateNoteReturn(brochure_copy_deadline);
+	\}	
+	
+	function editBrochureMailingDates(td)
+	\{			
+		var ret = get_modal_window_return('&method=editors_multidatenote', 500, 430, brochure_mailing_dates);
+		
+		if(!ret) \{ return; \}
+		
+		brochure_mailing_dates = ret;
+		
+		document.getElementById('brochureMailingDatesTd').innerHTML = getMultiDateNoteText(brochure_mailing_dates);
+		document.deal_form.brochure_mailing_dates.value = getMultiDateNoteReturn(brochure_mailing_dates);
+	\}
+	
+	function editTicketsOnSale(td)
+	\{
+		var ret = get_modal_window_return('&method=editors_number_text&number=' + tickets_on_sale + '&notes=' + tickets_on_sale_reason, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		tickets_on_sale = parseInt(ret.number);
+		tickets_on_sale_reason = ret.notes;
+		
+		document.deal_form.tickets_on_sale.value = tickets_on_sale;
+		document.deal_form.tickets_on_sale_reason.value = tickets_on_sale_reason;
+			
+		td.innerHTML = ret.number + '<br><span style="color:blue;font-size:7pt;">' + ret.notes + '</span>';
+		
+		calculate();
+	\}		
+	
+	function editTicketPrices(td)
+	\{		
+		var ret = get_modal_window_return('&method=editors_multiprice&value=' + ticket_price, 500, 430);
+		
+		if(!ret) \{ return; \}
+		
+		ticket_price = ret.value;
+		td.innerHTML = ret.title;
+		
+		document.deal_form.ticket_price.value = ticket_price;
+		
+		calculate();
+	\}	
+	
+	function alterVar(field, gui)
+	\{		
+		var st = field + ' = ' + gui.value;
+		
+		eval(st);
+		
+		calculate();
+		
+		if(field == 'gross_box_office')
+		\{
+			gui.style.fontWeight = 'bold';
+			gui.style.color = '#880000';
+			document.deal_form.gross_box_office.value = gui.value;
+		\}
+	\}
+	
+	function calculateAverageTicketPrice()
+	\{
+		var prices = ticket_price.split(/:/);
+		var priceArray = new Array();
+		
+		var noPercentCount = 0;
+		var totalPercent = 0;
+		
+		for(var i=0; i<prices.length; i++)
+		\{
+			var parts = prices[i].split('=');
+			
+			var price = parseFloat(parts[0]);
+			var percent = parseFloat(parts[2]);
+			
+			if(!isNaN(price))
+			\{
+				var ref = new Object();
+				ref.price = price;
+				
+				if(!isNaN(percent))
+				\{
+					ref.percent = percent;
+					totalPercent += percent;
+				\}
+				else
+				\{
+					noPercentCount++;
+				\}
+				
+				priceArray[priceArray.length] = ref;
+			\}
+		\}
+		
+		var remainingPercent = 100 - totalPercent;
+		
+		if(noPercentCount>0)
+		\{
+			var dividedPercent = remainingPercent / noPercentCount;
+			
+			for(var i=0; i<priceArray.length; i++)
+			\{
+				var ref = priceArray[i];
+				
+				if(!ref.percent)
+				\{
+					ref.percent = Math.round(dividedPercent);
+				\}
+			\}
+		\}
+		
+		var total = 0;
+		var count = 0;
+		
+		for(var i=0; i<priceArray.length; i++)
+		\{
+			var ref = priceArray[i];
+			
+			var price = ref.price;
+			var percent = ref.percent;
+			
+			if((!isNaN(price))&&(!isNaN(percent)))
+			\{
+				total += price * percent;
+				count++;
+			\}
+		\}
+		
+		var avg = 0;
+		
+		if(count>0)
+		\{
+			avg = total/100;
+		\}
+		
+		return avg;	
+	\}	
+	
+	function roundNumber(num)
+	\{
+		num /= 10;
+		
+		num = Math.round(num);
+		
+		num *= 10;
+		
+		var st = '' + num;
+		
+		if(st.indexOf('.')<0)
+		\{
+			return st + '.00';
+		\}
+		else
+		\{
+			var parts = st.split('.');
+			
+			var float = parts[1];
+			
+			if(float.length==2)
+			\{
+				return st;
+			\}
+			else
+			\{
+				return st + '0';
+			\}
+		\}
+	\}
+	
+	function calculateFigures(key, dealRatio, totalGross)
+	\{
+		var gross = totalGross * dealRatio;
+		var vat_amount = gross * vat;
+		var net = gross - vat_amount;
+		
+		document.getElementById(key + '_gross').innerText = roundNumber(gross);
+		document.getElementById(key + '_vat').innerText = roundNumber(vat_amount);
+		document.getElementById(key + '_net').innerText = roundNumber(net);	
+	\}
+	
+	function calculate()
+	\{	
+		var gross = gross_box_office;
+		var avgPrice = calculateAverageTicketPrice();
+		
+		document.getElementById('avgPriceTd').innerText = roundNumber(avgPrice);
+		
+		if(gross<=0)
+		\{	
+			gross = tickets_on_sale * avgPrice;
+			
+			document.deal_form.gross.value = roundNumber(gross);
+		\}
+		
+		var totalGross = gross * tourdate_count;
+		
+		document.getElementById('totalGrossTd').innerText = roundNumber(totalGross);
+		
+		var somDealRatio = deal / 100;
+		var venueDealRatio = 1 - somDealRatio;
+		
+		calculateFigures('som', somDealRatio, totalGross);
+		calculateFigures('venue', venueDealRatio, totalGross);
+	\}	
+</script>
+<body>
+<form action="{$c{script}}" method="POST" name="deal_form">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="booking_create_dealsheet_submit">
+<input type="hidden" name="deal_id" value="{$c{deal}->get_id}">
+<input type="hidden" name="booking_id" value="{$c{booking}->get_id}">
+<input type="hidden" name="summary_mode" value="{$c{params}->{summary_mode}}">
+<input type="hidden" name="modal" value="{$c{params}->{modal}}">
+<table border="0" cellpadding="10" cellspacing="0">
+<tr>
+  <td height="1" colspan=3><span class="welcome">Dealsheet for {$c{booking_tour}->name}</span> - 
+    <input type="button" class="button" value="Print" onClick="self.print();">    <br>
+    <br>
+	<b><a href="javascript:showVenueInfo({$c{venue}->get_id});"><span style="text-decoration:none;"><img src="/images/icons/16/help.gif" width="16" height="16" border=0 align="absmiddle">&nbsp;&nbsp;&nbsp;</span>{$c{venue}->get_city_title}</a></b><br><br>
+  {$c{booking}->get_tourdatetime_titles}<br><br>
+  <span style="color:red;">Created by {$c{user}->get_fullname} on {$c{deal}->get_created_st}</span>  </td>
+</tr>
+<tr>
+<td height="100%" align="left" valign="top">
+
+
+  <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+<TR>
+<TD>
+<TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+<TR>
+<TD CLASS="panelbody">
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset style="height:100%;">
+<legend>Deal Sheet</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Deal Sheet<br><br>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Staffing Level:</TD>
+    <TD width="200" ALIGN="LEFT" VALIGN="MIDDLE"><select name="staff_level" class="text_field" id="staff_level" style="width:100%;">
+{$c{deal}->get_staff_options('staff_level')}	
+        </select></TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Projector:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->yes_no_gui('projector')}</TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Projectionist:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->yes_no_gui('projectionist')}</TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Screen:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->yes_no_gui('screen')}</TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Print Required: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><textarea name="print_required" type="text" class="text_field" id="print_required" style="width:100%;height:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{deal}->print_required}</textarea></TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Print Deadline:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><table><tr><td align="LEFT"><input name="print_deadline" type="TEXT" class="text_field" id="print_deadline" style="width:100px;" value="{$c{deal}->calendar_value('print_deadline')}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");	
+<td align="LEFT"><A ONCLICK="calendar_click(document.deal_form.print_deadline);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+</tr></table></TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>In Brochure: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->yes_no_gui('in_brochure')}</TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Brochure Publication Date: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><table>
+      <tr>
+        <td align="LEFT"><input name="brochure_deadline" type="TEXT" class="text_field" id="brochure_deadline" style="width:100px;" value="{$c{deal}->calendar_value('brochure_deadline')}"></td>
+{
+$OUT.=Webkit::Browser->if_not_mac(<<"+++");		
+        <td align="LEFT"><A ONCLICK="calendar_click(document.deal_form.brochure_deadline);"><IMG src="/images/holiday/but_date.gif" WIDTH="26" HEIGHT="20" BORDER="0" ALIGN="ABSMIDDLE"></A></td>
++++
+}
+      </tr>
+    </table></TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap><input name="brochure_copy_deadline" type="hidden" id="brochure_copy_deadline">Brochure Copy Deadline: </TD>
+ <td valign="MIDDLE" class="editTd" onClick="editBrochureCopyDeadline(document.getElementById('brochureCopyDeadlineTd'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochureCopyDeadlineTd"></span></td>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap><input name="brochure_mailing_dates" type="hidden" id="brochure_mailing_dates">
+      Brochure Hit Dates: </TD>
+    <td valign="MIDDLE" class="editTd" onClick="editBrochureMailingDates(document.getElementById('brochureMailingDatesTd'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="brochureMailingDatesTd"></span></TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Playing Under/Over: </TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE">{$c{deal}->yes_no_gui('paying_under_over')}</TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Terms:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><textarea name="terms" type="text" class="text_field" id="terms" style="width:100%;height:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{deal}->terms}</textarea></TD>
+  </TR>
+  <TR>
+    <TD ALIGN="LEFT" VALIGN="top" style="padding-right:5px;" nowrap>Notes:</TD>
+    <TD ALIGN="LEFT" VALIGN="MIDDLE"><textarea name="notes" type="text" class="text_field" id="notes" style="width:100%;height:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{deal}->notes}</textarea></TD>
+  </TR>
+</TABLE>
+
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}
+
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="MIDDLE"><span style="color:#880000;" id="error_span">{$c{deal}->{error_text}}</span></TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE"><input type="submit" name="Submit" value="Save" CLASS="button2" style="width:75px;"><input type="button"  value="Cancel" CLASS="button2" style="width:75px;" onClick="goBack();"></TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE></td>
+<td align="center" valign="top">&nbsp;</td>
+<td align="center" valign="top"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" CLASS="panelouter">
+  <TR>
+    <TD>
+      <TABLE WIDTH="100%" BORDER="0" CELLPADDING="8" CELLSPACING="0" CLASS="panelinner">
+        <TR>
+          <TD CLASS="panelbody">    
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Tourdate Details</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Tourdate Details<br><br>
++++
+}
+              <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                <TR align="right">
+                  <TD VALIGN="MIDDLE" nowrap style="padding-right:5px;">Tour:</TD>
+                  <TD align="left" VALIGN="MIDDLE">{$c{booking_tour}->name}</TD>
+                </TR>
+                <TR align="right">
+                  <TD VALIGN="MIDDLE" nowrap style="padding-right:5px;">Venue:</TD>
+                  <TD align="left" VALIGN="MIDDLE">{$c{venue}->get_city_title}</TD>
+                </TR>
+                <TR align="right">
+                  <TD VALIGN="top" nowrap style="padding-right:5px;">Dates:</TD>
+                  <TD align="left" VALIGN="MIDDLE">{$c{booking}->get_tourdatetime_titles}</TD>
+                </TR>
+              </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}
+			<br>       			      
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Deal Figures</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Deal Figures<br><br>
++++
+}             
+              <table border="0" cellpadding="3" cellspacing="0">
+                <tr align="right">
+                  <td width="100" valign="MIDDLE" nowrap style="padding-right:5px;">Guarantee:</td>
+                  <td width="150" valign="MIDDLE"><input name="guarantee" type="TEXT" class="text_field" id="guarantee" style="width:100%;text-align:right;" value="{$c{booking}->guarantee}" onFocus="this.className='text_field2';" onBlur="this.className='text_field';"></td>
+                </tr>
+                <tr align="right">
+                  <td valign="top" style="padding-right:5px;" nowrap><input type="hidden" name="ticket_price" value="{$c{booking}->ticket_price}">Ticket Prices: </td>
+                  <td valign="MIDDLE" class="editTd" onClick="editTicketPrices(document.getElementById('ticketPriceSpan'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="ticketPriceSpan">{$c{booking}->get_ticket_price_title}</span></td>
+                </tr>
+                <tr align="right">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Avg Ticket Price: </td>
+                  <td valign="MIDDLE"><span id="avgPriceTd">{$c{booking}->calculate_average_ticket_price}</span></td>
+                </tr>
+                <tr align="right">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap> Venue Capacity:</td>
+                  <td valign="MIDDLE">{$c{venue}->capacity} </td>
+                </tr>
+                <tr align="right">
+                  <td valign="top" style="padding-right:5px;" nowrap> <input name="tickets_on_sale" type="hidden" id="tickets_on_sale" value="{$c{booking}->tickets_on_sale}">
+                    <input name="tickets_on_sale_reason" type="hidden" id="tickets_on_sale_reason" value="{$c{booking}->tickets_on_sale_reason}">
+                    Tickets On Sale:</td>
+                  <td valign="MIDDLE" id="ticketsOnSaleTd" class="editTd" onClick="editTicketsOnSale(document.getElementById('ticketsOnSaleSpan'));" onMouseOver="editTdOver(this);" onMouseOut="editTdOut(this);"><span id="ticketsOnSaleSpan">{$c{booking}->tickets_on_sale}<br><span style="color:blue;font-size:7pt;">{$c{booking}->tickets_on_sale_reason}</span></span></TD>
+                </tr>			
+                <tr align="right">
+                  <td height=10 colspan=2></td>
+                </tr>				
+                <tr align="right">
+                  <td valign="top" style="padding-right:5px;" nowrap> Venue Target:</td>
+                  <td width="100" valign="MIDDLE"><textarea name="venue_target" type="text" class="text_field" id="venue_target" style="width:150px;height:50px;" onFocus="this.className='text_field2';" onBlur="this.className='text_field';">{$c{booking}->venue_target}</textarea></td>
+                </tr>								
+                <tr align="right">
+                  <td height=10 colspan=2></td>
+                </tr>
+                <tr align="right">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap><input name="gross_box_office" type="hidden" id="gross_box_office" value="{$c{booking}->gross_box_office}">
+                    Per Show Gross: </td>
+{
+	if($c{booking}->gross_box_office>0)
+	{
+		$c{gross_style} = 'font-weight:bold;color:#880000;';
+	}
+	
+	return '';
+}				  
+                  <td valign="MIDDLE"><input name="gross" type="TEXT" class="text_field" id="gross" style="width:100%;text-align:right;{$c{gross_style}}" value="{$c{deal}->{_per_show_gross}}" onChange="alterVar('gross_box_office', this);" onFocus="this.className='text_field2';" onBlur="this.className='text_field';"></td>
+                </tr>
+                <tr align="right">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Total Gross: </td>
+                  <td valign="MIDDLE"><span id="totalGrossTd">{$c{deal}->{_total_gross}}</span></td>
+                </tr>
+                <tr align="right">
+                  <td valign="MIDDLE" style="padding-right:5px;" nowrap>Deal:</td>
+                  <td valign="MIDDLE"><input name="deal" type="TEXT" class="text_field" id="deal" style="width:100%;text-align:right;{$c{gross_style}}" value="{$c{booking}->deal}" onChange="alterVar('deal', this);" onFocus="this.className='text_field2';" onBlur="this.className='text_field';"></td>
+                </tr>
+              </table>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}
+			<br>       			
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Sing-A-Long Figures</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Sing-A-Long Figures<br><br>
++++
+}  
+              <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                <TR align="right">
+                  <TD width="100" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Gross:</TD>
+                  <TD width="150" VALIGN="MIDDLE"><span id="som_gross">{$c{deal}->{_som_gross}}</span></TD>
+                </TR>
+                <TR align="right">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>VAT:</TD>
+                  <TD VALIGN="MIDDLE"><span id="som_vat">{$c{deal}->{_som_vat}}</span></TD>
+                </TR>
+                <TR align="right">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Net:</TD>
+                  <TD VALIGN="MIDDLE"><span id="som_net">{$c{deal}->{_som_net}}</span></TD>
+                </TR>
+              </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+} 
+			<br>       			  		
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");
+<fieldset>
+<legend>Venue Figures</legend>
+<div class="seccontent" align="left">
++++
+
+	$OUT.=Webkit::Browser->if_is_mac(<<"+++");
+	Venue Figures<br><br>
++++
+}  
+              <TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0">
+                <TR align="right">
+                  <TD width="100" VALIGN="MIDDLE" nowrap style="padding-right:5px;">Gross:</TD>
+                  <TD width="150" VALIGN="MIDDLE"><span id="venue_gross">{$c{deal}->{_venue_gross}}</span></TD>
+                </TR>
+                <TR align="right">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>VAT:</TD>
+                  <TD VALIGN="MIDDLE"><span id="venue_vat">{$c{deal}->{_venue_vat}}</span></TD>
+                </TR>
+                <TR align="right">
+                  <TD VALIGN="MIDDLE" style="padding-right:5px;" nowrap>Net:</TD>
+                  <TD VALIGN="MIDDLE"><span id="venue_net">{$c{deal}->{_venue_net}}</span></TD>
+                </TR>
+              </TABLE>
+{
+	$OUT.=Webkit::Browser->if_not_mac(<<"+++");					
+                  </div>
+                </fieldset>
++++
+}
+            </TD>
+        </TR>
+    </TABLE></TD>
+  </TR>
+</TABLE></td>
+</tr>
+</table>
+</form>
+{$c{calendar}}
+<script>initMultiDates();</script>
+</body>
+</html>
+
+
+

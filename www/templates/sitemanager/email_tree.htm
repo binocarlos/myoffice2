@@ -1,0 +1,127 @@
+<link rel="stylesheet" href="/lib/xtree.css" type="text/css">
+<script src="/lib/xtree.js"></script>
+<span id="menutree"></span>
+<script>
+	function get_xTree_query(query)
+	\{
+		var loc = href + query;
+
+
+		parent.parent.page.content.location = loc;
+	\}
+	
+	function read_email(pop_id)
+	\{
+		var loc = href + '&method=email_inbox&pop_box_id=' + pop_id;
+			
+		parent.parent.page.content.location = loc;
+	\}
+
+	function show_pop_settings(pop_id)
+	\{
+		var loc = href + '&method=email_view_pop_account_details&pop_box_id=' + pop_id;
+
+		var result = this.showModalDialog(loc, null, 'status:no;resizable:yes;dialogWidth:350px;dialogHeight:250px;help:no;scroll:no;');
+	\}
+
+var tree = new WebFXTree('Email Accounts');
+
+var pop_accounts = new WebFXTreeItem('Mailboxes');
+
+var aliases = new WebFXTreeItem('Email Aliases');
+
+tree.add(pop_accounts);
+tree.add(aliases);
+
+tree.action = "javascript: get_xTree_query('&method=email_home_content');";
+
+{
+	my $pop_arr = $c{org}->get_child_array('pop_account');
+
+	foreach my $pop_box (@$pop_arr)
+	{
+		my $pop_id = $pop_box->get_id;
+
+		my $pop_name = $pop_box->get_value('name');
+
+		my $addressarr = $pop_box->get_all_addresses_array;
+
+		$OUT.=<<"+++";
+var pop$pop_id = new WebFXTreeItem('$pop_name');
+pop$pop_id.action = "javascript: get_xTree_query('&method=email_edit_pop_account&pop_box_id=$pop_id');";
+
+var reademail$pop_id = new WebFXTreeItem('Read Email...');
+reademail$pop_id.action = "javascript: read_email($pop_id);";
+reademail$pop_id.icon = '/images/xtree/settings.png';
+
+var popsettings$pop_id = new WebFXTreeItem('Show Settings...');
+popsettings$pop_id.action = "javascript: show_pop_settings($pop_id);";
+popsettings$pop_id.icon = '/images/xtree/settings.png';
+
+pop$pop_id.add(reademail$pop_id);
+pop$pop_id.add(popsettings$pop_id);
++++
+
+		my $count = @$addressarr;
+
+		if($count==0)
+		{
+			$OUT.=<<"+++";
+pop$pop_id.icon = "/images/xtree/email.png";
++++
+		}
+
+		$OUT.=<<"+++";
+pop_accounts.add(pop$pop_id);
++++
+
+		$count = 0;
+
+		foreach my $address (@$addressarr)
+		{
+			$count++;
+
+			my $id = 'pop'.$pop_id.'_address'.$count;
+
+			$OUT.=<<"+++";
+var $id = new WebFXTreeItem('$address');
+$id.action = "javascript: get_xTree_query('&method=email_edit_pop_account&pop_box_id=$pop_id');";
+$id.icon = '/images/xtree/email.png';
+
+pop$pop_id.add($id);
++++
+		}
+	}
+
+	my $alias_arr = $c{org}->get_alias_array;
+
+	foreach my $alias (@$alias_arr)
+	{
+		my $alias_id = $alias->get_id;
+
+		my $alias_name = $alias->get_value('email_address');
+
+		$OUT.=<<"+++";
+var alias$alias_id = new WebFXTreeItem('$alias_name');
+alias$alias_id.action = "javascript: get_xTree_query('&method=email_edit_alias&email_address_id=$alias_id');";
+alias$alias_id.icon = '/images/xtree/email.png';
+
+aliases.add(alias$alias_id);
++++
+	}
+}
+
+var tree_string = tree.toString();
+
+document.write(tree_string);
+
+tree.collapseAll();
+
+tree.expand();
+pop_accounts.expand();
+
+
+</script>
+
+
+

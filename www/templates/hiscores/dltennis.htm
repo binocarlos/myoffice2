@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>David Lock</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+a \{color:#666699; text-decoration:none;\}
+a:hover \{color:#A3C7EB; text-decoration:underline;\}
+body \{
+	background-attachment: fixed;
+	background-color: #FFFFFF;
+	background-image: url(/images/pagebacknew.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+\}
+</style>
+
+</head>
+
+<body>
+<div align="center">
+  <table width="100%" border="0" align="center" cellpadding="10">
+    <tr> 
+      <td height=15 colspan="2" align="center" valign="top"> </td>
+    </tr>
+    <tr valign="middle"> 
+      <td height="184" align="center"><img src="/images/dlock.gif" width="300" height="157"></td>
+      <td align="left"> 
+        <table width="100%" border="0" cellpadding="5" cellspacing="1" style="border: 1px solid #666666;">
+          <tr>
+            <td style="background-color:#ffffff;filter: Alpha(Opacity=60, Style=0);">
+              <p><font size="2" face="Tahoma, Verdana, Arial">Mini Wimbledon!</font></p>
+              <p><font size="2" face="Tahoma, Verdana, Arial">Click below to play 
+                the game, if you score well, you will appear near the top of the 
+                hiscore list!</font></p>
+              <p><font size="2" face="Tahoma, Verdana, Arial">Good Luck!<br>
+                <br>
+                <b><a href="http://www.davidlockconsulting.com/game/flash_frame.htm">Click 
+                Here to play the game</a></b><br>
+                <br>
+                <b><a href="http://www.davidlockconsulting.com/flash_frame.htm">Click Here to return to the website</a></b></font></p>
+              </td>
+          </tr>
+        </table>
+        
+      </td>
+    </tr>
+    <tr> 
+      <td height=15 colspan="2" align="center" valign="top"> </td>
+    </tr>	
+    <tr> 
+      <td colspan="2" align="center" valign="top">
+        <table width="100%" border="0" align="center" cellpadding="3" cellspacing="0" bgcolor="#666699">
+          <tr> 
+            <td align="center" valign="top"> 
+              <table width="100%" border="0" cellpadding="3" cellspacing="1">
+                <tr bgcolor=#ffffff> 
+                  <td width="10%" align="center" valign="middle" bgcolor="#666699">&nbsp;</td>
+                  <td align="left" valign="middle" bgcolor="#666699" class="white14"><strong><font face="Verdana" size=2 color="#FFFFFF">Name</font></strong></td>
+                  <td width="27%" align="left" valign="middle" bgcolor="#666699" class="white14"><strong><font face="Verdana" size=2 color="#FFFFFF">Score</font></strong></td>
+                  <td width="26%" align="left" valign="middle" bgcolor="#666699" class="white14"><strong><font face="Verdana" size=2 color="#FFFFFF">Date</font></strong></td>
+                </tr>
+{
+	my $arr = $c{hiscores};
+	my $count = 0;
+	foreach my $hiscore (@$arr) 
+	{
+		my $name = $hiscore->get_name;
+		my $score = $hiscore->get_score; 
+                my $datest = $hiscore->get_date;
+		$count++;
+
+		$OUT.=<<"+++"; 
+                <tr bgcolor=#ffffff> 
+                  <td width="60" align="right" valign="middle" bgcolor="#666699"><font face="Verdana" size=2 color="#FFFFFF"><strong>$count.</strong></font></td>
+                  <td align="left" valign="middle"><font face="Verdana" size=2>$name</font></td>
+                  <td align="left" valign="middle"><font face="Verdana" size=2>$score</font></td>
+                  <td align="left" valign="middle"><font face="Verdana" size=2>$datest</font></td>
+                </tr>
++++
+	}
+} 
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+ </div>
+</body>
+</html>

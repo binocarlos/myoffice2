@@ -1,0 +1,159 @@
+<!--#include virtual="temp_include.htm" -->
+
+<script>
+
+	function do_cancel()
+	\{
+		var cancel_method = '{$c{cancel_method}}';
+		
+		if(cancel_method!='')
+		\{
+			var new_loc = href + '&method=' + cancel_method;
+			
+			document.location = new_loc;
+		\}
+	\}
+
+	function validate_answerform()
+	\{
+		var ret = true;
+		var form = document.answerform;
+		var required_texts = new Array('answer');
+
+		for(var i=0; i<required_texts.length; i++)
+		\{
+			var field = required_texts[i];
+			var value = form[field].value;
+
+			if(value=='')
+			\{
+				form_error('You must supply a ' + field + ' value.');
+				form[field].className = 'text_field2';
+				ret = false;
+			\}
+		\}
+
+		return ret;
+	\}
+	
+	function form_error(text)
+	\{
+		document.all('error_span').innerText = text;
+	\}
+	
+</script>
+	 
+<form method="POST" action="{$c{script}}" style="margin:0;" name="answerform" onSubmit="return validate_answerform();">
+<input type="hidden" name="session_id" value="{$c{session_id}}">
+<input type="hidden" name="method" value="{$c{submit_method}}">
+<input type="hidden" name="query_id" value="{$c{query}->get_id}">
+
+
+<TABLE WIDTH="100%" HEIGHT="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="50%" HEIGHT="100%">
+
+ <TABLE WIDTH="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0" HEIGHT="100%">
+	<TR>
+	  <TD><table border="0" cellpadding="0" cellspacing="0" class="panelouter" width="100%">
+<tr>
+<td valign="top">				 
+<table width="100%" border="0" cellpadding="8" cellspacing="0" class="panelinner">
+<tr>
+<td class="panelbody">
+<fieldset>
+<legend>Query Details</legend>
+<div class="seccontent">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td align="RIGHT">Client:&nbsp;</td>
+<td align="LEFT">{$c{query}->get_client_name}</td>
+</tr>
+<tr valign="top">
+<td align="RIGHT" width="70">Submitted By:&nbsp;</td>
+<td align="LEFT">{$c{query}->get_user_fullname}</td>
+</tr>
+<tr valign="top">
+<td align="RIGHT">Submitted:&nbsp;</td>
+<td align="LEFT">{$c{query}->get_submitted_title}</td>
+</tr>
+<tr valign="top">
+<td align="RIGHT">Subject:&nbsp;</td>
+<td align="LEFT">{$c{query}->get_value('title')}</td>
+</tr>
+<tr valign="top">
+<td align="RIGHT">Question:&nbsp;</td>
+<td align="LEFT">{$c{query}->get_question_title}</td>
+</tr>
+</table>
+</div>
+</fieldset>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table></TD>
+	</TR>
+	<TR>
+	  <TD HEIGHT="8"><img src="/images/clear.gif" width="1" height="8" border="0"></TD>
+	</TR>
+	<TR>
+	  <TD HEIGHT="100%" width="100%"><table border="0" cellpadding="0" cellspacing="0" class="panelouter" width="100%" HEIGHT="100%">
+<tr>
+<td valign="top" height="100%">				 
+<table border="0" width="100%" cellpadding="8" cellspacing="0" class="panelinner" height="100%">
+<tr>
+<td class="panelbody" valign="top" height="100%">
+
+<fieldset>
+<legend>Answer Details</legend>
+<div class="seccontent">
+<table border="0" cellpadding="0" cellspacing="0" height="100%">
+<tr style="padding-bottom:5px;">
+<td align="RIGHT" width="70">Keywords:&nbsp;</td>
+<td align="LEFT"><input onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" type="TEXT" name="keywords" value="{$c{query}->get_keywords_string}" style="width:100%;"></td>
+</tr>
+<tr>
+<td align="RIGHT" valign="top" style="padding-top:4px;">Answer:&nbsp;</td>
+<td align="LEFT" height="100%" width="100%"><textarea onFocus="this.className='text_field2';" onBlur="this.className='text_field';" class="text_field" name="answer" style="width:100%; height:200px;">{$c{query}->get_value('answer')}</textarea></td>
+</tr>
+</table>
+</div>
+</fieldset>
+
+
+<img src="/images/clear.gif" width="1" height="8" border="0"><br>
+
+<table border="0" cellpadding="0" cellspacing="0" align="RIGHT" width="100%">
+<tr>
+<td align="LEFT" valign="TOP"><font color="red"><b id="error_span">{$c{query}->{error_text}}</b></font></td>
+<td align="RIGHT" valign="TOP"><input type="submit" value="{$c{submit_title}}" class="button" name="submit"><img src="/images/clear.gif" width="8" height="8" border="0"><input type="button" value="Cancel" class="button" name="Button" onClick="do_cancel();" style="width:75px;"></td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>  </TD>
+	</TR>
+ </TABLE> 
+
+
+
+
+
+  </TD>
+  <TD WIDTH="10"><img src="/images/clear.gif" width="10" height="1" border="0"></TD>
+  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="50%" HEIGHT="100%">{$c{js_form}}</TD>
+</TR>
+</TABLE> 
+
+
+
+
+
+

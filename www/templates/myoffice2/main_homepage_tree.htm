@@ -1,0 +1,81 @@
+<!--#include virtual="temp_include.htm" -->
+
+<style type="text/css">
+<!--
+.style1 \{
+	color: #CC0000;
+	font-weight: bold;
+\}
+-->
+</style>
+<script>
+	function viewBooking(id)
+	\{
+		top.get_double_frameset('myoffice2_booking_progress&booking_id=' + id);
+	\}
+</script>
+<body>
+<table width="100%"  border="0" cellpadding="5" cellspacing="0">
+  <tr>
+    <td colspan="2" class="welcome">Sections</td>
+</tr>
+  <tr valign="middle">
+    <td width="20"><img src="/images/icons/24x24/photo_portrait.gif" width="24" height="24" border="0"></td>
+  <td>Users - <a href="javascript:top.get_menu_iframe_query('add_user','Add User');">add</a> - <a href="javascript:top.get_menu_iframe_query('users_home','Current Users');">list</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/home_red.gif" width="24" height="24"></td>
+<td>Venues - <a href="javascript:top.get_menu_iframe_query('venue_form', 'Current Venues');">add</a> - <a href="javascript:top.get_menu_iframe_query('venue_home', 'Current Venues');">list</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/photo_scenery.gif" width="24" height="24"></td>
+<td>Tours - <a href="javascript:top.get_menu_iframe_query('tour_home', 'Current Tours');">list</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/document_add.gif" width="24" height="24"></td>
+<td>Booking - <a href="javascript:top.addBooking();">add</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/document_into.gif" width="24" height="24"></td>
+<td>Booking Progress - <a href="javascript:top.get_double_frameset('myoffice2_booking_progress');">sheet</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/document_preferences.gif" width="24" height="24"></td>
+<td>Booking Pencil -  <a href="javascript:top.get_double_frameset('myoffice2_booking_penciled');">sheet</a></td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/document_certificate.gif" width="24" height="24"></td>
+<td>Booking - <a href="javascript:top.get_double_frameset('myoffice2_booking_report');">report</a> - <a href="javascript:top.viewDealSheet();">deal sheets</a></td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/window_sidebar.gif" width="24" height="24"></td>
+<td>Tour &amp; Tick - <a href="javascript:top.get_double_frameset('myoffice2_tourlist');">sheet</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/font.gif" width="24" height="24"></td>
+<td>Print Sheets - <a href="javascript:top.get_double_frameset('myoffice2_print&amp;page_method=print_form');">add</a> - <a href="javascript:top.get_double_frameset('myoffice2_print');">list</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/document_chart.gif" width="24" height="24"></td>
+<td>Sales Figures - <a href="javascript:top.get_double_frameset('myoffice2_sales_figures');">sheet</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/scroll.gif" width="24" height="24"></td>
+<td>Venue History - <a href="javascript:top.viewVenueStatus();">sheet</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/scroll_view.gif" width="24" height="24"></td>
+<td>Venue History - <a href="javascript:top.searchVenueHistory();">search</a> </td>
+</tr>
+<tr valign="middle">
+<td><img src="/images/icons/24x24/history2.gif" width="24" height="24"></td>
+<td>Timeline - <a href="javascript:top.viewTimeline();">sheet</a> </td>
+</tr>
+</table>
+<br>
+<br>
+</body>
+</html>
+
+
+
