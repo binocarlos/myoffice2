@@ -3,6 +3,7 @@ package Webkit::Apache::PerlHandler;
 use strict;
 
 use Apache2::Upload ();
+use Webkit::MyOffice2::Admin ();
 
 #######################################
 #######################################
@@ -179,12 +180,15 @@ sub application_handler
 		return &error_page($r, "Module Not Found for $appname");
 	}
 
+	#print "Content-type: text/plain\n\n";
+	#print "Making app\n";
+	
 	my $app = eval($module.'->new');
-	
-	
 
+	#if(!$app) { print "no app\n"; } else { print "have app\n"; }
 	if(!$app) { return &error_page($r, "No Modules Loaded for $module"); }
 
+	#exit 1;
 	eval
 	{
 		$app->run($params);

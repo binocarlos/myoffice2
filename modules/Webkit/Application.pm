@@ -78,18 +78,18 @@ sub init
 {
 	my ($self) = @_;
 
-	my $db = Webkit::DB->new($self->get_app_info);
+	#my $db = Webkit::DB->new($self->get_app_info);
 
-	if(!$db)
-	{
-		Webkit::Error->wkerror("The DB did not start up");
-	}
+	#if(!$db)
+	#{
+#		Webkit::Error->wkerror("The DB did not start up");
+#	}
 	
 	my $r = Apache2::RequestUtil->request;
 	
 	$self->{_r} = $r;
 
-	$self->{db} = $db;
+	#$self->{db} = $db;
 }
 
 

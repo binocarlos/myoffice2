@@ -7,24 +7,6 @@ use Apache2::compat ();
 use Apache2::Request;
 use Apache2::Cookie;
 
-#use Apache ();
-#use Apache::Reload ();
-#use Apache::Constants ();
-#use Apache::Request ();
-#use Apache::DBI ();
-#use Apache::File ();
-#use Apache::URI ();
-#use Apache::TempFile ();
-#use Apache::Cookie ();
-#use Apache::SSI ();
-
-#use Apache::SizeLimit ();
-
-#$Apache::SizeLimit::MAX_PROCESS_SIZE = 50000;	# 18Mb Total
-#$Apache::SizeLimit::MAX_UNSHARED_SIZE = 20000;	# 6Mb Unshared each
-
-#$Apache::SizeLimit::CHECK_EVERY_N_REQUESTS = 5;
-
 use Data::Dumper ();
 use DBI ();
 use POSIX ();
@@ -33,15 +15,7 @@ use MIME::Entity ();
 use JSON ();
 use Captcha::reCAPTCHA ();
 
-#use Apache::Session::Generate::MD5 ();
-use Data::Dumper ();
-
 use File::Copy ();
-
-#use GD::Graph ();
-#use GD::Graph::bars ();
-#use GD::Graph::hbars ();
-#use GD::Graph::lines ();
 
 use HTML::Parse();
 use HTML::FormatText();
@@ -98,45 +72,6 @@ use Webkit::Apache::HTMLResources ();
 
 use Webkit::OrgAdmin::Admin ();
 
-use Webkit::Player::App ();
-use Webkit::Player::Session ();
-use Webkit::Player::Installation ();
-use Webkit::Player::User ();
-use Webkit::Player::Account ();
-use Webkit::Player::OU ();
-use Webkit::Player::Keyword ();
-use Webkit::Player::PurchaseRecord ();
-use Webkit::Player::Invoice ();
-use Webkit::Player::SearchWord ();
-use Webkit::Player::Views ();
-use Webkit::Player::ActivityFeedback ();
-use Webkit::Player::BectaVocab ();
-use Webkit::Player::BectaVocabLink ();
-use Webkit::Player::TextEntry ();
-use Webkit::Player::AccountLink ();
-use Webkit::Player::Moderation ();
-use Webkit::Player::Log ();
-use Webkit::Player::Edubase ();
-
-use Webkit::SkillsAudit::Admin ();
-use Webkit::SkillsAudit::WebAdmin ();
-use Webkit::SkillsAudit::Org ();
-use Webkit::SkillsAudit::Answer ();
-use Webkit::SkillsAudit::Audit ();
-use Webkit::SkillsAudit::AuditTemplate ();
-use Webkit::SkillsAudit::Question ();
-use Webkit::SkillsAudit::QuestionGroup ();
-use Webkit::SkillsAudit::School ();
-use Webkit::SkillsAudit::Visitor ();
-use Webkit::SkillsAudit::VisitorSession ();
-
-use Webkit::SkillsAudit::QuestionTypes::MChoice ();
-use Webkit::SkillsAudit::QuestionTypes::Score ();
-use Webkit::SkillsAudit::QuestionTypes::Text ();
-use Webkit::SkillsAudit::QuestionTypes::Radio ();
-use Webkit::SkillsAudit::QuestionTypes::Resources ();
-use Webkit::SkillsAudit::QuestionTypes::Checkbox ();
-
 use Webkit::MyOffice2::Admin ();
 use Webkit::MyOffice2::Venue ();
 use Webkit::MyOffice2::Contact ();
@@ -164,10 +99,11 @@ BEGIN
 {
 	DBI->install_driver("mysql");
 
-	my $user = $ENV{MYSQL_USER};
-	my $password = $ENV{MYSQL_PASSWORD};
-
-	my $dbh = DBI->connect("dbi:mysql:webkit:localhost", $user, $password);
+	my $user = "";
+	my $password = "";
+	open (USERFILE, '/etc/myofficeuser.conf'); while (<USERFILE>) { chomp; $user = $_; } close (USERFILE);
+	open (PASSWORDFILE, '/etc/myofficepassword.conf'); while (<PASSWORDFILE>) { chomp; $password = $_; } close (PASSWORDFILE);
+	my $dbh = DBI->connect("dbi:mysql:webkit:mysql", $user, $password);
 	$dbh->disconnect if ($dbh);
 
 	Webkit::Apache::ApplicationHub->initialise_application_cache;
