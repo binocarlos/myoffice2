@@ -45,8 +45,13 @@ sub _init
 
 	$config->{sqldb} = 'webkit';
 
-	my $dsn = "dbi:mysql:$config->{sqldb}:localhost";	
-
+	my $dsn = "dbi:mysql:$config->{sqldb}:mysql";	
+	my $user = "";
+	my $password = "";
+	open (USERFILE, '/etc/myofficeuser.conf'); while (<USERFILE>) { chomp; $user = $_; } close (USERFILE);
+	open (PASSWORDFILE, '/etc/myofficepassword.conf'); while (<PASSWORDFILE>) { chomp; $password = $_; } close (PASSWORDFILE);
+	$config->{sqluser} = $user;
+	$config->{sqlpassword} = $password;
 	my $sqlattr = {	PrintError => 0,
 			AutoCommit => 1,
 			RaiseError => 1 };
