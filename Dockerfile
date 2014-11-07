@@ -47,8 +47,8 @@ RUN unlink /etc/apache2/mods-enabled/cgid.load
 RUN unlink /etc/apache2/mods-enabled/cgid.conf
 
 # Our start-up script
-#ADD . /home/webkitapps
-#ADD myoffice2.conf /etc/apache2/sites-enabled/myoffice2.conf
+ADD . /home/webkitapps
+ADD myoffice2.conf /etc/apache2/sites-enabled/myoffice2.conf
 
 ADD start.sh /start.sh
 RUN chmod a+x /start.sh
